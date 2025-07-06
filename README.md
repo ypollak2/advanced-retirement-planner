@@ -1,5 +1,7 @@
 # 📊 Advanced Retirement Planner
 
+Claude Artifact: https://claude.ai/public/artifacts/8074dc92-7cc5-4e78-9b81-3fa8ce84b37f
+
 Professional retirement planning tool with index returns, risk levels, and accurate tax calculations.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
