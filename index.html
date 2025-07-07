@@ -14,8 +14,8 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Recharts from CDN -->
-    <script src="https://unpkg.com/recharts@2/umd/Recharts.js"></script>
+    <!-- Chart.js - More reliable charting library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         body {
@@ -97,12 +97,12 @@
             console.log('Checking dependencies...');
             console.log('React:', typeof React);
             console.log('ReactDOM:', typeof ReactDOM);
-            console.log('Recharts:', typeof Recharts);
+            console.log('Chart:', typeof Chart);
             
             const missing = [];
             if (typeof React === 'undefined') missing.push('React');
             if (typeof ReactDOM === 'undefined') missing.push('ReactDOM');
-            if (typeof Recharts === 'undefined') missing.push('Recharts');
+            if (typeof Chart === 'undefined') missing.push('Chart.js');
             
             if (missing.length > 0) {
                 console.error('Missing dependencies:', missing);
@@ -151,7 +151,60 @@
         function initializeApp() {
             try {
                 const { useState, useEffect } = React;
-        const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } = Recharts;
+        
+        // Simple Chart component using Chart.js
+        const SimpleChart = ({ data, type = 'line' }) => {
+            const chartRef = React.useRef(null);
+            const chartInstance = React.useRef(null);
+            
+            React.useEffect(() => {
+                if (chartRef.current && data && data.length > 0) {
+                    const ctx = chartRef.current.getContext('2d');
+                    
+                    // Destroy existing chart
+                    if (chartInstance.current) {
+                        chartInstance.current.destroy();
+                    }
+                    
+                    const chartData = {
+                        labels: data.map(d => `Age ${d.age || d.name || d.year}`),
+                        datasets: [{
+                            label: 'Total Savings',
+                            data: data.map(d => d.totalSavings || d.value),
+                            borderColor: '#8B5CF6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            fill: true
+                        }]
+                    };
+                    
+                    chartInstance.current = new Chart(ctx, {
+                        type: type,
+                        data: chartData,
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Retirement Savings Progress'
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return '$' + (value / 1000).toFixed(0) + 'K';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }, [data, type]);
+            
+            return React.createElement('canvas', { ref: chartRef, style: { maxHeight: '400px' } });
+        };
         
         // Simple icon replacements using Unicode symbols
         const Calculator = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '🧮');
@@ -958,17 +1011,10 @@
                                 ),
                                 // Chart
                                 React.createElement('div', { className: "mt-6 h-64" },
-                                    React.createElement(ResponsiveContainer, { width: "100%", height: "100%" },
-                                        React.createElement(BarChart, { 
-                                            data: Object.entries(historicalReturns[selectedTimeHorizon]).map(([name, value]) => ({ name, value }))
-                                        }, [
-                                            React.createElement(CartesianGrid, { strokeDasharray: "3 3" }),
-                                            React.createElement(XAxis, { dataKey: "name", angle: -45, textAnchor: "end", height: 80, fontSize: 12 }),
-                                            React.createElement(YAxis, { label: { value: '%', angle: -90, position: 'insideLeft' } }),
-                                            React.createElement(Tooltip, { formatter: (value) => [`${value}%`, 'Annual Return'] }),
-                                            React.createElement(Bar, { dataKey: "value", fill: "#3B82F6" })
-                                        ])
-                                    )
+                                    React.createElement(SimpleChart, { 
+                                        data: Object.entries(historicalReturns[selectedTimeHorizon]).map(([name, value]) => ({ name, value })),
+                                        type: 'bar'
+                                    })
                                 )
                             ])
                         ]),
@@ -1094,82 +1140,10 @@
                             t.progressChart
                         ]),
                         React.createElement('div', { className: "h-96 mb-4" },
-                            React.createElement(ResponsiveContainer, { width: "100%", height: "100%" },
-                                React.createElement(LineChart, {
-                                    data: chartData,
-                                    margin: { top: 20, right: 30, left: 60, bottom: 20 }
-                                }, [
-                                    React.createElement(CartesianGrid, { strokeDasharray: "3 3", stroke: "#e2e8f0" }),
-                                    React.createElement(XAxis, {
-                                        dataKey: "age",
-                                        label: { value: "Age", position: "insideBottom", offset: -10 }
-                                    }),
-                                    React.createElement(YAxis, {
-                                        tickFormatter: (value) => `$${(value / 1000).toFixed(0)}K`,
-                                        label: {
-                                            value: "Savings (in thousands $)",
-                                            angle: -90,
-                                            position: "insideLeft",
-                                            style: { textAnchor: "middle" }
-                                        },
-                                        width: 80
-                                    }),
-                                    React.createElement(Tooltip, {
-                                        formatter: (value, name) => [
-                                            formatCurrency(value),
-                                            name === 'pensionSavings' ? 'Pension' :
-                                            name === 'trainingFund' ? 'Training Fund' :
-                                            name === 'totalSavings' ? 'Total Nominal' :
-                                            name === 'inflationAdjusted' ? 'Inflation Adjusted' : name
-                                        ],
-                                        labelFormatter: (label) => `Age ${label}`,
-                                        contentStyle: {
-                                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                                            border: '1px solid #ccc',
-                                            borderRadius: '8px',
-                                            fontSize: '14px'
-                                        }
-                                    }),
-                                    React.createElement(Legend),
-                                    React.createElement(Line, {
-                                        type: "monotone",
-                                        dataKey: "pensionSavings",
-                                        stroke: "#3B82F6",
-                                        strokeWidth: 3,
-                                        name: "Pension",
-                                        dot: { fill: "#3B82F6", strokeWidth: 2, r: 4 },
-                                        activeDot: { r: 6, stroke: "#3B82F6", strokeWidth: 2 }
-                                    }),
-                                    React.createElement(Line, {
-                                        type: "monotone",
-                                        dataKey: "trainingFund",
-                                        stroke: "#10B981",
-                                        strokeWidth: 3,
-                                        name: "Training Fund",
-                                        dot: { fill: "#10B981", strokeWidth: 2, r: 4 },
-                                        activeDot: { r: 6, stroke: "#10B981", strokeWidth: 2 }
-                                    }),
-                                    React.createElement(Line, {
-                                        type: "monotone",
-                                        dataKey: "totalSavings",
-                                        stroke: "#8B5CF6",
-                                        strokeWidth: 4,
-                                        name: "Total Nominal",
-                                        dot: { fill: "#8B5CF6", strokeWidth: 2, r: 5 },
-                                        activeDot: { r: 7, stroke: "#8B5CF6", strokeWidth: 2 }
-                                    }),
-                                    React.createElement(Line, {
-                                        type: "monotone",
-                                        dataKey: "inflationAdjusted",
-                                        stroke: "#F59E0B",
-                                        strokeWidth: 3,
-                                        strokeDasharray: "5 5",
-                                        name: "Inflation Adjusted",
-                                        dot: { fill: "#F59E0B", strokeWidth: 2, r: 4 },
-                                        activeDot: { r: 6, stroke: "#F59E0B", strokeWidth: 2 }
-                                    })
-                                ])
-                            )
+                            React.createElement(SimpleChart, { 
+                                data: chartData,
+                                type: 'line'
+                            })
                         ),
                         React.createElement('div', { className: "bg-gray-50 rounded-lg p-4" }, [
                             React.createElement('div', { className: "grid md:grid-cols-2 gap-4 text-sm" }, [
