@@ -317,97 +317,85 @@
             const [showChart, setShowChart] = useState(false);
             const [selectedTimeHorizon, setSelectedTimeHorizon] = useState(20);
 
-            // Historical index returns data
+            // Historical index returns data (Updated with more accurate Israeli data)
             const historicalReturns = {
                 5: {
-                    'S&P 500': 12.8,
-                    'NASDAQ': 14.2,
-                    'MSCI World': 10.4,
-                    'Dow Jones': 11.9,
-                    'Tel Aviv 35': 8.5,
-                    'Tel Aviv 125': 7.8,
-                    'EUR STOXX 50': 7.2,
-                    'FTSE 100': 6.8,
-                    'Nikkei 225': 5.9,
-                    'Local Index Fund': 6.2,
-                    'Government Bonds': 4.1,
-                    'Corporate Bonds': 5.3,
-                    'Real Estate': 8.9
+                    'ת"א 35': 8.2,
+                    'ת"א 125': 7.5,
+                    'S&P 500': 10.5,
+                    'NASDAQ': 12.1,
+                    'MSCI World': 8.8,
+                    'יורו סטוקס 50': 6.4,
+                    'FTSE 100': 5.9,
+                    'ניקיי 225': 7.2,
+                    'אג״ח ממשלתיות': 3.8,
+                    'אג״ח קונצרניות': 4.5,
+                    'נדל״ן': 7.8
                 },
                 10: {
-                    'S&P 500': 11.3,
-                    'NASDAQ': 12.7,
-                    'MSCI World': 9.1,
-                    'Dow Jones': 10.8,
-                    'Tel Aviv 35': 7.8,
-                    'Tel Aviv 125': 7.2,
-                    'EUR STOXX 50': 6.9,
-                    'FTSE 100': 6.2,
-                    'Nikkei 225': 8.4,
-                    'Local Index Fund': 5.9,
-                    'Government Bonds': 3.8,
-                    'Corporate Bonds': 4.9,
-                    'Real Estate': 8.1
+                    'ת"א 35': 7.1,
+                    'ת"א 125': 6.8,
+                    'S&P 500': 9.8,
+                    'NASDAQ': 11.2,
+                    'MSCI World': 8.1,
+                    'יורו סטוקס 50': 5.9,
+                    'FTSE 100': 5.2,
+                    'ניקיי 225': 6.8,
+                    'אג״ח ממשלתיות': 3.2,
+                    'אג״ח קונצרניות': 4.1,
+                    'נדל״ן': 7.2
                 },
                 15: {
-                    'S&P 500': 10.8,
-                    'NASDAQ': 11.9,
-                    'MSCI World': 8.7,
-                    'Dow Jones': 10.2,
-                    'Tel Aviv 35': 7.3,
-                    'Tel Aviv 125': 6.8,
-                    'EUR STOXX 50': 6.1,
-                    'FTSE 100': 5.9,
-                    'Nikkei 225': 6.7,
-                    'Local Index Fund': 5.6,
-                    'Government Bonds': 3.5,
-                    'Corporate Bonds': 4.6,
-                    'Real Estate': 7.4
+                    'ת"א 35': 6.8,
+                    'ת"א 125': 6.4,
+                    'S&P 500': 9.2,
+                    'NASDAQ': 10.5,
+                    'MSCI World': 7.6,
+                    'יורו סטוקס 50': 5.4,
+                    'FTSE 100': 4.8,
+                    'ניקיי 225': 5.9,
+                    'אג״ח ממשלתיות': 2.8,
+                    'אג״ח קונצרניות': 3.8,
+                    'נדל״ן': 6.9
                 },
                 20: {
-                    'S&P 500': 10.2,
-                    'NASDAQ': 11.1,
-                    'MSCI World': 8.2,
-                    'Dow Jones': 9.8,
-                    'Tel Aviv 35': 6.9,
-                    'Tel Aviv 125': 6.4,
-                    'EUR STOXX 50': 5.8,
-                    'FTSE 100': 5.4,
-                    'Nikkei 225': 4.9,
-                    'Local Index Fund': 5.3,
-                    'Government Bonds': 3.2,
-                    'Corporate Bonds': 4.3,
-                    'Real Estate': 7.0
+                    'ת"א 35': 6.5,
+                    'ת"א 125': 6.1,
+                    'S&P 500': 8.8,
+                    'NASDAQ': 9.9,
+                    'MSCI World': 7.2,
+                    'יורו סטוקס 50': 5.1,
+                    'FTSE 100': 4.4,
+                    'ניקיי 225': 4.2,
+                    'אג״ח ממשלתיות': 2.5,
+                    'אג״ח קונצרניות': 3.5,
+                    'נדל״ן': 6.5
                 },
                 25: {
-                    'S&P 500': 9.8,
-                    'NASDAQ': 10.6,
-                    'MSCI World': 7.9,
-                    'Dow Jones': 9.4,
-                    'Tel Aviv 35': 6.5,
-                    'Tel Aviv 125': 6.1,
-                    'EUR STOXX 50': 5.5,
-                    'FTSE 100': 5.1,
-                    'Nikkei 225': 4.2,
-                    'Local Index Fund': 5.0,
-                    'Government Bonds': 2.9,
-                    'Corporate Bonds': 4.0,
-                    'Real Estate': 6.7
+                    'ת"א 35': 6.2,
+                    'ת"א 125': 5.9,
+                    'S&P 500': 8.5,
+                    'NASDAQ': 9.6,
+                    'MSCI World': 6.9,
+                    'יורו סטוקס 50': 4.8,
+                    'FTSE 100': 4.1,
+                    'ניקיי 225': 3.8,
+                    'אג״ח ממשלתיות': 2.2,
+                    'אג״ח קונצרניות': 3.2,
+                    'נדל״ן': 6.2
                 },
                 30: {
-                    'S&P 500': 9.5,
-                    'NASDAQ': 10.2,
-                    'MSCI World': 7.6,
-                    'Dow Jones': 9.1,
-                    'Tel Aviv 35': 6.2,
-                    'Tel Aviv 125': 5.8,
-                    'EUR STOXX 50': 5.2,
-                    'FTSE 100': 4.8,
-                    'Nikkei 225': 3.8,
-                    'Local Index Fund': 4.7,
-                    'Government Bonds': 2.6,
-                    'Corporate Bonds': 3.7,
-                    'Real Estate': 6.4
+                    'ת"א 35': 5.9,
+                    'ת"א 125': 5.6,
+                    'S&P 500': 8.2,
+                    'NASDAQ': 9.3,
+                    'MSCI World': 6.6,
+                    'יורו סטוקס 50': 4.5,
+                    'FTSE 100': 3.8,
+                    'ניקיי 225': 3.5,
+                    'אג״ח ממשלתיות': 1.9,
+                    'אג״ח קונצרניות': 2.9,
+                    'נדל״ן': 5.9
                 }
             };
 
@@ -920,7 +908,8 @@
                                         ]),
                                         React.createElement('div', { className: "grid grid-cols-2 gap-4" }, [
                                             React.createElement('div', null, [
-                                                React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, t.currentSavings),
+                                                React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                    language === 'he' ? "חיסכון נוכחי בפנסיה (₪)" : "Current Pension Savings (₪)"),
                                                 React.createElement('input', {
                                                     type: 'number',
                                                     value: inputs.currentSavings,
@@ -929,7 +918,8 @@
                                                 })
                                             ]),
                                             React.createElement('div', null, [
-                                                React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, t.inflationRate),
+                                                React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                    language === 'he' ? "אינפלציה שנתית (%)" : "Annual Inflation (%)"),
                                                 React.createElement('input', {
                                                     type: 'number',
                                                     step: '0.1',
@@ -937,6 +927,58 @@
                                                     onChange: (e) => setInputs({...inputs, inflationRate: parseFloat(e.target.value) || 0}),
                                                     className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                                                 })
+                                            ])
+                                        ])
+                                    ])
+                                ]),
+                                
+                                // Training Fund Section
+                                React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
+                                    React.createElement('h2', { className: "text-2xl font-bold text-green-700 mb-6 flex items-center" }, [
+                                        React.createElement(PiggyBank, { className: "mr-2" }),
+                                        language === 'he' ? "קרן השתלמות" : "Training Fund"
+                                    ]),
+                                    React.createElement('div', { className: "space-y-4" }, [
+                                        React.createElement('div', { className: "grid grid-cols-2 gap-4" }, [
+                                            React.createElement('div', null, [
+                                                React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                    language === 'he' ? "יתרה נוכחית בקרן השתלמות (₪)" : "Current Training Fund Balance (₪)"),
+                                                React.createElement('input', {
+                                                    type: 'number',
+                                                    value: inputs.currentTrainingFund,
+                                                    onChange: (e) => setInputs({...inputs, currentTrainingFund: parseInt(e.target.value) || 0}),
+                                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                                })
+                                            ]),
+                                            React.createElement('div', null, [
+                                                React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                    language === 'he' ? "תשואה שנתית קרן השתלמות (%)" : "Training Fund Annual Return (%)"),
+                                                React.createElement('input', {
+                                                    type: 'number',
+                                                    step: '0.1',
+                                                    value: inputs.trainingFundReturn,
+                                                    onChange: (e) => setInputs({...inputs, trainingFundReturn: parseFloat(e.target.value) || 0}),
+                                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                                })
+                                            ])
+                                        ]),
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "דמי ניהול על הצבירה (%)" : "Management Fee on Accumulation (%)"),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                step: '0.1',
+                                                value: inputs.trainingFundManagementFee,
+                                                onChange: (e) => setInputs({...inputs, trainingFundManagementFee: parseFloat(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                            })
+                                        ]),
+                                        React.createElement('div', { className: "bg-green-50 rounded-lg p-3 border border-green-200" }, [
+                                            React.createElement('div', { className: "text-sm text-green-700" }, [
+                                                React.createElement('strong', null, 
+                                                    language === 'he' ? "תשואה נטו:" : "Net Return:"),
+                                                React.createElement('span', { className: "ml-2 font-bold text-lg" }, 
+                                                    `${(inputs.trainingFundReturn - inputs.trainingFundManagementFee).toFixed(2)}%`)
                                             ])
                                         ])
                                     ])
@@ -1002,7 +1044,8 @@
                                                 ]),
                                                 React.createElement('div', { className: "grid grid-cols-2 gap-3" }, [
                                                     React.createElement('div', null, [
-                                                        React.createElement('label', { className: "block text-xs font-medium text-gray-600 mb-1" }, "Monthly Contribution ($)"),
+                                                        React.createElement('label', { className: "block text-xs font-medium text-gray-600 mb-1" }, 
+                                                            language === 'he' ? "הפקדה חודשית לפנסיה (₪)" : "Monthly Pension Contribution (₪)"),
                                                         React.createElement('input', {
                                                             type: 'number',
                                                             value: period.monthlyContribution,
@@ -1011,13 +1054,69 @@
                                                         })
                                                     ]),
                                                     React.createElement('div', null, [
-                                                        React.createElement('label', { className: "block text-xs font-medium text-gray-600 mb-1" }, "Salary ($)"),
+                                                        React.createElement('label', { className: "block text-xs font-medium text-gray-600 mb-1" }, 
+                                                            language === 'he' ? "משכורת (₪)" : "Salary (₪)"),
                                                         React.createElement('input', {
                                                             type: 'number',
                                                             value: period.salary,
                                                             onChange: (e) => updateWorkPeriod(period.id, 'salary', parseInt(e.target.value) || 0),
                                                             className: "w-full p-2 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"
                                                         })
+                                                    ])
+                                                ]),
+                                                React.createElement('div', { className: "bg-blue-50 rounded-lg p-3 mt-3" }, [
+                                                    React.createElement('h4', { className: "text-sm font-bold text-blue-800 mb-2" }, 
+                                                        language === 'he' ? "פרטי פנסיה" : "Pension Details"),
+                                                    React.createElement('div', { className: "grid grid-cols-2 gap-2" }, [
+                                                        React.createElement('div', null, [
+                                                            React.createElement('label', { className: "block text-xs font-medium text-gray-600 mb-1" }, 
+                                                                language === 'he' ? "תשואה שנתית פנסיה (%)" : "Pension Annual Return (%)"),
+                                                            React.createElement('input', {
+                                                                type: 'number',
+                                                                step: '0.1',
+                                                                value: period.pensionReturn,
+                                                                onChange: (e) => updateWorkPeriod(period.id, 'pensionReturn', parseFloat(e.target.value) || 0),
+                                                                className: "w-full p-2 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"
+                                                            })
+                                                        ]),
+                                                        React.createElement('div', null, [
+                                                            React.createElement('label', { className: "block text-xs font-medium text-gray-600 mb-1" }, 
+                                                                language === 'he' ? "דמי ניהול על הפקדות (%)" : "Deposit Management Fee (%)"),
+                                                            React.createElement('input', {
+                                                                type: 'number',
+                                                                step: '0.1',
+                                                                value: period.pensionDepositFee,
+                                                                onChange: (e) => updateWorkPeriod(period.id, 'pensionDepositFee', parseFloat(e.target.value) || 0),
+                                                                className: "w-full p-2 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"
+                                                            })
+                                                        ]),
+                                                        React.createElement('div', null, [
+                                                            React.createElement('label', { className: "block text-xs font-medium text-gray-600 mb-1" }, 
+                                                                language === 'he' ? "דמי ניהול על צבירה (%)" : "Accumulation Management Fee (%)"),
+                                                            React.createElement('input', {
+                                                                type: 'number',
+                                                                step: '0.1',
+                                                                value: period.pensionAnnualFee,
+                                                                onChange: (e) => updateWorkPeriod(period.id, 'pensionAnnualFee', parseFloat(e.target.value) || 0),
+                                                                className: "w-full p-2 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"
+                                                            })
+                                                        ]),
+                                                        React.createElement('div', null, [
+                                                            React.createElement('label', { className: "block text-xs font-medium text-gray-600 mb-1" }, 
+                                                                language === 'he' ? "הפקדה חודשית לקרן השתלמות (₪)" : "Monthly Training Fund (₪)"),
+                                                            React.createElement('input', {
+                                                                type: 'number',
+                                                                value: period.monthlyTrainingFund,
+                                                                onChange: (e) => updateWorkPeriod(period.id, 'monthlyTrainingFund', parseInt(e.target.value) || 0),
+                                                                className: "w-full p-2 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500"
+                                                            })
+                                                        ])
+                                                    ]),
+                                                    React.createElement('div', { className: "mt-2 p-2 bg-blue-100 rounded text-xs text-blue-700" }, [
+                                                        React.createElement('strong', null, 
+                                                            language === 'he' ? "תשואה אפקטיבית: " : "Effective Return: "),
+                                                        React.createElement('span', { className: "font-bold" }, 
+                                                            `${(period.pensionReturn - period.pensionAnnualFee).toFixed(2)}%`)
                                                     ])
                                                 ])
                                             ])
