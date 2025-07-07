@@ -1630,25 +1630,65 @@
                 dir: language === 'he' ? 'rtl' : 'ltr'
             }, [
                 React.createElement('div', { className: "max-w-7xl mx-auto" }, [
-                    // Header
-                    React.createElement('div', { className: "text-center mb-8 animate-fade-in" }, [
-                        React.createElement('div', { className: "flex justify-center items-center gap-4 mb-4" }, [
-                            React.createElement('div', { className: "flex items-center gap-3" }, [
-                                React.createElement('h1', { 
-                                    className: "text-4xl font-bold bg-gradient-to-r from-purple-800 to-blue-800 bg-clip-text text-transparent"
-                                }, t.title)
-                            ]),
+                    // Header - Premium Design
+                    React.createElement('div', { className: "relative text-center mb-12 animate-fade-in" }, [
+                        // Background decoration
+                        React.createElement('div', { 
+                            className: "absolute inset-0 bg-gradient-to-r from-purple-100/30 via-blue-100/30 to-indigo-100/30 rounded-3xl blur-3xl -z-10" 
+                        }),
+                        
+                        // Main header container
+                        React.createElement('div', { className: "relative bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/50 p-8 mx-auto max-w-4xl" }, [
+                            // Top decorative line
+                            React.createElement('div', { className: "w-20 h-1 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 rounded-full mx-auto mb-6" }),
+                            
+                            // Language toggle - floating top right
                             React.createElement('button', {
                                 onClick: () => setLanguage(language === 'he' ? 'en' : 'he'),
-                                className: "bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2 rounded-lg flex items-center hover:from-purple-600 hover:to-blue-600 transition-all duration-300 shadow-lg"
+                                className: "absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-3 py-2 rounded-full flex items-center hover:from-purple-600 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                             }, [
-                                React.createElement(Languages, { size: 20, className: "mr-2" }),
-                                language === 'he' ? 'English' : 'עברית'
+                                React.createElement(Languages, { size: 16, className: "mr-1" }),
+                                React.createElement('span', { className: "text-sm font-medium" }, 
+                                    language === 'he' ? 'EN' : 'עב')
+                            ]),
+                            
+                            // Main title with elegant styling
+                            React.createElement('div', { className: "mb-6" }, [
+                                React.createElement('h1', { 
+                                    className: "text-5xl md:text-6xl font-black tracking-tight mb-2",
+                                    style: {
+                                        background: 'linear-gradient(135deg, #1e293b 0%, #3730a3 25%, #1e40af 50%, #7c3aed 75%, #1e293b 100%)',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                        backgroundClip: 'text',
+                                        textShadow: '0 4px 20px rgba(0,0,0,0.1)'
+                                    }
+                                }, t.title),
+                                
+                                // Elegant underline
+                                React.createElement('div', { className: "w-32 h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent mx-auto mb-4" })
+                            ]),
+                            
+                            // Subtitle with premium styling
+                            React.createElement('p', { 
+                                className: "text-lg md:text-xl text-gray-600 font-light tracking-wide leading-relaxed max-w-2xl mx-auto mb-6",
+                                style: { fontFamily: "'Inter', 'Segoe UI', sans-serif" }
+                            }, t.subtitle),
+                            
+                            // Professional badge/tagline
+                            React.createElement('div', { className: "inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-50 to-blue-50 rounded-full border border-purple-200/50" }, [
+                                React.createElement('div', { className: "w-2 h-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mr-2 animate-pulse" }),
+                                React.createElement('span', { className: "text-sm font-medium text-gray-700" }, 
+                                    language === 'he' ? "פתרון מקצועי לתכנון פיננסי מתקדם" : "Professional Advanced Financial Planning Solution")
+                            ]),
+                            
+                            // Bottom decorative element
+                            React.createElement('div', { className: "mt-6 flex justify-center space-x-1" }, [
+                                React.createElement('div', { className: "w-2 h-2 bg-purple-400 rounded-full animate-pulse", style: { animationDelay: '0ms' } }),
+                                React.createElement('div', { className: "w-2 h-2 bg-blue-400 rounded-full animate-pulse", style: { animationDelay: '150ms' } }),
+                                React.createElement('div', { className: "w-2 h-2 bg-indigo-400 rounded-full animate-pulse", style: { animationDelay: '300ms' } })
                             ])
                         ]),
-                        React.createElement('p', { 
-                            className: "text-lg text-gray-600 mb-6" 
-                        }, t.subtitle),
                         
                         // Tabs
                         React.createElement('div', { className: "flex justify-center space-x-1 bg-white rounded-xl p-1 shadow-lg max-w-3xl mx-auto" }, [
