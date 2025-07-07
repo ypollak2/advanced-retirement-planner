@@ -1199,7 +1199,8 @@
                 const remainingAfterExpenses = totalNetIncome - futureMonthlyExpenses;
 
                 const currentSalary = workPeriods.length > 0 ? workPeriods[workPeriods.length - 1].salary : 0;
-                const targetMonthlyIncome = (currentSalary * inputs.targetReplacement) / 100;
+                const futureTargetSalary = currentSalary * Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement);
+                const targetMonthlyIncome = (futureTargetSalary * inputs.targetReplacement) / 100;
                 const achievesTarget = totalNetIncome >= targetMonthlyIncome;
 
                 setResults({
@@ -1236,8 +1237,10 @@
                     remainingAfterExpenses: Math.round(remainingAfterExpenses),
                     remainingAfterExpensesInflationAdjusted: Math.round(remainingAfterExpenses / Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement)),
                     targetMonthlyIncome: Math.round(targetMonthlyIncome),
+                    targetMonthlyIncomeInflationAdjusted: Math.round(targetMonthlyIncome / Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement)),
                     achievesTarget: achievesTarget,
                     targetGap: Math.round(targetMonthlyIncome - totalNetIncome),
+                    targetGapInflationAdjusted: Math.round((targetMonthlyIncome - totalNetIncome) / Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement)),
                     riskLevel: inputs.riskTolerance,
                     riskMultiplier: riskScenarios[inputs.riskTolerance]?.multiplier || 1.0
                 });
@@ -1554,8 +1557,8 @@
                 } else {
                     insights.push(
                         language === 'he' 
-                            ? `⚠️ יש פער של ${formatCurrency(results.targetGap)} מהיעד החודשי שלך. שקול להגדיל הפקדות או לדחות את גיל הפרישה.`
-                            : `⚠️ There's a ${formatCurrency(results.targetGap)} monthly gap from your target. Consider increasing contributions or delaying retirement age.`
+                            ? `⚠️ יש פער של ${formatCurrency(results.targetGap)} (${formatCurrency(results.targetGapInflationAdjusted)} בכוח קנייה של היום) מהיעד החודשי שלך. שקול להגדיל הפקדות או לדחות את גיל הפרישה.`
+                            : `⚠️ There's a ${formatCurrency(results.targetGap)} (${formatCurrency(results.targetGapInflationAdjusted)} in today's purchasing power) monthly gap from your target. Consider increasing contributions or delaying retirement age.`
                     );
                 }
 
@@ -1563,14 +1566,14 @@
                 if (results.remainingAfterExpenses >= 0) {
                     insights.push(
                         language === 'he' 
-                            ? `💰 אחרי כיסוי ההוצאות הצפויות, תישאר עם עודף חודשי של ${formatCurrency(results.remainingAfterExpenses)}, שמאפשר גמישות פיננסית ביטחון נוסף.`
-                            : `💰 After covering expected expenses, you'll have a monthly surplus of ${formatCurrency(results.remainingAfterExpenses)}, providing financial flexibility and extra security.`
+                            ? `💰 אחרי כיסוי ההוצאות הצפויות, תישאר עם עודף חודשי של ${formatCurrency(results.remainingAfterExpenses)} (${formatCurrency(results.remainingAfterExpensesInflationAdjusted)} בכוח קנייה של היום), שמאפשר גמישות פיננסית ביטחון נוסף.`
+                            : `💰 After covering expected expenses, you'll have a monthly surplus of ${formatCurrency(results.remainingAfterExpenses)} (${formatCurrency(results.remainingAfterExpensesInflationAdjusted)} in today's purchasing power), providing financial flexibility and extra security.`
                     );
                 } else {
                     insights.push(
                         language === 'he' 
-                            ? `🔴 ההוצאות הצפויות עולות על ההכנסה הצפויה ב-${formatCurrency(Math.abs(results.remainingAfterExpenses))} לחודש. חשוב לתכנן מחדש.`
-                            : `🔴 Expected expenses exceed projected income by ${formatCurrency(Math.abs(results.remainingAfterExpenses))} monthly. Important to replan.`
+                            ? `🔴 ההוצאות הצפויות עולות על ההכנסה הצפויה ב-${formatCurrency(Math.abs(results.remainingAfterExpenses))} (${formatCurrency(Math.abs(results.remainingAfterExpensesInflationAdjusted))} בכוח קנייה של היום) לחודש. חשוב לתכנן מחדש.`
+                            : `🔴 Expected expenses exceed projected income by ${formatCurrency(Math.abs(results.remainingAfterExpenses))} (${formatCurrency(Math.abs(results.remainingAfterExpensesInflationAdjusted))} in today's purchasing power) monthly. Important to replan.`
                     );
                 }
 
@@ -2864,11 +2867,19 @@
                                                 : 'bg-yellow-50 border-yellow-200'
                                         }`
                                     }, [
-                                        React.createElement('div', { className: "flex justify-between items-center mb-2" }, [
-                                            React.createElement('span', { className: "font-medium" }, 
-                                                language === 'he' ? `יעד החלפת ${inputs.targetReplacement}% ממשכורת:` : `Target ${inputs.targetReplacement}% salary replacement:`),
-                                            React.createElement('span', { className: "font-bold currency-format" }, 
-                                                formatCurrency(results.targetMonthlyIncome))
+                                        React.createElement('div', { className: "space-y-1 mb-2" }, [
+                                            React.createElement('div', { className: "flex justify-between items-center" }, [
+                                                React.createElement('span', { className: "font-medium" }, 
+                                                    language === 'he' ? `יעד החלפת ${inputs.targetReplacement}% ממשכורת:` : `Target ${inputs.targetReplacement}% salary replacement:`),
+                                                React.createElement('span', { className: "font-bold currency-format" }, 
+                                                    formatCurrency(results.targetMonthlyIncome))
+                                            ]),
+                                            React.createElement('div', { className: "flex justify-between items-center text-sm text-gray-600" }, [
+                                                React.createElement('span', null, 
+                                                    language === 'he' ? "(בכוח קנייה של היום):" : "(in today's purchasing power):"),
+                                                React.createElement('span', { className: "font-semibold currency-format" }, 
+                                                    formatCurrency(results.targetMonthlyIncomeInflationAdjusted))
+                                            ])
                                         ]),
                                         React.createElement('div', { className: "flex justify-between items-center mb-2" }, [
                                             React.createElement('span', { className: "font-medium" }, 
@@ -2877,18 +2888,31 @@
                                                 formatCurrency(results.totalNetIncome))
                                         ]),
                                         React.createElement('hr', { className: "my-2 border-gray-300" }),
-                                        React.createElement('div', { className: "flex justify-between items-center" }, [
-                                            React.createElement('span', { className: "font-bold text-lg" }, 
-                                                results.achievesTarget 
-                                                    ? (language === 'he' ? "✅ היעד מושג! עודף:" : "✅ Target achieved! Surplus:")
-                                                    : (language === 'he' ? "⚠️ פער מהיעד:" : "⚠️ Gap from target:")),
-                                            React.createElement('span', { 
-                                                className: `font-bold text-xl currency-format ${
-                                                    results.achievesTarget ? 'text-green-700' : 'text-yellow-700'
-                                                }`
-                                            }, results.achievesTarget 
-                                                ? formatCurrency(-results.targetGap)
-                                                : formatCurrency(results.targetGap))
+                                        React.createElement('div', { className: "space-y-1" }, [
+                                            React.createElement('div', { className: "flex justify-between items-center" }, [
+                                                React.createElement('span', { className: "font-bold text-lg" }, 
+                                                    results.achievesTarget 
+                                                        ? (language === 'he' ? "✅ היעד מושג! עודף:" : "✅ Target achieved! Surplus:")
+                                                        : (language === 'he' ? "⚠️ פער מהיעד:" : "⚠️ Gap from target:")),
+                                                React.createElement('span', { 
+                                                    className: `font-bold text-xl currency-format ${
+                                                        results.achievesTarget ? 'text-green-700' : 'text-yellow-700'
+                                                    }`
+                                                }, results.achievesTarget 
+                                                    ? formatCurrency(-results.targetGap)
+                                                    : formatCurrency(results.targetGap))
+                                            ]),
+                                            React.createElement('div', { className: "flex justify-between items-center text-sm" }, [
+                                                React.createElement('span', { className: "text-gray-600" }, 
+                                                    language === 'he' ? "(בכוח קנייה של היום):" : "(in today's purchasing power):"),
+                                                React.createElement('span', { 
+                                                    className: `font-semibold currency-format ${
+                                                        results.achievesTarget ? 'text-green-600' : 'text-yellow-600'
+                                                    }`
+                                                }, results.achievesTarget 
+                                                    ? formatCurrency(-results.targetGapInflationAdjusted)
+                                                    : formatCurrency(results.targetGapInflationAdjusted))
+                                            ])
                                         ])
                                     ]),
                                     
@@ -2896,19 +2920,23 @@
                                     React.createElement('div', { className: "bg-gray-50 rounded-lg p-4" }, [
                                         React.createElement('h4', { className: "font-bold text-gray-800 mb-2" }, 
                                             language === 'he' ? "💡 תובנות מרכזיות:" : "💡 Key Insights:"),
-                                        React.createElement('ul', { className: "space-y-1 text-sm text-gray-700" }, [
+                                        React.createElement('ul', { className: "space-y-2 text-sm text-gray-700" }, [
+                                            React.createElement('li', { className: "bg-blue-50 p-2 rounded border-l-4 border-blue-400" }, 
+                                                language === 'he' 
+                                                    ? `📊 השפעת אינפלציה: הכנסה של ${formatCurrency(results.totalNetIncome)} תהיה שווה ${formatCurrency(results.inflationAdjustedIncome)} בכוח קנייה של היום`
+                                                    : `📊 Inflation impact: Income of ${formatCurrency(results.totalNetIncome)} equals ${formatCurrency(results.inflationAdjustedIncome)} in today's purchasing power`),
                                             React.createElement('li', null, 
                                                 language === 'he' 
-                                                    ? `• כוח קנייה בפועל (כיום): ${formatCurrency(results.remainingAfterExpensesInflationAdjusted)}`
-                                                    : `• Real purchasing power (today's value): ${formatCurrency(results.remainingAfterExpensesInflationAdjusted)}`),
+                                                    ? `• עודף/גירעון אחרי הוצאות (בכוח קנייה של היום): ${formatCurrency(results.remainingAfterExpensesInflationAdjusted)}`
+                                                    : `• Surplus/deficit after expenses (today's purchasing power): ${formatCurrency(results.remainingAfterExpensesInflationAdjusted)}`),
                                             React.createElement('li', null, 
                                                 language === 'he' 
-                                                    ? `• אחוז החלפה בפועל: ${Math.round((results.totalNetIncome / (workPeriods[workPeriods.length - 1]?.salary || 1)) * 100)}%`
-                                                    : `• Actual replacement ratio: ${Math.round((results.totalNetIncome / (workPeriods[workPeriods.length - 1]?.salary || 1)) * 100)}%`),
-                                            results.remainingAfterExpenses < 0 && React.createElement('li', { className: "text-red-600 font-medium" }, 
+                                                    ? `• אחוז החלפה נומינלי: ${Math.round((results.totalNetIncome / (workPeriods[workPeriods.length - 1]?.salary || 1)) * 100)}% | בכוח קנייה של היום: ${Math.round((results.inflationAdjustedIncome / (workPeriods[workPeriods.length - 1]?.salary || 1)) * 100)}%`
+                                                    : `• Replacement ratio nominal: ${Math.round((results.totalNetIncome / (workPeriods[workPeriods.length - 1]?.salary || 1)) * 100)}% | Today's purchasing power: ${Math.round((results.inflationAdjustedIncome / (workPeriods[workPeriods.length - 1]?.salary || 1)) * 100)}%`),
+                                            results.remainingAfterExpenses < 0 && React.createElement('li', { className: "text-red-600 font-medium bg-red-50 p-2 rounded" }, 
                                                 language === 'he' 
-                                                    ? "• נדרש להגדיל הפקדות או להקטין הוצאות צפויות"
-                                                    : "• Consider increasing contributions or reducing expected expenses")
+                                                    ? "⚠️ נדרש להגדיל הפקדות או להקטין הוצאות צפויות"
+                                                    : "⚠️ Consider increasing contributions or reducing expected expenses")
                                         ])
                                     ])
                                 ])
