@@ -474,8 +474,51 @@
             const [claudeInsights, setClaudeInsights] = useState(null);
             const [selectedTimeHorizon, setSelectedTimeHorizon] = useState(20);
 
-            // Real-time index data state - starts empty, loaded from APIs
-            const [historicalReturns, setHistoricalReturns] = useState({});
+            // Real-time index data state - starts with fallback, then updated from APIs
+            const [historicalReturns, setHistoricalReturns] = useState({
+                5: {
+                    'ת"א 35': 8.2, 'ת"א 125': 7.5, 'S&P 500': 10.5, 'NASDAQ': 12.1,
+                    'MSCI World': 8.8, 'יורו סטוקס 50': 6.4, 'FTSE 100': 5.9,
+                    'ניקיי 225': 7.2, 'אג״ח ממשלתיות': 3.8, 'אג״ח קונצרניות': 4.5,
+                    'נדל״ן ארה״ב': 7.8, 'נדל״ן ישראל': 9.2, 'נדל״ן אירופה': 6.5, 
+                    'נדל״ן עולמי': 7.3, 'נדל״ן אסיה': 8.1
+                },
+                10: {
+                    'ת"א 35': 7.1, 'ת"א 125': 6.8, 'S&P 500': 9.8, 'NASDAQ': 11.2,
+                    'MSCI World': 8.1, 'יורו סטוקס 50': 5.9, 'FTSE 100': 5.2,
+                    'ניקיי 225': 6.8, 'אג״ח ממשלתיות': 3.2, 'אג״ח קונצרניות': 4.1,
+                    'נדל״ן ארה״ב': 7.2, 'נדל״ן ישראל': 8.5, 'נדל״ן אירופה': 5.8,
+                    'נדל״ן עולמי': 6.9, 'נדל״ן אסיה': 7.4
+                },
+                15: {
+                    'ת"א 35': 6.8, 'ת"א 125': 6.5, 'S&P 500': 9.4, 'NASDAQ': 10.2,
+                    'MSCI World': 7.8, 'יורו סטוקס 50': 5.8, 'FTSE 100': 5.3,
+                    'ניקיי 225': 6.2, 'אג״ח ממשלתיות': 3.5, 'אג״ח קונצרניות': 4.1,
+                    'נדל״ן ארה״ב': 6.8, 'נדל״ן ישראל': 8.0, 'נדל״ן אירופה': 5.5,
+                    'נדל״ן עולמי': 6.5, 'נדל״ן אסיה': 7.0
+                },
+                20: {
+                    'ת"א 35': 6.5, 'ת"א 125': 6.1, 'S&P 500': 8.8, 'NASDAQ': 9.9,
+                    'MSCI World': 7.2, 'יורו סטוקס 50': 5.1, 'FTSE 100': 4.4,
+                    'ניקיי 225': 4.2, 'אג״ח ממשלתיות': 2.5, 'אג״ח קונצרניות': 3.5,
+                    'נדל״ן ארה״ב': 6.5, 'נדל״ן ישראל': 7.8, 'נדל״ן אירופה': 5.2,
+                    'נדל״ן עולמי': 6.1, 'נדל״ן אסיה': 6.7
+                },
+                25: {
+                    'ת"א 35': 5.8, 'ת"א 125': 5.7, 'S&P 500': 8.6, 'NASDAQ': 9.4,
+                    'MSCI World': 7.0, 'יורו סטוקס 50': 5.1, 'FTSE 100': 4.6,
+                    'ניקיי 225': 5.5, 'אג״ח ממשלתיות': 2.9, 'אג״ח קונצרניות': 3.6,
+                    'נדל״ן ארה״ב': 6.0, 'נדל״ן ישראל': 7.5, 'נדל״ן אירופה': 5.0,
+                    'נדל״ן עולמי': 5.8, 'נדל״ן אסיה': 6.3
+                },
+                30: {
+                    'ת"א 35': 5.5, 'ת"א 125': 5.4, 'S&P 500': 8.3, 'NASDAQ': 9.1,
+                    'MSCI World': 6.8, 'יורו סטוקס 50': 4.9, 'FTSE 100': 4.4,
+                    'ניקיי 225': 5.2, 'אג״ח ממשלתיות': 2.7, 'אג״ח קונצרניות': 3.4,
+                    'נדל״ן ארה״ב': 5.7, 'נדל״ן ישראל': 7.2, 'נדל״ן אירופה': 4.8,
+                    'נדל״ן עולמי': 5.5, 'נדל״ן אסיה': 6.0
+                }
+            });
             
             // Exchange rates state
             const [exchangeRates, setExchangeRates] = useState({
@@ -848,21 +891,16 @@
                 }
             };
 
-            // Load all financial data once on component mount (session-based)
+            // Load all financial data once on component mount
             useEffect(() => {
-                // Use sessionStorage to track if data was already fetched this session
-                const sessionKey = 'financialDataFetched';
-                const dataFetched = sessionStorage.getItem(sessionKey);
+                console.log('Loading financial data...');
                 
-                if (!dataFetched) {
-                    // First time in this session - fetch all data
-                    fetchIndexData();
-                    fetchExchangeRates();
-                    fetchCryptoPrices();
-                    
-                    // Mark as fetched for this session
-                    sessionStorage.setItem(sessionKey, 'true');
-                }
+                // Always fetch data on component mount to ensure we have current data
+                fetchIndexData();
+                fetchExchangeRates();
+                fetchCryptoPrices();
+                
+                console.log('Financial data fetch initiated');
             }, []);
 
             // Risk scenarios
@@ -2695,8 +2733,8 @@
                                         React.createElement('div', { className: "w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse" }),
                                         React.createElement('span', { className: "text-sm font-medium" }, 
                                             language === 'he' 
-                                                ? "📊 נתונים עדכניים מ-API של Google Finance ו-Yahoo Finance" 
-                                                : "📊 Live data from Google Finance & Yahoo Finance APIs"),
+                                                ? (lastUpdated ? "📊 נתונים עדכניים מ-API של Google Finance ו-Yahoo Finance" : "📊 נתונים היסטוריים (מתעדכן ברקע מ-API)")
+                                                : (lastUpdated ? "📊 Live data from Google Finance & Yahoo Finance APIs" : "📊 Historical data (updating from APIs in background)")),
                                         lastUpdated && React.createElement('span', { className: "text-xs text-gray-600 ml-2" }, 
                                             ` (${lastUpdated.toLocaleTimeString()})`)
                                     ])
