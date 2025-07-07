@@ -10,12 +10,12 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- React & ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    <!-- React & ReactDOM from CDN with integrity -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Recharts -->
-    <script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js"></script>
+    <!-- Recharts from CDN -->
+    <script src="https://unpkg.com/recharts@2/umd/Recharts.js"></script>
     
     <style>
         body {
@@ -94,15 +94,28 @@
 
         // Check if dependencies are loaded
         function checkDependencies() {
-            if (typeof React === 'undefined' || typeof ReactDOM === 'undefined' || 
-                typeof Recharts === 'undefined') {
+            console.log('Checking dependencies...');
+            console.log('React:', typeof React);
+            console.log('ReactDOM:', typeof ReactDOM);
+            console.log('Recharts:', typeof Recharts);
+            
+            const missing = [];
+            if (typeof React === 'undefined') missing.push('React');
+            if (typeof ReactDOM === 'undefined') missing.push('ReactDOM');
+            if (typeof Recharts === 'undefined') missing.push('Recharts');
+            
+            if (missing.length > 0) {
+                console.error('Missing dependencies:', missing);
                 document.getElementById('root').innerHTML = `
                     <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
                         <div class="text-center max-w-md">
                             <div class="text-red-500 text-6xl mb-4">⚠️</div>
                             <h2 class="text-2xl font-bold text-red-700 mb-4">Loading Error</h2>
                             <p class="text-gray-700 mb-4">
-                                The application failed to load required dependencies. This might be due to:
+                                Missing dependencies: <strong>${missing.join(', ')}</strong>
+                            </p>
+                            <p class="text-gray-700 mb-4">
+                                This might be due to:
                             </p>
                             <ul class="text-left text-gray-600 mb-4 space-y-1">
                                 <li>• Internet connectivity issues</li>
@@ -117,6 +130,7 @@
                 `;
                 return false;
             }
+            console.log('All dependencies loaded successfully!');
             return true;
         }
 
