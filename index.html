@@ -206,26 +206,74 @@
             return React.createElement('canvas', { ref: chartRef, style: { maxHeight: '400px' } });
         };
         
-        // Simple icon replacements using Unicode symbols
-        const Calculator = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '🧮');
-        const TrendingUp = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '📈');
-        const Globe = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '🌍');
-        const DollarSign = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '💲');
-        const PiggyBank = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '🐷');
-        const AlertCircle = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '⚠️');
-        const Plus = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '➕');
-        const Trash2 = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '🗑️');
-        const Download = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '⬇️');
-        const Languages = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '🌐');
-        const Settings = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '⚙️');
-        const Info = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, 'ℹ️');
-        const Target = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '🎯');
-        const Shuffle = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '🔀');
-        const BarChart3 = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '📊');
-        const Percent = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '📈');
+        // Beautiful icon replacements with enhanced styling
+        const Calculator = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '📊');
+        const TrendingUp = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '📈');
+        const Globe = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '🌍');
+        const DollarSign = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '💰');
+        const PiggyBank = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '🐷');
+        const AlertCircle = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '⚠️');
+        const Plus = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '➕');
+        const Trash2 = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '🗑️');
+        const Download = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '⬇️');
+        const Languages = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '🌐');
+        const Settings = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '⚙️');
+        const Info = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, 'ℹ️');
+        const Target = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '🎯');
+        const Shuffle = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '🔀');
+        const BarChart3 = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '📊');
+        const Percent = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '📈');
 
         const RetirementPlanner = () => {
-            const [language, setLanguage] = useState('en');
+            const [language, setLanguage] = useState('he');
             const [activeTab, setActiveTab] = useState('basic');
             const [inputs, setInputs] = useState({
                 currentAge: 30,
@@ -792,9 +840,18 @@
                     // Header
                     React.createElement('div', { className: "text-center mb-8 animate-fade-in" }, [
                         React.createElement('div', { className: "flex justify-center items-center gap-4 mb-4" }, [
-                            React.createElement('h1', { 
-                                className: "text-4xl font-bold bg-gradient-to-r from-purple-800 to-blue-800 bg-clip-text text-transparent"
-                            }, t.title),
+                            React.createElement('div', { className: "flex items-center gap-3" }, [
+                                React.createElement('div', { 
+                                    className: "w-16 h-16 bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300"
+                                }, [
+                                    React.createElement('span', { 
+                                        className: "text-2xl text-white font-bold" 
+                                    }, "💰")
+                                ]),
+                                React.createElement('h1', { 
+                                    className: "text-4xl font-bold bg-gradient-to-r from-purple-800 to-blue-800 bg-clip-text text-transparent"
+                                }, t.title)
+                            ]),
                             React.createElement('button', {
                                 onClick: () => setLanguage(language === 'he' ? 'en' : 'he'),
                                 className: "bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2 rounded-lg flex items-center hover:from-purple-600 hover:to-blue-600 transition-all duration-300 shadow-lg"
@@ -970,68 +1027,77 @@
                             ]),
 
                             activeTab === 'advanced' && React.createElement('div', { className: "space-y-6" }, [
-                                // Risk and Return Settings
+                                // Advanced Settings
                                 React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
-                                    React.createElement('h2', { className: "text-2xl font-bold text-purple-700 mb-6 flex items-center" }, [
+                                    React.createElement('h2', { className: "text-2xl font-bold text-orange-700 mb-6 flex items-center" }, [
                                         React.createElement(Settings, { className: "mr-2" }),
-                                        "הגדרות מתקדמות"
+                                        language === 'he' ? "הגדרות מתקדמות" : "Advanced Settings"
                                     ]),
                                     React.createElement('div', { className: "space-y-4" }, [
                                         React.createElement('div', { className: "grid grid-cols-2 gap-4" }, [
                                             React.createElement('div', null, [
-                                                React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "רמת סיכון"),
-                                                React.createElement('select', {
-                                                    value: inputs.riskTolerance,
-                                                    onChange: (e) => setInputs({...inputs, riskTolerance: e.target.value}),
-                                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                                }, [
-                                                    React.createElement('option', { value: 'veryConservative' }, 'שמרני מאוד'),
-                                                    React.createElement('option', { value: 'conservative' }, 'שמרני'),
-                                                    React.createElement('option', { value: 'moderate' }, 'מתון'),
-                                                    React.createElement('option', { value: 'aggressive' }, 'אגרסיבי'),
-                                                    React.createElement('option', { value: 'veryAggressive' }, 'אגרסיבי מאוד')
-                                                ])
+                                                React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                    language === 'he' ? "הוצאות חודשיות נוכחיות (₪)" : "Current Monthly Expenses (₪)"),
+                                                React.createElement('input', {
+                                                    type: 'number',
+                                                    value: inputs.currentMonthlyExpenses,
+                                                    onChange: (e) => setInputs({...inputs, currentMonthlyExpenses: parseInt(e.target.value) || 0}),
+                                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                                })
                                             ]),
                                             React.createElement('div', null, [
-                                                React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "יעד החלפת משכורת (%)"),
+                                                React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                    language === 'he' ? "יעד: החלפת % ממשכורת" : "Target: Replace % of Salary"),
                                                 React.createElement('input', {
                                                     type: 'number',
                                                     value: inputs.targetReplacement,
                                                     onChange: (e) => setInputs({...inputs, targetReplacement: parseInt(e.target.value) || 0}),
-                                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                                })
-                                            ])
-                                        ]),
-                                        React.createElement('div', { className: "grid grid-cols-2 gap-4" }, [
-                                            React.createElement('div', null, [
-                                                React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "חיסכון נוכחי בקרן השתלמות (₪)"),
-                                                React.createElement('input', {
-                                                    type: 'number',
-                                                    value: inputs.currentTrainingFund,
-                                                    onChange: (e) => setInputs({...inputs, currentTrainingFund: parseInt(e.target.value) || 0}),
-                                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                                })
-                                            ]),
-                                            React.createElement('div', null, [
-                                                React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "תשואה צפויה קרן השתלמות (%)"),
-                                                React.createElement('input', {
-                                                    type: 'number',
-                                                    step: '0.1',
-                                                    value: inputs.trainingFundReturn,
-                                                    onChange: (e) => setInputs({...inputs, trainingFundReturn: parseFloat(e.target.value) || 0}),
-                                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                                                 })
                                             ])
                                         ]),
                                         React.createElement('div', null, [
-                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, "דמי ניהול קרן השתלמות (%)"),
-                                            React.createElement('input', {
-                                                type: 'number',
-                                                step: '0.1',
-                                                value: inputs.trainingFundManagementFee,
-                                                onChange: (e) => setInputs({...inputs, trainingFundManagementFee: parseFloat(e.target.value) || 0}),
-                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                                            })
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-3" }, 
+                                                language === 'he' ? "רמת סיכון" : "Risk Level"),
+                                            React.createElement('div', { className: "grid grid-cols-5 gap-2" }, [
+                                                'veryConservative', 'conservative', 'moderate', 'aggressive', 'veryAggressive'
+                                            ].map(risk => {
+                                                const labels = {
+                                                    he: {
+                                                        veryConservative: 'שמרני מאוד',
+                                                        conservative: 'שמרני',
+                                                        moderate: 'מתון',
+                                                        aggressive: 'אגרסיבי',
+                                                        veryAggressive: 'אגרסיבי מאוד'
+                                                    },
+                                                    en: {
+                                                        veryConservative: 'Very Conservative',
+                                                        conservative: 'Conservative',
+                                                        moderate: 'Moderate',
+                                                        aggressive: 'Aggressive',
+                                                        veryAggressive: 'Very Aggressive'
+                                                    }
+                                                };
+                                                const multipliers = {
+                                                    veryConservative: '-30%',
+                                                    conservative: '-15%',
+                                                    moderate: '0%',
+                                                    aggressive: '+15%',
+                                                    veryAggressive: '+30%'
+                                                };
+                                                return React.createElement('button', {
+                                                    key: risk,
+                                                    onClick: () => setInputs({...inputs, riskTolerance: risk}),
+                                                    className: `p-3 rounded-lg border-2 transition-all text-center ${
+                                                        inputs.riskTolerance === risk 
+                                                            ? 'border-orange-500 bg-orange-50 text-orange-700' 
+                                                            : 'border-gray-200 bg-white hover:border-orange-300'
+                                                    }`
+                                                }, [
+                                                    React.createElement('div', { className: "font-medium text-sm" }, labels[language][risk]),
+                                                    React.createElement('div', { className: "text-xs text-gray-500 mt-1" }, multipliers[risk])
+                                                ]);
+                                            }))
                                         ])
                                     ])
                                 ])
