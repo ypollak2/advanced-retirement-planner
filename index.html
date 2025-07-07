@@ -194,10 +194,34 @@
                                     tension: 0.4
                                 },
                                 {
-                                    label: isHebrew ? 'סה"כ צבירה (נומינלי)' : 'Total Accumulation (Nominal)',
-                                    data: data.map(d => d.totalSavings),
+                                    label: isHebrew ? 'תיק אישי (נומינלי)' : 'Personal Portfolio (Nominal)',
+                                    data: data.map(d => d.personalPortfolio || 0),
                                     borderColor: '#8B5CF6',
                                     backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                                    fill: false,
+                                    tension: 0.4
+                                },
+                                {
+                                    label: isHebrew ? 'קריפטו (נומינלי)' : 'Crypto (Nominal)',
+                                    data: data.map(d => d.crypto || 0),
+                                    borderColor: '#F97316',
+                                    backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                                    fill: false,
+                                    tension: 0.4
+                                },
+                                {
+                                    label: isHebrew ? 'נדל״ן (נומינלי)' : 'Real Estate (Nominal)',
+                                    data: data.map(d => d.realEstate || 0),
+                                    borderColor: '#059669',
+                                    backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                                    fill: false,
+                                    tension: 0.4
+                                },
+                                {
+                                    label: isHebrew ? 'סה"כ צבירה (נומינלי)' : 'Total Accumulation (Nominal)',
+                                    data: data.map(d => d.totalSavings),
+                                    borderColor: '#DC2626',
+                                    backgroundColor: 'rgba(220, 38, 38, 0.1)',
                                     fill: false,
                                     tension: 0.4,
                                     borderWidth: 3
@@ -360,6 +384,10 @@
             className: className + " inline-flex items-center justify-center", 
             style: { fontSize: `${size}px` } 
         }, '📊');
+        const Building = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '🏢');
         const Percent = ({ size = 16, className = "" }) => React.createElement('span', { 
             className: className + " inline-flex items-center justify-center", 
             style: { fontSize: `${size}px` } 
@@ -383,7 +411,27 @@
                 riskTolerance: 'moderate',
                 currentTrainingFund: 25000,
                 trainingFundReturn: 6.5,
-                trainingFundManagementFee: 0.5
+                trainingFundManagementFee: 0.5,
+                // Personal investment portfolio (no tax benefits)
+                currentPersonalPortfolio: 0,
+                personalPortfolioMonthly: 0,
+                personalPortfolioReturn: 8.0,
+                personalPortfolioTaxRate: 25, // Capital gains tax
+                // Cryptocurrency portfolio
+                currentCrypto: 0,
+                cryptoMonthly: 0,
+                cryptoReturn: 15.0, // High volatility expected return
+                cryptoTaxRate: 25,
+                // FIRE calculation
+                fireTargetAge: 50,
+                fireMonthlyExpenses: 15000, // Expenses for FIRE lifestyle
+                fireSafeWithdrawlRate: 4.0, // 4% rule
+                // Real Estate Investment
+                currentRealEstate: 0,
+                realEstateMonthly: 0,
+                realEstateReturn: 6.0, // Property appreciation
+                realEstateRentalYield: 4.0, // Annual rental yield
+                realEstateTaxRate: 10, // Property tax and expenses
             });
 
             const [pensionIndexAllocation, setPensionIndexAllocation] = useState([
@@ -653,7 +701,33 @@
                     historicalReturns: "📈 Historical Average Returns in Leading Indices",
                     timeHorizon: "Time Horizon (years):",
                     useThisReturn: "Use This Return",
-                    years: "years"
+                    years: "years",
+                    // Personal Portfolio
+                    personalPortfolio: "Personal Investment Portfolio",
+                    currentPersonalPortfolio: "Current Personal Portfolio (₪)",
+                    personalPortfolioMonthly: "Monthly Investment (₪)",
+                    personalPortfolioReturn: "Expected Annual Return (%)",
+                    personalPortfolioTax: "Capital Gains Tax (%)",
+                    // Cryptocurrency
+                    cryptocurrency: "Cryptocurrency Portfolio",
+                    currentCrypto: "Current Crypto Holdings (₪)",
+                    cryptoMonthly: "Monthly Crypto Investment (₪)",
+                    cryptoReturn: "Expected Annual Return (%)",
+                    cryptoTax: "Crypto Tax Rate (%)",
+                    // FIRE
+                    fireCalculator: "FIRE Calculator - Early Retirement",
+                    fireTargetAge: "Target Early Retirement Age",
+                    fireMonthlyExpenses: "Monthly FIRE Expenses (₪)",
+                    fireSafeWithdrawlRate: "Safe Withdrawal Rate (%)",
+                    fireTarget: "FIRE Target",
+                    fireProgress: "FIRE Progress",
+                    // Real Estate
+                    realEstate: "Real Estate Investment",
+                    currentRealEstate: "Current Real Estate (₪)",
+                    realEstateMonthly: "Monthly Real Estate Investment (₪)",
+                    realEstateReturn: "Annual Appreciation (%)",
+                    realEstateRentalYield: "Annual Rental Yield (%)",
+                    realEstateTax: "Property Tax & Expenses (%)"
                 },
                 he: {
                     title: "📊 מתכנן הפנסיה המתקדם",
@@ -687,7 +761,33 @@
                     historicalReturns: "📈 ממוצע תשואות היסטוריות במדדים מובילים",
                     timeHorizon: "אופק זמן (שנים):",
                     useThisReturn: "השתמש בתשואה זו",
-                    years: "שנים"
+                    years: "שנים",
+                    // Personal Portfolio
+                    personalPortfolio: "תיק השקעות אישי",
+                    currentPersonalPortfolio: "תיק אישי נוכחי (₪)",
+                    personalPortfolioMonthly: "השקעה חודשית (₪)",
+                    personalPortfolioReturn: "תשואה שנתית צפויה (%)",
+                    personalPortfolioTax: "מס רווחי הון (%)",
+                    // Cryptocurrency
+                    cryptocurrency: "תיק קריפטו",
+                    currentCrypto: "קריפטו נוכחי (₪)",
+                    cryptoMonthly: "השקעה חודשית בקריפטו (₪)",
+                    cryptoReturn: "תשואה שנתית צפויה (%)",
+                    cryptoTax: "מס על קריפטו (%)",
+                    // FIRE
+                    fireCalculator: "מחשבון FIRE - פרישה מוקדמת",
+                    fireTargetAge: "גיל יעד לפרישה מוקדמת",
+                    fireMonthlyExpenses: "הוצאות חודשיות ב-FIRE (₪)",
+                    fireSafeWithdrawlRate: "שיעור משיכה בטוח (%)",
+                    fireTarget: "יעד FIRE",
+                    fireProgress: "התקדמות ל-FIRE",
+                    // Real Estate
+                    realEstate: "נדל״ן השקעה",
+                    currentRealEstate: "נדל״ן נוכחי (₪)",
+                    realEstateMonthly: "השקעה חודשית בנדל״ן (₪)",
+                    realEstateReturn: "עליית ערך שנתית (%)",
+                    realEstateRentalYield: "תשואת שכירות שנתית (%)",
+                    realEstateTax: "מס ועלויות נדל״ן (%)"
                 }
             };
 
@@ -802,6 +902,9 @@
 
                 let totalPensionSavings = inputs.currentSavings;
                 let totalTrainingFund = inputs.currentTrainingFund;
+                let totalPersonalPortfolio = inputs.currentPersonalPortfolio;
+                let totalCrypto = inputs.currentCrypto;
+                let totalRealEstate = inputs.currentRealEstate;
                 let periodResults = [];
                 
                 const sortedPeriods = [...workPeriods].sort((a, b) => a.startAge - b.startAge);
@@ -856,9 +959,53 @@
                         totalTrainingFund += contributionsValue;
                     }
                 }
+
+                // Calculate Personal Portfolio
+                const adjustedPersonalPortfolioReturn = getAdjustedReturn(inputs.personalPortfolioReturn);
+                const personalPortfolioMonthlyReturn = adjustedPersonalPortfolioReturn / 100 / 12;
+                const personalPortfolioMonths = yearsToRetirement * 12;
+                
+                const personalPortfolioGrowth = totalPersonalPortfolio * Math.pow(1 + personalPortfolioMonthlyReturn, personalPortfolioMonths);
+                const personalPortfolioContributions = inputs.personalPortfolioMonthly * (Math.pow(1 + personalPortfolioMonthlyReturn, personalPortfolioMonths) - 1) / personalPortfolioMonthlyReturn;
+                totalPersonalPortfolio = personalPortfolioGrowth + personalPortfolioContributions;
+
+                // Calculate Cryptocurrency
+                const adjustedCryptoReturn = getAdjustedReturn(inputs.cryptoReturn);
+                const cryptoMonthlyReturn = adjustedCryptoReturn / 100 / 12;
+                const cryptoMonths = yearsToRetirement * 12;
+                
+                const cryptoGrowth = totalCrypto * Math.pow(1 + cryptoMonthlyReturn, cryptoMonths);
+                const cryptoContributions = inputs.cryptoMonthly * (Math.pow(1 + cryptoMonthlyReturn, cryptoMonths) - 1) / cryptoMonthlyReturn;
+                totalCrypto = cryptoGrowth + cryptoContributions;
+
+                // Calculate Real Estate
+                const adjustedRealEstateReturn = getAdjustedReturn(inputs.realEstateReturn);
+                const realEstateMonthlyReturn = adjustedRealEstateReturn / 100 / 12;
+                const realEstateMonths = yearsToRetirement * 12;
+                
+                const realEstateGrowth = totalRealEstate * Math.pow(1 + realEstateMonthlyReturn, realEstateMonths);
+                const realEstateContributions = inputs.realEstateMonthly * (Math.pow(1 + realEstateMonthlyReturn, realEstateMonths) - 1) / realEstateMonthlyReturn;
+                totalRealEstate = realEstateGrowth + realEstateContributions;
+
+                // Calculate Real Estate Rental Income
+                const realEstateRentalIncome = totalRealEstate * (inputs.realEstateRentalYield / 100) / 12;
                 
                 const monthlyPension = totalPensionSavings * 0.04 / 12;
                 const monthlyTrainingFundIncome = totalTrainingFund * 0.05 / 12;
+                
+                // Calculate monthly income from new investment types
+                const monthlyPersonalPortfolioIncome = totalPersonalPortfolio * 0.04 / 12;
+                const monthlyCryptoIncome = totalCrypto * 0.04 / 12;
+                const monthlyRealEstateIncome = totalRealEstate * 0.04 / 12; // Capital gains withdrawal
+                
+                // Apply taxes to new investment types
+                const personalPortfolioTax = monthlyPersonalPortfolioIncome * (inputs.personalPortfolioTaxRate / 100);
+                const cryptoTax = monthlyCryptoIncome * (inputs.cryptoTaxRate / 100);
+                const realEstateTax = monthlyRealEstateIncome * (inputs.realEstateTaxRate / 100);
+                
+                const netPersonalPortfolioIncome = monthlyPersonalPortfolioIncome - personalPortfolioTax;
+                const netCryptoIncome = monthlyCryptoIncome - cryptoTax;
+                const netRealEstateIncome = monthlyRealEstateIncome - realEstateTax + realEstateRentalIncome;
                 
                 let weightedTaxRate = 0;
                 let totalWeight = 0;
@@ -881,7 +1028,7 @@
                 
                 const lastCountry = countryData[sortedPeriods[sortedPeriods.length - 1].country];
                 const socialSecurity = lastCountry.socialSecurity;
-                const totalNetIncome = netPension + netTrainingFundIncome + socialSecurity;
+                const totalNetIncome = netPension + netTrainingFundIncome + socialSecurity + netPersonalPortfolioIncome + netCryptoIncome + netRealEstateIncome;
 
                 const futureMonthlyExpenses = inputs.currentMonthlyExpenses * Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement);
                 const remainingAfterExpenses = totalNetIncome - futureMonthlyExpenses;
@@ -893,11 +1040,24 @@
                 setResults({
                     totalSavings: Math.round(totalPensionSavings),
                     trainingFundValue: Math.round(totalTrainingFund),
+                    personalPortfolioValue: Math.round(totalPersonalPortfolio),
+                    cryptoValue: Math.round(totalCrypto),
+                    realEstateValue: Math.round(totalRealEstate),
                     monthlyPension: Math.round(monthlyPension),
                     monthlyTrainingFundIncome: Math.round(monthlyTrainingFundIncome),
+                    monthlyPersonalPortfolioIncome: Math.round(monthlyPersonalPortfolioIncome),
+                    monthlyCryptoIncome: Math.round(monthlyCryptoIncome),
+                    monthlyRealEstateIncome: Math.round(monthlyRealEstateIncome),
+                    realEstateRentalIncome: Math.round(realEstateRentalIncome),
                     pensionTax: Math.round(pensionTax),
+                    personalPortfolioTax: Math.round(personalPortfolioTax),
+                    cryptoTax: Math.round(cryptoTax),
+                    realEstateTax: Math.round(realEstateTax),
                     netPension: Math.round(netPension),
                     netTrainingFundIncome: Math.round(netTrainingFundIncome),
+                    netPersonalPortfolioIncome: Math.round(netPersonalPortfolioIncome),
+                    netCryptoIncome: Math.round(netCryptoIncome),
+                    netRealEstateIncome: Math.round(netRealEstateIncome),
                     socialSecurity: socialSecurity,
                     totalNetIncome: Math.round(totalNetIncome),
                     periodResults,
@@ -937,14 +1097,22 @@
                 const chartPoints = [];
                 let accumulatedPensionSavings = inputs.currentSavings;
                 let accumulatedTrainingFund = inputs.currentTrainingFund;
+                let accumulatedPersonalPortfolio = inputs.currentPersonalPortfolio;
+                let accumulatedCrypto = inputs.currentCrypto;
+                let accumulatedRealEstate = inputs.currentRealEstate;
+                
+                const totalInitialSavings = accumulatedPensionSavings + accumulatedTrainingFund + accumulatedPersonalPortfolio + accumulatedCrypto + accumulatedRealEstate;
                 
                 chartPoints.push({
                     year: inputs.currentAge,
                     age: inputs.currentAge,
                     pensionSavings: accumulatedPensionSavings,
                     trainingFund: accumulatedTrainingFund,
-                    totalSavings: accumulatedPensionSavings + accumulatedTrainingFund,
-                    inflationAdjusted: accumulatedPensionSavings + accumulatedTrainingFund,
+                    personalPortfolio: accumulatedPersonalPortfolio,
+                    crypto: accumulatedCrypto,
+                    realEstate: accumulatedRealEstate,
+                    totalSavings: totalInitialSavings,
+                    inflationAdjusted: totalInitialSavings,
                     yearLabel: `Age ${inputs.currentAge}`
                 });
 
@@ -971,8 +1139,18 @@
                         const trainingFundNetReturn = (adjustedTrainingFundReturn - inputs.trainingFundManagementFee) / 100;
                         accumulatedTrainingFund = accumulatedTrainingFund * (1 + trainingFundNetReturn);
                     }
+
+                    // Update new investment types annually
+                    const adjustedPersonalPortfolioReturn = getAdjustedReturn(inputs.personalPortfolioReturn);
+                    accumulatedPersonalPortfolio = accumulatedPersonalPortfolio * (1 + adjustedPersonalPortfolioReturn / 100) + (inputs.personalPortfolioMonthly * 12);
                     
-                    const totalSavings = accumulatedPensionSavings + accumulatedTrainingFund;
+                    const adjustedCryptoReturn = getAdjustedReturn(inputs.cryptoReturn);
+                    accumulatedCrypto = accumulatedCrypto * (1 + adjustedCryptoReturn / 100) + (inputs.cryptoMonthly * 12);
+                    
+                    const adjustedRealEstateReturn = getAdjustedReturn(inputs.realEstateReturn);
+                    accumulatedRealEstate = accumulatedRealEstate * (1 + adjustedRealEstateReturn / 100) + (inputs.realEstateMonthly * 12);
+                    
+                    const totalSavings = accumulatedPensionSavings + accumulatedTrainingFund + accumulatedPersonalPortfolio + accumulatedCrypto + accumulatedRealEstate;
                     const inflationAdjustedValue = totalSavings / Math.pow(1 + inputs.inflationRate / 100, yearOffset);
                     
                     chartPoints.push({
@@ -980,6 +1158,9 @@
                         age: currentAge,
                         pensionSavings: Math.round(accumulatedPensionSavings),
                         trainingFund: Math.round(accumulatedTrainingFund),
+                        personalPortfolio: Math.round(accumulatedPersonalPortfolio),
+                        crypto: Math.round(accumulatedCrypto),
+                        realEstate: Math.round(accumulatedRealEstate),
                         totalSavings: Math.round(totalSavings),
                         inflationAdjusted: Math.round(inflationAdjustedValue),
                         yearLabel: `Age ${currentAge}`
@@ -1068,7 +1249,8 @@
                             { id: 'basic', icon: Calculator, label: t.basic },
                             { id: 'advanced', icon: Settings, label: t.advanced },
                             { id: 'analysis', icon: BarChart3, label: t.analysis },
-                            { id: 'scenarios', icon: Target, label: t.scenarios }
+                            { id: 'scenarios', icon: Target, label: t.scenarios },
+                            { id: 'fire', icon: TrendingUp, label: t.fireCalculator }
                         ].map(tab => 
                             React.createElement('button', {
                                 key: tab.id,
@@ -1191,6 +1373,197 @@
                                                 React.createElement('span', { className: "ml-2 font-bold text-lg" }, 
                                                     `${(inputs.trainingFundReturn - inputs.trainingFundManagementFee).toFixed(2)}%`)
                                             ])
+                                        ])
+                                    ])
+                                ]),
+                                
+                                // Personal Portfolio (No Tax Benefits)
+                                React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
+                                    React.createElement('h2', { className: "text-2xl font-bold text-purple-700 mb-6 flex items-center" }, [
+                                        React.createElement(DollarSign, { className: "mr-2" }),
+                                        language === 'he' ? "תיק השקעות אישי" : "Personal Investment Portfolio"
+                                    ]),
+                                    React.createElement('div', { className: "bg-purple-50 rounded-lg p-4 mb-6 border border-purple-200" }, [
+                                        React.createElement('p', { className: "text-sm text-purple-700 mb-2" }, [
+                                            React.createElement('strong', null, 
+                                                language === 'he' ? "חשוב לדעת:" : "Important to Know:"),
+                                            React.createElement('span', { className: "block mt-1" }, 
+                                                language === 'he' ? "השקעות אישיות אינן זוכות להטבות מס כמו פנסיה וקרן השתלמות" : "Personal investments don't receive tax benefits like pension and training funds")
+                                        ])
+                                    ]),
+                                    React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 gap-6" }, [
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "צבירה נוכחית (₪)" : "Current Accumulation (₪)"),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                value: inputs.currentPersonalPortfolio,
+                                                onChange: (e) => setInputs({...inputs, currentPersonalPortfolio: parseInt(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                            })
+                                        ]),
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "השקעה חודשית (₪)" : "Monthly Investment (₪)"),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                value: inputs.personalPortfolioMonthly,
+                                                onChange: (e) => setInputs({...inputs, personalPortfolioMonthly: parseInt(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                            })
+                                        ]),
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "תשואה מוערכת (%)" : "Expected Return (%)"),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                step: '0.1',
+                                                value: inputs.personalPortfolioReturn,
+                                                onChange: (e) => setInputs({...inputs, personalPortfolioReturn: parseFloat(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                            })
+                                        ]),
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "מס רווחי הון (%)" : "Capital Gains Tax (%)"),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                step: '0.1',
+                                                value: inputs.personalPortfolioTaxRate,
+                                                onChange: (e) => setInputs({...inputs, personalPortfolioTaxRate: parseFloat(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                            })
+                                        ])
+                                    ])
+                                ]),
+                                
+                                // Cryptocurrency Portfolio
+                                React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
+                                    React.createElement('h2', { className: "text-2xl font-bold text-orange-700 mb-6 flex items-center" }, [
+                                        React.createElement(TrendingUp, { className: "mr-2" }),
+                                        language === 'he' ? "תיק מטבעות דיגיטליים" : "Cryptocurrency Portfolio"
+                                    ]),
+                                    React.createElement('div', { className: "bg-orange-50 rounded-lg p-4 mb-6 border border-orange-200" }, [
+                                        React.createElement('p', { className: "text-sm text-orange-700 mb-2" }, [
+                                            React.createElement('strong', null, 
+                                                language === 'he' ? "שים לב:" : "Important:"),
+                                            React.createElement('span', { className: "block mt-1" }, 
+                                                language === 'he' ? "השקעות בקריפטו הן בסיכון גבוה ועלולות לחוות תנודתיות קיצונית" : "Crypto investments are high risk and may experience extreme volatility")
+                                        ])
+                                    ]),
+                                    React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 gap-6" }, [
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "צבירה נוכחית (₪)" : "Current Holdings (₪)"),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                value: inputs.currentCrypto,
+                                                onChange: (e) => setInputs({...inputs, currentCrypto: parseInt(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                            })
+                                        ]),
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "השקעה חודשית (₪)" : "Monthly Investment (₪)"),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                value: inputs.cryptoMonthly,
+                                                onChange: (e) => setInputs({...inputs, cryptoMonthly: parseInt(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                            })
+                                        ]),
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "תשואה מוערכת (%)" : "Expected Return (%)"),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                step: '0.1',
+                                                value: inputs.cryptoReturn,
+                                                onChange: (e) => setInputs({...inputs, cryptoReturn: parseFloat(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                            })
+                                        ]),
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "מס רווחי הון (%)" : "Capital Gains Tax (%)"),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                step: '0.1',
+                                                value: inputs.cryptoTaxRate,
+                                                onChange: (e) => setInputs({...inputs, cryptoTaxRate: parseFloat(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                            })
+                                        ])
+                                    ])
+                                ]),
+                                
+                                // Real Estate Investment
+                                React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
+                                    React.createElement('h2', { className: "text-2xl font-bold text-emerald-700 mb-6 flex items-center" }, [
+                                        React.createElement(Building, { className: "mr-2" }),
+                                        language === 'he' ? "השקעות נדל\"ן" : "Real Estate Investment"
+                                    ]),
+                                    React.createElement('div', { className: "bg-emerald-50 rounded-lg p-4 mb-6 border border-emerald-200" }, [
+                                        React.createElement('p', { className: "text-sm text-emerald-700 mb-2" }, [
+                                            React.createElement('strong', null, 
+                                                language === 'he' ? "כולל:" : "Includes:"),
+                                            React.createElement('span', { className: "block mt-1" }, 
+                                                language === 'he' ? "עליית ערך הנכס ודמי שכירות חודשיים" : "Property appreciation and monthly rental income")
+                                        ])
+                                    ]),
+                                    React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 gap-6" }, [
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "השקעה נוכחית (₪)" : "Current Investment (₪)"),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                value: inputs.currentRealEstate,
+                                                onChange: (e) => setInputs({...inputs, currentRealEstate: parseInt(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                            })
+                                        ]),
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "השקעה חודשית (₪)" : "Monthly Investment (₪)"),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                value: inputs.realEstateMonthly,
+                                                onChange: (e) => setInputs({...inputs, realEstateMonthly: parseInt(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                            })
+                                        ]),
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "עליית ערך שנתית (%)" : "Annual Appreciation (%)"),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                step: '0.1',
+                                                value: inputs.realEstateReturn,
+                                                onChange: (e) => setInputs({...inputs, realEstateReturn: parseFloat(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                            })
+                                        ]),
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "תשואת השכרה (%)" : "Rental Yield (%)"),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                step: '0.1',
+                                                value: inputs.realEstateRentalYield,
+                                                onChange: (e) => setInputs({...inputs, realEstateRentalYield: parseFloat(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                            })
+                                        ]),
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "מס רווחי הון (%)" : "Capital Gains Tax (%)"),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                step: '0.1',
+                                                value: inputs.realEstateTaxRate,
+                                                onChange: (e) => setInputs({...inputs, realEstateTaxRate: parseFloat(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                            })
                                         ])
                                     ])
                                 ]),
@@ -1443,6 +1816,111 @@
                                         ])
                                     )
                                 )
+                            ]),
+
+                            activeTab === 'fire' && React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
+                                React.createElement('h2', { className: "text-2xl font-bold text-orange-600 mb-6 flex items-center" }, [
+                                    React.createElement(TrendingUp, { className: "mr-2" }),
+                                    t.fireCalculator
+                                ]),
+                                React.createElement('div', { className: "grid md:grid-cols-2 gap-6" }, [
+                                    // FIRE Settings
+                                    React.createElement('div', { className: "space-y-4" }, [
+                                        React.createElement('h3', { className: "text-lg font-bold text-gray-800 mb-4" }, 
+                                            language === 'he' ? "הגדרות FIRE" : "FIRE Settings"),
+                                        
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, t.fireTargetAge),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                value: inputs.fireTargetAge,
+                                                onChange: (e) => setInputs({...inputs, fireTargetAge: parseInt(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                            })
+                                        ]),
+                                        
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, t.fireMonthlyExpenses),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                value: inputs.fireMonthlyExpenses,
+                                                onChange: (e) => setInputs({...inputs, fireMonthlyExpenses: parseInt(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                            })
+                                        ]),
+                                        
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, t.fireSafeWithdrawlRate),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                step: '0.1',
+                                                value: inputs.fireSafeWithdrawlRate,
+                                                onChange: (e) => setInputs({...inputs, fireSafeWithdrawlRate: parseFloat(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                            })
+                                        ])
+                                    ]),
+                                    
+                                    // FIRE Calculation Results
+                                    React.createElement('div', { className: "space-y-4" }, [
+                                        React.createElement('h3', { className: "text-lg font-bold text-gray-800 mb-4" }, 
+                                            language === 'he' ? "תוצאות FIRE" : "FIRE Results"),
+                                        
+                                        React.createElement('div', { className: "bg-gradient-to-r from-orange-100 to-red-100 rounded-xl p-4 border border-orange-200" }, [
+                                            React.createElement('div', { className: "text-center" }, [
+                                                React.createElement('div', { className: "text-2xl font-bold text-orange-700 currency-format" }, 
+                                                    formatCurrency(inputs.fireMonthlyExpenses * 12 * (100 / inputs.fireSafeWithdrawlRate))),
+                                                React.createElement('div', { className: "text-sm text-gray-600" }, 
+                                                    language === 'he' ? "יעד FIRE (סכום נדרש)" : "FIRE Target (Required Amount)")
+                                            ])
+                                        ]),
+                                        
+                                        // Calculate years to FIRE based on current savings rate
+                                        (() => {
+                                            const currentTotalSavings = inputs.currentSavings + inputs.currentTrainingFund + inputs.currentPersonalPortfolio + inputs.currentCrypto + inputs.currentRealEstate;
+                                            const monthlyTotalSavings = workPeriods.reduce((sum, period) => {
+                                                if (inputs.currentAge >= period.startAge && inputs.currentAge <= period.endAge) {
+                                                    return sum + period.monthlyContribution + period.monthlyTrainingFund;
+                                                }
+                                                return sum;
+                                            }, 0) + inputs.personalPortfolioMonthly + inputs.cryptoMonthly + inputs.realEstateMonthly;
+                                            
+                                            const fireTarget = inputs.fireMonthlyExpenses * 12 * (100 / inputs.fireSafeWithdrawlRate);
+                                            const remainingNeeded = Math.max(0, fireTarget - currentTotalSavings);
+                                            const yearsToFire = monthlyTotalSavings > 0 ? remainingNeeded / (monthlyTotalSavings * 12) : Infinity;
+                                            const fireAge = inputs.currentAge + yearsToFire;
+                                            
+                                            return React.createElement('div', { className: "space-y-3" }, [
+                                                React.createElement('div', { className: "bg-blue-50 rounded-lg p-3" }, [
+                                                    React.createElement('div', { className: "text-lg font-bold text-blue-700 currency-format" }, 
+                                                        formatCurrency(currentTotalSavings)),
+                                                    React.createElement('div', { className: "text-xs text-gray-600" }, 
+                                                        language === 'he' ? "סה״כ חיסכונים נוכחיים" : "Current Total Savings")
+                                                ]),
+                                                
+                                                React.createElement('div', { className: "bg-green-50 rounded-lg p-3" }, [
+                                                    React.createElement('div', { className: "text-lg font-bold text-green-700 currency-format" }, 
+                                                        formatCurrency(monthlyTotalSavings)),
+                                                    React.createElement('div', { className: "text-xs text-gray-600" }, 
+                                                        language === 'he' ? "חיסכון חודשי כולל" : "Total Monthly Savings")
+                                                ]),
+                                                
+                                                React.createElement('div', { 
+                                                    className: `p-3 rounded-lg ${fireAge <= inputs.fireTargetAge ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}` 
+                                                }, [
+                                                    React.createElement('div', { className: "font-bold text-lg" }, 
+                                                        isFinite(yearsToFire) 
+                                                            ? (language === 'he' ? `גיל FIRE צפוי: ${Math.round(fireAge)}` : `Expected FIRE Age: ${Math.round(fireAge)}`)
+                                                            : (language === 'he' ? "נדרש להגדיל חיסכון חודשי" : "Need to increase monthly savings")),
+                                                    React.createElement('div', { className: "text-sm text-gray-600" }, 
+                                                        isFinite(yearsToFire) 
+                                                            ? (language === 'he' ? `עוד ${Math.round(yearsToFire)} שנים` : `${Math.round(yearsToFire)} years to go`)
+                                                            : (language === 'he' ? "בקצב הנוכחי לא ניתן להשיג FIRE" : "Current rate won't achieve FIRE"))
+                                                ])
+                                            ]);
+                                        })()
+                                    ])
+                                ])
                             ]),
 
                             activeTab === 'analysis' && React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
