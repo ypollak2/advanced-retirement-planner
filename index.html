@@ -10,18 +10,18 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- React & ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- React & ReactDOM with fallback -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js'"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js'"></script>
     
-    <!-- Recharts -->
-    <script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js"></script>
+    <!-- Recharts with fallback -->
+    <script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/recharts@2.8.0/umd/Recharts.js'"></script>
     
-    <!-- Lucide React -->
-    <script src="https://unpkg.com/lucide-react@0.263.1/dist/umd/lucide-react.js"></script>
+    <!-- Lucide React with fallback -->
+    <script src="https://unpkg.com/lucide-react@0.263.1/dist/umd/lucide-react.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/lucide-react@0.263.1/dist/umd/lucide-react.js'"></script>
     
-    <!-- Lodash -->
-    <script src="https://unpkg.com/lodash@4.17.21/lodash.min.js"></script>
+    <!-- Lodash with fallback -->
+    <script src="https://unpkg.com/lodash@4.17.21/lodash.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js'"></script>
     
     <style>
         body {
@@ -84,7 +84,65 @@
     <div id="root" class="min-h-screen gradient-bg"></div>
     
     <script>
-        const { useState, useEffect } = React;
+        // Loading indicator while dependencies load
+        document.addEventListener('DOMContentLoaded', function() {
+            const root = document.getElementById('root');
+            root.innerHTML = `
+                <div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                        <p class="text-gray-600 text-lg">Loading Advanced Retirement Planner...</p>
+                        <p class="text-gray-500 text-sm mt-2">Please wait while we load the application</p>
+                    </div>
+                </div>
+            `;
+        });
+
+        // Check if dependencies are loaded
+        function checkDependencies() {
+            if (typeof React === 'undefined' || typeof ReactDOM === 'undefined' || 
+                typeof Recharts === 'undefined' || typeof LucideReact === 'undefined') {
+                document.getElementById('root').innerHTML = `
+                    <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
+                        <div class="text-center max-w-md">
+                            <div class="text-red-500 text-6xl mb-4">⚠️</div>
+                            <h2 class="text-2xl font-bold text-red-700 mb-4">Loading Error</h2>
+                            <p class="text-gray-700 mb-4">
+                                The application failed to load required dependencies. This might be due to:
+                            </p>
+                            <ul class="text-left text-gray-600 mb-4 space-y-1">
+                                <li>• Internet connectivity issues</li>
+                                <li>• CDN service interruption</li>
+                                <li>• Browser compatibility issues</li>
+                            </ul>
+                            <button onclick="location.reload()" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                                Retry Loading
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return false;
+            }
+            return true;
+        }
+
+        // Wait for all dependencies to load
+        const maxWaitTime = 10000; // 10 seconds
+        let waitTime = 0;
+        const checkInterval = setInterval(() => {
+            if (checkDependencies()) {
+                clearInterval(checkInterval);
+                initializeApp();
+            } else if (waitTime > maxWaitTime) {
+                clearInterval(checkInterval);
+                // Error message already shown by checkDependencies
+            }
+            waitTime += 100;
+        }, 100);
+
+        function initializeApp() {
+            try {
+                const { useState, useEffect } = React;
         const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } = Recharts;
         
         // Lucide Icons
@@ -1163,6 +1221,28 @@
         // Render the app
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(React.createElement(RetirementPlanner));
+        
+        } catch (error) {
+            console.error('Error initializing app:', error);
+            document.getElementById('root').innerHTML = `
+                <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
+                    <div class="text-center max-w-md">
+                        <div class="text-red-500 text-6xl mb-4">💥</div>
+                        <h2 class="text-2xl font-bold text-red-700 mb-4">Application Error</h2>
+                        <p class="text-gray-700 mb-4">
+                            An error occurred while loading the application:
+                        </p>
+                        <div class="bg-red-100 border border-red-300 rounded-lg p-3 mb-4">
+                            <code class="text-red-700 text-sm">${error.message}</code>
+                        </div>
+                        <button onclick="location.reload()" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                            Reload Page
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+    }
     </script>
 </body>
 </html>
