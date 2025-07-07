@@ -1,31 +1,94 @@
 # 📊 Advanced Retirement Planner
 
-Claude Artifact: https://claude.ai/public/artifacts/8074dc92-7cc5-4e78-9b81-3fa8ce84b37f
-
-Professional retirement planning tool with index returns, risk levels, and accurate tax calculations.
+Professional retirement planning tool with comprehensive investment tracking, FIRE calculator, and modular architecture.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Version](https://img.shields.io/badge/version-1.0.0-green.svg)
 ![Language](https://img.shields.io/badge/language-English%20%7C%20Hebrew-orange.svg)
 
-## 🌟 Key Features
+## 🚀 Features
 
-- **💰 Advanced Pension Calculations** - Monthly income, taxes, and social security
-- **📈 Historical Index Returns** - 5 to 30-year data on leading indices
-- **🎯 Customizable Risk Levels** - Conservative, moderate, aggressive options
-- **🌍 Multi-Country Support** - Israel, USA, UK, Germany, France
-- **📊 Interactive Charts** - Track savings progress over time
-- **🎓 Training Fund Integration** - Separate calculations with management fees
-- **💱 Currency Conversion** - USD, EUR, GBP support
-- **🔄 What-If Scenarios** - Analyze impact of different variables
+### Core Retirement Planning
+- **Multi-country pension calculations** with country-specific tax rates
+- **Training fund tracking** with management fees
+- **Risk scenario modeling** (Very Conservative to Very Aggressive)
+- **Inflation-adjusted projections** with real purchasing power
+- **Work period management** across different countries
 
-## 🚀 Quick Start
+### Advanced Investment Tracking
+- **Personal Investment Portfolio** (non-tax-advantaged)
+- **Cryptocurrency Portfolio** with high volatility modeling
+- **Real Estate Investments** with rental income and appreciation
+- **Tax calculations** for capital gains on all investment types
+- **Risk-adjusted returns** across all asset classes
 
-### Option 1: Direct Usage (Recommended)
+### FIRE Calculator
+- **Financial Independence Retire Early** calculations
+- **4% safe withdrawal rule** implementation
+- **Target age planning** with progress tracking
+- **Total portfolio analysis** including all investment types
 
-1. **Download the file**: Save `index.html` to your computer
-2. **Open in browser**: Double-click the file or drag it to your browser
-3. **That's it!** The tool is ready to use
+### Visualization & Analysis
+- **Interactive charts** with 7+ data series tracking
+- **Historical index returns** from multiple markets
+- **Real-time API integration** for market data
+- **Comprehensive progress tracking** over time
+
+### Internationalization
+- **Full bilingual support** (Hebrew/English)
+- **RTL/LTR layout** adaptation
+- **Currency formatting** with proper localization
+
+## 📁 Project Structure
+
+This project offers **two versions**:
+
+### 1. Single File Version (`index.html`)
+- ✅ **Immediate deployment** - works instantly on GitHub Pages
+- ✅ **No build process** required
+- ✅ **Fast loading** - everything in one file
+- ✅ **Zero configuration** needed
+
+### 2. Modular Version (`index-modular.html` + `src/`)
+- ✅ **Better maintainability** - organized codebase
+- ✅ **Code reusability** - shared components
+- ✅ **Easier debugging** - isolated modules
+- ✅ **Team collaboration** friendly
+
+```
+src/
+├── components/
+│   └── Chart.js              # Chart visualization component
+├── utils/
+│   ├── calculations.js       # Core financial calculations
+│   └── chartData.js         # Chart data generation
+├── translations/
+│   └── index.js             # Bilingual text resources
+└── data/
+    └── constants.js         # Market data & configuration
+```
+
+## 🛠️ Development Setup
+
+### Option 1: Direct Usage (Recommended for quick start)
+1. Clone the repository
+2. Open `index.html` in your browser
+3. Start planning your retirement!
+
+### Option 2: Modular Development
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Deploy to GitHub Pages
+npm run deploy
+```
 
 ### Option 2: Upload to GitHub & GitHub Pages
 

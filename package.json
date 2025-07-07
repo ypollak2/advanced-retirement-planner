@@ -1,0 +1,28 @@
+{
+  "name": "advanced-retirement-planner",
+  "version": "1.0.0",
+  "description": "Professional retirement planning tool with comprehensive investment tracking",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "npm run build && gh-pages -d dist"
+  },
+  "keywords": [
+    "retirement",
+    "pension",
+    "investment",
+    "financial-planning",
+    "FIRE"
+  ],
+  "author": "Advanced Retirement Planner",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "gh-pages": "^6.0.0"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.0"
+  }
+}
