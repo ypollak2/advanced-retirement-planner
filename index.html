@@ -2442,6 +2442,56 @@
                                         ])
                                     ])
                                 ])
+                            ]),
+
+                            // Claude AI Insights Section
+                            React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
+                                React.createElement('h3', { className: "text-xl font-bold text-indigo-700 mb-4 flex items-center" }, [
+                                    React.createElement('span', { className: "mr-2" }, "🤖"),
+                                    language === 'he' ? "מסקנות מרכזיות מקלאוד" : "Claude's Key Insights"
+                                ]),
+                                React.createElement('div', { className: "bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-5 border border-indigo-200" }, [
+                                    React.createElement('div', { className: "space-y-3 text-gray-700" }, [
+                                        // Generate insights based on the data
+                                        React.createElement('p', { className: "text-sm leading-relaxed" }, 
+                                            results.achievesTarget 
+                                                ? (language === 'he' 
+                                                    ? `🎯 תכנית הפנסיה שלך נראית חזקה! אתה צפוי להשיג ${Math.round((results.totalNetIncome / (workPeriods[workPeriods.length - 1]?.salary || 1)) * 100)}% החלפת שכר, שזה מעל היעד של ${inputs.targetReplacement}%.`
+                                                    : `🎯 Your retirement plan looks strong! You're projected to achieve ${Math.round((results.totalNetIncome / (workPeriods[workPeriods.length - 1]?.salary || 1)) * 100)}% salary replacement, which exceeds your ${inputs.targetReplacement}% target.`)
+                                                : (language === 'he' 
+                                                    ? `⚠️ יש פער של ${formatCurrency(results.targetGap)} מהיעד החודשי שלך. שקול להגדיל הפקדות או לדחות את גיל הפרישה.`
+                                                    : `⚠️ There's a ${formatCurrency(results.targetGap)} monthly gap from your target. Consider increasing contributions or delaying retirement age.`)),
+                                        
+                                        React.createElement('p', { className: "text-sm leading-relaxed" }, 
+                                            results.remainingAfterExpenses >= 0
+                                                ? (language === 'he' 
+                                                    ? `💰 אחרי כיסוי ההוצאות הצפויות, תישאר עם עודף חודשי של ${formatCurrency(results.remainingAfterExpenses)}, שמאפשר גמישות פיננסית ביטחון נוסף.`
+                                                    : `💰 After covering expected expenses, you'll have a monthly surplus of ${formatCurrency(results.remainingAfterExpenses)}, providing financial flexibility and extra security.`)
+                                                : (language === 'he' 
+                                                    ? `🔴 ההוצאות הצפויות עולות על ההכנסה הצפויה ב-${formatCurrency(Math.abs(results.remainingAfterExpenses))} לחודש. חשוב לתכנן מחדש.`
+                                                    : `🔴 Expected expenses exceed projected income by ${formatCurrency(Math.abs(results.remainingAfterExpenses))} monthly. Important to replan.`)),
+                                        
+                                        React.createElement('p', { className: "text-sm leading-relaxed" }, 
+                                            language === 'he' 
+                                                ? `📊 האינפלציה תשפיע משמעותית על כוח הקנייה - בכסף של היום, הצבירה שלך תהיה שווה ${formatCurrency(results.inflationAdjustedIncome)} לחודש.`
+                                                : `📊 Inflation will significantly impact purchasing power - in today's money, your accumulation will be worth ${formatCurrency(results.inflationAdjustedIncome)} monthly.`),
+                                        
+                                        inputs.currentPersonalPortfolio > 0 || inputs.currentCrypto > 0 || inputs.currentRealEstate > 0 
+                                            ? React.createElement('p', { className: "text-sm leading-relaxed" }, 
+                                                language === 'he' 
+                                                    ? `🌟 התיק המגוון שלך (פנסיה, השקעות אישיות, קריפטו ונדל"ן) מספק פיזור סיכונים טוב ופוטנציאל לתשואות גבוהות יותר.`
+                                                    : `🌟 Your diversified portfolio (pension, personal investments, crypto, and real estate) provides good risk diversification and potential for higher returns.`)
+                                            : React.createElement('p', { className: "text-sm leading-relaxed" }, 
+                                                language === 'he' 
+                                                    ? `💡 שקול להוסיף השקעות נוספות כמו תיק מניות אישי או נדל"ן לפיזור סיכונים ופוטנציאל תשואה גבוה יותר.`
+                                                    : `💡 Consider adding additional investments like personal stocks or real estate for risk diversification and higher return potential.`),
+                                        
+                                        React.createElement('p', { className: "text-sm leading-relaxed font-medium text-indigo-800" }, 
+                                            language === 'he' 
+                                                ? `🎓 המלצה: בדוק את התכנית אחת לשנה, התאם לשינויים בשכר ובמטרות, ושמור על תכנון שמרני אך אופטימלי.`
+                                                : `🎓 Recommendation: Review your plan annually, adjust for salary and goal changes, and maintain conservative yet optimal planning.`)
+                                    ])
+                                ])
                             ])
                         ])
                     ]),
