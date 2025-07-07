@@ -10,18 +10,18 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- React & ReactDOM with fallback -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js'"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js'"></script>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
     
-    <!-- Recharts with fallback -->
-    <script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/recharts@2.8.0/umd/Recharts.js'"></script>
+    <!-- Recharts -->
+    <script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js"></script>
     
-    <!-- Lucide React with fallback -->
-    <script src="https://unpkg.com/lucide-react@0.263.1/dist/umd/lucide-react.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/lucide-react@0.263.1/dist/umd/lucide-react.js'"></script>
+    <!-- Lucide React - Use CDN version that works -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
-    <!-- Lodash with fallback -->
-    <script src="https://unpkg.com/lodash@4.17.21/lodash.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js'"></script>
+    <!-- Lodash -->
+    <script src="https://unpkg.com/lodash@4.17.21/lodash.min.js"></script>
     
     <style>
         body {
@@ -101,7 +101,7 @@
         // Check if dependencies are loaded
         function checkDependencies() {
             if (typeof React === 'undefined' || typeof ReactDOM === 'undefined' || 
-                typeof Recharts === 'undefined' || typeof LucideReact === 'undefined') {
+                typeof Recharts === 'undefined' || typeof lucide === 'undefined') {
                 document.getElementById('root').innerHTML = `
                     <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
                         <div class="text-center max-w-md">
@@ -145,23 +145,23 @@
                 const { useState, useEffect } = React;
         const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } = Recharts;
         
-        // Lucide Icons
-        const Calculator = LucideReact.Calculator;
-        const TrendingUp = LucideReact.TrendingUp;
-        const Globe = LucideReact.Globe;
-        const DollarSign = LucideReact.DollarSign;
-        const PiggyBank = LucideReact.PiggyBank;
-        const AlertCircle = LucideReact.AlertCircle;
-        const Plus = LucideReact.Plus;
-        const Trash2 = LucideReact.Trash2;
-        const Download = LucideReact.Download;
-        const Languages = LucideReact.Languages;
-        const Settings = LucideReact.Settings;
-        const Info = LucideReact.Info;
-        const Target = LucideReact.Target;
-        const Shuffle = LucideReact.Shuffle;
-        const BarChart3 = LucideReact.BarChart3;
-        const Percent = LucideReact.Percent;
+        // Simple icon replacements using Unicode symbols
+        const Calculator = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '🧮');
+        const TrendingUp = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '📈');
+        const Globe = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '🌍');
+        const DollarSign = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '💲');
+        const PiggyBank = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '🐷');
+        const AlertCircle = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '⚠️');
+        const Plus = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '➕');
+        const Trash2 = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '🗑️');
+        const Download = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '⬇️');
+        const Languages = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '🌐');
+        const Settings = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '⚙️');
+        const Info = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, 'ℹ️');
+        const Target = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '🎯');
+        const Shuffle = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '🔀');
+        const BarChart3 = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '📊');
+        const Percent = ({ size = 16, className = "" }) => React.createElement('span', { className, style: { fontSize: `${size}px` } }, '📈');
 
         const RetirementPlanner = () => {
             const [language, setLanguage] = useState('en');
