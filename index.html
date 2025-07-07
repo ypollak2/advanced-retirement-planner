@@ -17,12 +17,6 @@
     <!-- Recharts -->
     <script src="https://unpkg.com/recharts@2.8.0/umd/Recharts.js"></script>
     
-    <!-- Lucide React - Use CDN version that works -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    
-    <!-- Lodash -->
-    <script src="https://unpkg.com/lodash@4.17.21/lodash.min.js"></script>
-    
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -101,7 +95,7 @@
         // Check if dependencies are loaded
         function checkDependencies() {
             if (typeof React === 'undefined' || typeof ReactDOM === 'undefined' || 
-                typeof Recharts === 'undefined' || typeof lucide === 'undefined') {
+                typeof Recharts === 'undefined') {
                 document.getElementById('root').innerHTML = `
                     <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
                         <div class="text-center max-w-md">
