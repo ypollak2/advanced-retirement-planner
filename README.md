@@ -287,6 +287,38 @@ Want to contribute? Great!
 - 📱 Mobile responsiveness improvements
 - 🌐 Additional language translations
 
+## 🚀 Future Feature Roadmap
+
+### Core Financial Planning Features
+- 🛡️ **Emergency fund/safety cushion calculator** - Calculate recommended emergency savings
+- 💡 **General recommendations based on overall situation** - AI-powered personalized advice
+- 👨‍👩‍👧‍👦 **Multi-generational wealth planning** - Family wealth transfer strategies
+- 🌍 **Social security rights in different countries** - International pension benefits
+- 🏥 **Healthcare cost projections and insurance planning** - Medical expense forecasting
+- 🛡️ **Disability insurance and income protection analysis** - Risk mitigation planning
+
+### Advanced Investment & Tax Features
+- 💰 **Tax optimization strategies for different investment types** - Minimize tax burden
+- 🎲 **Monte Carlo simulations for retirement outcome probabilities** - Statistical modeling
+- 📜 **Estate planning and inheritance considerations** - Wealth transfer planning
+- 🏠 **Debt management and mortgage optimization** - Debt vs investment strategies
+
+### Lifestyle & Career Planning
+- 👶 **Family planning costs (education, children expenses)** - Life event budgeting
+- ✈️ **International retirement planning (visa, residency requirements)** - Global retirement
+- 📈 **Career planning and salary progression modeling** - Income growth projections
+- 🏢 **Business ownership and entrepreneurship retirement planning** - Self-employed strategies
+- 📊 **Lifestyle inflation modeling and expense projections** - Future cost analysis
+
+### International & Transfer Features
+- 🌐 **Pension transfer analysis for international workers** - Cross-border pension rights
+- 🌱 **Climate change impact on investment portfolios** - Sustainable investing
+- 🌿 **ESG (Environmental, Social, Governance) investment options** - Ethical investing
+
+### User Experience & Analysis
+- 🎯 **Retirement goal tracking with milestone celebrations** - Progress gamification
+- ⚠️ **Stress testing for economic downturns and market crashes** - Scenario planning
+
 ## 📞 Support & Contact
 
 - **Issues**: Open issue on GitHub for bug reports

@@ -2661,83 +2661,28 @@
                                             ])
                                         ])
                                     ]),
-                                    // Currency conversion with live rates
-                                    React.createElement('div', { className: "bg-gradient-to-r from-indigo-50 to-cyan-50 rounded-xl p-4 border border-indigo-200" }, [
-                                        React.createElement('div', { className: "flex justify-between items-center mb-3" }, [
-                                            React.createElement('h4', { className: "font-bold text-indigo-800" }, 
-                                                language === 'he' ? "🌍 המרת מטבעות" : "🌍 Currency Conversion"),
-                                            exchangeRatesLoading && React.createElement('div', { className: "text-xs text-indigo-600" }, 
-                                                language === 'he' ? "מעדכן..." : "Updating...")
-                                        ]),
-                                        React.createElement('div', { className: "grid grid-cols-3 gap-2" }, [
-                                            React.createElement('div', { className: "bg-white/70 rounded-lg p-3 text-center" }, [
-                                                React.createElement('div', { className: "text-sm text-gray-600" }, 
-                                                    language === 'he' ? "דולר אמריקאי" : "US Dollar"),
-                                                React.createElement('div', { className: "font-bold text-green-700 text-lg currency-format" }, convertCurrency(results.totalNetIncome, 'USD')),
-                                                React.createElement('div', { className: "text-xs text-gray-500" }, 
-                                                    language === 'he' ? `שער: ₪${exchangeRates.USD.toFixed(2)}` : `Rate: ₪${exchangeRates.USD.toFixed(2)}`)
+                                    // Currency conversion - compact version
+                                    React.createElement('div', { className: "bg-gradient-to-r from-indigo-50 to-cyan-50 rounded-lg p-3 border border-indigo-200" }, [
+                                        React.createElement('h4', { className: "font-semibold text-indigo-800 mb-3 text-center" }, 
+                                            language === 'he' ? "🌍 המרת מטבעות" : "🌍 Currency Conversion"),
+                                        React.createElement('div', { className: "grid grid-cols-3 gap-3" }, [
+                                            React.createElement('div', { className: "text-center" }, [
+                                                React.createElement('div', { className: "text-xs text-gray-600" }, 
+                                                    language === 'he' ? "USD" : "USD"),
+                                                React.createElement('div', { className: "font-bold text-green-700 currency-format" }, convertCurrency(results.totalNetIncome, 'USD'))
                                             ]),
-                                            React.createElement('div', { className: "bg-white/70 rounded-lg p-3 text-center" }, [
-                                                React.createElement('div', { className: "text-sm text-gray-600" }, 
-                                                    language === 'he' ? "לירה שטרלינג" : "British Pound"),
-                                                React.createElement('div', { className: "font-bold text-green-700 text-lg currency-format" }, convertCurrency(results.totalNetIncome, 'GBP')),
-                                                React.createElement('div', { className: "text-xs text-gray-500" }, 
-                                                    language === 'he' ? `שער: ₪${exchangeRates.GBP.toFixed(2)}` : `Rate: ₪${exchangeRates.GBP.toFixed(2)}`)
+                                            React.createElement('div', { className: "text-center" }, [
+                                                React.createElement('div', { className: "text-xs text-gray-600" }, 
+                                                    language === 'he' ? "GBP" : "GBP"),
+                                                React.createElement('div', { className: "font-bold text-green-700 currency-format" }, convertCurrency(results.totalNetIncome, 'GBP'))
                                             ]),
-                                            React.createElement('div', { className: "bg-white/70 rounded-lg p-3 text-center" }, [
-                                                React.createElement('div', { className: "text-sm text-gray-600" }, 
-                                                    language === 'he' ? "יורו" : "Euro"),
-                                                React.createElement('div', { className: "font-bold text-green-700 text-lg currency-format" }, convertCurrency(results.totalNetIncome, 'EUR')),
-                                                React.createElement('div', { className: "text-xs text-gray-500" }, 
-                                                    language === 'he' ? `שער: ₪${exchangeRates.EUR.toFixed(2)}` : `Rate: ₪${exchangeRates.EUR.toFixed(2)}`)
+                                            React.createElement('div', { className: "text-center" }, [
+                                                React.createElement('div', { className: "text-xs text-gray-600" }, 
+                                                    language === 'he' ? "EUR" : "EUR"),
+                                                React.createElement('div', { className: "font-bold text-green-700 currency-format" }, convertCurrency(results.totalNetIncome, 'EUR'))
                                             ])
-                                        ]),
-                                        exchangeRatesLastUpdated && React.createElement('div', { className: "text-xs text-gray-500 text-center mt-2" }, 
-                                            language === 'he' 
-                                                ? `עודכן: ${exchangeRatesLastUpdated.toLocaleString('he-IL')}`
-                                                : `Updated: ${exchangeRatesLastUpdated.toLocaleString('en-US')}`)
+                                        ])
                                     ]),
-                                    
-                                    // Cryptocurrency prices
-                                    React.createElement('div', { className: "bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl p-4 border border-orange-200 mt-4" }, [
-                                        React.createElement('div', { className: "flex justify-between items-center mb-3" }, [
-                                            React.createElement('h4', { className: "font-bold text-orange-800" }, 
-                                                language === 'he' ? "₿ מחירי קריפטו" : "₿ Crypto Prices"),
-                                            cryptoPricesLoading && React.createElement('div', { className: "text-xs text-orange-600" }, 
-                                                language === 'he' ? "מעדכן..." : "Updating...")
-                                        ]),
-                                        React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-3 gap-4" }, [
-                                            ['bitcoin', 'Bitcoin', 'BTC', '₿'],
-                                            ['ethereum', 'Ethereum', 'ETH', 'Ξ'],
-                                            ['binancecoin', 'Binance Coin', 'BNB', 'B']
-                                        ].map(([id, name, ticker, symbol]) => 
-                                            React.createElement('div', { 
-                                                key: id,
-                                                className: "bg-white/80 rounded-lg p-4 border border-orange-200 hover:shadow-md transition-shadow" 
-                                            }, [
-                                                React.createElement('div', { className: "flex items-center justify-between mb-2" }, [
-                                                    React.createElement('div', { className: "flex items-center" }, [
-                                                        React.createElement('span', { className: "text-xl mr-2" }, symbol),
-                                                        React.createElement('div', null, [
-                                                            React.createElement('div', { className: "font-semibold text-gray-800" }, 
-                                                                language === 'he' ? name : name),
-                                                            React.createElement('div', { className: "text-xs text-gray-500" }, ticker)
-                                                        ])
-                                                    ]),
-                                                    React.createElement('div', { className: "text-right" }, [
-                                                        React.createElement('div', { className: "font-bold text-orange-700 text-lg" }, 
-                                                            `$${cryptoPrices[id]?.toLocaleString() || 'N/A'}`),
-                                                        React.createElement('div', { className: "text-sm text-gray-600" }, 
-                                                            `₪${(cryptoPrices[id] * exchangeRates.USD)?.toLocaleString() || 'N/A'}`)
-                                                    ])
-                                                ])
-                                            ])
-                                        )),
-                                        cryptoPricesLastUpdated && React.createElement('div', { className: "text-xs text-gray-500 text-center mt-2" }, 
-                                            language === 'he' 
-                                                ? `עודכן: ${cryptoPricesLastUpdated.toLocaleString('he-IL')}`
-                                                : `Updated: ${cryptoPricesLastUpdated.toLocaleString('en-US')}`)
-                                    ])
                                 ])
                             ]),
 
