@@ -491,7 +491,11 @@
                 'ניקיי 225': '^N225',
                 'אג״ח ממשלתיות': 'IEF',
                 'אג״ח קונצרניות': 'LQD',
-                'נדל״ן': 'VNQ'
+                'נדל״ן ארה״ב': 'VNQ',
+                'נדל״ן ישראל': 'TASE:TARE',
+                'נדל״ן אירופה': 'VGK',
+                'נדל״ן עולמי': 'VNQI',
+                'נדל״ן אסיה': 'VPL'
             };
 
             // Bilingual index names mapping
@@ -506,7 +510,11 @@
                 'ניקיי 225': { he: 'ניקיי 225', en: 'Nikkei 225' },
                 'אג״ח ממשלתיות': { he: 'אג״ח ממשלתיות', en: 'Government Bonds' },
                 'אג״ח קונצרניות': { he: 'אג״ח קונצרניות', en: 'Corporate Bonds' },
-                'נדל״ן': { he: 'נדל״ן', en: 'Real Estate' }
+                'נדל״ן ארה״ב': { he: 'נדל״ן ארה״ב', en: 'US Real Estate' },
+                'נדל״ן ישראל': { he: 'נדל״ן ישראל', en: 'Israel Real Estate' },
+                'נדל״ן אירופה': { he: 'נדל״ן אירופה', en: 'Europe Real Estate' },
+                'נדל״ן עולמי': { he: 'נדל״ן עולמי', en: 'Global Real Estate' },
+                'נדל״ן אסיה': { he: 'נדל״ן אסיה', en: 'Asia Real Estate' }
             };
 
             // Function to fetch real-time index data
@@ -626,17 +634,23 @@
                         5: {
                             'ת"א 35': 8.2, 'ת"א 125': 7.5, 'S&P 500': 10.5, 'NASDAQ': 12.1,
                             'MSCI World': 8.8, 'יורו סטוקס 50': 6.4, 'FTSE 100': 5.9,
-                            'ניקיי 225': 7.2, 'אג״ח ממשלתיות': 3.8, 'אג״ח קונצרניות': 4.5, 'נדל״ן': 7.8
+                            'ניקיי 225': 7.2, 'אג״ח ממשלתיות': 3.8, 'אג״ח קונצרניות': 4.5,
+                            'נדל״ן ארה״ב': 7.8, 'נדל״ן ישראל': 9.2, 'נדל״ן אירופה': 6.5, 
+                            'נדל״ן עולמי': 7.3, 'נדל״ן אסיה': 8.1
                         },
                         10: {
                             'ת"א 35': 7.1, 'ת"א 125': 6.8, 'S&P 500': 9.8, 'NASDAQ': 11.2,
                             'MSCI World': 8.1, 'יורו סטוקס 50': 5.9, 'FTSE 100': 5.2,
-                            'ניקיי 225': 6.8, 'אג״ח ממשלתיות': 3.2, 'אג״ח קונצרניות': 4.1, 'נדל״ן': 7.2
+                            'ניקיי 225': 6.8, 'אג״ח ממשלתיות': 3.2, 'אג״ח קונצרניות': 4.1,
+                            'נדל״ן ארה״ב': 7.2, 'נדל״ן ישראל': 8.5, 'נדל״ן אירופה': 5.8,
+                            'נדל״ן עולמי': 6.9, 'נדל״ן אסיה': 7.4
                         },
                         20: {
                             'ת"א 35': 6.5, 'ת"א 125': 6.1, 'S&P 500': 8.8, 'NASDAQ': 9.9,
                             'MSCI World': 7.2, 'יורו סטוקס 50': 5.1, 'FTSE 100': 4.4,
-                            'ניקיי 225': 4.2, 'אג״ח ממשלתיות': 2.5, 'אג״ח קונצרניות': 3.5, 'נדל״ן': 6.5
+                            'ניקיי 225': 4.2, 'אג״ח ממשלתיות': 2.5, 'אג״ח קונצרניות': 3.5,
+                            'נדל״ן ארה״ב': 6.5, 'נדל״ן ישראל': 7.8, 'נדל״ן אירופה': 5.2,
+                            'נדל״ן עולמי': 6.1, 'נדל״ן אסיה': 6.7
                         }
                     });
                 } finally {
@@ -1238,6 +1252,175 @@
                 setWorkPeriods(workPeriods.map(period => 
                     period.id === id ? { ...period, [field]: value } : period
                 ));
+            };
+
+            // Export retirement summary for sharing
+            const exportRetirementSummary = async () => {
+                try {
+                    const summaryText = generateSummaryText();
+                    
+                    // Try to use Web Share API if available (mobile)
+                    if (navigator.share) {
+                        await navigator.share({
+                            title: language === 'he' ? 'תכנית הפנסיה שלי' : 'My Retirement Plan',
+                            text: summaryText
+                        });
+                    } else {
+                        // Fallback: Copy to clipboard
+                        await navigator.clipboard.writeText(summaryText);
+                        alert(language === 'he' 
+                            ? 'הסיכום הועתק ללוח! ניתן להדביק בוואטסאפ' 
+                            : 'Summary copied to clipboard! You can paste it in WhatsApp');
+                    }
+                } catch (error) {
+                    console.error('Export failed:', error);
+                    // Final fallback: Show in alert for manual copy
+                    const summaryText = generateSummaryText();
+                    prompt(
+                        language === 'he' 
+                            ? 'העתק את הטקסט הבא:' 
+                            : 'Copy the following text:', 
+                        summaryText
+                    );
+                }
+            };
+
+            // Generate formatted summary text
+            const generateSummaryText = () => {
+                if (!results) return '';
+                
+                const title = language === 'he' 
+                    ? '📊 תכנית הפנסיה שלי - סיכום'
+                    : '📊 My Retirement Plan - Summary';
+                
+                const totalAccumulation = results.totalSavings + results.trainingFundValue + 
+                    results.personalPortfolioValue + results.cryptoValue + results.realEstateValue;
+                
+                const breakdown = language === 'he' 
+                    ? `💰 צבירה צפויה: ${formatCurrency(totalAccumulation)}
+📈 הכנסה חודשית נטו: ${formatCurrency(results.totalNetIncome)}
+🎯 יעד החלפה: ${inputs.targetReplacement}% (${results.achievesTarget ? '✅ מושג' : '⚠️ לא מושג'})
+📊 יתרה לאחר הוצאות: ${formatCurrency(results.remainingAfterExpenses)}`
+                    : `💰 Expected Accumulation: ${formatCurrency(totalAccumulation)}
+📈 Net Monthly Income: ${formatCurrency(results.totalNetIncome)}
+🎯 Replacement Target: ${inputs.targetReplacement}% (${results.achievesTarget ? '✅ Achieved' : '⚠️ Not Achieved'})
+📊 Surplus After Expenses: ${formatCurrency(results.remainingAfterExpenses)}`;
+
+                const insights = claudeInsights 
+                    ? (language === 'he' ? '\n🤖 מסקנות קלאוד:\n' : '\n🤖 Claude\'s Insights:\n') + 
+                      claudeInsights.map(insight => `• ${insight}`).join('\n')
+                    : '';
+                
+                const footer = language === 'he'
+                    ? '\n\n📱 נוצר עם מתכנן הפנסיה המתקדם'
+                    : '\n\n📱 Generated with Advanced Retirement Planner';
+                
+                return `${title}\n\n${breakdown}${insights}${footer}`;
+            };
+
+            // Export results as image
+            const exportAsImage = async () => {
+                try {
+                    // Create a temporary canvas to draw the summary
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Set canvas dimensions for mobile sharing
+                    canvas.width = 800;
+                    canvas.height = 1200;
+                    
+                    // Set background gradient
+                    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    gradient.addColorStop(0, '#667eea');
+                    gradient.addColorStop(1, '#764ba2');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Set text properties
+                    ctx.textAlign = language === 'he' ? 'right' : 'left';
+                    const margin = 40;
+                    let y = margin + 40;
+                    
+                    // Title
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 32px Arial';
+                    const title = language === 'he' ? '📊 תכנית הפנסיה שלי' : '📊 My Retirement Plan';
+                    ctx.fillText(title, language === 'he' ? canvas.width - margin : margin, y);
+                    y += 80;
+                    
+                    // White background for content
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                    ctx.fillRect(margin, y - 20, canvas.width - (margin * 2), canvas.height - y - margin);
+                    
+                    // Content
+                    ctx.fillStyle = '#1f2937';
+                    ctx.font = 'bold 24px Arial';
+                    
+                    const totalAccumulation = results.totalSavings + results.trainingFundValue + 
+                        results.personalPortfolioValue + results.cryptoValue + results.realEstateValue;
+                    
+                    const lines = [
+                        language === 'he' ? `💰 צבירה צפויה: ${formatCurrency(totalAccumulation)}` : `💰 Expected: ${formatCurrency(totalAccumulation)}`,
+                        language === 'he' ? `📈 הכנסה חודשית: ${formatCurrency(results.totalNetIncome)}` : `📈 Monthly Income: ${formatCurrency(results.totalNetIncome)}`,
+                        language === 'he' ? `🎯 יעד החלפה: ${inputs.targetReplacement}% ${results.achievesTarget ? '✅' : '⚠️'}` : `🎯 Target: ${inputs.targetReplacement}% ${results.achievesTarget ? '✅' : '⚠️'}`,
+                        language === 'he' ? `📊 יתרה: ${formatCurrency(results.remainingAfterExpenses)}` : `📊 Surplus: ${formatCurrency(results.remainingAfterExpenses)}`
+                    ];
+                    
+                    lines.forEach(line => {
+                        y += 50;
+                        ctx.fillText(line, language === 'he' ? canvas.width - margin - 20 : margin + 20, y);
+                    });
+                    
+                    // Add key insights
+                    if (claudeInsights && claudeInsights.length > 0) {
+                        y += 60;
+                        ctx.fillStyle = '#4f46e5';
+                        ctx.font = 'bold 20px Arial';
+                        ctx.fillText(language === 'he' ? '🤖 מסקנות מרכזיות:' : '🤖 Key Insights:', 
+                            language === 'he' ? canvas.width - margin - 20 : margin + 20, y);
+                        
+                        ctx.fillStyle = '#1f2937';
+                        ctx.font = '16px Arial';
+                        
+                        claudeInsights.slice(0, 3).forEach(insight => {
+                            y += 40;
+                            // Wrap long text
+                            const maxWidth = canvas.width - (margin * 2) - 40;
+                            const shortInsight = insight.length > 60 ? insight.substring(0, 60) + '...' : insight;
+                            ctx.fillText(`• ${shortInsight}`, language === 'he' ? canvas.width - margin - 20 : margin + 20, y);
+                        });
+                    }
+                    
+                    // Footer
+                    y = canvas.height - 60;
+                    ctx.fillStyle = '#6b7280';
+                    ctx.font = '14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(language === 'he' ? 'נוצר עם מתכנן הפנסיה המתקדם' : 'Generated with Advanced Retirement Planner', 
+                        canvas.width / 2, y);
+                    
+                    // Convert to blob and download
+                    canvas.toBlob(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = language === 'he' ? 'תכנית-פנסיה.png' : 'retirement-plan.png';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        
+                        alert(language === 'he' ? 
+                            'התמונה נשמרה! ניתן לשלוח אותה בוואטסאפ' : 
+                            'Image saved! You can share it on WhatsApp');
+                    }, 'image/png');
+                    
+                } catch (error) {
+                    console.error('Image export failed:', error);
+                    alert(language === 'he' ? 
+                        'שגיאה ביצירת התמונה. נסה את שיתוף הטקסט' : 
+                        'Failed to create image. Try text sharing instead');
+                }
             };
 
             // Generate Claude AI insights
@@ -2362,7 +2545,7 @@
                             React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
                                 React.createElement('h3', { className: "text-xl font-bold text-blue-700 mb-4 flex items-center" }, [
                                     React.createElement(Calculator, { className: "mr-2" }),
-                                    language === 'he' ? "פירוט החיסכונים" : "Savings Breakdown"
+                                    language === 'he' ? "פירוט חסכונות" : "Savings Breakdown"
                                 ]),
                                 React.createElement('div', { className: "space-y-3" }, [
                                     React.createElement('div', { className: "flex justify-between p-3 bg-blue-50 rounded-lg" }, [
@@ -2377,8 +2560,73 @@
                                     ]),
                                     React.createElement('div', { className: "flex justify-between p-3 bg-gray-50 rounded-lg border-2 border-gray-300" }, [
                                         React.createElement('span', { className: "font-bold" }, 
-                                            language === 'he' ? "סה״כ חיסכונים:" : "Total Savings:"),
+                                            language === 'he' ? "סה״כ חסכונות:" : "Total Savings:"),
                                         React.createElement('span', { className: "font-bold text-gray-800 currency-format" }, formatCurrency(results.totalSavings + results.trainingFundValue))
+                                    ])
+                                ])
+                            ]),
+
+                            // Comprehensive Savings Breakdown
+                            React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
+                                React.createElement('h3', { className: "text-xl font-bold text-purple-700 mb-4 flex items-center" }, [
+                                    React.createElement('span', { className: "mr-2" }, "💎"),
+                                    language === 'he' ? "פירוט מלא של הצבירה" : "Complete Accumulation Breakdown"
+                                ]),
+                                React.createElement('div', { className: "space-y-3" }, [
+                                    // Pension Savings
+                                    results.totalSavings > 0 && React.createElement('div', { className: "flex justify-between p-3 bg-blue-50 rounded-lg border border-blue-200" }, [
+                                        React.createElement('span', { className: "flex items-center" }, [
+                                            React.createElement('span', { className: "w-3 h-3 bg-blue-500 rounded-full mr-2" }),
+                                            language === 'he' ? "פנסיה:" : "Pension:"
+                                        ]),
+                                        React.createElement('span', { className: "font-bold text-blue-700 currency-format" }, formatCurrency(results.totalSavings))
+                                    ]),
+                                    // Training Fund
+                                    results.trainingFundValue > 0 && React.createElement('div', { className: "flex justify-between p-3 bg-green-50 rounded-lg border border-green-200" }, [
+                                        React.createElement('span', { className: "flex items-center" }, [
+                                            React.createElement('span', { className: "w-3 h-3 bg-green-500 rounded-full mr-2" }),
+                                            language === 'he' ? "קרן השתלמות:" : "Training Fund:"
+                                        ]),
+                                        React.createElement('span', { className: "font-bold text-green-700 currency-format" }, formatCurrency(results.trainingFundValue))
+                                    ]),
+                                    // Personal Portfolio
+                                    results.personalPortfolioValue > 0 && React.createElement('div', { className: "flex justify-between p-3 bg-purple-50 rounded-lg border border-purple-200" }, [
+                                        React.createElement('span', { className: "flex items-center" }, [
+                                            React.createElement('span', { className: "w-3 h-3 bg-purple-500 rounded-full mr-2" }),
+                                            language === 'he' ? "תיק אישי:" : "Personal Portfolio:"
+                                        ]),
+                                        React.createElement('span', { className: "font-bold text-purple-700 currency-format" }, formatCurrency(results.personalPortfolioValue))
+                                    ]),
+                                    // Cryptocurrency
+                                    results.cryptoValue > 0 && React.createElement('div', { className: "flex justify-between p-3 bg-orange-50 rounded-lg border border-orange-200" }, [
+                                        React.createElement('span', { className: "flex items-center" }, [
+                                            React.createElement('span', { className: "w-3 h-3 bg-orange-500 rounded-full mr-2" }),
+                                            language === 'he' ? "קריפטו:" : "Cryptocurrency:"
+                                        ]),
+                                        React.createElement('span', { className: "font-bold text-orange-700 currency-format" }, formatCurrency(results.cryptoValue))
+                                    ]),
+                                    // Real Estate
+                                    results.realEstateValue > 0 && React.createElement('div', { className: "flex justify-between p-3 bg-emerald-50 rounded-lg border border-emerald-200" }, [
+                                        React.createElement('span', { className: "flex items-center" }, [
+                                            React.createElement('span', { className: "w-3 h-3 bg-emerald-500 rounded-full mr-2" }),
+                                            language === 'he' ? "נדל״ן:" : "Real Estate:"
+                                        ]),
+                                        React.createElement('span', { className: "font-bold text-emerald-700 currency-format" }, formatCurrency(results.realEstateValue))
+                                    ]),
+                                    // Total Line
+                                    React.createElement('div', { className: "flex justify-between p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border-2 border-indigo-300" }, [
+                                        React.createElement('span', { className: "font-bold text-lg flex items-center" }, [
+                                            React.createElement('span', { className: "w-4 h-4 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full mr-2" }),
+                                            language === 'he' ? "סה״כ צבירה:" : "Total Accumulation:"
+                                        ]),
+                                        React.createElement('span', { className: "font-bold text-xl text-indigo-700 currency-format" }, 
+                                            formatCurrency(
+                                                results.totalSavings + 
+                                                results.trainingFundValue + 
+                                                results.personalPortfolioValue + 
+                                                results.cryptoValue + 
+                                                results.realEstateValue
+                                            ))
                                     ])
                                 ])
                             ]),
@@ -2538,6 +2786,26 @@
                                             }, insight)
                                         )
                                     )
+                                ]),
+                                
+                                // Export Buttons
+                                React.createElement('div', { className: "mt-4 pt-4 border-t border-indigo-200" }, [
+                                    React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 gap-3" }, [
+                                        React.createElement('button', {
+                                            onClick: () => exportRetirementSummary(),
+                                            className: "bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-3 rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 shadow-lg flex items-center justify-center font-medium"
+                                        }, [
+                                            React.createElement('span', { className: "mr-2" }, "📱"),
+                                            language === 'he' ? "שיתוף טקסט" : "Share Text"
+                                        ]),
+                                        React.createElement('button', {
+                                            onClick: () => exportAsImage(),
+                                            className: "bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-3 rounded-lg hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 shadow-lg flex items-center justify-center font-medium"
+                                        }, [
+                                            React.createElement('span', { className: "mr-2" }, "🖼️"),
+                                            language === 'he' ? "שמירה כתמונה" : "Save as Image"
+                                        ])
+                                    ])
                                 ])
                             ])
                         ])
