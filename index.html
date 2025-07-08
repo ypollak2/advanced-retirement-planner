@@ -17,6 +17,10 @@
     <!-- Chart.js - More reliable charting library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
+    <!-- CORS Proxy Solutions -->
+    <script src="./cors-proxy-solution.js"></script>
+    <script src="./yahoo-finance-cors-fix.js"></script>
+    
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -303,7 +307,8 @@
                     }
                     
                     chartInstance.current = new Chart(ctx, {
-                        type: type === 'stressComparison' ? 'bar' : type,
+                        type: type === 'stressComparison' ? 'bar' : 
+                              type === 'crisisTimeline' ? 'line' : type,
                         data: chartData,
                         options: {
                             responsive: true,
@@ -2217,18 +2222,22 @@
                 }
             }, [inputs, workPeriods, showChart, pensionIndexAllocation, trainingFundIndexAllocation]);
 
-            // Stress Testing Functions
+            // Stress Testing Functions - Simplified Version
             const runStressTest = (scenarioType) => {
-                try {
-                    console.log('runStressTest called with:', scenarioType);
-                    console.log('results state:', results);
-                    console.log('language state:', language);
-                    
-                    if (!results) {
-                        console.log('No results found, showing alert');
-                        alert(language === 'he' ? 'יש לחשב תכנית פרישה תחילה' : 'Please calculate retirement plan first');
-                        return;
-                    }
+                // Immediate safety check
+                if (typeof scenarioType !== 'string') {
+                    console.error('Invalid scenario type');
+                    return;
+                }
+                
+                console.log('=== STRESS TEST START ===');
+                console.log('Scenario:', scenarioType);
+                
+                // Simple check without complex logic
+                if (!results || !results.totalNetIncome) {
+                    alert(language === 'he' ? 'יש לחשב תכנית פרישה תחילה' : 'Please calculate retirement plan first');
+                    return;
+                }
 
                 // Track stress test action
                 try {
@@ -2243,6 +2252,7 @@
                     console.warn('Analytics tracking failed:', analyticsError);
                 }
 
+                try {
                 const scenarios = {
                     financial_crisis_2008: {
                         name: language === 'he' ? "משבר פיננסי 2008" : "2008 Financial Crisis",
