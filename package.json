@@ -1,28 +1,60 @@
 {
   "name": "advanced-retirement-planner",
-  "version": "1.0.0",
-  "description": "Professional retirement planning tool with comprehensive investment tracking",
+  "version": "2.2.3",
+  "description": "Professional retirement planning tool with comprehensive investment tracking, FIRE calculator, and stress testing",
   "main": "index.html",
+  "homepage": "https://ypollak2.github.io/advanced-retirement-planner",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ypollak2/advanced-retirement-planner.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ypollak2/advanced-retirement-planner/issues"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && gh-pages -d dist"
+    "deploy": "npm run build && gh-pages -d dist",
+    "test": "echo \"No tests specified\" && exit 0",
+    "lint": "echo \"No linting configured\" && exit 0",
+    "audit": "npm audit --audit-level=moderate",
+    "audit-fix": "npm audit fix",
+    "security": "npm audit && npm run license-check",
+    "license-check": "license-checker --summary --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;CC0-1.0;Unlicense;0BSD;CC-BY-3.0;CC-BY-4.0;(MIT AND CC-BY-3.0)'"
   },
   "keywords": [
     "retirement",
     "pension",
     "investment",
     "financial-planning",
-    "FIRE"
+    "FIRE",
+    "stress-testing",
+    "portfolio-management",
+    "retirement-calculator"
   ],
-  "author": "Advanced Retirement Planner",
-  "license": "MIT",
-  "devDependencies": {
-    "vite": "^5.0.0",
-    "gh-pages": "^6.0.0"
+  "author": {
+    "name": "Advanced Retirement Planner Contributors",
+    "url": "https://github.com/ypollak2/advanced-retirement-planner/graphs/contributors"
   },
-  "dependencies": {
-    "chart.js": "^4.4.0"
-  }
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.0.0",
+    "license-checker": "^25.0.1",
+    "vite": "^7.0.3"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ]
 }
