@@ -171,8 +171,31 @@
                     // Use language prop instead of global variable
                     const isHebrew = language === 'he';
                     
-                    // Check if this is accumulation chart (has pensionSavings property) or index chart
-                    if (data[0] && data[0].pensionSavings !== undefined) {
+                    // Check chart type: accumulation, index, or stress comparison
+                    if (type === 'stressComparison') {
+                        // Stress test comparison chart
+                        chartData = {
+                            labels: data.map(d => d.scenario),
+                            datasets: [
+                                {
+                                    label: isHebrew ? 'הכנסה חודשית (₪)' : 'Monthly Income (₪)',
+                                    data: data.map(d => d.monthlyIncome),
+                                    backgroundColor: ['rgba(34, 197, 94, 0.8)', 'rgba(239, 68, 68, 0.8)'],
+                                    borderColor: ['rgb(34, 197, 94)', 'rgb(239, 68, 68)'],
+                                    borderWidth: 2,
+                                    yAxisID: 'y'
+                                },
+                                {
+                                    label: isHebrew ? 'צבירה כוללת (₪ מיליונים)' : 'Total Accumulation (₪ millions)',
+                                    data: data.map(d => d.totalAccumulation / 1000000),
+                                    backgroundColor: ['rgba(59, 130, 246, 0.8)', 'rgba(147, 51, 234, 0.8)'],
+                                    borderColor: ['rgb(59, 130, 246)', 'rgb(147, 51, 234)'],
+                                    borderWidth: 2,
+                                    yAxisID: 'y1'
+                                }
+                            ]
+                        };
+                    } else if (data[0] && data[0].pensionSavings !== undefined) {
                         // Accumulation chart with multiple lines
                         chartData = {
                             labels: data.map(d => isHebrew ? `גיל ${d.age}` : `Age ${d.age}`),
@@ -252,7 +275,7 @@
                     }
                     
                     chartInstance.current = new Chart(ctx, {
-                        type: type,
+                        type: type === 'stressComparison' ? 'bar' : type,
                         data: chartData,
                         options: {
                             responsive: true,
@@ -260,7 +283,9 @@
                             plugins: {
                                 title: {
                                     display: true,
-                                    text: data[0] && data[0].pensionSavings !== undefined 
+                                    text: type === 'stressComparison' 
+                                        ? (isHebrew ? 'השוואה: מצב רגיל מול משבר' : 'Comparison: Normal vs Crisis')
+                                        : data[0] && data[0].pensionSavings !== undefined 
                                         ? (isHebrew ? 'התפתחות הצבירה לאורך השנים' : 'Accumulation Progress Over Years')
                                         : (isHebrew ? 'תשואות היסטוריות במדדים' : 'Historical Index Returns'),
                                     font: {
@@ -277,7 +302,51 @@
                                     }
                                 }
                             },
-                            scales: {
+                            scales: type === 'stressComparison' ? {
+                                y: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'left',
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: isHebrew ? 'הכנסה חודשית (₪)' : 'Monthly Income (₪)'
+                                    },
+                                    ticks: {
+                                        callback: function(value) {
+                                            if (value >= 1000) {
+                                                return '₪' + (value / 1000).toFixed(0) + 'K';
+                                            } else {
+                                                return '₪' + value.toFixed(0);
+                                            }
+                                        }
+                                    }
+                                },
+                                y1: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'right',
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: isHebrew ? 'צבירה (מיליוני ₪)' : 'Accumulation (₪ millions)'
+                                    },
+                                    grid: {
+                                        drawOnChartArea: false,
+                                    },
+                                    ticks: {
+                                        callback: function(value) {
+                                            return value.toFixed(1) + 'M';
+                                        }
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: true,
+                                        color: 'rgba(0, 0, 0, 0.1)'
+                                    }
+                                }
+                            } : {
                                 y: {
                                     beginAtZero: true,
                                     ticks: {
@@ -4149,6 +4218,80 @@
                                         language === 'he' ? "תוצאות מבחן העמידות" : "Stress Test Results"
                                     ]),
                                     React.createElement('div', { className: "space-y-6" }, [
+                                        // Detailed Crisis Explanation Section
+                                        React.createElement('div', { className: "bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 mb-6 border border-blue-200" }, [
+                                            React.createElement('h4', { className: "font-bold text-blue-800 mb-4 flex items-center" }, [
+                                                React.createElement('span', { className: "mr-2" }, "🔍"),
+                                                language === 'he' ? "הסבר מפורט על המשבר והשפעותיו" : "Detailed Crisis Explanation and Impact"
+                                            ]),
+                                            React.createElement('div', { className: "space-y-4" }, [
+                                                // Crisis Methodology Explanation
+                                                React.createElement('div', { className: "bg-white rounded-lg p-4 border border-blue-100" }, [
+                                                    React.createElement('h5', { className: "font-semibold text-blue-700 mb-2" }, 
+                                                        language === 'he' ? "📈 אופן חישוב השפעות המשבר:" : "📈 How Crisis Impacts Are Calculated:"),
+                                                    React.createElement('ul', { className: "text-sm text-blue-600 space-y-2" }, [
+                                                        React.createElement('li', { className: "flex items-start" }, [
+                                                            React.createElement('span', { className: "mr-2 text-blue-400" }, "1."),
+                                                            React.createElement('div', null, [
+                                                                React.createElement('strong', null, language === 'he' ? "שלב ראשון - השפעה מיידית:" : "Phase 1 - Immediate Impact:"),
+                                                                React.createElement('span', { className: "block mt-1" }, 
+                                                                    language === 'he' 
+                                                                        ? `ירידה חד-פעמית של ${stressTestResults.scenario?.portfolioDecline || 0}% בצבירה הקיימת (אפקט קריסת השוק)`
+                                                                        : `One-time ${stressTestResults.scenario?.portfolioDecline || 0}% decline in existing accumulation (market crash effect)`)
+                                                            ])
+                                                        ]),
+                                                        React.createElement('li', { className: "flex items-start" }, [
+                                                            React.createElement('span', { className: "mr-2 text-blue-400" }, "2."),
+                                                            React.createElement('div', null, [
+                                                                React.createElement('strong', null, language === 'he' ? "שלב שני - שנות המשבר:" : "Phase 2 - Crisis Years:"),
+                                                                React.createElement('span', { className: "block mt-1" }, 
+                                                                    language === 'he' 
+                                                                        ? `במשך ${stressTestResults.scenario?.duration || 0} שנים: תשואות מופחתות ב-3-4%, הפקדות מופחתות ב-${stressTestResults.scenario?.incomeReduction || 0}%`
+                                                                        : `For ${stressTestResults.scenario?.duration || 0} years: 3-4% reduced returns, ${stressTestResults.scenario?.incomeReduction || 0}% reduced contributions`)
+                                                            ])
+                                                        ]),
+                                                        React.createElement('li', { className: "flex items-start" }, [
+                                                            React.createElement('span', { className: "mr-2 text-blue-400" }, "3."),
+                                                            React.createElement('div', null, [
+                                                                React.createElement('strong', null, language === 'he' ? "שלב שלישי - התאוששות:" : "Phase 3 - Recovery:"),
+                                                                React.createElement('span', { className: "block mt-1" }, 
+                                                                    language === 'he' 
+                                                                        ? `השנים הנותרות: חזרה לתשואות ותרומות רגילות`
+                                                                        : `Remaining years: return to normal returns and contributions`)
+                                                            ])
+                                                        ])
+                                                    ])
+                                                ]),
+                                                
+                                                // Real World Context
+                                                React.createElement('div', { className: "bg-white rounded-lg p-4 border border-blue-100" }, [
+                                                    React.createElement('h5', { className: "font-semibold text-blue-700 mb-2" }, 
+                                                        language === 'he' ? "🌍 הקשר היסטורי:" : "🌍 Historical Context:"),
+                                                    React.createElement('div', { className: "text-sm text-blue-600" }, 
+                                                        stressTestResults.scenario?.name === 'financial_crisis_2008' ? 
+                                                            (language === 'he' ? 
+                                                                "משבר 2008 החל עם קריסת בנק ליהמן ברדרס, הוביל לירידה של 57% ב-S&P 500, עלייה באבטלה ל-10%, ואילץ בנקים מרכזיים להוריד ריבית כמעט לאפס. ההתאוששות ארכה כ-6 שנים עד שהשווקים חזרו לשיאים." :
+                                                                "The 2008 crisis began with Lehman Brothers collapse, led to 57% S&P 500 decline, unemployment rising to 10%, and forced central banks to cut rates near zero. Recovery took about 6 years for markets to reach new highs."
+                                                            ) :
+                                                        stressTestResults.scenario?.name === 'covid_pandemic' ?
+                                                            (language === 'he' ? 
+                                                                "משבר קורונה 2020 גרם לסגירות כלכליות נרחבות, ירידה של 34% ב-S&P 500 במרץ, אך התאוששות מהירה הודות לתמיכה ממשלתית וחדשנות רפואית. השווקים הגיעו לשיאים חדשים תוך שנה." :
+                                                                "COVID-19 crisis caused widespread economic shutdowns, 34% S&P 500 decline in March, but rapid recovery due to government support and medical innovation. Markets reached new highs within a year."
+                                                            ) :
+                                                        stressTestResults.scenario?.name === 'high_inflation' ?
+                                                            (language === 'he' ? 
+                                                                "אינפלציה גבוהה בשנות ה-70 הגיעה ל-14% בארה\"ב, נגרמה ממשבר הנפט ומדיניות מוניטרית רופפה. הפתרון דרש העלאות ריבית דרמטיות ל-20% והתמודדות עם מיתון עמוק." :
+                                                                "High inflation in the 1970s reached 14% in the US, caused by oil crisis and loose monetary policy. Solution required dramatic interest rate hikes to 20% and dealing with deep recession."
+                                                            ) :
+                                                            (language === 'he' ? 
+                                                                "התרחיש שבדקתם מבוסס על פרמטרים כלכליים מציאותיים ולוקח בחשבון דפוסי התאוששות היסטוריים של השווקים והכלכלה." :
+                                                                "The scenario you tested is based on realistic economic parameters and takes into account historical recovery patterns of markets and the economy."
+                                                            )
+                                                    )
+                                                ])
+                                            ])
+                                        ]),
+                                        
                                         // Scenario Overview
                                         React.createElement('div', { className: "bg-gray-50 rounded-lg p-4" }, [
                                             React.createElement('h4', { className: "font-bold text-gray-800 mb-2" }, 
@@ -4230,6 +4373,54 @@
                                                         `${stressTestResults.recoveryYears || 'N/A'}`),
                                                     React.createElement('div', { className: "text-gray-600" }, 
                                                         language === 'he' ? "שנות התאוששות" : "Recovery Years")
+                                                ])
+                                            ])
+                                        ]),
+
+                                        // Stress Test Comparison Chart
+                                        React.createElement('div', { className: "bg-white rounded-lg p-6 border border-gray-200" }, [
+                                            React.createElement('h4', { className: "font-bold text-gray-800 mb-4 flex items-center" }, [
+                                                React.createElement('span', { className: "mr-2" }, "📊"),
+                                                language === 'he' ? "גרף השוואה: רגיל מול משבר" : "Comparison Chart: Normal vs Crisis"
+                                            ]),
+                                            React.createElement('div', { className: "h-80 mb-4" },
+                                                React.createElement(SimpleChart, { 
+                                                    data: [
+                                                        {
+                                                            scenario: language === 'he' ? 'מצב רגיל' : 'Normal',
+                                                            monthlyIncome: stressTestResults.normal.monthlyIncome,
+                                                            totalAccumulation: stressTestResults.normal.totalAccumulation,
+                                                            achievesTarget: stressTestResults.normal.achievesTarget ? 100 : 0
+                                                        },
+                                                        {
+                                                            scenario: language === 'he' ? 'במשבר' : 'Crisis',
+                                                            monthlyIncome: stressTestResults.stressed.monthlyIncome,
+                                                            totalAccumulation: stressTestResults.stressed.totalAccumulation,
+                                                            achievesTarget: stressTestResults.stressed.achievesTarget ? 100 : 0
+                                                        }
+                                                    ],
+                                                    type: 'stressComparison',
+                                                    language: language
+                                                })
+                                            ),
+                                            React.createElement('div', { className: "grid grid-cols-3 gap-4 text-center text-sm" }, [
+                                                React.createElement('div', { className: "bg-blue-50 p-3 rounded-lg" }, [
+                                                    React.createElement('div', { className: "font-semibold text-blue-800" }, 
+                                                        language === 'he' ? "הכנסה חודשית" : "Monthly Income"),
+                                                    React.createElement('div', { className: "text-xs text-blue-600 mt-1" }, 
+                                                        language === 'he' ? "הכנסה צפויה בפרישה" : "Expected retirement income")
+                                                ]),
+                                                React.createElement('div', { className: "bg-green-50 p-3 rounded-lg" }, [
+                                                    React.createElement('div', { className: "font-semibold text-green-800" }, 
+                                                        language === 'he' ? "צבירה כוללת" : "Total Accumulation"),
+                                                    React.createElement('div', { className: "text-xs text-green-600 mt-1" }, 
+                                                        language === 'he' ? "כל הכסף שיצטבר עד הפרישה" : "Total money accumulated by retirement")
+                                                ]),
+                                                React.createElement('div', { className: "bg-purple-50 p-3 rounded-lg" }, [
+                                                    React.createElement('div', { className: "font-semibold text-purple-800" }, 
+                                                        language === 'he' ? "השגת יעד" : "Target Achievement"),
+                                                    React.createElement('div', { className: "text-xs text-purple-600 mt-1" }, 
+                                                        language === 'he' ? "עמידה ביעד החלפת ההכנסה" : "Meeting income replacement target")
                                                 ])
                                             ])
                                         ]),
