@@ -843,6 +843,17 @@
                 currentMonthlyExpenses: 12000,
                 targetReplacement: 75,
                 riskTolerance: 'moderate',
+                // Salary and Income
+                currentMonthlySalary: 15000,
+                expectedSalaryGrowth: 3.0, // Annual percentage growth
+                // Family Planning Costs
+                familyPlanningEnabled: false,
+                numberOfChildren: 2,
+                childBirthYear1: 2026,
+                childBirthYear2: 2028,
+                childCostMonthly: 2500, // Monthly cost per child
+                childCostYears: 18, // Years of support per child
+                childEducationFund: 100000, // Education fund per child
                 currentTrainingFund: 25000,
                 trainingFundReturn: 6.5,
                 trainingFundManagementFee: 0.5,
@@ -3516,6 +3527,185 @@
                                                     language === 'he' ? "תשואה נטו:" : "Net Return:"),
                                                 React.createElement('span', { className: "ml-2 font-bold text-lg" }, 
                                                     `${(inputs.trainingFundReturn - inputs.trainingFundManagementFee).toFixed(2)}%`)
+                                            ])
+                                        ])
+                                    ])
+                                ]),
+                                
+                                // Salary and Income Section
+                                React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
+                                    React.createElement('h2', { className: "text-2xl font-bold text-blue-700 mb-6 flex items-center" }, [
+                                        React.createElement(DollarSign, { className: "mr-2" }),
+                                        language === 'he' ? "משכורת והכנסות" : "Salary and Income"
+                                    ]),
+                                    React.createElement('div', { className: "space-y-4" }, [
+                                        React.createElement('div', { className: "grid grid-cols-2 gap-4" }, [
+                                            React.createElement('div', null, [
+                                                React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                    language === 'he' ? "משכורת חודשית נוכחית (₪)" : "Current Monthly Salary (₪)"),
+                                                React.createElement('input', {
+                                                    type: 'number',
+                                                    value: inputs.currentMonthlySalary,
+                                                    onChange: (e) => setInputs({...inputs, currentMonthlySalary: parseInt(e.target.value) || 0}),
+                                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                })
+                                            ]),
+                                            React.createElement('div', null, [
+                                                React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                    language === 'he' ? "צמיחה שנתית צפויה במשכורת (%)" : "Expected Annual Salary Growth (%)"),
+                                                React.createElement('input', {
+                                                    type: 'number',
+                                                    step: '0.1',
+                                                    value: inputs.expectedSalaryGrowth,
+                                                    onChange: (e) => setInputs({...inputs, expectedSalaryGrowth: parseFloat(e.target.value) || 0}),
+                                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                                })
+                                            ])
+                                        ]),
+                                        React.createElement('div', { className: "bg-blue-50 rounded-lg p-3 border border-blue-200" }, [
+                                            React.createElement('div', { className: "text-sm text-blue-700" }, [
+                                                React.createElement('strong', null, 
+                                                    language === 'he' ? "משכורת שנתית נוכחית:" : "Current Annual Salary:"),
+                                                React.createElement('span', { className: "ml-2 font-bold text-lg" }, 
+                                                    `₪${(inputs.currentMonthlySalary * 12).toLocaleString()}`),
+                                                React.createElement('br'),
+                                                React.createElement('strong', null, 
+                                                    language === 'he' ? "משכורת חודשית בפרישה (צפויה):" : "Monthly Salary at Retirement (Projected):"),
+                                                React.createElement('span', { className: "ml-2 font-bold text-lg" }, 
+                                                    `₪${Math.round(inputs.currentMonthlySalary * Math.pow(1 + inputs.expectedSalaryGrowth/100, inputs.retirementAge - inputs.currentAge)).toLocaleString()}`)
+                                            ])
+                                        ])
+                                    ])
+                                ]),
+                                
+                                // Family Planning Section
+                                React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
+                                    React.createElement('h2', { className: "text-2xl font-bold text-pink-700 mb-6 flex items-center" }, [
+                                        React.createElement('span', { className: "mr-2" }, "👨‍👩‍👧‍👦"),
+                                        language === 'he' ? "תכנון משפחתי וילדים" : "Family Planning & Children"
+                                    ]),
+                                    React.createElement('div', { className: "space-y-4" }, [
+                                        React.createElement('div', { className: "flex items-center space-x-3 mb-4" }, [
+                                            React.createElement('input', {
+                                                type: 'checkbox',
+                                                id: 'family-planning-toggle',
+                                                checked: inputs.familyPlanningEnabled,
+                                                onChange: (e) => setInputs({...inputs, familyPlanningEnabled: e.target.checked}),
+                                                className: "w-4 h-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                                            }),
+                                            React.createElement('label', { 
+                                                htmlFor: 'family-planning-toggle',
+                                                className: "text-sm font-medium text-gray-700" 
+                                            }, language === 'he' ? "כלול תכנון משפחתי בחישוב" : "Include family planning in calculation")
+                                        ]),
+                                        
+                                        inputs.familyPlanningEnabled && React.createElement('div', { className: "space-y-4" }, [
+                                            React.createElement('div', { className: "grid grid-cols-2 gap-4" }, [
+                                                React.createElement('div', null, [
+                                                    React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                        language === 'he' ? "מספר ילדים מתוכנן" : "Number of Planned Children"),
+                                                    React.createElement('input', {
+                                                        type: 'number',
+                                                        min: '0',
+                                                        max: '10',
+                                                        value: inputs.numberOfChildren,
+                                                        onChange: (e) => setInputs({...inputs, numberOfChildren: parseInt(e.target.value) || 0}),
+                                                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                                                    })
+                                                ]),
+                                                React.createElement('div', null, [
+                                                    React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                        language === 'he' ? "עלות חודשית לילד (₪)" : "Monthly Cost per Child (₪)"),
+                                                    React.createElement('input', {
+                                                        type: 'number',
+                                                        value: inputs.childCostMonthly,
+                                                        onChange: (e) => setInputs({...inputs, childCostMonthly: parseInt(e.target.value) || 0}),
+                                                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                                                    })
+                                                ])
+                                            ]),
+                                            
+                                            inputs.numberOfChildren >= 1 && React.createElement('div', { className: "grid grid-cols-2 gap-4" }, [
+                                                React.createElement('div', null, [
+                                                    React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                        language === 'he' ? "שנת לידה ילד ראשון" : "First Child Birth Year"),
+                                                    React.createElement('input', {
+                                                        type: 'number',
+                                                        min: new Date().getFullYear(),
+                                                        max: new Date().getFullYear() + 20,
+                                                        value: inputs.childBirthYear1,
+                                                        onChange: (e) => setInputs({...inputs, childBirthYear1: parseInt(e.target.value) || new Date().getFullYear()}),
+                                                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                                                    })
+                                                ]),
+                                                inputs.numberOfChildren >= 2 && React.createElement('div', null, [
+                                                    React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                        language === 'he' ? "שנת לידה ילד שני" : "Second Child Birth Year"),
+                                                    React.createElement('input', {
+                                                        type: 'number',
+                                                        min: new Date().getFullYear(),
+                                                        max: new Date().getFullYear() + 25,
+                                                        value: inputs.childBirthYear2,
+                                                        onChange: (e) => setInputs({...inputs, childBirthYear2: parseInt(e.target.value) || new Date().getFullYear()}),
+                                                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                                                    })
+                                                ])
+                                            ]),
+                                            
+                                            React.createElement('div', { className: "grid grid-cols-2 gap-4" }, [
+                                                React.createElement('div', null, [
+                                                    React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                        language === 'he' ? "שנות תמיכה כלכלית לילד" : "Years of Financial Support per Child"),
+                                                    React.createElement('input', {
+                                                        type: 'number',
+                                                        min: '0',
+                                                        max: '30',
+                                                        value: inputs.childCostYears,
+                                                        onChange: (e) => setInputs({...inputs, childCostYears: parseInt(e.target.value) || 18}),
+                                                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                                                    })
+                                                ]),
+                                                React.createElement('div', null, [
+                                                    React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                        language === 'he' ? "קרן חינוך לילד (₪)" : "Education Fund per Child (₪)"),
+                                                    React.createElement('input', {
+                                                        type: 'number',
+                                                        value: inputs.childEducationFund,
+                                                        onChange: (e) => setInputs({...inputs, childEducationFund: parseInt(e.target.value) || 0}),
+                                                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                                                    })
+                                                ])
+                                            ]),
+                                            
+                                            React.createElement('div', { className: "bg-pink-50 rounded-lg p-4 border border-pink-200" }, [
+                                                React.createElement('h4', { className: "font-bold text-pink-800 mb-2" }, 
+                                                    language === 'he' ? "סיכום עלויות משפחתיות:" : "Family Cost Summary:"),
+                                                React.createElement('div', { className: "text-sm text-pink-700 space-y-1" }, [
+                                                    React.createElement('div', null, [
+                                                        React.createElement('strong', null, 
+                                                            language === 'he' ? "עלות חודשית כוללת:" : "Total Monthly Cost:"),
+                                                        React.createElement('span', { className: "ml-2 font-bold" }, 
+                                                            `₪${(inputs.childCostMonthly * inputs.numberOfChildren).toLocaleString()}`)
+                                                    ]),
+                                                    React.createElement('div', null, [
+                                                        React.createElement('strong', null, 
+                                                            language === 'he' ? "עלות שנתית כוללת:" : "Total Annual Cost:"),
+                                                        React.createElement('span', { className: "ml-2 font-bold" }, 
+                                                            `₪${(inputs.childCostMonthly * inputs.numberOfChildren * 12).toLocaleString()}`)
+                                                    ]),
+                                                    React.createElement('div', null, [
+                                                        React.createElement('strong', null, 
+                                                            language === 'he' ? "קרנות חינוך כוללת:" : "Total Education Funds:"),
+                                                        React.createElement('span', { className: "ml-2 font-bold" }, 
+                                                            `₪${(inputs.childEducationFund * inputs.numberOfChildren).toLocaleString()}`)
+                                                    ]),
+                                                    React.createElement('div', { className: "pt-2 border-t border-pink-300 mt-2" }, [
+                                                        React.createElement('strong', null, 
+                                                            language === 'he' ? "עלות כוללת למשפחה:" : "Total Family Cost:"),
+                                                        React.createElement('span', { className: "ml-2 font-bold text-lg" }, 
+                                                            `₪${((inputs.childCostMonthly * inputs.numberOfChildren * 12 * inputs.childCostYears) + (inputs.childEducationFund * inputs.numberOfChildren)).toLocaleString()}`)
+                                                    ])
+                                                ])
                                             ])
                                         ])
                                     ])

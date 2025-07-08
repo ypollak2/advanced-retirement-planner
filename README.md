@@ -3,7 +3,7 @@
 Professional retirement planning tool with comprehensive investment tracking, FIRE calculator, and modular architecture.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-2.2.3-green.svg)
+![Version](https://img.shields.io/badge/version-2.3.0-green.svg)
 ![Language](https://img.shields.io/badge/language-English%20%7C%20Hebrew-orange.svg)
 
 ## 🚀 Features
@@ -11,6 +11,8 @@ Professional retirement planning tool with comprehensive investment tracking, FI
 ### Core Retirement Planning
 - **Multi-country pension calculations** with country-specific tax rates
 - **Training fund tracking** with management fees
+- **Salary and income tracking** with main input section and growth projections
+- **Family planning costs** with comprehensive child expense calculations
 - **Risk scenario modeling** (Very Conservative to Very Aggressive)
 - **Inflation-adjusted projections** with real purchasing power
 - **Work period management** across different countries
@@ -38,7 +40,9 @@ Professional retirement planning tool with comprehensive investment tracking, FI
 ### Visualization & Analysis
 - **Interactive charts** with 7+ data series tracking
 - **Historical index returns** from multiple markets
-- **Real-time API integration** for market data
+- **Real-time API integration** for market data with CORS proxy solutions
+- **Multiple fallback data sources** (Alpha Vantage, Finnhub, IEX Cloud, FMP)
+- **Serverless function support** for reliable data fetching
 - **Comprehensive progress tracking** over time
 
 ### Internationalization
@@ -48,7 +52,14 @@ Professional retirement planning tool with comprehensive investment tracking, FI
 
 ## 📁 Project Structure
 
-This project offers **two versions**:
+This project offers **two versions** plus comprehensive solutions for API integration:
+
+### 🔧 **API Integration Solutions**
+- `cors-proxy-solution.js` - CORS proxy with multiple fallback services
+- `yahoo-finance-cors-fix.js` - Drop-in replacement for Yahoo Finance API calls
+- `serverless-solutions/` - Netlify & Vercel serverless function implementations
+- `alternative-apis/` - Multi-provider finance APIs (Alpha Vantage, Finnhub, IEX, FMP)
+- `IMPLEMENTATION_GUIDE.md` - Complete setup instructions for all solutions
 
 ### 1. Single File Version (`index.html`)
 - ✅ **Immediate deployment** - works instantly on GitHub Pages
@@ -186,20 +197,35 @@ advanced-retirement-planner/
 - Add existing savings and inflation rate
 - Set salary replacement targets
 
-### 2. Work Periods
+### 2. Salary & Income
+- Input current monthly salary
+- Set expected annual salary growth rate
+- View projected salary at retirement
+
+### 3. Family Planning (Optional)
+- Enable family planning calculations
+- Set number of planned children
+- Configure birth years for each child
+- Define monthly cost per child
+- Set years of financial support
+- Plan education fund per child
+- View comprehensive family cost summary
+
+### 5. Work Periods
 - Add different work periods
 - Select countries and salaries
 - Configure returns and management fees
 
-### 3. Index Analysis
+### 6. Index Analysis
 - View historical returns
 - Use data for auto-filling
 - Compare different indices
 
-### 4. Scenarios
+### 7. Scenarios & Stress Testing
 - Test impact of risk levels
+- Run comprehensive stress tests (2008 Crisis, COVID-19, High Inflation)
 - Analyze goals and adjustments
-- View long-term projections
+- View long-term projections with crisis timeline visualization
 
 ## ⚙️ Technical Customizations
 
@@ -275,6 +301,12 @@ const exchangeRates = {
 - Ensure returns are in 0-50% range
 - Confirm work periods don't overlap
 
+### CORS/API Issues
+- **Financial data not loading**: The tool includes multiple fallback solutions
+- **"Access blocked by CORS policy"**: Automatic proxy services handle this
+- **Data appears stale**: Check the data source indicator and refresh
+- **For developers**: See `IMPLEMENTATION_GUIDE.md` for deployment options
+
 ## 🤝 Contributing to the Project
 
 Want to contribute? Great!
@@ -296,7 +328,25 @@ Want to contribute? Great!
 
 ## ✅ Recently Completed Features
 
-### Latest Additions (Version 2.2.3)
+### Latest Additions (Version 2.3.0)
+- ✅ **Salary Space in Main Input** - Dedicated salary section with current monthly salary and growth projections
+- ✅ **Family Planning Cost Calculator** - Comprehensive family expense planning with:
+  - Number of children planning
+  - Monthly cost per child calculations  
+  - Birth year scheduling for multiple children
+  - Years of financial support per child
+  - Education fund planning per child
+  - Complete family cost summary and projections
+- ✅ **CORS Solutions for Yahoo Finance API** - Multiple robust solutions:
+  - CORS proxy services with automatic fallback
+  - Serverless function implementations (Netlify, Vercel)
+  - Alternative API providers (Alpha Vantage, Finnhub, IEX Cloud, FMP)
+  - Comprehensive error handling and data caching
+- ✅ **Chart.js Error Fixes** - Resolved "crisisTimeline" controller registration issues
+- ✅ **Stress Test Button Crash Fix** - Fixed missing try-catch blocks causing website crashes
+- ✅ **Enhanced Financial Data Integration** - Real-time market data with multiple fallback sources
+
+### Previous Additions (Version 2.2.3)
 - ✅ **Comprehensive Security Framework** - Complete security policy with vulnerability reporting
 - ✅ **GitHub Wiki Documentation** - Detailed guides for all features and usage
 - ✅ **Automated Security Scanning** - Continuous vulnerability detection and updates
@@ -344,9 +394,7 @@ Want to contribute? Great!
 - 🏠 **Debt management and mortgage optimization** - Debt vs investment strategies
 
 ### Lifestyle & Career Planning
-- 👶 **Family planning costs (education, children expenses)** - Life event budgeting
 - ✈️ **International retirement planning (visa, residency requirements)** - Global retirement
-- 📈 **Career planning and salary progression modeling** - Income growth projections
 - 🏢 **Business ownership and entrepreneurship retirement planning** - Self-employed strategies
 - 📊 **Lifestyle inflation modeling and expense projections** - Future cost analysis
 
