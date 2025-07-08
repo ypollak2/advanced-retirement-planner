@@ -3,7 +3,7 @@
 Professional retirement planning tool with comprehensive investment tracking, FIRE calculator, and modular architecture.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-2.2.0-green.svg)
+![Version](https://img.shields.io/badge/version-2.2.1-green.svg)
 ![Language](https://img.shields.io/badge/language-English%20%7C%20Hebrew-orange.svg)
 
 ## 🚀 Features
@@ -296,7 +296,13 @@ Want to contribute? Great!
 
 ## ✅ Recently Completed Features
 
-### Latest Additions (Version 2.2.0+)
+### Latest Additions (Version 2.2.1)
+- ✅ **Dynamic Crisis Explanations** - Stress test explanations now adapt to actual scenario parameters
+- ✅ **Enhanced Educational Content** - Crisis severity classification and duration descriptions
+- ✅ **Real-time Parameter Display** - Shows exact percentages and timeframes for each scenario
+- ✅ **Improved Stress Test Graph** - Dedicated comparison chart for Normal vs Crisis scenarios
+
+### Previous Additions (Version 2.2.0)
 - ✅ **Enhanced AI-Powered Stress Testing** - Natural language scenario input with intelligent parameter extraction
 - ✅ **Refined User Interface** - Improved tabs design with artistic symbols instead of emojis
 - ✅ **Advanced Natural Language Processing** - AI interprets user-described economic scenarios and converts to stress test parameters
