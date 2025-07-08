@@ -1,0 +1,178 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run security scan every Monday at 9:00 AM UTC
+    - cron: '0 9 * * 1'
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    name: Security Vulnerability Scan
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run npm audit
+      run: npm audit --audit-level=moderate
+      continue-on-error: true
+    
+    - name: Run npm audit fix
+      run: npm audit fix --audit-level=moderate
+      continue-on-error: true
+    
+    - name: Check for vulnerabilities
+      run: npm audit --audit-level=high
+    
+    - name: Run CodeQL Analysis
+      uses: github/codeql-action/init@v3
+      with:
+        languages: javascript
+        queries: security-and-quality
+    
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:javascript"
+    
+    - name: Upload security scan results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-scan-results
+        path: |
+          npm-audit-results.json
+          codeql-results.sarif
+        retention-days: 30
+
+  dependency-review:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Dependency Review
+      uses: actions/dependency-review-action@v4
+      with:
+        fail-on-severity: high
+        deny-licenses: GPL-2.0, GPL-3.0
+        comment-summary-in-pr: true
+
+  security-headers:
+    runs-on: ubuntu-latest
+    name: Security Headers Check
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Security Headers Analysis
+      run: |
+        echo "Checking security headers implementation..."
+        
+        # Check for CSP in HTML files
+        if grep -r "Content-Security-Policy" *.html; then
+          echo "✅ Content Security Policy found"
+        else
+          echo "⚠️ Content Security Policy not found"
+        fi
+        
+        # Check for HTTPS enforcement
+        if grep -r "https://" *.html; then
+          echo "✅ HTTPS URLs found"
+        else
+          echo "⚠️ HTTPS enforcement check needed"
+        fi
+        
+        # Check for secure headers in meta tags
+        if grep -r "X-Content-Type-Options\|X-Frame-Options\|X-XSS-Protection" *.html; then
+          echo "✅ Security headers found"
+        else
+          echo "⚠️ Security headers should be implemented"
+        fi
+    
+    - name: Check for sensitive data
+      run: |
+        echo "Scanning for potential sensitive data..."
+        
+        # Check for potential API keys or secrets
+        if grep -r -i "api[_-]key\|secret\|password\|token" --include="*.html" --include="*.js" --include="*.json" .; then
+          echo "⚠️ Potential sensitive data found - please review"
+          exit 1
+        else
+          echo "✅ No obvious sensitive data found"
+        fi
+    
+    - name: JavaScript Security Check
+      run: |
+        echo "Checking JavaScript security..."
+        
+        # Check for eval usage
+        if grep -r "eval(" --include="*.html" --include="*.js" .; then
+          echo "⚠️ eval() usage found - security risk"
+          exit 1
+        else
+          echo "✅ No eval() usage found"
+        fi
+        
+        # Check for innerHTML usage
+        if grep -r "innerHTML" --include="*.html" --include="*.js" .; then
+          echo "⚠️ innerHTML usage found - check for XSS prevention"
+        else
+          echo "✅ No innerHTML usage found"
+        fi
+        
+        # Check for document.write usage
+        if grep -r "document.write" --include="*.html" --include="*.js" .; then
+          echo "⚠️ document.write usage found - security risk"
+          exit 1
+        else
+          echo "✅ No document.write usage found"
+        fi
+
+  license-check:
+    runs-on: ubuntu-latest
+    name: License Compliance Check
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Check licenses
+      run: |
+        npx license-checker --summary --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;CC0-1.0;Unlicense'
+    
+    - name: Generate license report
+      run: |
+        npx license-checker --csv --out licenses.csv
+        
+    - name: Upload license report
+      uses: actions/upload-artifact@v4
+      with:
+        name: license-report
+        path: licenses.csv
+        retention-days: 30
