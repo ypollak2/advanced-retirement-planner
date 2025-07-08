@@ -2219,22 +2219,29 @@
 
             // Stress Testing Functions
             const runStressTest = (scenarioType) => {
-                console.log('runStressTest called with:', scenarioType);
-                console.log('results state:', results);
-                console.log('language state:', language);
-                
-                if (!results) {
-                    console.log('No results found, showing alert');
-                    alert(language === 'he' ? 'יש לחשב תכנית פרישה תחילה' : 'Please calculate retirement plan first');
-                    return;
-                }
+                try {
+                    console.log('runStressTest called with:', scenarioType);
+                    console.log('results state:', results);
+                    console.log('language state:', language);
+                    
+                    if (!results) {
+                        console.log('No results found, showing alert');
+                        alert(language === 'he' ? 'יש לחשב תכנית פרישה תחילה' : 'Please calculate retirement plan first');
+                        return;
+                    }
 
                 // Track stress test action
-                AnalyticsManager.trackAction('stress_test_run', { 
-                    scenarioType,
-                    userAge: inputs.currentAge,
-                    timestamp: new Date().toISOString()
-                });
+                try {
+                    if (typeof AnalyticsManager !== 'undefined' && AnalyticsManager.trackAction) {
+                        AnalyticsManager.trackAction('stress_test_run', { 
+                            scenarioType,
+                            userAge: inputs.currentAge,
+                            timestamp: new Date().toISOString()
+                        });
+                    }
+                } catch (analyticsError) {
+                    console.warn('Analytics tracking failed:', analyticsError);
+                }
 
                 const scenarios = {
                     financial_crisis_2008: {
@@ -2291,7 +2298,18 @@
                 console.log('Stressed results:', stressedResults);
                 
                 console.log('Generating recommendations...');
-                const recommendations = generateStressTestRecommendations(scenario, stressedResults);
+                let recommendations = [];
+                try {
+                    if (typeof generateStressTestRecommendations === 'function') {
+                        recommendations = generateStressTestRecommendations(scenario, stressedResults);
+                    } else {
+                        console.warn('generateStressTestRecommendations function not found');
+                        recommendations = [language === 'he' ? 'המלצות זמינות לאחר חישוב מלא' : 'Recommendations available after full calculation'];
+                    }
+                } catch (recError) {
+                    console.warn('Error generating recommendations:', recError);
+                    recommendations = [language === 'he' ? 'שגיאה ביצירת המלצות' : 'Error generating recommendations'];
+                }
                 console.log('Recommendations:', recommendations);
 
                 console.log('Setting stress test results...');
@@ -2312,7 +2330,17 @@
                 };
                 
                 console.log('Stress test data to set:', stressTestData);
-                setStressTestResults(stressTestData);
+                
+                try {
+                    if (typeof setStressTestResults === 'function') {
+                        setStressTestResults(stressTestData);
+                        console.log('Stress test results set successfully');
+                    } else {
+                        console.error('setStressTestResults function not found');
+                    }
+                } catch (setError) {
+                    console.error('Error setting stress test results:', setError);
+                }
 
                 // Scroll to results
                 setTimeout(() => {
@@ -2326,6 +2354,13 @@
                 }, 100);
                 
                 console.log('runStressTest completed successfully');
+                
+                } catch (error) {
+                    console.error('Error in runStressTest:', error);
+                    alert(language === 'he' ? 
+                        'שגיאה במבחן העמידות. אנא נסה שוב או רענן את הדף.' : 
+                        'Error in stress test. Please try again or refresh the page.');
+                }
             };
 
             const runCustomStressTest = () => {
