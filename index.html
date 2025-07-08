@@ -2240,7 +2240,7 @@
                     }
                 };
 
-                const scenario = scenarios[scenarioType];
+                const scenario = {...scenarios[scenarioType], name: scenarioType};
                 const stressedResults = calculateStressedResults(scenario);
                 
                 const recommendations = generateStressTestRecommendations(scenario, stressedResults);
@@ -2300,7 +2300,7 @@
                     recoveryYears: Math.ceil(duration * 1.5)
                 };
 
-                const stressedResults = calculateStressedResults(customScenario);
+                const stressedResults = calculateStressedResults({...customScenario, name: 'custom'});
                 const recommendations = generateStressTestRecommendations(customScenario, stressedResults);
 
                 setStressTestResults({
@@ -2501,6 +2501,77 @@
                 return result;
             };
 
+            // Generate dynamic crisis explanations based on scenario parameters
+            const generateDynamicCrisisExplanation = (scenario, inputs, language) => {
+                const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
+                const recoveryYears = Math.max(0, yearsToRetirement - (scenario?.duration || 0));
+                
+                // Crisis severity classification
+                const getSeverity = (portfolioDecline) => {
+                    if (portfolioDecline >= 40) return language === 'he' ? 'משבר קשה' : 'severe crisis';
+                    if (portfolioDecline >= 25) return language === 'he' ? 'משבר בינוני' : 'moderate crisis';
+                    return language === 'he' ? 'משבר קל' : 'mild crisis';
+                };
+
+                // Duration description
+                const getDurationDescription = (duration) => {
+                    if (duration <= 1) return language === 'he' ? 'קצר מועד' : 'short-term';
+                    if (duration <= 3) return language === 'he' ? 'בינוני' : 'medium-term';
+                    return language === 'he' ? 'ממושך' : 'long-term';
+                };
+
+                const explanations = {
+                    methodology: [
+                        {
+                            phase: language === 'he' ? "שלב ראשון - השפעה מיידית:" : "Phase 1 - Immediate Impact:",
+                            description: language === 'he' 
+                                ? `ירידה חד-פעמית של ${scenario?.portfolioDecline || 0}% בצבירה הקיימת (${getSeverity(scenario?.portfolioDecline || 0)}, ${getDurationDescription(scenario?.duration || 0)})`
+                                : `One-time ${scenario?.portfolioDecline || 0}% decline in existing accumulation (${getSeverity(scenario?.portfolioDecline || 0)}, ${getDurationDescription(scenario?.duration || 0)})`
+                        },
+                        {
+                            phase: language === 'he' ? "שלב שני - שנות המשבר:" : "Phase 2 - Crisis Years:",
+                            description: language === 'he' 
+                                ? `במשך ${scenario?.duration || 0} שנים: תשואות מופחתות ב-3-4%, הפקדות מופחתות ב-${scenario?.incomeReduction || 0}%${scenario?.inflationIncrease > 0 ? `, אינפלציה מוגברת ב-${scenario.inflationIncrease}%` : ''}`
+                                : `For ${scenario?.duration || 0} years: 3-4% reduced returns, ${scenario?.incomeReduction || 0}% reduced contributions${scenario?.inflationIncrease > 0 ? `, +${scenario.inflationIncrease}% inflation` : ''}`
+                        },
+                        {
+                            phase: language === 'he' ? "שלב שלישי - התאוששות:" : "Phase 3 - Recovery:",
+                            description: language === 'he' 
+                                ? `השנים הנותרות (${recoveryYears} שנים): חזרה לתשואות ותרומות רגילות`
+                                : `Remaining years (${recoveryYears} years): return to normal returns and contributions`
+                        }
+                    ],
+                    historicalContext: getHistoricalContext(scenario, language)
+                };
+
+                return explanations;
+            };
+
+            // Generate historical context based on scenario type
+            const getHistoricalContext = (scenario, language) => {
+                if (!scenario?.name) {
+                    return language === 'he' ? 
+                        "התרחיש שבדקתם מבוסס על פרמטרים כלכליים מציאותיים ולוקח בחשבון דפוסי התאוששות היסטוריים של השווקים והכלכלה." :
+                        "The scenario you tested is based on realistic economic parameters and takes into account historical recovery patterns of markets and the economy.";
+                }
+
+                const contextMap = {
+                    'financial_crisis_2008': language === 'he' ? 
+                        "משבר 2008 החל עם קריסת בנק ליהמן ברדרס, הוביל לירידה של 57% ב-S&P 500, עלייה באבטלה ל-10%, ואילץ בנקים מרכזיים להוריד ריבית כמעט לאפס. ההתאוששות ארכה כ-6 שנים עד שהשווקים חזרו לשיאים." :
+                        "The 2008 crisis began with Lehman Brothers collapse, led to 57% S&P 500 decline, unemployment rising to 10%, and forced central banks to cut rates near zero. Recovery took about 6 years for markets to reach new highs.",
+                    'covid_pandemic': language === 'he' ? 
+                        "משבר קורונה 2020 גרם לסגירות כלכליות נרחבות, ירידה של 34% ב-S&P 500 במרץ, אך התאוששות מהירה הודות לתמיכה ממשלתית וחדשנות רפואית. השווקים הגיעו לשיאים חדשים תוך שנה." :
+                        "COVID-19 crisis caused widespread economic shutdowns, 34% S&P 500 decline in March, but rapid recovery due to government support and medical innovation. Markets reached new highs within a year.",
+                    'high_inflation': language === 'he' ? 
+                        "אינפלציה גבוהה בשנות ה-70 הגיעה ל-14% בארה\"ב, נגרמה ממשבר הנפט ומדיניות מוניטרית רופפה. הפתרון דרש העלאות ריבית דרמטיות ל-20% והתמודדות עם מיתון עמוק." :
+                        "High inflation in the 1970s reached 14% in the US, caused by oil crisis and loose monetary policy. Solution required dramatic interest rate hikes to 20% and dealing with deep recession."
+                };
+
+                return contextMap[scenario.name] || (language === 'he' ? 
+                    "התרחיש שבדקתם מבוסס על פרמטרים כלכליים מציאותיים ולוקח בחשבון דפוסי התאוששות היסטוריים של השווקים והכלכלה." :
+                    "The scenario you tested is based on realistic economic parameters and takes into account historical recovery patterns of markets and the economy.");
+            };
+
             const generateStressTestRecommendations = (scenario, stressedResults) => {
                 const recommendations = [];
                 
@@ -2680,7 +2751,7 @@
                             recoveryYears: Math.ceil(scenario.duration * 1.5)
                         };
                         
-                        const stressedResults = calculateStressedResults(customScenario);
+                        const stressedResults = calculateStressedResults({...customScenario, name: 'custom'});
                         const recommendations = generateStressTestRecommendations(customScenario, stressedResults);
                         
                         const normalTotalAccumulation = results.totalSavings + results.trainingFundValue + results.personalPortfolioValue + results.cryptoValue + results.realEstateValue;
@@ -4224,72 +4295,36 @@
                                                 React.createElement('span', { className: "mr-2" }, "🔍"),
                                                 language === 'he' ? "הסבר מפורט על המשבר והשפעותיו" : "Detailed Crisis Explanation and Impact"
                                             ]),
-                                            React.createElement('div', { className: "space-y-4" }, [
-                                                // Crisis Methodology Explanation
-                                                React.createElement('div', { className: "bg-white rounded-lg p-4 border border-blue-100" }, [
-                                                    React.createElement('h5', { className: "font-semibold text-blue-700 mb-2" }, 
-                                                        language === 'he' ? "📈 אופן חישוב השפעות המשבר:" : "📈 How Crisis Impacts Are Calculated:"),
-                                                    React.createElement('ul', { className: "text-sm text-blue-600 space-y-2" }, [
-                                                        React.createElement('li', { className: "flex items-start" }, [
-                                                            React.createElement('span', { className: "mr-2 text-blue-400" }, "1."),
-                                                            React.createElement('div', null, [
-                                                                React.createElement('strong', null, language === 'he' ? "שלב ראשון - השפעה מיידית:" : "Phase 1 - Immediate Impact:"),
-                                                                React.createElement('span', { className: "block mt-1" }, 
-                                                                    language === 'he' 
-                                                                        ? `ירידה חד-פעמית של ${stressTestResults.scenario?.portfolioDecline || 0}% בצבירה הקיימת (אפקט קריסת השוק)`
-                                                                        : `One-time ${stressTestResults.scenario?.portfolioDecline || 0}% decline in existing accumulation (market crash effect)`)
-                                                            ])
-                                                        ]),
-                                                        React.createElement('li', { className: "flex items-start" }, [
-                                                            React.createElement('span', { className: "mr-2 text-blue-400" }, "2."),
-                                                            React.createElement('div', null, [
-                                                                React.createElement('strong', null, language === 'he' ? "שלב שני - שנות המשבר:" : "Phase 2 - Crisis Years:"),
-                                                                React.createElement('span', { className: "block mt-1" }, 
-                                                                    language === 'he' 
-                                                                        ? `במשך ${stressTestResults.scenario?.duration || 0} שנים: תשואות מופחתות ב-3-4%, הפקדות מופחתות ב-${stressTestResults.scenario?.incomeReduction || 0}%`
-                                                                        : `For ${stressTestResults.scenario?.duration || 0} years: 3-4% reduced returns, ${stressTestResults.scenario?.incomeReduction || 0}% reduced contributions`)
-                                                            ])
-                                                        ]),
-                                                        React.createElement('li', { className: "flex items-start" }, [
-                                                            React.createElement('span', { className: "mr-2 text-blue-400" }, "3."),
-                                                            React.createElement('div', null, [
-                                                                React.createElement('strong', null, language === 'he' ? "שלב שלישי - התאוששות:" : "Phase 3 - Recovery:"),
-                                                                React.createElement('span', { className: "block mt-1" }, 
-                                                                    language === 'he' 
-                                                                        ? `השנים הנותרות: חזרה לתשואות ותרומות רגילות`
-                                                                        : `Remaining years: return to normal returns and contributions`)
-                                                            ])
-                                                        ])
-                                                    ])
-                                                ]),
+                                            (() => {
+                                                // Generate dynamic explanations
+                                                const dynamicExplanation = generateDynamicCrisisExplanation(stressTestResults.scenario, inputs, language);
                                                 
-                                                // Real World Context
-                                                React.createElement('div', { className: "bg-white rounded-lg p-4 border border-blue-100" }, [
-                                                    React.createElement('h5', { className: "font-semibold text-blue-700 mb-2" }, 
-                                                        language === 'he' ? "🌍 הקשר היסטורי:" : "🌍 Historical Context:"),
-                                                    React.createElement('div', { className: "text-sm text-blue-600" }, 
-                                                        stressTestResults.scenario?.name === 'financial_crisis_2008' ? 
-                                                            (language === 'he' ? 
-                                                                "משבר 2008 החל עם קריסת בנק ליהמן ברדרס, הוביל לירידה של 57% ב-S&P 500, עלייה באבטלה ל-10%, ואילץ בנקים מרכזיים להוריד ריבית כמעט לאפס. ההתאוששות ארכה כ-6 שנים עד שהשווקים חזרו לשיאים." :
-                                                                "The 2008 crisis began with Lehman Brothers collapse, led to 57% S&P 500 decline, unemployment rising to 10%, and forced central banks to cut rates near zero. Recovery took about 6 years for markets to reach new highs."
-                                                            ) :
-                                                        stressTestResults.scenario?.name === 'covid_pandemic' ?
-                                                            (language === 'he' ? 
-                                                                "משבר קורונה 2020 גרם לסגירות כלכליות נרחבות, ירידה של 34% ב-S&P 500 במרץ, אך התאוששות מהירה הודות לתמיכה ממשלתית וחדשנות רפואית. השווקים הגיעו לשיאים חדשים תוך שנה." :
-                                                                "COVID-19 crisis caused widespread economic shutdowns, 34% S&P 500 decline in March, but rapid recovery due to government support and medical innovation. Markets reached new highs within a year."
-                                                            ) :
-                                                        stressTestResults.scenario?.name === 'high_inflation' ?
-                                                            (language === 'he' ? 
-                                                                "אינפלציה גבוהה בשנות ה-70 הגיעה ל-14% בארה\"ב, נגרמה ממשבר הנפט ומדיניות מוניטרית רופפה. הפתרון דרש העלאות ריבית דרמטיות ל-20% והתמודדות עם מיתון עמוק." :
-                                                                "High inflation in the 1970s reached 14% in the US, caused by oil crisis and loose monetary policy. Solution required dramatic interest rate hikes to 20% and dealing with deep recession."
-                                                            ) :
-                                                            (language === 'he' ? 
-                                                                "התרחיש שבדקתם מבוסס על פרמטרים כלכליים מציאותיים ולוקח בחשבון דפוסי התאוששות היסטוריים של השווקים והכלכלה." :
-                                                                "The scenario you tested is based on realistic economic parameters and takes into account historical recovery patterns of markets and the economy."
+                                                return React.createElement('div', { className: "space-y-4" }, [
+                                                    // Crisis Methodology Explanation - Dynamic
+                                                    React.createElement('div', { className: "bg-white rounded-lg p-4 border border-blue-100" }, [
+                                                        React.createElement('h5', { className: "font-semibold text-blue-700 mb-2" }, 
+                                                            language === 'he' ? "📈 אופן חישוב השפעות המשבר:" : "📈 How Crisis Impacts Are Calculated:"),
+                                                        React.createElement('ul', { className: "text-sm text-blue-600 space-y-2" }, 
+                                                            dynamicExplanation.methodology.map((item, index) => 
+                                                                React.createElement('li', { key: index, className: "flex items-start" }, [
+                                                                    React.createElement('span', { className: "mr-2 text-blue-400" }, `${index + 1}.`),
+                                                                    React.createElement('div', null, [
+                                                                        React.createElement('strong', null, item.phase),
+                                                                        React.createElement('span', { className: "block mt-1" }, item.description)
+                                                                    ])
+                                                                ])
                                                             )
-                                                    )
-                                                ])
-                                            ])
+                                                        )
+                                                    ]),
+                                                    
+                                                    // Real World Context - Dynamic
+                                                    React.createElement('div', { className: "bg-white rounded-lg p-4 border border-blue-100" }, [
+                                                        React.createElement('h5', { className: "font-semibold text-blue-700 mb-2" }, 
+                                                            language === 'he' ? "🌍 הקשר היסטורי:" : "🌍 Historical Context:"),
+                                                        React.createElement('div', { className: "text-sm text-blue-600" }, dynamicExplanation.historicalContext)
+                                                    ])
+                                                ]);
+                                            })()
                                         ]),
                                         
                                         // Scenario Overview
