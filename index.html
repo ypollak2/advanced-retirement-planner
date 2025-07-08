@@ -2280,10 +2280,11 @@
             };
 
             const calculateStressedResults = (scenario) => {
-                console.log('Calculating stressed results with scenario:', scenario); // Debug log
+                console.log('Calculating stressed results with scenario:', scenario);
                 
-                // Create modified inputs for stress test
-                const stressedInputs = { ...inputs };
+                // **מציאותיות במבחן עמידות - גישה פשוטה יותר**
+                
+                // 1. השפעה ישירה על הכנסות (רק במשך תקופת המשבר)
                 const stressedWorkPeriods = workPeriods.map(period => ({
                     ...period,
                     salary: period.salary * (1 - scenario.incomeReduction / 100),
@@ -2291,139 +2292,129 @@
                     monthlyTrainingFund: period.monthlyTrainingFund * (1 - scenario.incomeReduction / 100)
                 }));
 
-                console.log('Original inputs:', inputs);
-                console.log('Stressed work periods:', stressedWorkPeriods);
+                // 2. השפעה חד-פעמית על צבירה קיימת (ירידה בשוק)
+                const currentSavingsAfterCrash = inputs.currentSavings * (1 - scenario.portfolioDecline / 100);
+                const currentPersonalPortfolioAfterCrash = inputs.currentPersonalPortfolio * (1 - scenario.portfolioDecline / 100);
+                const currentCryptoAfterCrash = inputs.currentCrypto * (1 - scenario.portfolioDecline / 100);
+                const currentRealEstateAfterCrash = inputs.currentRealEstate * (1 - (scenario.realEstateDecline || scenario.portfolioDecline * 0.6) / 100);
+                const currentTrainingFundAfterCrash = inputs.currentTrainingFund * (1 - scenario.portfolioDecline / 100);
 
-                // Apply immediate portfolio declines (market crash effect)
-                stressedInputs.currentSavings = inputs.currentSavings * (1 - scenario.portfolioDecline / 100);
-                stressedInputs.currentPersonalPortfolio = inputs.currentPersonalPortfolio * (1 - scenario.portfolioDecline / 100);
-                stressedInputs.currentCrypto = inputs.currentCrypto * (1 - scenario.portfolioDecline / 100);
-                stressedInputs.currentRealEstate = inputs.currentRealEstate * (1 - (scenario.realEstateDecline || scenario.portfolioDecline) / 100);
-                stressedInputs.currentTrainingFund = inputs.currentTrainingFund * (1 - scenario.portfolioDecline / 100);
-                
-                // Apply inflation increase
-                stressedInputs.inflationRate = inputs.inflationRate + scenario.inflationIncrease;
-                
-                // Apply monthly contribution reductions based on income reduction
-                stressedInputs.personalPortfolioMonthly = inputs.personalPortfolioMonthly * (1 - scenario.incomeReduction / 100);
-                stressedInputs.cryptoMonthly = inputs.cryptoMonthly * (1 - scenario.incomeReduction / 100);
-                stressedInputs.realEstateMonthly = inputs.realEstateMonthly * (1 - scenario.incomeReduction / 100);
+                console.log(`Portfolio impact: ${scenario.portfolioDecline}% decline`);
+                console.log(`Income impact: ${scenario.incomeReduction}% reduction for ${scenario.duration} years`);
+                console.log(`Inflation impact: +${scenario.inflationIncrease}% for calculation period`);
 
-                // Reduce expected returns during crisis (market uncertainty)
-                const returnReduction = Math.min(scenario.portfolioDecline / 200, 0.5); // Up to 50% return reduction
-                stressedInputs.personalPortfolioReturn = Math.max(inputs.personalPortfolioReturn * (1 - returnReduction), 2);
-                stressedInputs.cryptoReturn = Math.max(inputs.cryptoReturn * (1 - returnReduction), 3);
-                stressedInputs.realEstateReturn = Math.max(inputs.realEstateReturn * (1 - returnReduction), 2);
-                stressedInputs.trainingFundReturn = Math.max(inputs.trainingFundReturn * (1 - returnReduction), 3);
-
-                console.log('Stressed inputs:', stressedInputs);
-
-                // Run a comprehensive calculation for stressed scenario
-                const yearsToRetirement = stressedInputs.retirementAge - stressedInputs.currentAge;
+                // 3. חישוב פשוט - רוב שנות הפרישה ללא משבר
+                const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
                 if (yearsToRetirement <= 0) {
-                    return {
-                        monthlyIncome: 0,
-                        totalAccumulation: 0,
-                        achievesTarget: false
-                    };
+                    return { monthlyIncome: 0, totalAccumulation: 0, achievesTarget: false };
                 }
 
-                // Calculate pension savings with stress
-                let totalPensionSavings = stressedInputs.currentSavings;
-                let totalTrainingFund = stressedInputs.currentTrainingFund;
-                let totalPersonalPortfolio = stressedInputs.currentPersonalPortfolio;
-                let totalCrypto = stressedInputs.currentCrypto;
-                let totalRealEstate = stressedInputs.currentRealEstate;
+                // 4. חישוב צבירה פשוט בשני שלבים:
+                // שלב 1: שנות המשבר (הפקדות מופחתות, תשואות נמוכות)
+                // שלב 2: שנות ההתאוששות (חזרה לנורמלי)
 
-                // Simulate year-by-year growth under stress
-                for (let year = 0; year < yearsToRetirement; year++) {
-                    const currentAge = stressedInputs.currentAge + year;
-                    
-                    // Find active work period
+                let totalPensionSavings = currentSavingsAfterCrash;
+                let totalTrainingFund = currentTrainingFundAfterCrash;
+                let totalPersonalPortfolio = currentPersonalPortfolioAfterCrash;
+                let totalCrypto = currentCryptoAfterCrash;
+                let totalRealEstate = currentRealEstateAfterCrash;
+
+                // שנות המשבר (תשואות נמוכות, הפקדות מופחתות)
+                const crisisYears = Math.min(scenario.duration, yearsToRetirement);
+                for (let year = 0; year < crisisYears; year++) {
+                    const currentAge = inputs.currentAge + year;
                     const activePeriod = stressedWorkPeriods.find(period => 
                         currentAge >= period.startAge && currentAge < period.endAge
                     );
-                    
+
                     if (activePeriod) {
-                        // Apply crisis effects gradually (worst in first years)
-                        const crisisIntensity = year < scenario.duration ? 
-                            Math.max(0.3, 1 - (year / scenario.duration) * 0.7) : 0.3;
+                        // תשואות מופחתות במהלך המשבר (לא דרמטיות)
+                        const pensionCrisisReturn = Math.max((activePeriod.pensionReturn || 6) - 3, 1); // 3% פחות מהרגיל
+                        const netReturn = (pensionCrisisReturn - activePeriod.pensionAnnualFee) / 100;
+                        const netContribution = activePeriod.monthlyContribution * (1 - activePeriod.pensionDepositFee / 100);
                         
-                        // Pension growth with crisis effects
-                        const pensionReturn = Math.max(
-                            (activePeriod.pensionReturn || 5) * crisisIntensity, 
-                            1
-                        );
+                        totalPensionSavings = totalPensionSavings * (1 + netReturn) + (netContribution * 12);
+                        
+                        // קרן השתלמות - גם פחות תשואה
+                        const trainingCrisisReturn = Math.max(inputs.trainingFundReturn - 2, 1); // 2% פחות
+                        const trainingNetReturn = (trainingCrisisReturn - inputs.trainingFundManagementFee) / 100;
+                        totalTrainingFund = totalTrainingFund * (1 + trainingNetReturn) + (activePeriod.monthlyTrainingFund * 12);
+                    }
+
+                    // השקעות אישיות - הפקדות מופחתות, תשואות נמוכות יותר
+                    const personalCrisisReturn = Math.max(inputs.personalPortfolioReturn - 4, 0); // 4% פחות
+                    const cryptoCrisisReturn = Math.max(inputs.cryptoReturn - 8, -5); // יותר תנודתי
+                    const realEstateCrisisReturn = Math.max(inputs.realEstateReturn - 2, 1); // פחות מושפע
+
+                    totalPersonalPortfolio = totalPersonalPortfolio * (1 + personalCrisisReturn / 100) + 
+                        (inputs.personalPortfolioMonthly * (1 - scenario.incomeReduction / 100) * 12);
+                    
+                    totalCrypto = totalCrypto * (1 + cryptoCrisisReturn / 100) + 
+                        (inputs.cryptoMonthly * (1 - scenario.incomeReduction / 100) * 12);
+                    
+                    totalRealEstate = totalRealEstate * (1 + realEstateCrisisReturn / 100) + 
+                        (inputs.realEstateMonthly * (1 - scenario.incomeReduction / 100) * 12);
+                }
+
+                // שנות ההתאוששות (חזרה לתשואות רגילות)
+                const recoveryYears = yearsToRetirement - crisisYears;
+                for (let year = 0; year < recoveryYears; year++) {
+                    const currentAge = inputs.currentAge + crisisYears + year;
+                    const activePeriod = workPeriods.find(period => 
+                        currentAge >= period.startAge && currentAge < period.endAge
+                    );
+
+                    if (activePeriod) {
+                        // חזרה לתשואות רגילות
+                        const pensionReturn = activePeriod.pensionReturn || 6;
                         const netReturn = (pensionReturn - activePeriod.pensionAnnualFee) / 100;
                         const netContribution = activePeriod.monthlyContribution * (1 - activePeriod.pensionDepositFee / 100);
                         
                         totalPensionSavings = totalPensionSavings * (1 + netReturn) + (netContribution * 12);
                         
-                        // Training fund with crisis effects
-                        const trainingReturn = Math.max(
-                            stressedInputs.trainingFundReturn * crisisIntensity,
-                            1
-                        );
-                        const trainingNetReturn = (trainingReturn - stressedInputs.trainingFundManagementFee) / 100;
+                        const trainingNetReturn = (inputs.trainingFundReturn - inputs.trainingFundManagementFee) / 100;
                         totalTrainingFund = totalTrainingFund * (1 + trainingNetReturn) + (activePeriod.monthlyTrainingFund * 12);
-                    } else {
-                        // No active contributions, just growth
-                        totalPensionSavings = totalPensionSavings * 1.02; // Very conservative growth
-                        totalTrainingFund = totalTrainingFund * 1.02;
                     }
+
+                    // השקעות אישיות חוזרות לרגיל
+                    totalPersonalPortfolio = totalPersonalPortfolio * (1 + inputs.personalPortfolioReturn / 100) + 
+                        (inputs.personalPortfolioMonthly * 12);
                     
-                    // Personal investments with crisis effects
-                    const personalReturn = year < scenario.duration ? 
-                        stressedInputs.personalPortfolioReturn * Math.max(0.2, 1 - (year / scenario.duration) * 0.8) :
-                        stressedInputs.personalPortfolioReturn;
+                    totalCrypto = totalCrypto * (1 + inputs.cryptoReturn / 100) + 
+                        (inputs.cryptoMonthly * 12);
                     
-                    totalPersonalPortfolio = totalPersonalPortfolio * (1 + personalReturn / 100) + 
-                        (stressedInputs.personalPortfolioMonthly * 12);
-                    
-                    // Crypto with high volatility during crisis
-                    const cryptoReturn = year < scenario.duration ? 
-                        stressedInputs.cryptoReturn * Math.max(0.1, 1 - (year / scenario.duration) * 0.9) :
-                        stressedInputs.cryptoReturn;
-                    
-                    totalCrypto = totalCrypto * (1 + cryptoReturn / 100) + 
-                        (stressedInputs.cryptoMonthly * 12);
-                    
-                    // Real estate recovery slower than stocks
-                    const realEstateReturn = year < scenario.duration * 1.5 ? 
-                        stressedInputs.realEstateReturn * Math.max(0.3, 1 - (year / (scenario.duration * 1.5)) * 0.7) :
-                        stressedInputs.realEstateReturn;
-                    
-                    totalRealEstate = totalRealEstate * (1 + realEstateReturn / 100) + 
-                        (stressedInputs.realEstateMonthly * 12);
+                    totalRealEstate = totalRealEstate * (1 + inputs.realEstateReturn / 100) + 
+                        (inputs.realEstateMonthly * 12);
                 }
 
-                // Calculate monthly incomes with stress scenario tax implications
-                const monthlyPension = (totalPensionSavings * 0.045) / 12; // 4.5% withdrawal rate (more conservative)
+                // חישוב הכנסה חודשית (רגיל)
+                const monthlyPension = (totalPensionSavings * 0.045) / 12;
                 const monthlyTrainingFund = (totalTrainingFund * 0.045) / 12;
-                const monthlyPersonalPortfolio = (totalPersonalPortfolio * 0.04) / 12; // 4% rule
+                const monthlyPersonalPortfolio = (totalPersonalPortfolio * 0.04) / 12;
                 const monthlyCrypto = (totalCrypto * 0.04) / 12;
                 const monthlyRealEstate = (totalRealEstate * 0.04) / 12;
 
-                // Apply taxes (might be higher during crisis)
-                const crisisTaxMultiplier = 1 + (scenario.inflationIncrease / 100) * 0.5; // Higher taxes due to government needs
-                const pensionTax = monthlyPension * 0.15 * crisisTaxMultiplier;
-                const personalTax = monthlyPersonalPortfolio * (stressedInputs.personalPortfolioTaxRate / 100) * crisisTaxMultiplier;
-                const cryptoTax = monthlyCrypto * (stressedInputs.cryptoTaxRate / 100) * crisisTaxMultiplier;
-                const realEstateTax = monthlyRealEstate * (stressedInputs.realEstateTaxRate / 100) * crisisTaxMultiplier;
+                // מיסים (מעט גבוהים יותר בגלל אינפלציה)
+                const inflationTaxMultiplier = 1 + (scenario.inflationIncrease / 100) * 0.3; // השפעה מתונה
+                const pensionTax = monthlyPension * 0.15 * inflationTaxMultiplier;
+                const personalTax = monthlyPersonalPortfolio * (inputs.personalPortfolioTaxRate / 100) * inflationTaxMultiplier;
+                const cryptoTax = monthlyCrypto * (inputs.cryptoTaxRate / 100) * inflationTaxMultiplier;
+                const realEstateTax = monthlyRealEstate * (inputs.realEstateTaxRate / 100) * inflationTaxMultiplier;
 
                 const totalMonthlyIncome = 
                     (monthlyPension - pensionTax) +
-                    monthlyTrainingFund + // Training fund is tax-free
+                    monthlyTrainingFund +
                     (monthlyPersonalPortfolio - personalTax) +
                     (monthlyCrypto - cryptoTax) +
                     (monthlyRealEstate - realEstateTax);
 
                 const totalAccumulation = totalPensionSavings + totalTrainingFund + totalPersonalPortfolio + totalCrypto + totalRealEstate;
                 
-                // Check if target is achieved
+                // בדיקת יעד (עם אינפלציה מוגברת)
                 const currentSalary = workPeriods[workPeriods.length - 1]?.salary || 0;
-                const futureTargetSalary = currentSalary * Math.pow(1 + stressedInputs.inflationRate / 100, yearsToRetirement);
-                const targetMonthlyIncome = (futureTargetSalary * stressedInputs.targetReplacement) / 100;
+                const adjustedInflationRate = inputs.inflationRate + scenario.inflationIncrease;
+                const futureTargetSalary = currentSalary * Math.pow(1 + adjustedInflationRate / 100, yearsToRetirement);
+                const targetMonthlyIncome = (futureTargetSalary * inputs.targetReplacement) / 100;
                 const achievesTarget = totalMonthlyIncome >= targetMonthlyIncome;
 
                 const result = {
@@ -2432,7 +2423,12 @@
                     achievesTarget
                 };
 
-                console.log('Stressed results:', result);
+                console.log('Crisis impact calculation:');
+                console.log('- Portfolio decline:', `${scenario.portfolioDecline}% immediate loss`);
+                console.log('- Income reduction:', `${scenario.incomeReduction}% for ${scenario.duration} years`);
+                console.log('- Inflation increase:', `+${scenario.inflationIncrease}% affects target calculation`);
+                console.log('Final stressed results:', result);
+                
                 return result;
             };
 
