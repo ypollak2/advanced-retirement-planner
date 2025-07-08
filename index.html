@@ -92,6 +92,9 @@
             `;
         });
 
+        // Global utility functions
+        const safeValue = (value) => isNaN(value) || !isFinite(value) ? 0 : Math.max(0, value);
+
         // Check if dependencies are loaded
         function checkDependencies() {
             console.log('Checking dependencies...');
@@ -2301,10 +2304,11 @@
                     return;
                 }
 
-                const incomeReduction = parseFloat(document.getElementById('custom-income-reduction')?.value || 20);
-                const portfolioDecline = parseFloat(document.getElementById('custom-portfolio-decline')?.value || 30);
-                const inflationIncrease = parseFloat(document.getElementById('custom-inflation-increase')?.value || 8);
-                const duration = parseFloat(document.getElementById('custom-crisis-duration')?.value || 3);
+                // Input validation with bounds checking
+                const incomeReduction = Math.max(0, Math.min(80, parseFloat(document.getElementById('custom-income-reduction')?.value || 20)));
+                const portfolioDecline = Math.max(0, Math.min(90, parseFloat(document.getElementById('custom-portfolio-decline')?.value || 30)));
+                const inflationIncrease = Math.max(0, Math.min(50, parseFloat(document.getElementById('custom-inflation-increase')?.value || 8)));
+                const duration = Math.max(1, Math.min(15, parseFloat(document.getElementById('custom-crisis-duration')?.value || 3)));
 
                 // Track custom stress test
                 AnalyticsManager.trackAction('custom_stress_test', { 
@@ -2378,24 +2382,40 @@
             };
 
             const calculateStressedResults = (scenario) => {
-                console.log('Calculating stressed results with scenario:', scenario);
-                
-                // **מציאותיות במבחן עמידות - גישה פשוטה יותר**
+                try {
+                    console.log('Calculating stressed results with scenario:', scenario);
+                    
+                    // Validate inputs
+                    if (!scenario || typeof scenario !== 'object') {
+                        throw new Error('Invalid scenario provided');
+                    }
+                    
+                    if (!inputs || !workPeriods || workPeriods.length === 0) {
+                        throw new Error('Invalid inputs or work periods');
+                    }
+                    
+                    // **מציאותיות במבחן עמידות - גישה פשוטה יותר**
+                    
+                    // Use global safe value function
                 
                 // 1. השפעה ישירה על הכנסות (רק במשך תקופת המשבר)
+                const incomeReduction = Math.min(80, Math.max(0, safeValue(scenario.incomeReduction || 0))) / 100;
+                const portfolioDecline = Math.min(90, Math.max(0, safeValue(scenario.portfolioDecline || 0))) / 100;
+                
                 const stressedWorkPeriods = workPeriods.map(period => ({
                     ...period,
-                    salary: period.salary * (1 - scenario.incomeReduction / 100),
-                    monthlyContribution: period.monthlyContribution * (1 - scenario.incomeReduction / 100),
-                    monthlyTrainingFund: period.monthlyTrainingFund * (1 - scenario.incomeReduction / 100)
+                    salary: safeValue(period.salary || 0) * (1 - incomeReduction),
+                    monthlyContribution: safeValue(period.monthlyContribution || 0) * (1 - incomeReduction),
+                    monthlyTrainingFund: safeValue(period.monthlyTrainingFund || 0) * (1 - incomeReduction)
                 }));
 
                 // 2. השפעה חד-פעמית על צבירה קיימת (ירידה בשוק)
-                const currentSavingsAfterCrash = inputs.currentSavings * (1 - scenario.portfolioDecline / 100);
-                const currentPersonalPortfolioAfterCrash = inputs.currentPersonalPortfolio * (1 - scenario.portfolioDecline / 100);
-                const currentCryptoAfterCrash = inputs.currentCrypto * (1 - scenario.portfolioDecline / 100);
-                const currentRealEstateAfterCrash = inputs.currentRealEstate * (1 - (scenario.realEstateDecline || scenario.portfolioDecline * 0.6) / 100);
-                const currentTrainingFundAfterCrash = inputs.currentTrainingFund * (1 - scenario.portfolioDecline / 100);
+                const currentSavingsAfterCrash = safeValue(inputs.currentSavings || 0) * (1 - portfolioDecline);
+                const currentPersonalPortfolioAfterCrash = safeValue(inputs.currentPersonalPortfolio || 0) * (1 - portfolioDecline);
+                const currentCryptoAfterCrash = safeValue(inputs.currentCrypto || 0) * (1 - portfolioDecline);
+                const realEstateDecline = Math.min(portfolioDecline, portfolioDecline * 0.6); // נדל"ן פחות תנודתי
+                const currentRealEstateAfterCrash = safeValue(inputs.currentRealEstate || 0) * (1 - realEstateDecline);
+                const currentTrainingFundAfterCrash = safeValue(inputs.currentTrainingFund || 0) * (1 - portfolioDecline);
 
                 console.log(`Portfolio impact: ${scenario.portfolioDecline}% decline`);
                 console.log(`Income impact: ${scenario.incomeReduction}% reduction for ${scenario.duration} years`);
@@ -2428,15 +2448,20 @@
                     if (activePeriod) {
                         // תשואות מופחתות במהלך המשבר (לא דרמטיות)
                         const pensionCrisisReturn = Math.max((activePeriod.pensionReturn || 6) - 3, 1); // 3% פחות מהרגיל
-                        const netReturn = (pensionCrisisReturn - activePeriod.pensionAnnualFee) / 100;
-                        const netContribution = activePeriod.monthlyContribution * (1 - activePeriod.pensionDepositFee / 100);
+                        const netReturn = (pensionCrisisReturn - (activePeriod.pensionAnnualFee || 0)) / 100;
+                        const netContribution = (activePeriod.monthlyContribution || 0) * (1 - (activePeriod.pensionDepositFee || 0) / 100);
                         
                         totalPensionSavings = totalPensionSavings * (1 + netReturn) + (netContribution * 12);
                         
                         // קרן השתלמות - גם פחות תשואה
-                        const trainingCrisisReturn = Math.max(inputs.trainingFundReturn - 2, 1); // 2% פחות
-                        const trainingNetReturn = (trainingCrisisReturn - inputs.trainingFundManagementFee) / 100;
-                        totalTrainingFund = totalTrainingFund * (1 + trainingNetReturn) + (activePeriod.monthlyTrainingFund * 12);
+                        const trainingCrisisReturn = Math.max((inputs.trainingFundReturn || 6) - 2, 1); // 2% פחות
+                        const trainingNetReturn = (trainingCrisisReturn - (inputs.trainingFundManagementFee || 0)) / 100;
+                        totalTrainingFund = totalTrainingFund * (1 + trainingNetReturn) + ((activePeriod.monthlyTrainingFund || 0) * 12);
+                    } else {
+                        // אם אין תקופת עבודה פעילה, רק צמיחה של הכספים הקיימים
+                        const defaultReturn = Math.max(6 - 3, 1); // 3% תשואה ברירת מחדל במשבר
+                        totalPensionSavings = totalPensionSavings * (1 + defaultReturn / 100);
+                        totalTrainingFund = totalTrainingFund * (1 + defaultReturn / 100);
                     }
 
                     // השקעות אישיות - הפקדות מופחתות, תשואות נמוכות יותר
@@ -2485,40 +2510,43 @@
                         (inputs.realEstateMonthly * 12);
                 }
 
-                // חישוב הכנסה חודשית (רגיל)
-                const monthlyPension = (totalPensionSavings * 0.045) / 12;
-                const monthlyTrainingFund = (totalTrainingFund * 0.045) / 12;
-                const monthlyPersonalPortfolio = (totalPersonalPortfolio * 0.04) / 12;
-                const monthlyCrypto = (totalCrypto * 0.04) / 12;
-                const monthlyRealEstate = (totalRealEstate * 0.04) / 12;
+                // חישוב הכנסה חודשית (רגיל) - עם הגנה מפני ערכים לא תקינים
+                
+                const monthlyPension = safeValue(totalPensionSavings * 0.045) / 12;
+                const monthlyTrainingFund = safeValue(totalTrainingFund * 0.045) / 12;
+                const monthlyPersonalPortfolio = safeValue(totalPersonalPortfolio * 0.04) / 12;
+                const monthlyCrypto = safeValue(totalCrypto * 0.04) / 12;
+                const monthlyRealEstate = safeValue(totalRealEstate * 0.04) / 12;
 
-                // מיסים (מעט גבוהים יותר בגלל אינפלציה)
-                const inflationTaxMultiplier = 1 + (scenario.inflationIncrease / 100) * 0.3; // השפעה מתונה
-                const pensionTax = monthlyPension * 0.15 * inflationTaxMultiplier;
-                const personalTax = monthlyPersonalPortfolio * (inputs.personalPortfolioTaxRate / 100) * inflationTaxMultiplier;
-                const cryptoTax = monthlyCrypto * (inputs.cryptoTaxRate / 100) * inflationTaxMultiplier;
-                const realEstateTax = monthlyRealEstate * (inputs.realEstateTaxRate / 100) * inflationTaxMultiplier;
+                // מיסים (מעט גבוהים יותר בגלל אינפלציה) - עם הגנה מפני ערכים לא תקינים
+                const safeInflationIncrease = safeValue(scenario?.inflationIncrease || 0);
+                const inflationTaxMultiplier = 1 + (safeInflationIncrease / 100) * 0.3; // השפעה מתונה
+                const pensionTax = safeValue(monthlyPension * 0.15 * inflationTaxMultiplier);
+                const personalTax = safeValue(monthlyPersonalPortfolio * (safeValue(inputs.personalPortfolioTaxRate) / 100) * inflationTaxMultiplier);
+                const cryptoTax = safeValue(monthlyCrypto * (safeValue(inputs.cryptoTaxRate) / 100) * inflationTaxMultiplier);
+                const realEstateTax = safeValue(monthlyRealEstate * (safeValue(inputs.realEstateTaxRate) / 100) * inflationTaxMultiplier);
 
-                const totalMonthlyIncome = 
-                    (monthlyPension - pensionTax) +
+                const totalMonthlyIncome = safeValue(
+                    Math.max(0, monthlyPension - pensionTax) +
                     monthlyTrainingFund +
-                    (monthlyPersonalPortfolio - personalTax) +
-                    (monthlyCrypto - cryptoTax) +
-                    (monthlyRealEstate - realEstateTax);
+                    Math.max(0, monthlyPersonalPortfolio - personalTax) +
+                    Math.max(0, monthlyCrypto - cryptoTax) +
+                    Math.max(0, monthlyRealEstate - realEstateTax)
+                );
 
-                const totalAccumulation = totalPensionSavings + totalTrainingFund + totalPersonalPortfolio + totalCrypto + totalRealEstate;
+                const totalAccumulation = safeValue(totalPensionSavings + totalTrainingFund + totalPersonalPortfolio + totalCrypto + totalRealEstate);
                 
                 // בדיקת יעד (עם אינפלציה מוגברת)
-                const currentSalary = workPeriods[workPeriods.length - 1]?.salary || 0;
-                const adjustedInflationRate = inputs.inflationRate + scenario.inflationIncrease;
-                const futureTargetSalary = currentSalary * Math.pow(1 + adjustedInflationRate / 100, yearsToRetirement);
-                const targetMonthlyIncome = (futureTargetSalary * inputs.targetReplacement) / 100;
+                const currentSalary = safeValue(workPeriods[workPeriods.length - 1]?.salary || 0);
+                const adjustedInflationRate = safeValue(inputs.inflationRate || 0) + safeInflationIncrease;
+                const futureTargetSalary = currentSalary * Math.pow(1 + Math.max(0, adjustedInflationRate) / 100, Math.max(0, yearsToRetirement));
+                const targetMonthlyIncome = safeValue((futureTargetSalary * safeValue(inputs.targetReplacement || 75)) / 100);
                 const achievesTarget = totalMonthlyIncome >= targetMonthlyIncome;
 
                 const result = {
-                    monthlyIncome: Math.round(totalMonthlyIncome),
-                    totalAccumulation: Math.round(totalAccumulation),
-                    achievesTarget
+                    monthlyIncome: Math.round(safeValue(totalMonthlyIncome)),
+                    totalAccumulation: Math.round(safeValue(totalAccumulation)),
+                    achievesTarget: Boolean(achievesTarget)
                 };
 
                 console.log('Crisis impact calculation:');
@@ -2528,6 +2556,19 @@
                 console.log('Final stressed results:', result);
                 
                 return result;
+                
+                } catch (error) {
+                    console.error('Error in calculateStressedResults:', error);
+                    // Return safe default results based on current inputs
+                    const fallbackIncome = safeValue(inputs?.currentSavings || 0) * 0.045 / 12 * 0.7; // Estimate based on current savings
+                    const fallbackAccumulation = safeValue(inputs?.currentSavings || 0) * 0.8;
+                    
+                    return {
+                        monthlyIncome: Math.round(fallbackIncome),
+                        totalAccumulation: Math.round(fallbackAccumulation),
+                        achievesTarget: false
+                    };
+                }
             };
 
             // Generate dynamic crisis explanations based on scenario parameters
@@ -2853,6 +2894,17 @@
                     // AI-powered natural language processing to extract parameters
                     const scenario = parseScenarioDescription(description);
                     
+                    // Validate scenario parameters
+                    if (!scenario || typeof scenario !== 'object') {
+                        throw new Error('Failed to parse scenario description');
+                    }
+                    
+                    // Apply bounds checking to AI-generated parameters
+                    scenario.incomeReduction = Math.max(0, Math.min(80, scenario.incomeReduction || 20));
+                    scenario.portfolioDecline = Math.max(0, Math.min(90, scenario.portfolioDecline || 30));
+                    scenario.inflationIncrease = Math.max(0, Math.min(50, scenario.inflationIncrease || 8));
+                    scenario.duration = Math.max(1, Math.min(15, scenario.duration || 3));
+                    
                     // Fill the custom scenario builder with AI-generated parameters
                     document.getElementById('custom-income-reduction').value = scenario.incomeReduction;
                     document.getElementById('custom-portfolio-decline').value = scenario.portfolioDecline;
@@ -2962,17 +3014,22 @@
             };
             
             const parseScenarioDescription = (description) => {
-                // Advanced NLP-like parsing to extract economic parameters from natural language
-                const text = description.toLowerCase();
-                const originalText = description;
-                
-                // Start with minimal default values - only use if no numbers found
-                let incomeReduction = 0;
-                let portfolioDecline = 0;
-                let inflationIncrease = 0;
-                let duration = 1;
-                let explanationParts = [];
-                let foundNumbers = false;
+                try {
+                    // Advanced NLP-like parsing to extract economic parameters from natural language
+                    if (!description || typeof description !== 'string') {
+                        throw new Error('Invalid description provided');
+                    }
+                    
+                    const text = description.toLowerCase();
+                    const originalText = description;
+                    
+                    // Start with minimal default values - only use if no numbers found
+                    let incomeReduction = 0;
+                    let portfolioDecline = 0;
+                    let inflationIncrease = 0;
+                    let duration = 1;
+                    let explanationParts = [];
+                    let foundNumbers = false;
                 
                 console.log('Parsing scenario:', text); // Debug log
                 
@@ -3181,15 +3238,27 @@
                     : `${impactLevel} crisis: ${incomeReduction}% income decline, ${portfolioDecline}% portfolio decline, ${inflationIncrease}% inflation increase for ${duration} years`);
                 
                 const scenario = {
-                    incomeReduction: Math.round(incomeReduction),
-                    portfolioDecline: Math.round(portfolioDecline),
-                    inflationIncrease: Math.round(inflationIncrease),
-                    duration: Math.round(duration),
-                    explanation: explanationParts.join('. ')
+                    incomeReduction: Math.round(Math.max(0, incomeReduction)),
+                    portfolioDecline: Math.round(Math.max(0, portfolioDecline)),
+                    inflationIncrease: Math.round(Math.max(0, inflationIncrease)),
+                    duration: Math.round(Math.max(1, duration)),
+                    explanation: explanationParts.join('. ') || 'תרחיש מותאם אישית'
                 };
                 
                 console.log('Final scenario:', scenario); // Debug log
                 return scenario;
+                
+                } catch (error) {
+                    console.error('Error parsing scenario description:', error);
+                    // Return default scenario if parsing fails
+                    return {
+                        incomeReduction: 20,
+                        portfolioDecline: 30,
+                        inflationIncrease: 8,
+                        duration: 3,
+                        explanation: 'תרחיש ברירת מחדל בשל שגיאה בפענוח'
+                    };
+                }
             };
 
             return React.createElement('div', {
@@ -4496,7 +4565,9 @@
                                                         React.createElement('div', { className: "text-right" }, [
                                                             React.createElement('div', { className: "font-semibold" }, formatCurrency(stressTestResults.stressed.monthlyIncome)),
                                                             React.createElement('div', { className: "text-xs text-red-600" }, 
-                                                                `${((stressTestResults.stressed.monthlyIncome - stressTestResults.normal.monthlyIncome) / stressTestResults.normal.monthlyIncome * 100).toFixed(1)}%`)
+                                                                stressTestResults.normal.monthlyIncome > 0 ? 
+                                                                `${((stressTestResults.stressed.monthlyIncome - stressTestResults.normal.monthlyIncome) / stressTestResults.normal.monthlyIncome * 100).toFixed(1)}%` : 
+                                                                '0%')
                                                         ])
                                                     ]),
                                                     React.createElement('div', { className: "flex justify-between items-center" }, [
@@ -4504,7 +4575,9 @@
                                                         React.createElement('div', { className: "text-right" }, [
                                                             React.createElement('div', { className: "font-semibold" }, formatCurrency(stressTestResults.stressed.totalAccumulation)),
                                                             React.createElement('div', { className: "text-xs text-red-600" }, 
-                                                                `${((stressTestResults.stressed.totalAccumulation - stressTestResults.normal.totalAccumulation) / stressTestResults.normal.totalAccumulation * 100).toFixed(1)}%`)
+                                                                stressTestResults.normal.totalAccumulation > 0 ? 
+                                                                `${((stressTestResults.stressed.totalAccumulation - stressTestResults.normal.totalAccumulation) / stressTestResults.normal.totalAccumulation * 100).toFixed(1)}%` : 
+                                                                '0%')
                                                         ])
                                                     ]),
                                                     React.createElement('div', { className: "flex justify-between" }, [
