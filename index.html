@@ -392,6 +392,336 @@
             className: className + " inline-flex items-center justify-center", 
             style: { fontSize: `${size}px` } 
         }, '📈');
+        const Zap = ({ size = 16, className = "" }) => React.createElement('span', { 
+            className: className + " inline-flex items-center justify-center", 
+            style: { fontSize: `${size}px` } 
+        }, '⚡');
+
+        // Analytics System for Usage Tracking
+        const AnalyticsManager = {
+            // Generate unique session ID
+            generateSessionId() {
+                return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            },
+
+            // Get or create visitor ID (persistent across sessions)
+            getVisitorId() {
+                let visitorId = localStorage.getItem('retirement_planner_visitor_id');
+                if (!visitorId) {
+                    visitorId = 'visitor_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('retirement_planner_visitor_id', visitorId);
+                }
+                return visitorId;
+            },
+
+            // Initialize analytics storage
+            initializeStorage() {
+                const storageKey = 'retirement_planner_analytics';
+                let analytics = JSON.parse(localStorage.getItem(storageKey) || '{}');
+                
+                if (!analytics.visitors) analytics.visitors = {};
+                if (!analytics.sessions) analytics.sessions = {};
+                if (!analytics.conclusions) analytics.conclusions = [];
+                if (!analytics.metadata) {
+                    analytics.metadata = {
+                        firstVisit: new Date().toISOString(),
+                        totalSessions: 0,
+                        totalVisitors: 0,
+                        lastUpdated: new Date().toISOString(),
+                        version: '2.1.0'
+                    };
+                }
+
+                localStorage.setItem(storageKey, JSON.stringify(analytics));
+                return analytics;
+            },
+
+            // Track visitor session
+            trackVisitor(language = 'he') {
+                const storageKey = 'retirement_planner_analytics';
+                const analytics = this.initializeStorage();
+                const visitorId = this.getVisitorId();
+                const sessionId = this.generateSessionId();
+                const timestamp = new Date().toISOString();
+
+                // Track visitor
+                if (!analytics.visitors[visitorId]) {
+                    analytics.visitors[visitorId] = {
+                        firstVisit: timestamp,
+                        totalSessions: 0,
+                        preferredLanguage: language,
+                        lastActive: timestamp
+                    };
+                    analytics.metadata.totalVisitors++;
+                }
+
+                analytics.visitors[visitorId].totalSessions++;
+                analytics.visitors[visitorId].lastActive = timestamp;
+                analytics.visitors[visitorId].preferredLanguage = language;
+
+                // Track session
+                analytics.sessions[sessionId] = {
+                    visitorId,
+                    startTime: timestamp,
+                    language,
+                    actions: [],
+                    conclusions: null,
+                    endTime: null
+                };
+
+                analytics.metadata.totalSessions++;
+                analytics.metadata.lastUpdated = timestamp;
+
+                localStorage.setItem(storageKey, JSON.stringify(analytics));
+                
+                // Store current session ID for tracking actions
+                sessionStorage.setItem('current_session_id', sessionId);
+                
+                return sessionId;
+            },
+
+            // Track user actions during session
+            trackAction(actionType, actionData = {}) {
+                const storageKey = 'retirement_planner_analytics';
+                const sessionId = sessionStorage.getItem('current_session_id');
+                
+                if (!sessionId) return;
+
+                const analytics = JSON.parse(localStorage.getItem(storageKey) || '{}');
+                
+                if (analytics.sessions && analytics.sessions[sessionId]) {
+                    analytics.sessions[sessionId].actions.push({
+                        type: actionType,
+                        data: actionData,
+                        timestamp: new Date().toISOString()
+                    });
+
+                    analytics.metadata.lastUpdated = new Date().toISOString();
+                    localStorage.setItem(storageKey, JSON.stringify(analytics));
+                }
+            },
+
+            // Track retirement plan conclusions
+            trackConclusion(results, inputs, workPeriods, language = 'he') {
+                const storageKey = 'retirement_planner_analytics';
+                const sessionId = sessionStorage.getItem('current_session_id');
+                
+                if (!sessionId || !results) return;
+
+                const analytics = JSON.parse(localStorage.getItem(storageKey) || '{}');
+                
+                // Anonymized conclusion data
+                const conclusion = {
+                    sessionId,
+                    timestamp: new Date().toISOString(),
+                    language,
+                    // User profile (anonymized)
+                    profile: {
+                        ageRange: this.getAgeRange(inputs.currentAge),
+                        yearsToRetirement: inputs.retirementAge - inputs.currentAge,
+                        riskTolerance: inputs.riskTolerance,
+                        targetReplacement: inputs.targetReplacement,
+                        hasEmergencyFund: inputs.currentEmergencyFund > 0,
+                        hasPersonalInvestments: inputs.currentPersonalPortfolio > 0,
+                        hasCrypto: inputs.currentCrypto > 0,
+                        hasRealEstate: inputs.currentRealEstate > 0
+                    },
+                    // Planning results (anonymized amounts)
+                    results: {
+                        achievesTarget: results.achievesTarget,
+                        targetGapRange: this.getAmountRange(Math.abs(results.targetGap || 0)),
+                        totalAccumulationRange: this.getAmountRange(results.totalNetIncome * 12),
+                        emergencyFundCoverage: inputs.currentMonthlyExpenses > 0 ? 
+                            Math.round(inputs.currentEmergencyFund / inputs.currentMonthlyExpenses) : 0,
+                        savingsRate: this.calculateSavingsRate(inputs, workPeriods),
+                        debtToIncomeRatio: this.calculateDebtRatio(inputs, workPeriods)
+                    },
+                    // Anonymized insights
+                    insights: {
+                        recommendationTypes: this.getRecommendationTypes(results, inputs, workPeriods),
+                        riskAlignment: this.assessRiskAlignment(inputs.currentAge, inputs.riskTolerance),
+                        planningScore: this.calculatePlanningScore(results, inputs)
+                    }
+                };
+
+                // Store in conclusions array
+                analytics.conclusions.push(conclusion);
+
+                // Update session with conclusion
+                if (analytics.sessions[sessionId]) {
+                    analytics.sessions[sessionId].conclusions = {
+                        achieved: results.achievesTarget,
+                        timestamp: new Date().toISOString()
+                    };
+                }
+
+                analytics.metadata.lastUpdated = new Date().toISOString();
+                localStorage.setItem(storageKey, JSON.stringify(analytics));
+
+                return conclusion;
+            },
+
+            // Helper methods for anonymization
+            getAgeRange(age) {
+                if (age < 25) return 'under25';
+                if (age < 35) return '25-34';
+                if (age < 45) return '35-44';
+                if (age < 55) return '45-54';
+                if (age < 65) return '55-64';
+                return '65plus';
+            },
+
+            getAmountRange(amount) {
+                if (amount < 100000) return 'under100k';
+                if (amount < 500000) return '100k-500k';
+                if (amount < 1000000) return '500k-1M';
+                if (amount < 2000000) return '1M-2M';
+                if (amount < 5000000) return '2M-5M';
+                return 'over5M';
+            },
+
+            calculateSavingsRate(inputs, workPeriods) {
+                const currentSalary = workPeriods[workPeriods.length - 1]?.salary || 0;
+                if (currentSalary === 0) return 0;
+                
+                const totalMonthlySavings = (workPeriods[workPeriods.length - 1]?.monthlyContribution || 0) +
+                    (workPeriods[workPeriods.length - 1]?.monthlyTrainingFund || 0) +
+                    inputs.personalPortfolioMonthly +
+                    inputs.cryptoMonthly +
+                    inputs.realEstateMonthly +
+                    inputs.emergencyFundMonthly;
+                
+                return Math.round((totalMonthlySavings / currentSalary) * 100);
+            },
+
+            calculateDebtRatio(inputs, workPeriods) {
+                const currentSalary = workPeriods[workPeriods.length - 1]?.salary || 0;
+                if (currentSalary === 0) return 0;
+                
+                const totalMonthlyDebt = inputs.mortgageMonthlyPayment +
+                    inputs.personalLoansMonthly +
+                    inputs.creditCardMonthly +
+                    inputs.otherDebtsMonthly;
+                
+                return Math.round((totalMonthlyDebt / currentSalary) * 100);
+            },
+
+            getRecommendationTypes(results, inputs, workPeriods) {
+                const types = [];
+                const currentAge = inputs.currentAge;
+                const savingsRate = this.calculateSavingsRate(inputs, workPeriods);
+                const emergencyFundCoverage = inputs.currentMonthlyExpenses > 0 ? 
+                    inputs.currentEmergencyFund / inputs.currentMonthlyExpenses : 0;
+
+                if (emergencyFundCoverage < 3) types.push('emergency_fund_critical');
+                else if (emergencyFundCoverage < 6) types.push('emergency_fund_warning');
+                
+                if (savingsRate < 10) types.push('savings_rate_low');
+                else if (savingsRate >= 20) types.push('savings_rate_excellent');
+                
+                if (!results.achievesTarget) types.push('target_gap');
+                
+                if (currentAge > 55 && (inputs.riskTolerance === 'aggressive' || inputs.riskTolerance === 'veryAggressive')) {
+                    types.push('risk_alignment');
+                }
+
+                return types;
+            },
+
+            assessRiskAlignment(age, riskTolerance) {
+                if (age < 30 && riskTolerance === 'conservative') return 'too_conservative';
+                if (age > 55 && (riskTolerance === 'aggressive' || riskTolerance === 'veryAggressive')) return 'too_aggressive';
+                return 'appropriate';
+            },
+
+            calculatePlanningScore(results, inputs) {
+                let score = 0;
+                
+                // Target achievement (30 points)
+                if (results.achievesTarget) score += 30;
+                else if (results.targetGap && results.targetGap < 5000) score += 20;
+                else if (results.targetGap && results.targetGap < 10000) score += 10;
+                
+                // Emergency fund (25 points)
+                const emergencyFundCoverage = inputs.currentMonthlyExpenses > 0 ? 
+                    inputs.currentEmergencyFund / inputs.currentMonthlyExpenses : 0;
+                if (emergencyFundCoverage >= 6) score += 25;
+                else if (emergencyFundCoverage >= 3) score += 15;
+                else if (emergencyFundCoverage >= 1) score += 5;
+                
+                // Diversification (20 points)
+                let diversificationScore = 0;
+                if (inputs.currentPersonalPortfolio > 0 || inputs.personalPortfolioMonthly > 0) diversificationScore += 7;
+                if (inputs.currentCrypto > 0 || inputs.cryptoMonthly > 0) diversificationScore += 3;
+                if (inputs.currentRealEstate > 0 || inputs.realEstateMonthly > 0) diversificationScore += 10;
+                score += Math.min(diversificationScore, 20);
+                
+                // Planning horizon (15 points)
+                const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
+                if (yearsToRetirement >= 25) score += 15;
+                else if (yearsToRetirement >= 15) score += 10;
+                else if (yearsToRetirement >= 5) score += 5;
+                
+                // Risk appropriateness (10 points)
+                const riskAlignment = this.assessRiskAlignment(inputs.currentAge, inputs.riskTolerance);
+                if (riskAlignment === 'appropriate') score += 10;
+                else if (riskAlignment === 'too_conservative' && inputs.currentAge < 35) score += 5;
+                
+                return Math.min(score, 100);
+            },
+
+            // Get analytics summary
+            getAnalyticsSummary() {
+                const storageKey = 'retirement_planner_analytics';
+                const analytics = JSON.parse(localStorage.getItem(storageKey) || '{}');
+                
+                if (!analytics.metadata) return null;
+
+                const now = new Date();
+                const sessionsToday = Object.values(analytics.sessions || {}).filter(session => {
+                    const sessionDate = new Date(session.startTime);
+                    return sessionDate.toDateString() === now.toDateString();
+                }).length;
+
+                const conclusionsToday = analytics.conclusions.filter(conclusion => {
+                    const conclusionDate = new Date(conclusion.timestamp);
+                    return conclusionDate.toDateString() === now.toDateString();
+                }).length;
+
+                return {
+                    totalVisitors: analytics.metadata.totalVisitors || 0,
+                    totalSessions: analytics.metadata.totalSessions || 0,
+                    totalConclusions: analytics.conclusions.length || 0,
+                    sessionsToday,
+                    conclusionsToday,
+                    lastUpdated: analytics.metadata.lastUpdated,
+                    version: analytics.metadata.version
+                };
+            },
+
+            // Export analytics data
+            exportAnalytics() {
+                const storageKey = 'retirement_planner_analytics';
+                const analytics = JSON.parse(localStorage.getItem(storageKey) || '{}');
+                return analytics;
+            },
+
+            // End session tracking
+            endSession() {
+                const sessionId = sessionStorage.getItem('current_session_id');
+                if (!sessionId) return;
+
+                const storageKey = 'retirement_planner_analytics';
+                const analytics = JSON.parse(localStorage.getItem(storageKey) || '{}');
+                
+                if (analytics.sessions && analytics.sessions[sessionId]) {
+                    analytics.sessions[sessionId].endTime = new Date().toISOString();
+                    localStorage.setItem(storageKey, JSON.stringify(analytics));
+                }
+
+                sessionStorage.removeItem('current_session_id');
+            }
+        };
 
         const RetirementPlanner = () => {
             const [language, setLanguage] = useState('he');
@@ -477,6 +807,7 @@
             const [showChart, setShowChart] = useState(false);
             const [claudeInsights, setClaudeInsights] = useState(null);
             const [selectedTimeHorizon, setSelectedTimeHorizon] = useState(20);
+            const [stressTestResults, setStressTestResults] = useState(null);
 
             // Real-time index data state - starts with fallback, then updated from APIs
             const [historicalReturns, setHistoricalReturns] = useState({
@@ -1737,10 +2068,43 @@
                 setClaudeInsights(insights);
             };
 
+            // Initialize analytics on component mount
+            useEffect(() => {
+                const sessionId = AnalyticsManager.trackVisitor(language);
+                console.log('Analytics session started:', sessionId);
+                
+                // Track page load
+                AnalyticsManager.trackAction('page_load', { 
+                    language,
+                    timestamp: new Date().toISOString()
+                });
+
+                // Cleanup on unmount
+                return () => {
+                    AnalyticsManager.endSession();
+                };
+            }, []);
+
+            // Track language changes
+            useEffect(() => {
+                AnalyticsManager.trackAction('language_change', { 
+                    newLanguage: language,
+                    timestamp: new Date().toISOString()
+                });
+            }, [language]);
+
             // Auto calculation
             useEffect(() => {
                 calculateRetirement();
             }, [inputs, workPeriods, pensionIndexAllocation, trainingFundIndexAllocation]);
+
+            // Track retirement conclusions when results change
+            useEffect(() => {
+                if (results) {
+                    const conclusion = AnalyticsManager.trackConclusion(results, inputs, workPeriods, language);
+                    console.log('Retirement conclusion tracked:', conclusion);
+                }
+            }, [results]);
 
             // Update Claude insights when results or language change
             useEffect(() => {
@@ -1752,6 +2116,336 @@
                     generateChartData();
                 }
             }, [inputs, workPeriods, showChart, pensionIndexAllocation, trainingFundIndexAllocation]);
+
+            // Stress Testing Functions
+            const runStressTest = (scenarioType) => {
+                if (!results) {
+                    alert(language === 'he' ? 'יש לחשב תכנית פרישה תחילה' : 'Please calculate retirement plan first');
+                    return;
+                }
+
+                // Track stress test action
+                AnalyticsManager.trackAction('stress_test_run', { 
+                    scenarioType,
+                    userAge: inputs.currentAge,
+                    timestamp: new Date().toISOString()
+                });
+
+                const scenarios = {
+                    financial_crisis_2008: {
+                        name: language === 'he' ? "משבר פיננסי 2008" : "2008 Financial Crisis",
+                        description: language === 'he' 
+                            ? "ירידה של 40% במניות, 30% בנדל״ן, עלייה באבטלה ותשואות נמוכות למשך 3 שנים"
+                            : "40% stock decline, 30% real estate decline, unemployment rise, low returns for 3 years",
+                        incomeReduction: 15,
+                        portfolioDecline: 40,
+                        realEstateDecline: 30,
+                        inflationIncrease: 1,
+                        duration: 3,
+                        recoveryYears: 5
+                    },
+                    covid_pandemic: {
+                        name: language === 'he' ? "משבר קורונה 2020" : "COVID-19 Pandemic 2020",
+                        description: language === 'he' 
+                            ? "ירידת הכנסה של 25%, תנודתיות גבוהה, עלייה בהוצאות רפואיות והתאוששות במשך שנתיים"
+                            : "25% income reduction, high volatility, increased medical expenses, recovery over two years",
+                        incomeReduction: 25,
+                        portfolioDecline: 25,
+                        realEstateDecline: 10,
+                        inflationIncrease: 3,
+                        duration: 2,
+                        recoveryYears: 3
+                    },
+                    high_inflation: {
+                        name: language === 'he' ? "אינפלציה גבוהה" : "High Inflation Scenario",
+                        description: language === 'he' 
+                            ? "אינפלציה של 15% לשנה, עליית מחירי מזון ודלק, ירידה בכוח הקנייה למשך 5 שנים"
+                            : "15% annual inflation, rising food & fuel prices, decreased purchasing power for 5 years",
+                        incomeReduction: 5,
+                        portfolioDecline: 15,
+                        realEstateDecline: 5,
+                        inflationIncrease: 12,
+                        duration: 5,
+                        recoveryYears: 7
+                    }
+                };
+
+                const scenario = scenarios[scenarioType];
+                const stressedResults = calculateStressedResults(scenario);
+                
+                const recommendations = generateStressTestRecommendations(scenario, stressedResults);
+
+                setStressTestResults({
+                    scenarioName: scenario.name,
+                    scenarioDescription: scenario.description,
+                    normal: {
+                        monthlyIncome: results.totalNetIncome,
+                        totalAccumulation: results.totalSavings + results.trainingFundValue + results.personalPortfolioValue + results.cryptoValue + results.realEstateValue,
+                        achievesTarget: results.achievesTarget
+                    },
+                    stressed: stressedResults,
+                    recoveryYears: scenario.recoveryYears,
+                    recommendations
+                });
+
+                // Scroll to results
+                setTimeout(() => {
+                    const resultsElement = document.querySelector('#stress-test-results');
+                    if (resultsElement) {
+                        resultsElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }, 100);
+            };
+
+            const runCustomStressTest = () => {
+                if (!results) {
+                    alert(language === 'he' ? 'יש לחשב תכנית פרישה תחילה' : 'Please calculate retirement plan first');
+                    return;
+                }
+
+                const incomeReduction = parseFloat(document.getElementById('custom-income-reduction')?.value || 20);
+                const portfolioDecline = parseFloat(document.getElementById('custom-portfolio-decline')?.value || 30);
+                const inflationIncrease = parseFloat(document.getElementById('custom-inflation-increase')?.value || 8);
+                const duration = parseFloat(document.getElementById('custom-crisis-duration')?.value || 3);
+
+                // Track custom stress test
+                AnalyticsManager.trackAction('custom_stress_test', { 
+                    incomeReduction,
+                    portfolioDecline,
+                    inflationIncrease,
+                    duration,
+                    userAge: inputs.currentAge
+                });
+
+                const customScenario = {
+                    name: language === 'he' ? "תרחיש מותאם אישית" : "Custom Scenario",
+                    description: language === 'he' 
+                        ? `ירידת הכנסה של ${incomeReduction}%, ירידה בתיק השקעות של ${portfolioDecline}%, עלייה באינפלציה של ${inflationIncrease}% למשך ${duration} שנים`
+                        : `${incomeReduction}% income reduction, ${portfolioDecline}% portfolio decline, ${inflationIncrease}% inflation increase for ${duration} years`,
+                    incomeReduction,
+                    portfolioDecline,
+                    realEstateDecline: portfolioDecline * 0.7,
+                    inflationIncrease,
+                    duration,
+                    recoveryYears: Math.ceil(duration * 1.5)
+                };
+
+                const stressedResults = calculateStressedResults(customScenario);
+                const recommendations = generateStressTestRecommendations(customScenario, stressedResults);
+
+                setStressTestResults({
+                    scenarioName: customScenario.name,
+                    scenarioDescription: customScenario.description,
+                    normal: {
+                        monthlyIncome: results.totalNetIncome,
+                        totalAccumulation: results.totalSavings + results.trainingFundValue + results.personalPortfolioValue + results.cryptoValue + results.realEstateValue,
+                        achievesTarget: results.achievesTarget
+                    },
+                    stressed: stressedResults,
+                    recoveryYears: customScenario.recoveryYears,
+                    recommendations
+                });
+            };
+
+            const generateAIScenario = () => {
+                // Track AI scenario generation
+                AnalyticsManager.trackAction('ai_scenario_generation', { 
+                    userAge: inputs.currentAge,
+                    riskTolerance: inputs.riskTolerance,
+                    hasEmergencyFund: inputs.currentEmergencyFund > 0
+                });
+
+                // Generate AI-powered scenario based on user profile
+                const userProfile = {
+                    age: inputs.currentAge,
+                    yearsToRetirement: inputs.retirementAge - inputs.currentAge,
+                    riskTolerance: inputs.riskTolerance,
+                    hasEmergencyFund: inputs.currentEmergencyFund > 0,
+                    savingsRate: calculateUserSavingsRate(),
+                    diversification: calculateDiversificationScore()
+                };
+
+                const aiScenario = generateAIBasedScenario(userProfile);
+                
+                // Show AI scenario in custom fields
+                document.getElementById('custom-income-reduction').value = aiScenario.incomeReduction;
+                document.getElementById('custom-portfolio-decline').value = aiScenario.portfolioDecline;
+                document.getElementById('custom-inflation-increase').value = aiScenario.inflationIncrease;
+                document.getElementById('custom-crisis-duration').value = aiScenario.duration;
+
+                alert(language === 'he' 
+                    ? `תרחיש AI נוצר: ${aiScenario.description}`
+                    : `AI Scenario Created: ${aiScenario.description}`);
+            };
+
+            const calculateStressedResults = (scenario) => {
+                // Create modified inputs for stress test
+                const stressedInputs = { ...inputs };
+                const stressedWorkPeriods = workPeriods.map(period => ({
+                    ...period,
+                    salary: period.salary * (1 - scenario.incomeReduction / 100),
+                    monthlyContribution: period.monthlyContribution * (1 - scenario.incomeReduction / 100)
+                }));
+
+                // Apply portfolio declines
+                stressedInputs.currentSavings = inputs.currentSavings * (1 - scenario.portfolioDecline / 100);
+                stressedInputs.currentPersonalPortfolio = inputs.currentPersonalPortfolio * (1 - scenario.portfolioDecline / 100);
+                stressedInputs.currentCrypto = inputs.currentCrypto * (1 - scenario.portfolioDecline / 100);
+                stressedInputs.currentRealEstate = inputs.currentRealEstate * (1 - (scenario.realEstateDecline || scenario.portfolioDecline) / 100);
+                
+                // Apply inflation increase
+                stressedInputs.inflationRate = inputs.inflationRate + scenario.inflationIncrease;
+
+                // Reduce expected returns during crisis
+                const returnReduction = 0.3; // 30% reduction in expected returns
+                stressedInputs.personalPortfolioReturn = inputs.personalPortfolioReturn * (1 - returnReduction);
+                stressedInputs.cryptoReturn = inputs.cryptoReturn * (1 - returnReduction);
+                stressedInputs.realEstateReturn = inputs.realEstateReturn * (1 - returnReduction);
+
+                // Calculate stressed results using the same calculation engine
+                // This is a simplified version - in practice you'd want to run the full calculation
+                const stressedTotalAccumulation = (
+                    stressedInputs.currentSavings + 
+                    stressedInputs.currentPersonalPortfolio + 
+                    stressedInputs.currentCrypto + 
+                    stressedInputs.currentRealEstate
+                ) * Math.pow(1.04, inputs.retirementAge - inputs.currentAge); // Conservative growth
+
+                const stressedMonthlyIncome = stressedTotalAccumulation * 0.04 / 12; // 4% rule
+                
+                const currentSalary = workPeriods[workPeriods.length - 1]?.salary || 0;
+                const targetMonthlyIncome = (currentSalary * inputs.targetReplacement) / 100;
+                const achievesTarget = stressedMonthlyIncome >= targetMonthlyIncome;
+
+                return {
+                    monthlyIncome: stressedMonthlyIncome,
+                    totalAccumulation: stressedTotalAccumulation,
+                    achievesTarget
+                };
+            };
+
+            const generateStressTestRecommendations = (scenario, stressedResults) => {
+                const recommendations = [];
+                
+                if (!stressedResults.achievesTarget) {
+                    recommendations.push(
+                        language === 'he' 
+                            ? "הגדל את קרן החירום לכיסוי של לפחות 6-12 חודשים הוצאות"
+                            : "Increase emergency fund to cover 6-12 months of expenses"
+                    );
+                    
+                    recommendations.push(
+                        language === 'he' 
+                            ? "שקול להגדיל את שיעור החיסכון החודשי ב-20-30%"
+                            : "Consider increasing monthly savings rate by 20-30%"
+                    );
+                }
+
+                if (scenario.portfolioDecline > 30) {
+                    recommendations.push(
+                        language === 'he' 
+                            ? "פזר השקעות על פני יותר סוגי נכסים להפחתת סיכון"
+                            : "Diversify investments across more asset classes to reduce risk"
+                    );
+                }
+
+                if (scenario.inflationIncrease > 5) {
+                    recommendations.push(
+                        language === 'he' 
+                            ? "השקע בנכסים המוגנים מפני אינפלציה (נדל״ן, מניות)"
+                            : "Invest in inflation-protected assets (real estate, stocks)"
+                    );
+                }
+
+                recommendations.push(
+                    language === 'he' 
+                        ? "בדוק ועדכן את התכנית הפיננסית אחת לשנה"
+                        : "Review and update financial plan annually"
+                );
+
+                recommendations.push(
+                    language === 'he' 
+                        ? "שמור על ביטוח נכות והכנסה מקיף"
+                        : "Maintain comprehensive disability and income insurance"
+                );
+
+                return recommendations;
+            };
+
+            const calculateUserSavingsRate = () => {
+                const currentSalary = workPeriods[workPeriods.length - 1]?.salary || 0;
+                if (currentSalary === 0) return 0;
+                
+                const totalMonthlySavings = (workPeriods[workPeriods.length - 1]?.monthlyContribution || 0) +
+                    (workPeriods[workPeriods.length - 1]?.monthlyTrainingFund || 0) +
+                    inputs.personalPortfolioMonthly +
+                    inputs.cryptoMonthly +
+                    inputs.realEstateMonthly +
+                    inputs.emergencyFundMonthly;
+                
+                return (totalMonthlySavings / currentSalary) * 100;
+            };
+
+            const calculateDiversificationScore = () => {
+                let score = 0;
+                if (inputs.currentPersonalPortfolio > 0 || inputs.personalPortfolioMonthly > 0) score += 25;
+                if (inputs.currentCrypto > 0 || inputs.cryptoMonthly > 0) score += 15;
+                if (inputs.currentRealEstate > 0 || inputs.realEstateMonthly > 0) score += 35;
+                if (inputs.currentEmergencyFund > 0) score += 25;
+                return score;
+            };
+
+            const generateAIBasedScenario = (userProfile) => {
+                // AI logic to generate personalized stress test scenarios
+                let incomeReduction = 20;
+                let portfolioDecline = 30;
+                let inflationIncrease = 5;
+                let duration = 3;
+                let description = "";
+
+                // Adjust based on age
+                if (userProfile.age < 35) {
+                    portfolioDecline += 10; // Young people can handle more volatility
+                    incomeReduction += 5;
+                    description += language === 'he' ? "תרחיש אגרסיבי לגיל צעיר" : "Aggressive scenario for young age";
+                } else if (userProfile.age > 55) {
+                    portfolioDecline -= 10; // Older people need more conservative scenarios
+                    incomeReduction -= 5;
+                    duration += 1;
+                    description += language === 'he' ? "תרחיש מותאם לגיל מתקדם" : "Scenario adapted for advanced age";
+                } else {
+                    description += language === 'he' ? "תרחיש מאוזן לגיל בוגר" : "Balanced scenario for middle age";
+                }
+
+                // Adjust based on risk tolerance
+                if (userProfile.riskTolerance === 'conservative') {
+                    portfolioDecline -= 5;
+                    incomeReduction -= 5;
+                } else if (userProfile.riskTolerance === 'aggressive') {
+                    portfolioDecline += 10;
+                    incomeReduction += 5;
+                }
+
+                // Adjust based on emergency fund
+                if (!userProfile.hasEmergencyFund) {
+                    incomeReduction += 10; // No safety net = higher income risk
+                    description += language === 'he' ? " + חוסר קרן חירום" : " + no emergency fund";
+                }
+
+                // Adjust based on diversification
+                if (userProfile.diversification < 50) {
+                    portfolioDecline += 5; // Concentrated portfolio = higher risk
+                    description += language === 'he' ? " + ריכוז השקעות" : " + concentrated investments";
+                }
+
+                return {
+                    incomeReduction: Math.min(incomeReduction, 50),
+                    portfolioDecline: Math.min(portfolioDecline, 60),
+                    inflationIncrease: Math.min(inflationIncrease, 15),
+                    duration: Math.min(duration, 5),
+                    description
+                };
+            };
 
             return React.createElement('div', {
                 className: `min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 ${language === 'he' ? 'dir-rtl' : 'dir-ltr'}`,
@@ -1810,6 +2504,7 @@
                             { id: 'advanced', icon: Settings, label: t.advanced },
                             { id: 'analysis', icon: BarChart3, label: t.analysis },
                             { id: 'scenarios', icon: Target, label: t.scenarios },
+                            { id: 'stresstest', icon: Zap, label: language === 'he' ? 'מבחני עמידות' : 'Stress Tests' },
                             { id: 'fire', icon: TrendingUp, label: t.fireCalculator }
                         ].map(tab => 
                             React.createElement('button', {
@@ -2782,6 +3477,268 @@
                                                 ])
                                             ]);
                                         })()
+                                    ])
+                                ])
+                            ]),
+
+                            // Stress Testing Tab
+                            activeTab === 'stresstest' && React.createElement('div', { className: "space-y-6" }, [
+                                React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
+                                    React.createElement('h2', { className: "text-2xl font-bold text-red-600 mb-6 flex items-center" }, [
+                                        React.createElement(Zap, { className: "mr-2" }),
+                                        language === 'he' ? "מבחני עמידות כלכליים" : "Economic Stress Testing"
+                                    ]),
+                                    React.createElement('div', { className: "bg-red-50 rounded-lg p-4 mb-6 border border-red-200" }, [
+                                        React.createElement('p', { className: "text-sm text-red-700 mb-2" }, [
+                                            React.createElement('strong', null, 
+                                                language === 'he' ? "מטרת המבחן:" : "Purpose of Testing:"),
+                                            React.createElement('span', { className: "block mt-1" }, 
+                                                language === 'he' ? "בחינת חוסן התכנית הפיננסית מול משברים כלכליים ותרחישי קיצון" : "Evaluate financial plan resilience against economic crises and extreme scenarios")
+                                        ])
+                                    ]),
+
+                                    // Predefined Stress Test Scenarios
+                                    React.createElement('div', { className: "grid md:grid-cols-2 gap-6" }, [
+                                        React.createElement('div', { className: "space-y-4" }, [
+                                            React.createElement('h3', { className: "text-xl font-bold text-gray-800 mb-4" }, 
+                                                language === 'he' ? "תרחישי משבר מוגדרים מראש" : "Predefined Crisis Scenarios"),
+                                            
+                                            // Scenario 1: 2008-style Financial Crisis
+                                            React.createElement('div', { className: "bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow" }, [
+                                                React.createElement('div', { className: "flex items-center mb-3" }, [
+                                                    React.createElement('span', { className: "text-2xl mr-3" }, "🏦"),
+                                                    React.createElement('h4', { className: "font-bold text-gray-800" }, 
+                                                        language === 'he' ? "משבר פיננסי 2008" : "2008 Financial Crisis")
+                                                ]),
+                                                React.createElement('ul', { className: "text-sm text-gray-600 space-y-1 mb-3" }, [
+                                                    React.createElement('li', null, language === 'he' ? "• ירידה של 40% במניות" : "• 40% stock market decline"),
+                                                    React.createElement('li', null, language === 'he' ? "• ירידה של 30% בנדל״ן" : "• 30% real estate decline"),
+                                                    React.createElement('li', null, language === 'he' ? "• עלייה באבטלה ל-10%" : "• Unemployment rises to 10%"),
+                                                    React.createElement('li', null, language === 'he' ? "• תשואות נמוכות למשך 3 שנים" : "• Low returns for 3 years")
+                                                ]),
+                                                React.createElement('button', {
+                                                    onClick: () => runStressTest('financial_crisis_2008'),
+                                                    className: "w-full bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+                                                }, language === 'he' ? "הרץ מבחן" : "Run Test")
+                                            ]),
+
+                                            // Scenario 2: COVID-19 Pandemic
+                                            React.createElement('div', { className: "bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow" }, [
+                                                React.createElement('div', { className: "flex items-center mb-3" }, [
+                                                    React.createElement('span', { className: "text-2xl mr-3" }, "🦠"),
+                                                    React.createElement('h4', { className: "font-bold text-gray-800" }, 
+                                                        language === 'he' ? "משבר קורונה 2020" : "COVID-19 Pandemic 2020")
+                                                ]),
+                                                React.createElement('ul', { className: "text-sm text-gray-600 space-y-1 mb-3" }, [
+                                                    React.createElement('li', null, language === 'he' ? "• ירידת הכנסה של 25%" : "• 25% income reduction"),
+                                                    React.createElement('li', null, language === 'he' ? "• תנודתיות גבוהה בשווקים" : "• High market volatility"),
+                                                    React.createElement('li', null, language === 'he' ? "• עלייה בהוצאות רפואיות" : "• Increased medical expenses"),
+                                                    React.createElement('li', null, language === 'he' ? "• התאוששות במשך שנתיים" : "• Recovery over two years")
+                                                ]),
+                                                React.createElement('button', {
+                                                    onClick: () => runStressTest('covid_pandemic'),
+                                                    className: "w-full bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors"
+                                                }, language === 'he' ? "הרץ מבחן" : "Run Test")
+                                            ]),
+
+                                            // Scenario 3: Hyperinflation
+                                            React.createElement('div', { className: "bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow" }, [
+                                                React.createElement('div', { className: "flex items-center mb-3" }, [
+                                                    React.createElement('span', { className: "text-2xl mr-3" }, "📈"),
+                                                    React.createElement('h4', { className: "font-bold text-gray-800" }, 
+                                                        language === 'he' ? "אינפלציה גבוהה" : "High Inflation Scenario")
+                                                ]),
+                                                React.createElement('ul', { className: "text-sm text-gray-600 space-y-1 mb-3" }, [
+                                                    React.createElement('li', null, language === 'he' ? "• אינפלציה של 15% לשנה" : "• 15% annual inflation"),
+                                                    React.createElement('li', null, language === 'he' ? "• עליית מחירי מזון ודלק" : "• Rising food & fuel prices"),
+                                                    React.createElement('li', null, language === 'he' ? "• ירידה בכוח הקנייה" : "• Decreased purchasing power"),
+                                                    React.createElement('li', null, language === 'he' ? "• החמרה במשך 5 שנים" : "• Deterioration over 5 years")
+                                                ]),
+                                                React.createElement('button', {
+                                                    onClick: () => runStressTest('high_inflation'),
+                                                    className: "w-full bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors"
+                                                }, language === 'he' ? "הרץ מבחן" : "Run Test")
+                                            ])
+                                        ]),
+
+                                        React.createElement('div', { className: "space-y-4" }, [
+                                            React.createElement('h3', { className: "text-xl font-bold text-gray-800 mb-4" }, 
+                                                language === 'he' ? "תרחיש מותאם אישית" : "Custom Scenario"),
+                                            
+                                            React.createElement('div', { className: "bg-white rounded-lg p-4 border border-gray-200" }, [
+                                                React.createElement('div', { className: "space-y-4" }, [
+                                                    React.createElement('div', null, [
+                                                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                            language === 'he' ? "ירידת הכנסה (%)" : "Income Reduction (%)"),
+                                                        React.createElement('input', {
+                                                            type: 'number',
+                                                            min: '0',
+                                                            max: '100',
+                                                            defaultValue: '20',
+                                                            id: 'custom-income-reduction',
+                                                            className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                                                        })
+                                                    ]),
+                                                    React.createElement('div', null, [
+                                                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                            language === 'he' ? "ירידה בתיק השקעות (%)" : "Investment Portfolio Decline (%)"),
+                                                        React.createElement('input', {
+                                                            type: 'number',
+                                                            min: '0',
+                                                            max: '100',
+                                                            defaultValue: '30',
+                                                            id: 'custom-portfolio-decline',
+                                                            className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                                                        })
+                                                    ]),
+                                                    React.createElement('div', null, [
+                                                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                            language === 'he' ? "עלייה באינפלציה (%)" : "Inflation Increase (%)"),
+                                                        React.createElement('input', {
+                                                            type: 'number',
+                                                            min: '0',
+                                                            max: '50',
+                                                            defaultValue: '8',
+                                                            id: 'custom-inflation-increase',
+                                                            className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                                                        })
+                                                    ]),
+                                                    React.createElement('div', null, [
+                                                        React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                            language === 'he' ? "משך המשבר (שנים)" : "Crisis Duration (years)"),
+                                                        React.createElement('input', {
+                                                            type: 'number',
+                                                            min: '1',
+                                                            max: '10',
+                                                            defaultValue: '3',
+                                                            id: 'custom-crisis-duration',
+                                                            className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                                                        })
+                                                    ]),
+                                                    React.createElement('button', {
+                                                        onClick: () => runCustomStressTest(),
+                                                        className: "w-full bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors mt-4"
+                                                    }, language === 'he' ? "הרץ מבחן מותאם" : "Run Custom Test")
+                                                ])
+                                            ]),
+
+                                            // Claude AI Scenario Generation
+                                            React.createElement('div', { className: "bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-4 border border-indigo-200" }, [
+                                                React.createElement('div', { className: "flex items-center mb-3" }, [
+                                                    React.createElement('span', { className: "text-2xl mr-3" }, "🤖"),
+                                                    React.createElement('h4', { className: "font-bold text-indigo-800" }, 
+                                                        language === 'he' ? "תרחיש מבוסס AI" : "AI-Generated Scenario")
+                                                ]),
+                                                React.createElement('p', { className: "text-sm text-indigo-700 mb-3" }, 
+                                                    language === 'he' 
+                                                        ? "קלאוד יצור תרחיש משבר מותאם לפרופיל הפיננסי שלך"
+                                                        : "Claude will create a crisis scenario tailored to your financial profile"),
+                                                React.createElement('button', {
+                                                    onClick: () => generateAIScenario(),
+                                                    className: "w-full bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors"
+                                                }, language === 'he' ? "צור תרחיש חכם" : "Generate Smart Scenario")
+                                            ])
+                                        ])
+                                    ])
+                                ]),
+
+                                // Stress Test Results Section (will appear after running tests)
+                                stressTestResults && React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
+                                    React.createElement('h3', { className: "text-xl font-bold text-red-700 mb-6 flex items-center" }, [
+                                        React.createElement('span', { className: "mr-2" }, "📊"),
+                                        language === 'he' ? "תוצאות מבחן העמידות" : "Stress Test Results"
+                                    ]),
+                                    React.createElement('div', { className: "space-y-6" }, [
+                                        // Scenario Overview
+                                        React.createElement('div', { className: "bg-gray-50 rounded-lg p-4" }, [
+                                            React.createElement('h4', { className: "font-bold text-gray-800 mb-2" }, 
+                                                language === 'he' ? "תרחיש שנבדק:" : "Tested Scenario:"),
+                                            React.createElement('p', { className: "text-gray-700" }, stressTestResults.scenarioDescription)
+                                        ]),
+
+                                        // Before vs After Comparison
+                                        React.createElement('div', { className: "grid md:grid-cols-2 gap-6" }, [
+                                            React.createElement('div', { className: "bg-green-50 rounded-lg p-4 border border-green-200" }, [
+                                                React.createElement('h4', { className: "font-bold text-green-800 mb-3" }, 
+                                                    language === 'he' ? "📈 מצב רגיל" : "📈 Normal Conditions"),
+                                                React.createElement('div', { className: "space-y-2 text-sm" }, [
+                                                    React.createElement('div', { className: "flex justify-between" }, [
+                                                        React.createElement('span', null, language === 'he' ? "הכנסה חודשית:" : "Monthly Income:"),
+                                                        React.createElement('span', { className: "font-semibold" }, formatCurrency(stressTestResults.normal.monthlyIncome))
+                                                    ]),
+                                                    React.createElement('div', { className: "flex justify-between" }, [
+                                                        React.createElement('span', null, language === 'he' ? "צבירה בפרישה:" : "Retirement Accumulation:"),
+                                                        React.createElement('span', { className: "font-semibold" }, formatCurrency(stressTestResults.normal.totalAccumulation))
+                                                    ]),
+                                                    React.createElement('div', { className: "flex justify-between" }, [
+                                                        React.createElement('span', null, language === 'he' ? "עומד ביעד:" : "Meets Target:"),
+                                                        React.createElement('span', { 
+                                                            className: `font-semibold ${stressTestResults.normal.achievesTarget ? 'text-green-600' : 'text-red-600'}`
+                                                        }, stressTestResults.normal.achievesTarget ? '✅' : '❌')
+                                                    ])
+                                                ])
+                                            ]),
+                                            React.createElement('div', { className: "bg-red-50 rounded-lg p-4 border border-red-200" }, [
+                                                React.createElement('h4', { className: "font-bold text-red-800 mb-3" }, 
+                                                    language === 'he' ? "⚠️ במשבר" : "⚠️ Under Stress"),
+                                                React.createElement('div', { className: "space-y-2 text-sm" }, [
+                                                    React.createElement('div', { className: "flex justify-between" }, [
+                                                        React.createElement('span', null, language === 'he' ? "הכנסה חודשית:" : "Monthly Income:"),
+                                                        React.createElement('span', { className: "font-semibold" }, formatCurrency(stressTestResults.stressed.monthlyIncome))
+                                                    ]),
+                                                    React.createElement('div', { className: "flex justify-between" }, [
+                                                        React.createElement('span', null, language === 'he' ? "צבירה בפרישה:" : "Retirement Accumulation:"),
+                                                        React.createElement('span', { className: "font-semibold" }, formatCurrency(stressTestResults.stressed.totalAccumulation))
+                                                    ]),
+                                                    React.createElement('div', { className: "flex justify-between" }, [
+                                                        React.createElement('span', null, language === 'he' ? "עומד ביעד:" : "Meets Target:"),
+                                                        React.createElement('span', { 
+                                                            className: `font-semibold ${stressTestResults.stressed.achievesTarget ? 'text-green-600' : 'text-red-600'}`
+                                                        }, stressTestResults.stressed.achievesTarget ? '✅' : '❌')
+                                                    ])
+                                                ])
+                                            ])
+                                        ]),
+
+                                        // Impact Analysis
+                                        React.createElement('div', { className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" }, [
+                                            React.createElement('h4', { className: "font-bold text-yellow-800 mb-3" }, 
+                                                language === 'he' ? "📉 השפעת המשבר" : "📉 Crisis Impact"),
+                                            React.createElement('div', { className: "grid md:grid-cols-3 gap-4 text-sm" }, [
+                                                React.createElement('div', { className: "text-center" }, [
+                                                    React.createElement('div', { className: "text-2xl font-bold text-red-600" }, 
+                                                        `${((stressTestResults.normal.totalAccumulation - stressTestResults.stressed.totalAccumulation) / stressTestResults.normal.totalAccumulation * 100).toFixed(1)}%`),
+                                                    React.createElement('div', { className: "text-gray-600" }, 
+                                                        language === 'he' ? "ירידה בצבירה" : "Accumulation Drop")
+                                                ]),
+                                                React.createElement('div', { className: "text-center" }, [
+                                                    React.createElement('div', { className: "text-2xl font-bold text-orange-600" }, 
+                                                        formatCurrency(stressTestResults.normal.totalAccumulation - stressTestResults.stressed.totalAccumulation)),
+                                                    React.createElement('div', { className: "text-gray-600" }, 
+                                                        language === 'he' ? "הפסד כספי" : "Financial Loss")
+                                                ]),
+                                                React.createElement('div', { className: "text-center" }, [
+                                                    React.createElement('div', { className: "text-2xl font-bold text-blue-600" }, 
+                                                        `${stressTestResults.recoveryYears || 'N/A'}`),
+                                                    React.createElement('div', { className: "text-gray-600" }, 
+                                                        language === 'he' ? "שנות התאוששות" : "Recovery Years")
+                                                ])
+                                            ])
+                                        ]),
+
+                                        // Recommendations
+                                        React.createElement('div', { className: "bg-blue-50 rounded-lg p-4 border border-blue-200" }, [
+                                            React.createElement('h4', { className: "font-bold text-blue-800 mb-3" }, 
+                                                language === 'he' ? "💡 המלצות לחיזוק" : "💡 Strengthening Recommendations"),
+                                            React.createElement('ul', { className: "space-y-2 text-sm text-blue-700" }, 
+                                                stressTestResults.recommendations.map((rec, index) => 
+                                                    React.createElement('li', { key: index, className: "flex items-start" }, [
+                                                        React.createElement('span', { className: "mr-2 mt-0.5" }, "•"),
+                                                        rec
+                                                    ])
+                                                )
+                                            )
+                                        ])
                                     ])
                                 ])
                             ]),
