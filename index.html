@@ -2219,7 +2219,12 @@
 
             // Stress Testing Functions
             const runStressTest = (scenarioType) => {
+                console.log('runStressTest called with:', scenarioType);
+                console.log('results state:', results);
+                console.log('language state:', language);
+                
                 if (!results) {
+                    console.log('No results found, showing alert');
                     alert(language === 'he' ? 'יש לחשב תכנית פרישה תחילה' : 'Please calculate retirement plan first');
                     return;
                 }
@@ -2270,32 +2275,57 @@
                     }
                 };
 
+                console.log('Available scenarios:', Object.keys(scenarios));
                 const scenario = {...scenarios[scenarioType], name: scenarioType};
-                const stressedResults = calculateStressedResults(scenario);
                 
-                const recommendations = generateStressTestRecommendations(scenario, stressedResults);
+                if (!scenario || !scenarios[scenarioType]) {
+                    console.error('Unknown scenario type:', scenarioType);
+                    console.error('Available scenarios:', Object.keys(scenarios));
+                    alert(language === 'he' ? 'שגיאה: תרחיש לא מוכר' : 'Error: Unknown scenario');
+                    return;
+                }
 
-                setStressTestResults({
+                console.log('Selected scenario:', scenario);
+                console.log('Calling calculateStressedResults...');
+                const stressedResults = calculateStressedResults(scenario);
+                console.log('Stressed results:', stressedResults);
+                
+                console.log('Generating recommendations...');
+                const recommendations = generateStressTestRecommendations(scenario, stressedResults);
+                console.log('Recommendations:', recommendations);
+
+                console.log('Setting stress test results...');
+                const normalAccumulation = results.totalSavings + results.trainingFundValue + results.personalPortfolioValue + results.cryptoValue + results.realEstateValue;
+                
+                const stressTestData = {
                     scenarioName: scenario.name,
                     scenarioDescription: scenario.description,
                     scenario: scenario, // Store the full scenario object
                     normal: {
                         monthlyIncome: results.totalNetIncome,
-                        totalAccumulation: results.totalSavings + results.trainingFundValue + results.personalPortfolioValue + results.cryptoValue + results.realEstateValue,
+                        totalAccumulation: normalAccumulation,
                         achievesTarget: results.achievesTarget
                     },
                     stressed: stressedResults,
                     recoveryYears: scenario.recoveryYears,
                     recommendations
-                });
+                };
+                
+                console.log('Stress test data to set:', stressTestData);
+                setStressTestResults(stressTestData);
 
                 // Scroll to results
                 setTimeout(() => {
+                    console.log('Attempting to scroll to results...');
                     const resultsElement = document.querySelector('#stress-test-results');
+                    console.log('Results element found:', !!resultsElement);
                     if (resultsElement) {
                         resultsElement.scrollIntoView({ behavior: 'smooth' });
+                        console.log('Scrolled to results');
                     }
                 }, 100);
+                
+                console.log('runStressTest completed successfully');
             };
 
             const runCustomStressTest = () => {
