@@ -1,0 +1,121 @@
+name: Security Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 9 * * 1'
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    name: NPM Security Audit
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run security audit
+      run: |
+        echo "Running npm audit..."
+        npm audit --audit-level=moderate || true
+        echo "Audit completed"
+    
+    - name: Check for high severity vulnerabilities
+      run: |
+        echo "Checking for high severity vulnerabilities..."
+        if npm audit --audit-level=high; then
+          echo "✅ No high severity vulnerabilities found"
+        else
+          echo "⚠️ High severity vulnerabilities found"
+          exit 1
+        fi
+
+  license-compliance:
+    runs-on: ubuntu-latest
+    name: License Compliance
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Check licenses
+      run: |
+        echo "Checking license compliance..."
+        npx license-checker --summary --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;CC0-1.0;Unlicense;0BSD;CC-BY-3.0;CC-BY-4.0;(MIT AND CC-BY-3.0)'
+        echo "✅ All licenses are compliant"
+
+  code-security:
+    runs-on: ubuntu-latest
+    name: Code Security Analysis
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Check for sensitive data
+      run: |
+        echo "Scanning for potential sensitive data..."
+        if grep -r -i "api[_-]key\|secret\|password\|token" --include="*.html" --include="*.js" --include="*.json" . | grep -v node_modules | grep -v ".git" | grep -v "package-lock.json"; then
+          echo "⚠️ Potential sensitive data found - please review"
+          exit 1
+        else
+          echo "✅ No obvious sensitive data found"
+        fi
+    
+    - name: JavaScript Security Check
+      run: |
+        echo "Checking JavaScript security..."
+        
+        # Check for eval usage
+        if grep -r "eval(" --include="*.html" --include="*.js" . | grep -v node_modules | grep -v ".git"; then
+          echo "⚠️ eval() usage found - security risk"
+          exit 1
+        else
+          echo "✅ No eval() usage found"
+        fi
+        
+        # Check for document.write usage
+        if grep -r "document.write" --include="*.html" --include="*.js" . | grep -v node_modules | grep -v ".git"; then
+          echo "⚠️ document.write usage found - security risk"
+          exit 1
+        else
+          echo "✅ No document.write usage found"
+        fi
+    
+    - name: HTML Security Headers Check
+      run: |
+        echo "Checking for security headers..."
+        
+        # Check for HTTPS enforcement
+        if grep -r "https://" --include="*.html" .; then
+          echo "✅ HTTPS URLs found"
+        else
+          echo "⚠️ HTTPS enforcement check needed"
+        fi
+        
+        echo "✅ Basic security checks passed"

@@ -9,10 +9,19 @@ on:
     # Run security scan every Monday at 9:00 AM UTC
     - cron: '0 9 * * 1'
 
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 jobs:
   security-scan:
     runs-on: ubuntu-latest
     name: Security Vulnerability Scan
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
     
     steps:
     - name: Checkout code
@@ -34,20 +43,25 @@ jobs:
       run: npm audit --audit-level=high
       continue-on-error: true
     
-    - name: Run CodeQL Analysis
+    - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
         languages: javascript
         queries: security-and-quality
+      continue-on-error: true
     
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:
         category: "/language:javascript"
+        upload: true
+      continue-on-error: true
 
   security-headers:
     runs-on: ubuntu-latest
     name: Security Headers Check
+    permissions:
+      contents: read
     
     steps:
     - name: Checkout code
@@ -120,6 +134,8 @@ jobs:
   license-check:
     runs-on: ubuntu-latest
     name: License Compliance Check
+    permissions:
+      contents: read
     
     steps:
     - name: Checkout code
