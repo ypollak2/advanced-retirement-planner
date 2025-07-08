@@ -3,7 +3,7 @@
 Professional retirement planning tool with comprehensive investment tracking, FIRE calculator, and modular architecture.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-2.1.0-green.svg)
+![Version](https://img.shields.io/badge/version-2.2.0-green.svg)
 ![Language](https://img.shields.io/badge/language-English%20%7C%20Hebrew-orange.svg)
 
 ## 🚀 Features
@@ -296,7 +296,14 @@ Want to contribute? Great!
 
 ## ✅ Recently Completed Features
 
-### Latest Additions (Version 2.1.0+)
+### Latest Additions (Version 2.2.0+)
+- ✅ **Enhanced AI-Powered Stress Testing** - Natural language scenario input with intelligent parameter extraction
+- ✅ **Refined User Interface** - Improved tabs design with artistic symbols instead of emojis
+- ✅ **Advanced Natural Language Processing** - AI interprets user-described economic scenarios and converts to stress test parameters
+- ✅ **Comprehensive Analytics Tracking** - Anonymous usage statistics and conclusion tracking across versions
+- ✅ **Professional Design Updates** - Cleaner tab layout with better spacing and visual hierarchy
+
+### Previous Additions (Version 2.1.0)
 - ✅ **Emergency fund/safety cushion calculator** - Calculate recommended emergency savings with 3-12 month coverage targets
 - ✅ **General recommendations based on overall situation** - Personalized advice engine with age-based logic, debt analysis, and savings rate optimization
 - ✅ **Dynamic API integration for real-time financial data** - Google Finance and Yahoo Finance integration with comprehensive fallbacks

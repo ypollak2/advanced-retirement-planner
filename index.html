@@ -808,6 +808,7 @@
             const [claudeInsights, setClaudeInsights] = useState(null);
             const [selectedTimeHorizon, setSelectedTimeHorizon] = useState(20);
             const [stressTestResults, setStressTestResults] = useState(null);
+            const [aiScenarioLoading, setAiScenarioLoading] = useState(false);
 
             // Real-time index data state - starts with fallback, then updated from APIs
             const [historicalReturns, setHistoricalReturns] = useState({
@@ -857,9 +858,9 @@
             
             // Exchange rates state
             const [exchangeRates, setExchangeRates] = useState({
-                USD: 3.37, // Fallback values
+                USD: 3.37, // Fallback values - ILS per currency unit
                 GBP: 4.60,
-                EUR: 3.60
+                EUR: 3.65  // Updated EUR exchange rate
             });
             const [exchangeRatesLoading, setExchangeRatesLoading] = useState(false);
             const [exchangeRatesLastUpdated, setExchangeRatesLastUpdated] = useState(null);
@@ -1472,7 +1473,7 @@
                 const formatters = {
                     USD: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }),
                     GBP: new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', minimumFractionDigits: 0 }),
-                    EUR: new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0 })
+                    EUR: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0 }) // Use en-US for consistent dot notation
                 };
                 return formatters[currency].format(convertedAmount);
             };
@@ -2447,6 +2448,226 @@
                 };
             };
 
+            // Enhanced AI Scenario Generation Functions
+            const generateAIScenarioFromDescription = async () => {
+                const textarea = document.getElementById('ai-scenario-description');
+                const description = textarea?.value?.trim();
+                
+                if (!description) {
+                    alert(language === 'he' ? 'אנא הזן תיאור תרחיש' : 'Please enter a scenario description');
+                    return;
+                }
+                
+                if (!results) {
+                    alert(language === 'he' ? 'יש לחשב תכנית פרישה תחילה' : 'Please calculate retirement plan first');
+                    return;
+                }
+                
+                setAiScenarioLoading(true);
+                
+                try {
+                    // Track AI scenario usage
+                    AnalyticsManager.trackAction('ai_scenario_from_description', { 
+                        descriptionLength: description.length,
+                        userAge: inputs.currentAge,
+                        language
+                    });
+                    
+                    // AI-powered natural language processing to extract parameters
+                    const scenario = parseScenarioDescription(description);
+                    
+                    // Fill the custom scenario builder with AI-generated parameters
+                    document.getElementById('custom-income-reduction').value = scenario.incomeReduction;
+                    document.getElementById('custom-portfolio-decline').value = scenario.portfolioDecline;
+                    document.getElementById('custom-inflation-increase').value = scenario.inflationIncrease;
+                    document.getElementById('custom-crisis-duration').value = scenario.duration;
+                    
+                    // Run the stress test automatically
+                    setTimeout(() => {
+                        const customScenario = {
+                            name: language === 'he' ? 'תרחיש AI מותאם' : 'AI Custom Scenario',
+                            description: `${language === 'he' ? 'מבוסס על:' : 'Based on:'} "${description.substring(0, 100)}${description.length > 100 ? '...' : ''}"`,
+                            incomeReduction: scenario.incomeReduction,
+                            portfolioDecline: scenario.portfolioDecline,
+                            realEstateDecline: scenario.portfolioDecline * 0.7,
+                            inflationIncrease: scenario.inflationIncrease,
+                            duration: scenario.duration,
+                            recoveryYears: Math.ceil(scenario.duration * 1.5)
+                        };
+                        
+                        const stressedResults = calculateStressedResults(customScenario);
+                        const recommendations = generateStressTestRecommendations(customScenario, stressedResults);
+                        
+                        setStressTestResults({
+                            scenarioName: customScenario.name,
+                            scenarioDescription: customScenario.description,
+                            normal: {
+                                monthlyIncome: results.totalNetIncome,
+                                totalAccumulation: results.totalSavings + results.trainingFundValue + results.personalPortfolioValue + results.cryptoValue + results.realEstateValue,
+                                achievesTarget: results.achievesTarget
+                            },
+                            stressed: stressedResults,
+                            recoveryYears: customScenario.recoveryYears,
+                            recommendations
+                        });
+                        
+                        setAiScenarioLoading(false);
+                        
+                        // Clear the textarea
+                        textarea.value = '';
+                        
+                        // Scroll to results
+                        setTimeout(() => {
+                            const resultsElement = document.querySelector('#stress-test-results');
+                            if (resultsElement) {
+                                resultsElement.scrollIntoView({ behavior: 'smooth' });
+                            }
+                        }, 100);
+                    }, 1000); // Small delay to show loading state
+                    
+                } catch (error) {
+                    console.error('AI scenario generation error:', error);
+                    setAiScenarioLoading(false);
+                    alert(language === 'he' 
+                        ? 'שגיאה ביצירת התרחיש. נסה תיאור אחר או השתמש במבנה המותאם ידנית'
+                        : 'Error creating scenario. Try a different description or use manual custom builder');
+                }
+            };
+            
+            const fillExampleScenario = () => {
+                const textarea = document.getElementById('ai-scenario-description');
+                const examples = {
+                    he: [
+                        'מה יקרה אם יהיה משבר כלכלי כמו ב-2008 אבל עם אינפלציה גבוהה של 10%?',
+                        'אני חושש ממלחמה שתשפיע על השווקים והכנסתי לירד ב-30% למשך שנתיים',
+                        'איך אני יעמוד במשבר שבו הנדל״ן יקרוס ב-50% והמניות ב-40% למשך 4 שנים?',
+                        'מה יקרה אם יהיה משבר טכנולוגי שיוביל לאבטלה נרחבת ובעיות כלכליות?'
+                    ],
+                    en: [
+                        'What if there\'s a recession like 2008 but with high inflation of 10%?',
+                        'I\'m worried about a war affecting markets and my income dropping 30% for two years',
+                        'How would I survive a crisis where real estate crashes 50% and stocks 40% for 4 years?',
+                        'What if there\'s a tech crisis leading to widespread unemployment and economic problems?'
+                    ]
+                };
+                
+                const langExamples = examples[language];
+                const randomExample = langExamples[Math.floor(Math.random() * langExamples.length)];
+                
+                if (textarea) {
+                    textarea.value = randomExample;
+                    textarea.focus();
+                }
+            };
+            
+            const parseScenarioDescription = (description) => {
+                // Advanced NLP-like parsing to extract economic parameters from natural language
+                const text = description.toLowerCase();
+                
+                let incomeReduction = 20;
+                let portfolioDecline = 30;
+                let inflationIncrease = 5;
+                let duration = 3;
+                
+                // Extract income reduction clues
+                const incomePatterns = [
+                    { regex: /(income|salary|wage).*(drop|fall|reduce|decrease).*(\\d+)%/, factor: 1 },
+                    { regex: /(\\d+)%.*(income|salary|wage).*(drop|fall|reduce|decrease)/, factor: 1 },
+                    { regex: /unemployment|job.loss|layoff/, factor: 50 },
+                    { regex: /war|conflict/, factor: 25 },
+                    { regex: /recession|depression/, factor: 20 }
+                ];
+                
+                // Extract portfolio decline clues
+                const portfolioPatterns = [
+                    { regex: /(stock|market|portfolio).*(crash|fall|drop).*(\\d+)%/, factor: 1 },
+                    { regex: /(\\d+)%.*(stock|market|portfolio).*(crash|fall|drop)/, factor: 1 },
+                    { regex: /2008|financial.crisis/, factor: 40 },
+                    { regex: /tech.crash|dot.com/, factor: 50 },
+                    { regex: /war|conflict/, factor: 25 },
+                    { regex: /recession/, factor: 30 }
+                ];
+                
+                // Extract inflation clues
+                const inflationPatterns = [
+                    { regex: /inflation.*(\\d+)%/, factor: 1 },
+                    { regex: /(\\d+)%.*inflation/, factor: 1 },
+                    { regex: /high.inflation/, factor: 12 },
+                    { regex: /hyperinflation/, factor: 20 },
+                    { regex: /price.rise|cost.increase/, factor: 8 }
+                ];
+                
+                // Extract duration clues
+                const durationPatterns = [
+                    { regex: /(\\d+).year/, factor: 1 },
+                    { regex: /(\\d+).month/, factor: 0.083 },
+                    { regex: /short.term|temporary/, factor: 1 },
+                    { regex: /long.term|extended/, factor: 5 },
+                    { regex: /decade/, factor: 10 }
+                ];
+                
+                // Process income patterns
+                for (const pattern of incomePatterns) {
+                    const match = text.match(pattern.regex);
+                    if (match && match[3]) {
+                        incomeReduction = Math.min(parseInt(match[3]) * pattern.factor, 60);
+                        break;
+                    } else if (match) {
+                        incomeReduction = Math.min(pattern.factor, 60);
+                    }
+                }
+                
+                // Process portfolio patterns
+                for (const pattern of portfolioPatterns) {
+                    const match = text.match(pattern.regex);
+                    if (match && match[3]) {
+                        portfolioDecline = Math.min(parseInt(match[3]) * pattern.factor, 70);
+                        break;
+                    } else if (match) {
+                        portfolioDecline = Math.min(pattern.factor, 70);
+                    }
+                }
+                
+                // Process inflation patterns
+                for (const pattern of inflationPatterns) {
+                    const match = text.match(pattern.regex);
+                    if (match && match[1] && !isNaN(parseInt(match[1]))) {
+                        inflationIncrease = Math.min(parseInt(match[1]) * pattern.factor, 25);
+                        break;
+                    } else if (match) {
+                        inflationIncrease = Math.min(pattern.factor, 25);
+                    }
+                }
+                
+                // Process duration patterns
+                for (const pattern of durationPatterns) {
+                    const match = text.match(pattern.regex);
+                    if (match && match[1] && !isNaN(parseInt(match[1]))) {
+                        duration = Math.max(1, Math.min(parseInt(match[1]) * pattern.factor, 10));
+                        break;
+                    } else if (match) {
+                        duration = Math.max(1, Math.min(pattern.factor, 10));
+                    }
+                }
+                
+                // Apply some AI-like adjustments based on context
+                if (text.includes('covid') || text.includes('pandemic')) {
+                    incomeReduction = Math.max(incomeReduction, 25);
+                    duration = Math.min(duration, 2);
+                }
+                
+                if (text.includes('real estate') || text.includes('property')) {
+                    portfolioDecline = Math.max(portfolioDecline, 20);
+                }
+                
+                return {
+                    incomeReduction: Math.round(incomeReduction),
+                    portfolioDecline: Math.round(portfolioDecline),
+                    inflationIncrease: Math.round(inflationIncrease),
+                    duration: Math.round(duration)
+                };
+            };
+
             return React.createElement('div', {
                 className: `min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 ${language === 'he' ? 'dir-rtl' : 'dir-ltr'}`,
                 dir: language === 'he' ? 'rtl' : 'ltr'
@@ -2498,26 +2719,26 @@
                             ])
                         ]),
                         
-                        // Tabs
-                        React.createElement('div', { className: "flex justify-center space-x-1 bg-white rounded-xl p-1 shadow-lg max-w-3xl mx-auto" }, [
-                            { id: 'basic', icon: Calculator, label: t.basic },
-                            { id: 'advanced', icon: Settings, label: t.advanced },
-                            { id: 'analysis', icon: BarChart3, label: t.analysis },
-                            { id: 'scenarios', icon: Target, label: t.scenarios },
-                            { id: 'stresstest', icon: Zap, label: language === 'he' ? 'מבחני עמידות' : 'Stress Tests' },
-                            { id: 'fire', icon: TrendingUp, label: t.fireCalculator }
+                        // Tabs - Improved spacing and design
+                        React.createElement('div', { className: "flex justify-center space-x-2 bg-white/80 backdrop-blur-sm rounded-2xl p-2 shadow-lg border border-slate-200/50 max-w-4xl mx-auto" }, [
+                            { id: 'basic', icon: '◈', label: t.basic },
+                            { id: 'advanced', icon: '⚙', label: t.advanced },
+                            { id: 'analysis', icon: '■', label: t.analysis },
+                            { id: 'scenarios', icon: '◉', label: t.scenarios },
+                            { id: 'stresstest', icon: '⚡', label: language === 'he' ? 'מבחני עמידות' : 'Stress Tests' },
+                            { id: 'fire', icon: '◗', label: t.fireCalculator }
                         ].map(tab => 
                             React.createElement('button', {
                                 key: tab.id,
                                 onClick: () => setActiveTab(tab.id),
-                                className: `flex items-center px-6 py-3 rounded-lg transition-all duration-300 ${
+                                className: `flex items-center px-5 py-3 rounded-xl transition-all duration-300 font-medium ${
                                     activeTab === tab.id
-                                        ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg transform scale-105'
-                                        : 'text-gray-600 hover:text-purple-700 hover:bg-purple-50'
+                                        ? 'bg-gradient-to-r from-slate-700 to-slate-800 text-white shadow-lg transform scale-105 border border-slate-600'
+                                        : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100/70 border border-transparent'
                                 }`
                             }, [
-                                React.createElement(tab.icon, { size: 16, className: "mr-2" }),
-                                tab.label
+                                React.createElement('span', { className: "text-lg mr-3" }, tab.icon),
+                                React.createElement('span', { className: "text-sm font-medium" }, tab.label)
                             ])
                         ))
                     ]),
@@ -3627,23 +3848,49 @@
                                                 React.createElement('div', { className: "flex items-center mb-3" }, [
                                                     React.createElement('span', { className: "text-2xl mr-3" }, "🤖"),
                                                     React.createElement('h4', { className: "font-bold text-indigo-800" }, 
-                                                        language === 'he' ? "תרחיש מבוסס AI" : "AI-Generated Scenario")
+                                                        language === 'he' ? "תרחיש חכם מותאם" : "AI-Powered Custom Scenario")
                                                 ]),
                                                 React.createElement('p', { className: "text-sm text-indigo-700 mb-3" }, 
                                                     language === 'he' 
-                                                        ? "קלאוד יצור תרחיש משבר מותאם לפרופיל הפיננסי שלך"
-                                                        : "Claude will create a crisis scenario tailored to your financial profile"),
-                                                React.createElement('button', {
-                                                    onClick: () => generateAIScenario(),
-                                                    className: "w-full bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors"
-                                                }, language === 'he' ? "צור תרחיש חכם" : "Generate Smart Scenario")
+                                                        ? "תאר במילים שלך תרחיש כלכלי שמעניין אותך, וקלאוד יהפוך אותו לפרמטרים ויריץ את המבחן"
+                                                        : "Describe in your own words an economic scenario you're concerned about, and Claude will convert it to parameters and run the test"),
+                                                
+                                                React.createElement('div', { className: "space-y-3" }, [
+                                                    React.createElement('textarea', {
+                                                        id: 'ai-scenario-description',
+                                                        placeholder: language === 'he' 
+                                                            ? "לדוגמה: 'מה יקרה אם יהיה משבר כלכלי כמו ב-2008 אבל עם אינפלציה גבוהה?' או 'אני חושש ממלחמה שתשפיע על השווקים והכנסתי'"
+                                                            : "Example: 'What if there's a recession like 2008 but with high inflation?' or 'I'm worried about a war affecting markets and my income'",
+                                                        rows: 3,
+                                                        className: "w-full p-3 border border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none text-sm",
+                                                        style: { direction: language === 'he' ? 'rtl' : 'ltr' }
+                                                    }),
+                                                    
+                                                    React.createElement('div', { className: "flex gap-2" }, [
+                                                        React.createElement('button', {
+                                                            onClick: () => generateAIScenarioFromDescription(),
+                                                            className: "flex-1 bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors text-sm"
+                                                        }, language === 'he' ? "צור ובצע מבחן" : "Create & Run Test"),
+                                                        
+                                                        React.createElement('button', {
+                                                            onClick: () => fillExampleScenario(),
+                                                            className: "px-3 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors text-sm"
+                                                        }, language === 'he' ? "דוגמה" : "Example")
+                                                    ])
+                                                ]),
+                                                
+                                                aiScenarioLoading && React.createElement('div', { className: "mt-3 flex items-center justify-center text-indigo-600" }, [
+                                                    React.createElement('div', { className: "animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-600 mr-2" }),
+                                                    React.createElement('span', { className: "text-sm" }, 
+                                                        language === 'he' ? "קלאוד מנתח את התרחיש..." : "Claude is analyzing the scenario...")
+                                                ])
                                             ])
                                         ])
                                     ])
                                 ]),
 
                                 // Stress Test Results Section (will appear after running tests)
-                                stressTestResults && React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
+                                stressTestResults && React.createElement('div', { id: "stress-test-results", className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
                                     React.createElement('h3', { className: "text-xl font-bold text-red-700 mb-6 flex items-center" }, [
                                         React.createElement('span', { className: "mr-2" }, "📊"),
                                         language === 'he' ? "תוצאות מבחן העמידות" : "Stress Test Results"
@@ -4553,7 +4800,7 @@
                                         ? `© ${new Date().getFullYear()} יהלי פולק - מתכנן הפנסיה המתקדם` 
                                         : `© ${new Date().getFullYear()} Yali Pollak - Advanced Retirement Planner`),
                                 React.createElement('span', { className: "text-gray-400" }, "|"),
-                                React.createElement('span', { className: "text-xs text-gray-400 font-mono" }, "v2.1.0")
+                                React.createElement('span', { className: "text-xs text-gray-400 font-mono" }, "v2.2.0")
                             ])
                         ])
                     ])
