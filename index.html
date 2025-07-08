@@ -4361,7 +4361,10 @@
                                                     React.createElement('li', null, language === 'he' ? "• תשואות נמוכות למשך 3 שנים" : "• Low returns for 3 years")
                                                 ]),
                                                 React.createElement('button', {
-                                                    onClick: () => runStressTest('financial_crisis_2008'),
+                                                    onClick: () => {
+                                                        console.log('Financial Crisis button clicked');
+                                                        runStressTest('financial_crisis_2008');
+                                                    },
                                                     className: "w-full bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
                                                 }, language === 'he' ? "הרץ מבחן" : "Run Test")
                                             ]),
@@ -4380,7 +4383,10 @@
                                                     React.createElement('li', null, language === 'he' ? "• התאוששות במשך שנתיים" : "• Recovery over two years")
                                                 ]),
                                                 React.createElement('button', {
-                                                    onClick: () => runStressTest('covid_pandemic'),
+                                                    onClick: () => {
+                                                        console.log('COVID Pandemic button clicked');
+                                                        runStressTest('covid_pandemic');
+                                                    },
                                                     className: "w-full bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors"
                                                 }, language === 'he' ? "הרץ מבחן" : "Run Test")
                                             ]),
@@ -4399,7 +4405,10 @@
                                                     React.createElement('li', null, language === 'he' ? "• החמרה במשך 5 שנים" : "• Deterioration over 5 years")
                                                 ]),
                                                 React.createElement('button', {
-                                                    onClick: () => runStressTest('high_inflation'),
+                                                    onClick: () => {
+                                                        console.log('High Inflation button clicked');
+                                                        runStressTest('high_inflation');
+                                                    },
                                                     className: "w-full bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors"
                                                 }, language === 'he' ? "הרץ מבחן" : "Run Test")
                                             ])
