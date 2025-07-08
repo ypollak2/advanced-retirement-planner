@@ -3,7 +3,7 @@
 Professional retirement planning tool with comprehensive investment tracking, FIRE calculator, and modular architecture.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-2.2.2-green.svg)
+![Version](https://img.shields.io/badge/version-2.2.3-green.svg)
 ![Language](https://img.shields.io/badge/language-English%20%7C%20Hebrew-orange.svg)
 
 ## 🚀 Features
@@ -296,7 +296,14 @@ Want to contribute? Great!
 
 ## ✅ Recently Completed Features
 
-### Latest Additions (Version 2.2.2)
+### Latest Additions (Version 2.2.3)
+- ✅ **Comprehensive Security Framework** - Complete security policy with vulnerability reporting
+- ✅ **GitHub Wiki Documentation** - Detailed guides for all features and usage
+- ✅ **Automated Security Scanning** - Continuous vulnerability detection and updates
+- ✅ **Enhanced Privacy Protection** - Advanced data protection and user privacy controls
+- ✅ **Security Best Practices** - Industry-standard security implementations
+
+### Previous Additions (Version 2.2.2)
 - ✅ **Crisis Timeline Visualization** - Time-series graph showing crisis impact over retirement years
 - ✅ **Enhanced Crisis Analysis** - Visual representation of crisis years vs recovery periods
 - ✅ **Comprehensive Investment Tracking** - Timeline includes all investment types (pension, training fund, personal, crypto, real estate)
