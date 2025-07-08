@@ -441,7 +441,11 @@
                 creditCardDebt: 0, // Current credit card debt
                 creditCardMonthly: 0, // Monthly credit card payments
                 otherDebts: 0, // Other debts (car loans, etc.)
-                otherDebtsMonthly: 0 // Monthly payments for other debts
+                otherDebtsMonthly: 0, // Monthly payments for other debts
+                // Emergency Fund
+                currentEmergencyFund: 0, // Current emergency fund balance
+                emergencyFundTarget: 6, // Target months of expenses to cover
+                emergencyFundMonthly: 0 // Monthly contribution to emergency fund
             });
 
             const [pensionIndexAllocation, setPensionIndexAllocation] = useState([
@@ -2124,6 +2128,97 @@
                                     ])
                                 ]),
                                 
+                                // Emergency Fund Section
+                                React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
+                                    React.createElement('h2', { className: "text-2xl font-bold text-red-600 mb-6 flex items-center" }, [
+                                        React.createElement('span', { className: "mr-2 text-2xl" }, "🛡️"),
+                                        language === 'he' ? "קרן חירום" : "Emergency Fund"
+                                    ]),
+                                    React.createElement('div', { className: "bg-red-50 rounded-lg p-4 mb-6 border border-red-200" }, [
+                                        React.createElement('p', { className: "text-sm text-red-700 mb-2" }, [
+                                            React.createElement('strong', null, 
+                                                language === 'he' ? "חשיבות קרן החירום:" : "Importance of Emergency Fund:"),
+                                            React.createElement('span', { className: "block mt-1" }, 
+                                                language === 'he' ? "קרן חירום מספקת ביטחון פיננסי במקרה של אובדן הכנסה או הוצאות בלתי צפויות" : "Emergency fund provides financial security in case of income loss or unexpected expenses")
+                                        ])
+                                    ]),
+                                    React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-3 gap-4 mb-4" }, [
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "קרן חירום נוכחית (₪)" : "Current Emergency Fund (₪)"),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                value: inputs.currentEmergencyFund,
+                                                onChange: (e) => setInputs({...inputs, currentEmergencyFund: parseInt(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                                            })
+                                        ]),
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "יעד חודשי הוצאות" : "Target Months Coverage"),
+                                            React.createElement('select', {
+                                                value: inputs.emergencyFundTarget,
+                                                onChange: (e) => setInputs({...inputs, emergencyFundTarget: parseInt(e.target.value)}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                                            }, [
+                                                React.createElement('option', { value: 3 }, language === 'he' ? "3 חודשים (מינימום)" : "3 months (minimum)"),
+                                                React.createElement('option', { value: 6 }, language === 'he' ? "6 חודשים (מומלץ)" : "6 months (recommended)"),
+                                                React.createElement('option', { value: 9 }, language === 'he' ? "9 חודשים (שמרני)" : "9 months (conservative)"),
+                                                React.createElement('option', { value: 12 }, language === 'he' ? "12 חודשים (מאוד שמרני)" : "12 months (very conservative)")
+                                            ])
+                                        ]),
+                                        React.createElement('div', null, [
+                                            React.createElement('label', { className: "block text-sm font-medium text-gray-700 mb-1" }, 
+                                                language === 'he' ? "הפקדה חודשית (₪)" : "Monthly Contribution (₪)"),
+                                            React.createElement('input', {
+                                                type: 'number',
+                                                value: inputs.emergencyFundMonthly,
+                                                onChange: (e) => setInputs({...inputs, emergencyFundMonthly: parseInt(e.target.value) || 0}),
+                                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                                            })
+                                        ])
+                                    ]),
+                                    // Emergency Fund Analysis
+                                    React.createElement('div', { className: "bg-gray-50 rounded-lg p-4" }, [
+                                        React.createElement('h4', { className: "font-semibold text-gray-800 mb-3" }, 
+                                            language === 'he' ? "ניתוח קרן החירום:" : "Emergency Fund Analysis:"),
+                                        (() => {
+                                            const targetAmount = inputs.currentMonthlyExpenses * inputs.emergencyFundTarget;
+                                            const currentCoverage = inputs.currentMonthlyExpenses > 0 ? 
+                                                (inputs.currentEmergencyFund / inputs.currentMonthlyExpenses).toFixed(1) : 0;
+                                            const gap = Math.max(0, targetAmount - inputs.currentEmergencyFund);
+                                            const monthsToTarget = inputs.emergencyFundMonthly > 0 ? 
+                                                Math.ceil(gap / inputs.emergencyFundMonthly) : 0;
+                                            
+                                            return React.createElement('div', { className: "grid grid-cols-1 md:grid-cols-2 gap-4 text-sm" }, [
+                                                React.createElement('div', { className: "space-y-2" }, [
+                                                    React.createElement('div', { className: "flex justify-between" }, [
+                                                        React.createElement('span', null, language === 'he' ? "יעד הקרן:" : "Target Fund:"),
+                                                        React.createElement('span', { className: "font-semibold" }, formatCurrency(targetAmount))
+                                                    ]),
+                                                    React.createElement('div', { className: "flex justify-between" }, [
+                                                        React.createElement('span', null, language === 'he' ? "כיסוי נוכחי:" : "Current Coverage:"),
+                                                        React.createElement('span', { 
+                                                            className: `font-semibold ${currentCoverage >= inputs.emergencyFundTarget ? 'text-green-600' : 'text-red-600'}`
+                                                        }, `${currentCoverage} ${language === 'he' ? 'חודשים' : 'months'}`)
+                                                    ])
+                                                ]),
+                                                React.createElement('div', { className: "space-y-2" }, [
+                                                    React.createElement('div', { className: "flex justify-between" }, [
+                                                        React.createElement('span', null, language === 'he' ? "פער לכיסוי:" : "Gap to Cover:"),
+                                                        React.createElement('span', { className: "font-semibold" }, formatCurrency(gap))
+                                                    ]),
+                                                    gap > 0 && inputs.emergencyFundMonthly > 0 && React.createElement('div', { className: "flex justify-between" }, [
+                                                        React.createElement('span', null, language === 'he' ? "זמן להשגת יעד:" : "Time to Target:"),
+                                                        React.createElement('span', { className: "font-semibold text-blue-600" }, 
+                                                            `${monthsToTarget} ${language === 'he' ? 'חודשים' : 'months'}`)
+                                                    ])
+                                                ])
+                                            ]);
+                                        })()
+                                    ])
+                                ]),
+                                
                                 // Work Periods
                                 React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
                                     React.createElement('div', { className: "flex justify-between items-center mb-6" }, [
@@ -3153,7 +3248,270 @@
                                         ])
                                     ])
                                 ])
-                            ])
+                            ]),
+
+                            // General Recommendations Section
+                            (() => {
+                                const generateGeneralRecommendations = () => {
+                                    if (!results) return [];
+                                    
+                                    const recommendations = [];
+                                    const currentSalary = workPeriods[workPeriods.length - 1]?.salary || 0;
+                                    const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
+                                    const currentAge = inputs.currentAge;
+                                    
+                                    // Emergency Fund Analysis
+                                    const emergencyFundTarget = inputs.currentMonthlyExpenses * inputs.emergencyFundTarget;
+                                    const emergencyFundGap = Math.max(0, emergencyFundTarget - inputs.currentEmergencyFund);
+                                    const emergencyFundCoverage = inputs.currentMonthlyExpenses > 0 ? 
+                                        inputs.currentEmergencyFund / inputs.currentMonthlyExpenses : 0;
+                                    
+                                    // Savings Rate Analysis
+                                    const totalMonthlySavings = (workPeriods[workPeriods.length - 1]?.monthlyContribution || 0) +
+                                        (workPeriods[workPeriods.length - 1]?.monthlyTrainingFund || 0) +
+                                        inputs.personalPortfolioMonthly +
+                                        inputs.cryptoMonthly +
+                                        inputs.realEstateMonthly +
+                                        inputs.emergencyFundMonthly;
+                                    const savingsRate = currentSalary > 0 ? (totalMonthlySavings / currentSalary) * 100 : 0;
+                                    
+                                    // Debt-to-Income Ratio
+                                    const totalMonthlyDebt = inputs.mortgageMonthlyPayment +
+                                        inputs.personalLoansMonthly +
+                                        inputs.creditCardMonthly +
+                                        inputs.otherDebtsMonthly;
+                                    const debtToIncomeRatio = currentSalary > 0 ? (totalMonthlyDebt / currentSalary) * 100 : 0;
+                                    
+                                    // Age-Based Recommendations
+                                    if (currentAge < 30) {
+                                        if (savingsRate < 10) {
+                                            recommendations.push({
+                                                type: 'warning',
+                                                priority: 'high',
+                                                title: language === 'he' ? '💡 הגדל חיסכון בגיל צעיר' : '💡 Increase Savings While Young',
+                                                text: language === 'he' 
+                                                    ? 'בגיל צעיר, כדאי לחסוך לפחות 10-15% מהשכר. יש לך יתרון זמן רב להנדס עליית ערך.'
+                                                    : 'At a young age, aim to save at least 10-15% of salary. You have the advantage of time for compound growth.'
+                                            });
+                                        }
+                                        if (inputs.riskTolerance === 'conservative') {
+                                            recommendations.push({
+                                                type: 'suggestion',
+                                                priority: 'medium',
+                                                title: language === 'he' ? '📈 שקול סיכון גבוה יותר' : '📈 Consider Higher Risk',
+                                                text: language === 'he' 
+                                                    ? 'בגיל צעיר, תוכל לקחת יותר סיכון בהשקעות עבור פוטנציאל תשואה גבוה יותר.'
+                                                    : 'At a young age, you can take more investment risk for higher return potential.'
+                                            });
+                                        }
+                                    } else if (currentAge >= 30 && currentAge < 45) {
+                                        if (savingsRate < 15) {
+                                            recommendations.push({
+                                                type: 'warning',
+                                                priority: 'high',
+                                                title: language === 'he' ? '⚡ הגדל חיסכון בגיל הפריים' : '⚡ Increase Prime Years Savings',
+                                                text: language === 'he' 
+                                                    ? 'בשנות הפריים שלך (30-45), כדאי לחסוך 15-20% מהשכר כדי למקסם את הצבירה.'
+                                                    : 'In your prime years (30-45), aim to save 15-20% of salary to maximize accumulation.'
+                                            });
+                                        }
+                                        if (!results.achievesTarget) {
+                                            recommendations.push({
+                                                type: 'warning',
+                                                priority: 'high',
+                                                title: language === 'he' ? '🎯 סגור פערים עכשיו' : '🎯 Close Gaps Now',
+                                                text: language === 'he' 
+                                                    ? `יש פער של ${formatCurrency(results.targetGap)} מהיעד. זה הזמן הטוב ביותר לסגור פערים.`
+                                                    : `There's a ${formatCurrency(results.targetGap)} gap from target. This is the best time to close gaps.`
+                                            });
+                                        }
+                                    } else if (currentAge >= 45 && currentAge < 60) {
+                                        if (inputs.riskTolerance === 'veryAggressive') {
+                                            recommendations.push({
+                                                type: 'caution',
+                                                priority: 'medium',
+                                                title: language === 'he' ? '⚖️ שקול להפחית סיכון' : '⚖️ Consider Reducing Risk',
+                                                text: language === 'he' 
+                                                    ? 'בגיל מתקדם יותר, כדאי להתחיל להפחית סיכון ולשמור על הצבירה.'
+                                                    : 'At a more advanced age, consider starting to reduce risk and preserve accumulation.'
+                                            });
+                                        }
+                                        if (savingsRate < 20) {
+                                            recommendations.push({
+                                                type: 'warning',
+                                                priority: 'high',
+                                                title: language === 'he' ? '🏃‍♂️ האצה לפני פרישה' : '🏃‍♂️ Accelerate Before Retirement',
+                                                text: language === 'he' 
+                                                    ? 'בשנים לפני הפרישה, כדאי להגדיל חיסכון ל-20-25% מהשכר.'
+                                                    : 'In the years before retirement, consider increasing savings to 20-25% of salary.'
+                                            });
+                                        }
+                                    } else if (currentAge >= 60) {
+                                        if (inputs.riskTolerance === 'aggressive' || inputs.riskTolerance === 'veryAggressive') {
+                                            recommendations.push({
+                                                type: 'warning',
+                                                priority: 'high',
+                                                title: language === 'he' ? '🛡️ שמור על הצבירה' : '🛡️ Preserve Accumulation',
+                                                text: language === 'he' 
+                                                    ? 'בקרבת הפרישה, כדאי לעבור לאסטרטגיה שמרנית יותר לשמירה על הצבירה.'
+                                                    : 'Near retirement, consider moving to a more conservative strategy to preserve accumulation.'
+                                            });
+                                        }
+                                    }
+
+                                    // Emergency Fund Recommendations
+                                    if (emergencyFundCoverage < 3) {
+                                        recommendations.push({
+                                            type: 'critical',
+                                            priority: 'critical',
+                                            title: language === 'he' ? '🚨 קרן חירום דחופה' : '🚨 Urgent Emergency Fund',
+                                            text: language === 'he' 
+                                                ? `יש לך כיסוי של ${emergencyFundCoverage.toFixed(1)} חודשים בלבד. צריך לפחות 3-6 חודשים.`
+                                                : `You have only ${emergencyFundCoverage.toFixed(1)} months coverage. Need at least 3-6 months.`
+                                        });
+                                    } else if (emergencyFundCoverage < 6) {
+                                        recommendations.push({
+                                            type: 'warning',
+                                            priority: 'high',
+                                            title: language === 'he' ? '🛡️ השלם קרן חירום' : '🛡️ Complete Emergency Fund',
+                                            text: language === 'he' 
+                                                ? `קרן החירום שלך מכסה ${emergencyFundCoverage.toFixed(1)} חודשים. כדאי להשלים ל-6 חודשים.`
+                                                : `Your emergency fund covers ${emergencyFundCoverage.toFixed(1)} months. Consider completing to 6 months.`
+                                        });
+                                    }
+
+                                    // Debt-to-Income Recommendations
+                                    if (debtToIncomeRatio > 40) {
+                                        recommendations.push({
+                                            type: 'critical',
+                                            priority: 'critical',
+                                            title: language === 'he' ? '💳 חובות גבוהים מדי' : '💳 Debt Too High',
+                                            text: language === 'he' 
+                                                ? `יחס החובות להכנסה שלך הוא ${debtToIncomeRatio.toFixed(1)}%. כדאי להוריד מתחת ל-30%.`
+                                                : `Your debt-to-income ratio is ${debtToIncomeRatio.toFixed(1)}%. Consider reducing below 30%.`
+                                        });
+                                    } else if (debtToIncomeRatio > 30) {
+                                        recommendations.push({
+                                            type: 'warning',
+                                            priority: 'medium',
+                                            title: language === 'he' ? '⚠️ שמור על חובות' : '⚠️ Monitor Debt',
+                                            text: language === 'he' 
+                                                ? `יחס החובות להכנסה שלך הוא ${debtToIncomeRatio.toFixed(1)}%. כדאי לא לעלות מעל 30%.`
+                                                : `Your debt-to-income ratio is ${debtToIncomeRatio.toFixed(1)}%. Consider not exceeding 30%.`
+                                        });
+                                    }
+
+                                    // Savings Rate Recommendations
+                                    if (savingsRate < 10) {
+                                        recommendations.push({
+                                            type: 'warning',
+                                            priority: 'high',
+                                            title: language === 'he' ? '📊 שיעור חיסכון נמוך' : '📊 Low Savings Rate',
+                                            text: language === 'he' 
+                                                ? `שיעור החיסכון שלך הוא ${savingsRate.toFixed(1)}%. מומלץ לפחות 10-15%.`
+                                                : `Your savings rate is ${savingsRate.toFixed(1)}%. Recommended at least 10-15%.`
+                                        });
+                                    } else if (savingsRate >= 20) {
+                                        recommendations.push({
+                                            type: 'success',
+                                            priority: 'low',
+                                            title: language === 'he' ? '🎉 שיעור חיסכון מצוין' : '🎉 Excellent Savings Rate',
+                                            text: language === 'he' 
+                                                ? `שיעור החיסכון שלך הוא ${savingsRate.toFixed(1)}%. זה מצוין!`
+                                                : `Your savings rate is ${savingsRate.toFixed(1)}%. This is excellent!`
+                                        });
+                                    }
+
+                                    // Investment Diversification Recommendations
+                                    const hasPersonalInvestments = inputs.currentPersonalPortfolio > 0 || inputs.personalPortfolioMonthly > 0;
+                                    const hasCrypto = inputs.currentCrypto > 0 || inputs.cryptoMonthly > 0;
+                                    const hasRealEstate = inputs.currentRealEstate > 0 || inputs.realEstateMonthly > 0;
+                                    
+                                    if (!hasPersonalInvestments && !hasCrypto && !hasRealEstate) {
+                                        recommendations.push({
+                                            type: 'suggestion',
+                                            priority: 'medium',
+                                            title: language === 'he' ? '🌟 פזר השקעות' : '🌟 Diversify Investments',
+                                            text: language === 'he' 
+                                                ? 'שקול להוסיף השקעות אישיות נוספות כמו מניות או נדל״ן לפיזור סיכונים.'
+                                                : 'Consider adding personal investments like stocks or real estate for risk diversification.'
+                                        });
+                                    }
+
+                                    // Risk Tolerance vs Age Recommendations
+                                    if (currentAge > 55 && (inputs.riskTolerance === 'aggressive' || inputs.riskTolerance === 'veryAggressive')) {
+                                        recommendations.push({
+                                            type: 'caution',
+                                            priority: 'medium',
+                                            title: language === 'he' ? '⚖️ התאם סיכון לגיל' : '⚖️ Adjust Risk to Age',
+                                            text: language === 'he' 
+                                                ? 'ככל שמתקרבים לפרישה, כדאי להפחית סיכון והגדיל חלק של אג״ח.'
+                                                : 'As you approach retirement, consider reducing risk and increasing bond allocation.'
+                                        });
+                                    }
+
+                                    // Positive Reinforcement for Good Planning
+                                    if (results.achievesTarget && emergencyFundCoverage >= 6 && savingsRate >= 15) {
+                                        recommendations.push({
+                                            type: 'success',
+                                            priority: 'low',
+                                            title: language === 'he' ? '🏆 תכנון מצוין' : '🏆 Excellent Planning',
+                                            text: language === 'he' 
+                                                ? 'הכל נראה נהדר! יש לך קרן חירום מספקת, שיעור חיסכון טוב ואתה עומד ליעד הפרישה.'
+                                                : 'Everything looks great! You have adequate emergency fund, good savings rate and meeting retirement target.'
+                                        });
+                                    }
+
+                                    // Sort by priority
+                                    const priorityOrder = { 'critical': 0, 'high': 1, 'medium': 2, 'low': 3 };
+                                    return recommendations.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+                                };
+
+                                const recommendations = generateGeneralRecommendations();
+                                
+                                return recommendations.length > 0 ? React.createElement('div', { className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" }, [
+                                    React.createElement('h3', { className: "text-xl font-bold text-amber-700 mb-4 flex items-center" }, [
+                                        React.createElement('span', { className: "mr-2" }, "💡"),
+                                        language === 'he' ? "המלצות כלליות מותאמות אישית" : "Personalized General Recommendations"
+                                    ]),
+                                    React.createElement('div', { className: "space-y-3" }, 
+                                        recommendations.map((rec, index) => {
+                                            const colors = {
+                                                'critical': 'bg-red-50 border-red-200 text-red-800',
+                                                'warning': 'bg-orange-50 border-orange-200 text-orange-800',
+                                                'caution': 'bg-yellow-50 border-yellow-200 text-yellow-800',
+                                                'suggestion': 'bg-blue-50 border-blue-200 text-blue-800',
+                                                'success': 'bg-green-50 border-green-200 text-green-800'
+                                            };
+                                            
+                                            const icons = {
+                                                'critical': '🚨',
+                                                'warning': '⚠️',
+                                                'caution': '⚖️',
+                                                'suggestion': '💡',
+                                                'success': '✅'
+                                            };
+                                            
+                                            return React.createElement('div', { 
+                                                key: index,
+                                                className: `rounded-lg p-4 border-l-4 ${colors[rec.type] || colors.suggestion}`
+                                            }, [
+                                                React.createElement('div', { className: "flex items-start" }, [
+                                                    React.createElement('span', { className: "text-lg mr-3 mt-0.5" }, icons[rec.type] || '💡'),
+                                                    React.createElement('div', { className: "flex-1" }, [
+                                                        React.createElement('h4', { className: "font-semibold mb-1" }, rec.title),
+                                                        React.createElement('p', { className: "text-sm leading-relaxed" }, rec.text)
+                                                    ])
+                                                ])
+                                            ]);
+                                        })
+                                    ),
+                                    React.createElement('div', { className: "mt-4 pt-4 border-t border-amber-200 text-xs text-amber-600" }, 
+                                        language === 'he' 
+                                            ? "💡 המלצות אלו מבוססות על המידע שהוזן ואינן מחליפות ייעוץ פיננסי מקצועי"
+                                            : "💡 These recommendations are based on entered information and don't replace professional financial advice")
+                                ]) : null;
+                            })()
                         ])
                     ]),
 
