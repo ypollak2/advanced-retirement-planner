@@ -3,7 +3,7 @@
 Professional retirement planning tool with comprehensive investment tracking, FIRE calculator, and modular architecture.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.0.0-green.svg)
+![Version](https://img.shields.io/badge/version-2.1.0-green.svg)
 ![Language](https://img.shields.io/badge/language-English%20%7C%20Hebrew-orange.svg)
 
 ## 🚀 Features
@@ -27,6 +27,13 @@ Professional retirement planning tool with comprehensive investment tracking, FI
 - **4% safe withdrawal rule** implementation
 - **Target age planning** with progress tracking
 - **Total portfolio analysis** including all investment types
+
+### Emergency Planning & Recommendations
+- **Emergency Fund Calculator** with 3-12 month coverage targets
+- **General Recommendations Engine** with age-based financial advice
+- **Debt-to-Income Analysis** with personalized thresholds
+- **Savings Rate Optimization** with smart target recommendations
+- **Risk Tolerance Assessment** aligned with age and goals
 
 ### Visualization & Analysis
 - **Interactive charts** with 7+ data series tracking
@@ -287,11 +294,18 @@ Want to contribute? Great!
 - 📱 Mobile responsiveness improvements
 - 🌐 Additional language translations
 
+## ✅ Recently Completed Features
+
+### Latest Additions (Version 2.1.0+)
+- ✅ **Emergency fund/safety cushion calculator** - Calculate recommended emergency savings with 3-12 month coverage targets
+- ✅ **General recommendations based on overall situation** - Personalized advice engine with age-based logic, debt analysis, and savings rate optimization
+- ✅ **Dynamic API integration for real-time financial data** - Google Finance and Yahoo Finance integration with comprehensive fallbacks
+- ✅ **Comprehensive testing framework** - Regression tests for all major functionality
+- ✅ **Enhanced UI/UX with refined header design** - Professional, minimalist interface
+
 ## 🚀 Future Feature Roadmap
 
 ### Core Financial Planning Features
-- 🛡️ **Emergency fund/safety cushion calculator** - Calculate recommended emergency savings
-- 💡 **General recommendations based on overall situation** - AI-powered personalized advice
 - 👨‍👩‍👧‍👦 **Multi-generational wealth planning** - Family wealth transfer strategies
 - 🌍 **Social security rights in different countries** - International pension benefits
 - 🏥 **Healthcare cost projections and insurance planning** - Medical expense forecasting
