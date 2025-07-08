@@ -2482,11 +2482,18 @@
                     document.getElementById('custom-inflation-increase').value = scenario.inflationIncrease;
                     document.getElementById('custom-crisis-duration').value = scenario.duration;
                     
+                    // Show a preview of the extracted parameters
+                    const previewMessage = language === 'he' 
+                        ? `AI זיהה: ירידה של ${scenario.incomeReduction}% בהכנסות, ${scenario.portfolioDecline}% בתיקי השקעות, ${scenario.inflationIncrease}% עלייה באינפלציה למשך ${scenario.duration} שנים`
+                        : `AI detected: ${scenario.incomeReduction}% income reduction, ${scenario.portfolioDecline}% portfolio decline, ${scenario.inflationIncrease}% inflation increase for ${scenario.duration} years`;
+                    
+                    alert(previewMessage);
+                    
                     // Run the stress test automatically
                     setTimeout(() => {
                         const customScenario = {
                             name: language === 'he' ? 'תרחיש AI מותאם' : 'AI Custom Scenario',
-                            description: `${language === 'he' ? 'מבוסס על:' : 'Based on:'} "${description.substring(0, 100)}${description.length > 100 ? '...' : ''}"`,
+                            description: scenario.explanation || `${language === 'he' ? 'מבוסס על:' : 'Based on:'} "${description.substring(0, 100)}${description.length > 100 ? '...' : ''}"`,
                             incomeReduction: scenario.incomeReduction,
                             portfolioDecline: scenario.portfolioDecline,
                             realEstateDecline: scenario.portfolioDecline * 0.7,
@@ -2538,16 +2545,18 @@
                 const textarea = document.getElementById('ai-scenario-description');
                 const examples = {
                     he: [
-                        'מה יקרה אם יהיה משבר כלכלי כמו ב-2008 אבל עם אינפלציה גבוהה של 10%?',
-                        'אני חושש ממלחמה שתשפיע על השווקים והכנסתי לירד ב-30% למשך שנתיים',
-                        'איך אני יעמוד במשבר שבו הנדל״ן יקרוס ב-50% והמניות ב-40% למשך 4 שנים?',
-                        'מה יקרה אם יהיה משבר טכנולוגי שיוביל לאבטלה נרחבת ובעיות כלכליות?'
+                        'מה יקרה אם יהיה משבר כלכלי כמו ב-2008 אבל עם אינפלציה של 12% למשך 3 שנים?',
+                        'אני חושש ממלחמה שתשפיע על השווקים והכנסתי תירד ב-35% למשך שנתיים',
+                        'איך אני יעמוד במשבר שבו הנדל״ן יקרוס ב-55% והמניות ב-45% למשך 4 שנים?',
+                        'מה יקרה אם תהיה מגפה כמו קורונה עם אבטלה של 25% וירידה בשוק של 30%?',
+                        'תרחיש של מיתון כלכלי עם הכנסות שיורדות ב-20% ואינפלציה של 8% למשך 5 שנים'
                     ],
                     en: [
-                        'What if there\'s a recession like 2008 but with high inflation of 10%?',
-                        'I\'m worried about a war affecting markets and my income dropping 30% for two years',
-                        'How would I survive a crisis where real estate crashes 50% and stocks 40% for 4 years?',
-                        'What if there\'s a tech crisis leading to widespread unemployment and economic problems?'
+                        'What if there\'s a recession like 2008 but with 12% inflation for 3 years?',
+                        'I\'m worried about a war where markets crash and my income drops 35% for two years',
+                        'How would I survive a crisis where real estate crashes 55% and stocks 45% for 4 years?',
+                        'What if there\'s a pandemic like COVID with 25% unemployment and 30% market decline?',
+                        'Economic recession scenario with income dropping 20% and 8% inflation for 5 years'
                     ]
                 };
                 
@@ -2563,109 +2572,179 @@
             const parseScenarioDescription = (description) => {
                 // Advanced NLP-like parsing to extract economic parameters from natural language
                 const text = description.toLowerCase();
+                const originalText = description;
                 
                 let incomeReduction = 20;
                 let portfolioDecline = 30;
                 let inflationIncrease = 5;
                 let duration = 3;
+                let explanationParts = [];
                 
-                // Extract income reduction clues
-                const incomePatterns = [
-                    { regex: /(income|salary|wage).*(drop|fall|reduce|decrease).*(\\d+)%/, factor: 1 },
-                    { regex: /(\\d+)%.*(income|salary|wage).*(drop|fall|reduce|decrease)/, factor: 1 },
-                    { regex: /unemployment|job.loss|layoff/, factor: 50 },
-                    { regex: /war|conflict/, factor: 25 },
-                    { regex: /recession|depression/, factor: 20 }
+                console.log('Parsing scenario:', text); // Debug log
+                
+                // Extract specific numbers first (more accurate)
+                const numberMatches = text.match(/(\d+)%/g);
+                const yearMatches = text.match(/(\d+)\s*(year|years|שנ)/g);
+                const monthMatches = text.match(/(\d+)\s*(month|months|חודש)/g);
+                
+                console.log('Number matches:', numberMatches); // Debug log
+                console.log('Year matches:', yearMatches); // Debug log
+                
+                // Extract income reduction clues with better Hebrew support
+                const incomeKeywords = [
+                    'income', 'salary', 'wage', 'הכנס', 'משכורת', 'שכר',
+                    'drop', 'fall', 'reduce', 'decrease', 'ירד', 'יפל', 'יקטן', 'ירידה',
+                    'unemployment', 'job loss', 'layoff', 'אבטלה', 'פיטורין'
                 ];
                 
-                // Extract portfolio decline clues
-                const portfolioPatterns = [
-                    { regex: /(stock|market|portfolio).*(crash|fall|drop).*(\\d+)%/, factor: 1 },
-                    { regex: /(\\d+)%.*(stock|market|portfolio).*(crash|fall|drop)/, factor: 1 },
-                    { regex: /2008|financial.crisis/, factor: 40 },
-                    { regex: /tech.crash|dot.com/, factor: 50 },
-                    { regex: /war|conflict/, factor: 25 },
-                    { regex: /recession/, factor: 30 }
+                const marketKeywords = [
+                    'stock', 'market', 'portfolio', 'shares', 'מניות', 'שוק', 'תיק', 'מדד',
+                    'crash', 'collapse', 'קריסה', 'נפילה', 'real estate', 'property', 'נדלן'
                 ];
                 
-                // Extract inflation clues
-                const inflationPatterns = [
-                    { regex: /inflation.*(\\d+)%/, factor: 1 },
-                    { regex: /(\\d+)%.*inflation/, factor: 1 },
-                    { regex: /high.inflation/, factor: 12 },
-                    { regex: /hyperinflation/, factor: 20 },
-                    { regex: /price.rise|cost.increase/, factor: 8 }
+                const inflationKeywords = [
+                    'inflation', 'אינפלציה', 'price', 'cost', 'מחיר', 'יוקר', 'עלות'
                 ];
                 
-                // Extract duration clues
-                const durationPatterns = [
-                    { regex: /(\\d+).year/, factor: 1 },
-                    { regex: /(\\d+).month/, factor: 0.083 },
-                    { regex: /short.term|temporary/, factor: 1 },
-                    { regex: /long.term|extended/, factor: 5 },
-                    { regex: /decade/, factor: 10 }
-                ];
-                
-                // Process income patterns
-                for (const pattern of incomePatterns) {
-                    const match = text.match(pattern.regex);
-                    if (match && match[3]) {
-                        incomeReduction = Math.min(parseInt(match[3]) * pattern.factor, 60);
-                        break;
-                    } else if (match) {
-                        incomeReduction = Math.min(pattern.factor, 60);
-                    }
+                // Check for specific crisis scenarios
+                if (text.includes('2008') || text.includes('financial crisis') || text.includes('משבר פיננסי')) {
+                    portfolioDecline = Math.max(portfolioDecline, 40);
+                    incomeReduction = Math.max(incomeReduction, 15);
+                    inflationIncrease = Math.max(inflationIncrease, 2);
+                    duration = 3;
+                    explanationParts.push(language === 'he' 
+                        ? 'מבוסס על משבר 2008: ירידות חדות בשוק ההון ואבטלה גבוהה'
+                        : 'Based on 2008 crisis: sharp market declines and high unemployment');
                 }
                 
-                // Process portfolio patterns
-                for (const pattern of portfolioPatterns) {
-                    const match = text.match(pattern.regex);
-                    if (match && match[3]) {
-                        portfolioDecline = Math.min(parseInt(match[3]) * pattern.factor, 70);
-                        break;
-                    } else if (match) {
-                        portfolioDecline = Math.min(pattern.factor, 70);
-                    }
-                }
-                
-                // Process inflation patterns
-                for (const pattern of inflationPatterns) {
-                    const match = text.match(pattern.regex);
-                    if (match && match[1] && !isNaN(parseInt(match[1]))) {
-                        inflationIncrease = Math.min(parseInt(match[1]) * pattern.factor, 25);
-                        break;
-                    } else if (match) {
-                        inflationIncrease = Math.min(pattern.factor, 25);
-                    }
-                }
-                
-                // Process duration patterns
-                for (const pattern of durationPatterns) {
-                    const match = text.match(pattern.regex);
-                    if (match && match[1] && !isNaN(parseInt(match[1]))) {
-                        duration = Math.max(1, Math.min(parseInt(match[1]) * pattern.factor, 10));
-                        break;
-                    } else if (match) {
-                        duration = Math.max(1, Math.min(pattern.factor, 10));
-                    }
-                }
-                
-                // Apply some AI-like adjustments based on context
-                if (text.includes('covid') || text.includes('pandemic')) {
+                if (text.includes('covid') || text.includes('pandemic') || text.includes('קורונה') || text.includes('מגפה')) {
                     incomeReduction = Math.max(incomeReduction, 25);
-                    duration = Math.min(duration, 2);
+                    portfolioDecline = Math.max(portfolioDecline, 25);
+                    inflationIncrease = Math.max(inflationIncrease, 3);
+                    duration = 2;
+                    explanationParts.push(language === 'he' 
+                        ? 'תרחיש דמוי קורונה: הגבלות, ירידה בהכנסות ותנודתיות גבוהה'
+                        : 'COVID-like scenario: lockdowns, income reduction and high volatility');
                 }
                 
-                if (text.includes('real estate') || text.includes('property')) {
-                    portfolioDecline = Math.max(portfolioDecline, 20);
+                if (text.includes('war') || text.includes('conflict') || text.includes('מלחמה') || text.includes('קונפליקט')) {
+                    incomeReduction = Math.max(incomeReduction, 30);
+                    portfolioDecline = Math.max(portfolioDecline, 35);
+                    inflationIncrease = Math.max(inflationIncrease, 8);
+                    duration = Math.max(duration, 2);
+                    explanationParts.push(language === 'he' 
+                        ? 'תרחיש מלחמה: חוסר יציבות כלכלית, ירידה בהשקעות ואינפלציה'
+                        : 'War scenario: economic instability, investment decline and inflation');
                 }
                 
-                return {
+                if (text.includes('recession') || text.includes('depression') || text.includes('מיתון') || text.includes('שפל')) {
+                    incomeReduction = Math.max(incomeReduction, 20);
+                    portfolioDecline = Math.max(portfolioDecline, 30);
+                    duration = Math.max(duration, 2);
+                    explanationParts.push(language === 'he' 
+                        ? 'תרחיש מיתון: צמיחה שלילית, אבטלה ועליה בעלויות מימון'
+                        : 'Recession scenario: negative growth, unemployment and rising financing costs');
+                }
+                
+                // Extract specific percentages for different categories
+                if (numberMatches) {
+                    numberMatches.forEach(match => {
+                        const num = parseInt(match.replace('%', ''));
+                        const beforeMatch = text.substring(0, text.indexOf(match));
+                        const afterMatch = text.substring(text.indexOf(match) + match.length);
+                        const context = beforeMatch.substring(Math.max(0, beforeMatch.length - 50)) + ' ' + afterMatch.substring(0, 50);
+                        
+                        console.log(`Processing ${num}% with context: ${context}`); // Debug log
+                        
+                        // Check if this percentage relates to income
+                        if (incomeKeywords.some(keyword => context.includes(keyword))) {
+                            incomeReduction = Math.max(incomeReduction, Math.min(num, 60));
+                            explanationParts.push(language === 'he' 
+                                ? `ירידה בהכנסות של ${num}% עקב השפעות המשבר על שוק העבודה`
+                                : `${num}% income reduction due to crisis impact on job market`);
+                            console.log(`Set income reduction to ${incomeReduction}%`); // Debug log
+                        }
+                        
+                        // Check if this percentage relates to market/portfolio
+                        else if (marketKeywords.some(keyword => context.includes(keyword))) {
+                            portfolioDecline = Math.max(portfolioDecline, Math.min(num, 70));
+                            explanationParts.push(language === 'he' 
+                                ? `ירידה בתיקי השקעות של ${num}% עקב חוסר ביטחון במשק`
+                                : `${num}% portfolio decline due to economic uncertainty`);
+                            console.log(`Set portfolio decline to ${portfolioDecline}%`); // Debug log
+                        }
+                        
+                        // Check if this percentage relates to inflation
+                        else if (inflationKeywords.some(keyword => context.includes(keyword))) {
+                            inflationIncrease = Math.max(inflationIncrease, Math.min(num, 25));
+                            explanationParts.push(language === 'he' 
+                                ? `עלייה באינפלציה של ${num}% עקב עליית עלויות ומחסור בהיצע`
+                                : `${num}% inflation increase due to rising costs and supply shortages`);
+                            console.log(`Set inflation increase to ${inflationIncrease}%`); // Debug log
+                        }
+                        
+                        // If no specific context, apply heuristics
+                        else {
+                            if (num >= 40) {
+                                portfolioDecline = Math.max(portfolioDecline, Math.min(num, 70));
+                                explanationParts.push(language === 'he' 
+                                    ? `ירידה משמעותית בשווקים של ${num}% עקב המשבר`
+                                    : `Significant market decline of ${num}% due to crisis`);
+                            } else if (num >= 15) {
+                                incomeReduction = Math.max(incomeReduction, Math.min(num, 60));
+                                explanationParts.push(language === 'he' 
+                                    ? `השפעה על ההכנסות בשיעור של ${num}%`
+                                    : `Income impact of ${num}%`);
+                            } else {
+                                inflationIncrease = Math.max(inflationIncrease, Math.min(num, 25));
+                                explanationParts.push(language === 'he' 
+                                    ? `עלייה במחירים בשיעור של ${num}%`
+                                    : `Price increase of ${num}%`);
+                            }
+                        }
+                    });
+                }
+                
+                // Extract duration
+                if (yearMatches) {
+                    const years = parseInt(yearMatches[0].match(/\d+/)[0]);
+                    duration = Math.max(duration, Math.min(years, 8));
+                    explanationParts.push(language === 'he' 
+                        ? `משך המשבר צפוי להיות ${years} שנים`
+                        : `Crisis duration expected to be ${years} years`);
+                    console.log(`Set duration to ${duration} years`); // Debug log
+                }
+                
+                if (monthMatches && !yearMatches) {
+                    const months = parseInt(monthMatches[0].match(/\d+/)[0]);
+                    duration = Math.max(1, Math.min(Math.ceil(months / 12), 5));
+                    explanationParts.push(language === 'he' 
+                        ? `משך המשבר צפוי להיות ${months} חודשים`
+                        : `Crisis duration expected to be ${months} months`);
+                }
+                
+                // Add general economic explanation if no specific parts were identified
+                if (explanationParts.length === 0) {
+                    explanationParts.push(language === 'he' 
+                        ? 'תרחיש כלכלי מותאם בהתאם לתיאור: ירידה בהכנסות, תנודתיות בשווקים ועליה במחירים'
+                        : 'Custom economic scenario based on description: income reduction, market volatility and price increases');
+                }
+                
+                // Add impact explanation
+                explanationParts.push(language === 'he' 
+                    ? `ההשפעה הכוללת: ירידה של ${incomeReduction}% בהכנסות, ${portfolioDecline}% בתיקי השקעות, עלייה של ${inflationIncrease}% באינפלציה למשך ${duration} שנים`
+                    : `Overall impact: ${incomeReduction}% income decline, ${portfolioDecline}% portfolio decline, ${inflationIncrease}% inflation increase for ${duration} years`);
+                
+                const scenario = {
                     incomeReduction: Math.round(incomeReduction),
                     portfolioDecline: Math.round(portfolioDecline),
                     inflationIncrease: Math.round(inflationIncrease),
-                    duration: Math.round(duration)
+                    duration: Math.round(duration),
+                    explanation: explanationParts.join('. ')
                 };
+                
+                console.log('Final scenario:', scenario); // Debug log
+                return scenario;
             };
 
             return React.createElement('div', {
@@ -3859,8 +3938,8 @@
                                                     React.createElement('textarea', {
                                                         id: 'ai-scenario-description',
                                                         placeholder: language === 'he' 
-                                                            ? "לדוגמה: 'מה יקרה אם יהיה משבר כלכלי כמו ב-2008 אבל עם אינפלציה גבוהה?' או 'אני חושש ממלחמה שתשפיע על השווקים והכנסתי'"
-                                                            : "Example: 'What if there's a recession like 2008 but with high inflation?' or 'I'm worried about a war affecting markets and my income'",
+                                                            ? "לדוגמה: 'מה יקרה אם יהיה משבר עם אינפלציה של 15% והכנסתי תירד ב-25% למשך 3 שנים?' או 'משבר שיגרום לירידה של 40% בנדל״ן'"
+                                                            : "Example: 'What if there's a crisis with 15% inflation and my income drops 25% for 3 years?' or 'Crisis causing 40% real estate decline'",
                                                         rows: 3,
                                                         className: "w-full p-3 border border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none text-sm",
                                                         style: { direction: language === 'he' ? 'rtl' : 'ltr' }
