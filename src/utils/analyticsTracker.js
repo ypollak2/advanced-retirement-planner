@@ -11,7 +11,7 @@ export const AnalyticsManager = {
                 totalSessions: 0,
                 totalVisitors: 0,
                 lastUpdated: new Date().toISOString(),
-                version: '2.4.0'
+                version: '2.4.1'
             };
         }
 
@@ -128,7 +128,7 @@ export const AnalyticsManager = {
                 totalSessions: 0,
                 totalVisitors: 0,
                 lastUpdated: new Date().toISOString(),
-                version: '2.4.0'
+                version: '2.4.1'
             }
         };
     },

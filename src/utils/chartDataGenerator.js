@@ -1,6 +1,7 @@
-import { calculateWeightedReturn, getAdjustedReturn } from './retirementCalculations.js';
+// Chart data generator for GitHub Pages compatibility
+// Dependencies: calculateWeightedReturn, getAdjustedReturn from retirementCalculations.js
 
-export const generateChartData = (
+window.generateChartData = (
     inputs, 
     workPeriods, 
     pensionIndexAllocation, 

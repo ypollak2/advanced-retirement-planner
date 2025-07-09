@@ -1,10 +1,11 @@
-export const exchangeRates = {
+// Market constants for GitHub Pages compatibility
+window.exchangeRates = {
     USD: 3.37,
     GBP: 4.60,
     EUR: 3.60
 };
 
-export const countryData = {
+window.countryData = {
     israel: {
         name: 'Israel',
         pensionTax: 0.15,
@@ -37,7 +38,7 @@ export const countryData = {
     }
 };
 
-export const historicalReturns = {
+window.historicalReturns = {
     5: {
         'Tel Aviv 35': 8.2,
         'S&P 500': 11.3,
@@ -100,7 +101,7 @@ export const historicalReturns = {
     }
 };
 
-export const indexNames = {
+window.indexNames = {
     'Tel Aviv 35': { he: 'ת"א 35', en: 'Tel Aviv 35' },
     'S&P 500': { he: 'S&P 500', en: 'S&P 500' },
     'NASDAQ': { he: 'נאסד"ק', en: 'NASDAQ' },
@@ -111,7 +112,7 @@ export const indexNames = {
     'Commodities': { he: 'סחורות', en: 'Commodities' }
 };
 
-export const riskScenarios = {
+window.riskScenarios = {
     veryConservative: { 
         multiplier: 0.7, 
         name: { he: 'שמרני מאוד', en: 'Very Conservative' },

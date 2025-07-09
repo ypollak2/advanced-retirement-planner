@@ -1,4 +1,5 @@
-export const translations = {
+// Multi-language translations for GitHub Pages compatibility
+window.translations = {
     he: {
         title: "מתכנן הפנסיה המתקדם",
         subtitle: "כלי מקצועי לתכנון פנסיה עם מעקב השקעות מקיף",

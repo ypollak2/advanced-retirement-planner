@@ -1,6 +1,7 @@
-import { countryData, riskScenarios } from '../data/constants.js';
+// Retirement calculations for GitHub Pages compatibility
+// Dependencies: countryData, riskScenarios from marketConstants.js
 
-export const formatCurrency = (amount) => {
+window.formatCurrency = (amount) => {
     return new Intl.NumberFormat('he-IL', {
         style: 'currency',
         currency: 'ILS',
@@ -8,7 +9,7 @@ export const formatCurrency = (amount) => {
     }).format(amount);
 };
 
-export const convertCurrency = (amount, currency, exchangeRates) => {
+window.convertCurrency = (amount, currency, exchangeRates) => {
     const convertedAmount = amount / exchangeRates[currency];
     const formatters = {
         USD: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }),
@@ -18,11 +19,11 @@ export const convertCurrency = (amount, currency, exchangeRates) => {
     return formatters[currency].format(convertedAmount);
 };
 
-export const getNetReturn = (grossReturn, managementFee) => {
+window. getNetReturn = (grossReturn, managementFee) => {
     return grossReturn - managementFee;
 };
 
-export const calculateWeightedReturn = (allocations, timeHorizon = 20, historicalReturns) => {
+window. calculateWeightedReturn = (allocations, timeHorizon = 20, historicalReturns) => {
     let totalReturn = 0;
     let totalPercentage = 0;
     
@@ -45,12 +46,12 @@ export const calculateWeightedReturn = (allocations, timeHorizon = 20, historica
     return totalPercentage > 0 ? totalReturn : 0;
 };
 
-export const getAdjustedReturn = (baseReturn, riskLevel = 'moderate') => {
+window. getAdjustedReturn = (baseReturn, riskLevel = 'moderate') => {
     const riskMultiplier = riskScenarios[riskLevel]?.multiplier || 1.0;
     return baseReturn * riskMultiplier;
 };
 
-export const calculateRetirement = (
+window. calculateRetirement = (
     inputs, 
     workPeriods, 
     pensionIndexAllocation, 

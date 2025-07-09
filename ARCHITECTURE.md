@@ -60,8 +60,8 @@ User Input → Validation → Calculation → Results → Visualization
 
 ```
 advanced-retirement-planner/
-├── index.html                    # Main entry point (modular architecture)
-├── index-legacy.html            # Legacy monolithic version (backup)
+├── index.html                    # Main entry point (stable monolithic version)
+├── index-modular-broken.html     # Modular version (ES6 import issues on GitHub Pages)
 ├── package.json                 # Dependencies and scripts
 ├── vite.config.js              # Build configuration
 ├── Dockerfile                  # Docker configuration
@@ -349,5 +349,5 @@ This architecture document serves as the foundation for:
 ---
 
 *Last updated: $(date)*
-*Version: 2.4.1*
+*Version: 2.4.2*
 *Contributors: Advanced Retirement Planner Team*
