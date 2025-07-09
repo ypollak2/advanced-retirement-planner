@@ -14,7 +14,7 @@
 
 ## System Overview
 
-The Advanced Retirement Planner is a **client-side React application** that provides comprehensive retirement planning tools with multi-language support (Hebrew/English). The system calculates pension projections, investment returns, and stress testing scenarios without requiring server-side processing.
+The Advanced Retirement Planner is a **client-side React application** that provides comprehensive retirement planning tools with multi-language support (Hebrew/English). The system now uses a **modular architecture** with ES6 modules, making it more maintainable and solving file size limitations. The system calculates pension projections, investment returns, and stress testing scenarios without requiring server-side processing.
 
 ### Key Features
 - **Multi-investment tracking**: Pension, training funds, personal portfolio, crypto, real estate
@@ -60,8 +60,8 @@ User Input → Validation → Calculation → Results → Visualization
 
 ```
 advanced-retirement-planner/
-├── index.html                    # Main entry point (legacy)
-├── index-modular.html           # Modular entry point (new)
+├── index.html                    # Main entry point (modular architecture)
+├── index-legacy.html            # Legacy monolithic version (backup)
 ├── package.json                 # Dependencies and scripts
 ├── vite.config.js              # Build configuration
 ├── Dockerfile                  # Docker configuration
@@ -349,5 +349,5 @@ This architecture document serves as the foundation for:
 ---
 
 *Last updated: $(date)*
-*Version: 2.4.0*
+*Version: 2.4.1*
 *Contributors: Advanced Retirement Planner Team*

@@ -3,7 +3,7 @@
 Professional retirement planning tool with comprehensive investment tracking, FIRE calculator, and modular architecture.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-2.4.0-green.svg)
+![Version](https://img.shields.io/badge/version-2.4.1-green.svg)
 ![Language](https://img.shields.io/badge/language-English%20%7C%20Hebrew-orange.svg)
 
 ## 🚀 Features
@@ -109,8 +109,10 @@ npm run docker:dev
 
 ### Option 2: Direct Usage (Quick start)
 1. Clone the repository
-2. Open `index.html` in your browser
+2. Open `index.html` in your browser (now uses modular architecture)
 3. Start planning your retirement!
+
+**Note**: The main `index.html` now uses the modular architecture. For the legacy version, use `index-legacy.html`.
 
 ### Option 3: Modular Development
 ```bash
