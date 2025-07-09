@@ -5029,16 +5029,6 @@
                                     ))
                                 ]),
                                 
-                                // Simple data source indicator
-                                lastUpdated && React.createElement('div', { className: "bg-green-50 rounded-lg p-3 mb-4 border border-green-200" }, [
-                                    React.createElement('div', { className: "flex items-center text-green-800 text-sm" }, [
-                                        React.createElement('div', { className: "w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse" }),
-                                        React.createElement('span', null, 
-                                            language === 'he' ? "נתונים עדכניים" : "Live data"),
-                                        React.createElement('span', { className: "text-xs text-gray-600 ml-2" }, 
-                                            `(${new Date(lastUpdated).toLocaleTimeString(language === 'he' ? 'he-IL' : 'en-US')})`)
-                                    ])
-                                ]),
                                 
                                 // Show loading or no data message
                                 (!historicalReturns[selectedTimeHorizon] || Object.keys(historicalReturns[selectedTimeHorizon]).length === 0) ? 
