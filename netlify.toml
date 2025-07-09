@@ -1,9 +1,11 @@
 [build]
-  # Build command (explicitly disabled for static deployment)
+  # No build command needed - this is a static site with CDN imports
   command = ""
-  # Directory to publish
+  # Directory to publish - root directory contains index.html and all static files
   publish = "."
-  # Ignore package.json build scripts
+  # Base directory
+  base = ""
+  # Ignore package.json build scripts - deploy static files directly
   ignore = "false"
   
 [build.environment]
