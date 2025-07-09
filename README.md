@@ -3,7 +3,7 @@
 Professional retirement planning tool with comprehensive investment tracking, FIRE calculator, and modular architecture.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-2.4.2-green.svg)
+![Version](https://img.shields.io/badge/version-2.4.3-green.svg)
 ![Language](https://img.shields.io/badge/language-English%20%7C%20Hebrew-orange.svg)
 
 ## 🚀 Features
@@ -128,6 +128,27 @@ npm run build
 # Deploy to GitHub Pages
 npm run deploy
 ```
+
+### Option 4: Netlify Deployment (ES6 Modules Support)
+The repository includes automatic Netlify deployment configuration:
+
+```bash
+# Automatic deployment on push to main branch
+git push origin main
+
+# Or deploy manually:
+# 1. Connect your GitHub repo to Netlify
+# 2. Build command: (empty)
+# 3. Publish directory: ./
+# 4. Deploy!
+```
+
+**Netlify Benefits:**
+- ✅ Perfect ES6 module support
+- ✅ Auto-deployment on Git push
+- ✅ Free tier: 100GB bandwidth/month
+- ✅ Custom domains
+- ✅ Works with modular architecture
 
 ### Docker Commands
 ```bash

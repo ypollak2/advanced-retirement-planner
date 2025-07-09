@@ -1,0 +1,34 @@
+[build]
+  # Build command (empty for static deployment)
+  command = ""
+  # Directory to publish
+  publish = "."
+  
+[build.environment]
+  # Node version for build process
+  NODE_VERSION = "18"
+
+[[headers]]
+  # Add proper headers for ES6 modules
+  for = "/*.js"
+  [headers.values]
+    Content-Type = "application/javascript"
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/src/**/*.js"
+  [headers.values]
+    Content-Type = "application/javascript"
+    Access-Control-Allow-Origin = "*"
+
+# Redirect rules
+[[redirects]]
+  from = "/modular"
+  to = "/index-modular-broken.html"
+  status = 200
+
+# Custom domain (optional)
+# [[redirects]]
+#   from = "https://your-domain.com/*"
+#   to = "https://your-netlify-site.netlify.app/:splat"
+#   status = 301
