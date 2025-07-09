@@ -3,7 +3,7 @@
 Professional retirement planning tool with comprehensive investment tracking, FIRE calculator, and modular architecture.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-2.4.4-green.svg)
+![Version](https://img.shields.io/badge/version-2.4.5-green.svg)
 ![Language](https://img.shields.io/badge/language-English%20%7C%20Hebrew-orange.svg)
 
 ## 🚀 Features
@@ -136,11 +136,14 @@ The repository includes automatic Netlify deployment configuration:
 # Automatic deployment on push to main branch
 git push origin main
 
-# Or deploy manually:
-# 1. Connect your GitHub repo to Netlify
-# 2. Build command: (empty)
-# 3. Publish directory: ./
-# 4. Deploy!
+# Manual setup:
+# 1. Go to https://app.netlify.com
+# 2. "Import from Git" → Connect GitHub
+# 3. Select your repository
+# 4. Deploy settings:
+#    - Build command: (leave empty)
+#    - Publish directory: ./
+# 5. Deploy!
 ```
 
 **Netlify Benefits:**
@@ -149,6 +152,7 @@ git push origin main
 - ✅ Free tier: 100GB bandwidth/month
 - ✅ Custom domains
 - ✅ Works with modular architecture
+- ✅ No build process needed (static files)
 
 ### Docker Commands
 ```bash
@@ -382,7 +386,7 @@ Want to contribute? Great!
 
 ## ✅ Recently Completed Features
 
-### Latest Additions (Version 2.4.4)
+### Latest Additions (Version 2.4.5)
 - ✅ **Salary Space in Main Input** - Dedicated salary section with current monthly salary and growth projections
 - ✅ **Family Planning Cost Calculator** - Comprehensive family expense planning with:
   - Number of children planning
