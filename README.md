@@ -382,7 +382,7 @@ Want to contribute? Great!
 
 ## ✅ Recently Completed Features
 
-### Latest Additions (Version 2.3.0)
+### Latest Additions (Version 2.4.3)
 - ✅ **Salary Space in Main Input** - Dedicated salary section with current monthly salary and growth projections
 - ✅ **Family Planning Cost Calculator** - Comprehensive family expense planning with:
   - Number of children planning
