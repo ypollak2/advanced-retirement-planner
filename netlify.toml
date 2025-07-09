@@ -1,8 +1,10 @@
 [build]
-  # Build command (empty for static deployment)
+  # Build command (explicitly disabled for static deployment)
   command = ""
   # Directory to publish
   publish = "."
+  # Ignore package.json build scripts
+  ignore = "false"
   
 [build.environment]
   # Node version for build process

@@ -3,7 +3,7 @@
 Professional retirement planning tool with comprehensive investment tracking, FIRE calculator, and modular architecture.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-2.4.3-green.svg)
+![Version](https://img.shields.io/badge/version-2.4.4-green.svg)
 ![Language](https://img.shields.io/badge/language-English%20%7C%20Hebrew-orange.svg)
 
 ## 🚀 Features
@@ -382,7 +382,7 @@ Want to contribute? Great!
 
 ## ✅ Recently Completed Features
 
-### Latest Additions (Version 2.4.3)
+### Latest Additions (Version 2.4.4)
 - ✅ **Salary Space in Main Input** - Dedicated salary section with current monthly salary and growth projections
 - ✅ **Family Planning Cost Calculator** - Comprehensive family expense planning with:
   - Number of children planning
