@@ -3,7 +3,7 @@
 Professional retirement planning tool with comprehensive investment tracking, FIRE calculator, and modular architecture.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-2.3.0-green.svg)
+![Version](https://img.shields.io/badge/version-2.4.0-green.svg)
 ![Language](https://img.shields.io/badge/language-English%20%7C%20Hebrew-orange.svg)
 
 ## 🚀 Features

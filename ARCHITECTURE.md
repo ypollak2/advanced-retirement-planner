@@ -349,5 +349,5 @@ This architecture document serves as the foundation for:
 ---
 
 *Last updated: $(date)*
-*Version: 2.3.0*
+*Version: 2.4.0*
 *Contributors: Advanced Retirement Planner Team*
