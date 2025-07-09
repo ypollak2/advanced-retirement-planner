@@ -79,11 +79,11 @@
     
     <script type="module">
         // Import modules
-        import { translations } from './src/translations/index.js';
-        import { exchangeRates, countryData, historicalReturns, indexNames, riskScenarios } from './src/data/constants.js';
-        import { formatCurrency, convertCurrency, calculateRetirement } from './src/utils/calculations.js';
-        import { generateChartData } from './src/utils/chartData.js';
-        import { SimpleChart } from './src/components/Chart.js';
+        import { translations } from './src/translations/multiLanguage.js';
+        import { exchangeRates, countryData, historicalReturns, indexNames, riskScenarios } from './src/data/marketConstants.js';
+        import { formatCurrency, convertCurrency, calculateRetirement } from './src/utils/retirementCalculations.js';
+        import { generateChartData } from './src/utils/chartDataGenerator.js';
+        import { SimpleChart } from './src/components/FinancialChart.js';
 
         // Loading indicator
         document.getElementById('root').innerHTML = `

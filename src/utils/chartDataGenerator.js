@@ -1,4 +1,4 @@
-import { calculateWeightedReturn, getAdjustedReturn } from './calculations.js';
+import { calculateWeightedReturn, getAdjustedReturn } from './retirementCalculations.js';
 
 export const generateChartData = (
     inputs, 

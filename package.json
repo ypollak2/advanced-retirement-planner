@@ -12,7 +12,7 @@
     "url": "https://github.com/ypollak2/advanced-retirement-planner/issues"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
     "deploy": "npm run build && gh-pages -d dist",
@@ -21,7 +21,11 @@
     "audit": "npm audit --audit-level=moderate",
     "audit-fix": "npm audit fix",
     "security": "npm audit && npm run license-check",
-    "license-check": "license-checker --summary --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;CC0-1.0;Unlicense;0BSD;CC-BY-3.0;CC-BY-4.0;(MIT AND CC-BY-3.0)'"
+    "license-check": "license-checker --summary --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;CC0-1.0;Unlicense;0BSD;CC-BY-3.0;CC-BY-4.0;(MIT AND CC-BY-3.0)'",
+    "docker:build": "docker build -t retirement-planner .",
+    "docker:run": "docker run -p 3000:3000 retirement-planner",
+    "docker:dev": "docker-compose up --build",
+    "docker:prod": "docker-compose --profile production up --build"
   },
   "keywords": [
     "retirement",

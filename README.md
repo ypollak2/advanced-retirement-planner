@@ -10,12 +10,12 @@ Professional retirement planning tool with comprehensive investment tracking, FI
 
 ### Core Retirement Planning
 - **Multi-country pension calculations** with country-specific tax rates
-- **Training fund tracking** with management fees
+- **Training fund tracking** with management fees and net return calculations
 - **Salary and income tracking** with main input section and growth projections
-- **Family planning costs** with comprehensive child expense calculations
+- **Family planning costs** with comprehensive child expense calculations and education funds
 - **Risk scenario modeling** (Very Conservative to Very Aggressive)
 - **Inflation-adjusted projections** with real purchasing power
-- **Work period management** across different countries
+- **Work period management** across different countries with dynamic period addition/removal
 
 ### Advanced Investment Tracking
 - **Personal Investment Portfolio** (non-tax-advantaged)
@@ -76,24 +76,43 @@ This project offers **two versions** plus comprehensive solutions for API integr
 ```
 src/
 ├── components/
-│   └── Chart.js              # Chart visualization component
+│   ├── RetirementBasicForm.js      # Basic form inputs
+│   ├── RetirementAdvancedForm.js   # Advanced settings
+│   ├── RetirementResultsPanel.js   # Results display
+│   ├── StressTestingPanel.js       # Stress testing
+│   ├── FinancialChart.js           # Chart visualization
+│   └── RetirementPlannerApp.js     # Main app component
 ├── utils/
-│   ├── calculations.js       # Core financial calculations
-│   └── chartData.js         # Chart data generation
+│   ├── retirementCalculations.js   # Core financial calculations
+│   ├── chartDataGenerator.js       # Chart data generation
+│   ├── stressTestLogic.js          # Stress test calculations
+│   └── analyticsTracker.js         # Analytics tracking
 ├── translations/
-│   └── index.js             # Bilingual text resources
+│   └── multiLanguage.js            # Bilingual text resources
 └── data/
-    └── constants.js         # Market data & configuration
+    └── marketConstants.js          # Market data & configuration
 ```
 
 ## 🛠️ Development Setup
 
-### Option 1: Direct Usage (Recommended for quick start)
+### Option 1: Docker Development (Recommended)
+```bash
+# Clone the repository
+git clone https://github.com/ypollak2/advanced-retirement-planner.git
+cd advanced-retirement-planner
+
+# Start with Docker Compose
+npm run docker:dev
+
+# Access at http://localhost:3000
+```
+
+### Option 2: Direct Usage (Quick start)
 1. Clone the repository
 2. Open `index.html` in your browser
 3. Start planning your retirement!
 
-### Option 2: Modular Development
+### Option 3: Modular Development
 ```bash
 # Install dependencies
 npm install
@@ -106,6 +125,18 @@ npm run build
 
 # Deploy to GitHub Pages
 npm run deploy
+```
+
+### Docker Commands
+```bash
+# Build Docker image
+npm run docker:build
+
+# Run development environment
+npm run docker:dev
+
+# Run production environment
+npm run docker:prod
 ```
 
 ### Option 2: Upload to GitHub & GitHub Pages
