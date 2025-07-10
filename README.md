@@ -5,7 +5,7 @@ Professional retirement planning tool with comprehensive investment tracking, FI
 **🌐 Live Website:** https://advanced-pension-planner.netlify.app/
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-2.6.1-green.svg)
+![Version](https://img.shields.io/badge/version-2.7.0-green.svg)
 ![Language](https://img.shields.io/badge/language-English%20%7C%20Hebrew-orange.svg)
 ![Deployment](https://img.shields.io/badge/deployment-Netlify-00C7B7.svg)
 ![Security](https://img.shields.io/badge/security-SAST%20enabled-brightgreen.svg)
@@ -227,6 +227,34 @@ git add .
 git commit -m "Initial commit"
 git push
 ```
+
+## 🧪 Testing & Quality Assurance
+
+### Quick Testing
+```bash
+# Run automated tests
+npm test
+
+# Run local testing dashboard  
+npm run test:local
+
+# Run pre-commit checks
+./pre-commit-hook.sh
+```
+
+### Testing Features
+- **File structure validation** - Ensures all required files exist
+- **JavaScript syntax checking** - Detects common errors before deployment
+- **Module export verification** - Confirms all window exports are present
+- **Performance monitoring** - Checks file sizes and optimization
+- **Security scanning** - Identifies potential security issues
+- **Browser compatibility testing** - Tests loading in multiple environments
+
+### Testing Files
+- `test-runner.js` - Automated test suite (Node.js)
+- `test-local.html` - Interactive testing dashboard  
+- `pre-commit-hook.sh` - Git pre-commit validation
+- `.github/workflows/test.yml` - CI/CD pipeline
 
 ## 🔄 Version Management
 

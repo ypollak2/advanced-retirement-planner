@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Retirement Planner v2.6.1 - Professional Pension Planning Tool</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root" class="min-h-screen gradient-bg"></div>
+    
+    <!-- Load modules -->
+    <script src="./src/translations/multiLanguage.js?v=2.6.1"></script>
+    <script src="./src/data/marketConstants.js?v=2.6.1"></script>
+    <script src="./src/utils/retirementCalculations.js?v=2.6.1"></script>
+    
+    <script>
+        // Simple React App
+        const App = () => {
+            const [language, setLanguage] = React.useState('he');
+            const [inputs, setInputs] = React.useState({
+                currentAge: 30,
+                retirementAge: 67,
+                currentSavings: 50000,
+                currentMonthlyExpenses: 12000,
+                targetReplacement: 75,
+                inflationRate: 3
+            });
+            const [results, setResults] = React.useState(null);
+            
+            const t = window.multiLanguage ? window.multiLanguage[language] : {
+                title: language === 'he' ? 'מתכנן הפנסיה המתקדם' : 'Advanced Retirement Planner',
+                subtitle: language === 'he' ? 'כלי מקצועי לתכנון פנסיה' : 'Professional Pension Planning Tool',
+                currentAge: language === 'he' ? 'גיל נוכחי' : 'Current Age',
+                retirementAge: language === 'he' ? 'גיל פרישה' : 'Retirement Age',
+                currentSavings: language === 'he' ? 'חיסכון נוכחי' : 'Current Savings',
+                calculate: language === 'he' ? 'חשב' : 'Calculate'
+            };
+            
+            const handleCalculate = () => {
+                if (window.calculateRetirement) {
+                    const workPeriods = [{
+                        id: 1,
+                        country: 'israel',
+                        startAge: inputs.currentAge,
+                        endAge: inputs.retirementAge,
+                        monthlyContribution: 2000,
+                        salary: 15000,
+                        pensionReturn: 7.0,
+                        pensionDepositFee: 0.5,
+                        pensionAnnualFee: 1.0,
+                        monthlyTrainingFund: 500
+                    }];
+                    
+                    try {
+                        const result = window.calculateRetirement(inputs, workPeriods, [], []);
+                        setResults(result);
+                    } catch (error) {
+                        console.error('Calculation error:', error);
+                        setResults({ error: 'Calculation failed' });
+                    }
+                } else {
+                    console.error('calculateRetirement function not available');
+                }
+            };
+            
+            return React.createElement('div', {
+                className: 'min-h-screen gradient-bg py-8 px-4',
+                dir: language === 'he' ? 'rtl' : 'ltr'
+            }, [
+                // Header
+                React.createElement('div', {
+                    key: 'header',
+                    className: 'text-center mb-8'
+                }, [
+                    React.createElement('h1', {
+                        key: 'title',
+                        className: 'text-4xl md:text-6xl font-bold text-white mb-4 animate-fade-in'
+                    }, t.title),
+                    React.createElement('p', {
+                        key: 'subtitle',
+                        className: 'text-xl text-white/90 animate-fade-in'
+                    }, t.subtitle),
+                    React.createElement('button', {
+                        key: 'lang-btn',
+                        onClick: () => setLanguage(language === 'he' ? 'en' : 'he'),
+                        className: 'mt-4 px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-all'
+                    }, language === 'he' ? 'English' : 'עברית')
+                ]),
+                
+                // Main Content
+                React.createElement('div', {
+                    key: 'content',
+                    className: 'max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8'
+                }, [
+                    // Input Form
+                    React.createElement('div', {
+                        key: 'form',
+                        className: 'glass-effect rounded-2xl shadow-xl p-6 border border-white/20'
+                    }, [
+                        React.createElement('h2', {
+                            key: 'form-title',
+                            className: 'text-2xl font-bold text-purple-700 mb-6'
+                        }, t.title),
+                        
+                        React.createElement('div', {
+                            key: 'inputs',
+                            className: 'space-y-4'
+                        }, [
+                            // Current Age
+                            React.createElement('div', { key: 'age' }, [
+                                React.createElement('label', {
+                                    key: 'age-label',
+                                    className: 'block text-sm font-medium text-gray-700 mb-1'
+                                }, t.currentAge),
+                                React.createElement('input', {
+                                    key: 'age-input',
+                                    type: 'number',
+                                    value: inputs.currentAge,
+                                    onChange: (e) => setInputs({...inputs, currentAge: parseInt(e.target.value) || 0}),
+                                    className: 'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500'
+                                })
+                            ]),
+                            
+                            // Retirement Age
+                            React.createElement('div', { key: 'retirement' }, [
+                                React.createElement('label', {
+                                    key: 'retirement-label',
+                                    className: 'block text-sm font-medium text-gray-700 mb-1'
+                                }, t.retirementAge),
+                                React.createElement('input', {
+                                    key: 'retirement-input',
+                                    type: 'number',
+                                    value: inputs.retirementAge,
+                                    onChange: (e) => setInputs({...inputs, retirementAge: parseInt(e.target.value) || 0}),
+                                    className: 'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500'
+                                })
+                            ]),
+                            
+                            // Current Savings
+                            React.createElement('div', { key: 'savings' }, [
+                                React.createElement('label', {
+                                    key: 'savings-label',
+                                    className: 'block text-sm font-medium text-gray-700 mb-1'
+                                }, t.currentSavings + ' (₪)'),
+                                React.createElement('input', {
+                                    key: 'savings-input',
+                                    type: 'number',
+                                    value: inputs.currentSavings,
+                                    onChange: (e) => setInputs({...inputs, currentSavings: parseInt(e.target.value) || 0}),
+                                    className: 'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500'
+                                })
+                            ]),
+                            
+                            // Calculate Button
+                            React.createElement('button', {
+                                key: 'calc-btn',
+                                onClick: handleCalculate,
+                                className: 'w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all'
+                            }, t.calculate)
+                        ])
+                    ]),
+                    
+                    // Results
+                    React.createElement('div', {
+                        key: 'results',
+                        className: 'glass-effect rounded-2xl shadow-xl p-6 border border-white/20'
+                    }, [
+                        React.createElement('h2', {
+                            key: 'results-title',
+                            className: 'text-2xl font-bold text-green-700 mb-6'
+                        }, language === 'he' ? 'תוצאות החישוב' : 'Results'),
+                        
+                        results ? (
+                            results.error ? 
+                                React.createElement('div', {
+                                    key: 'error',
+                                    className: 'text-red-600'
+                                }, results.error) :
+                                React.createElement('div', {
+                                    key: 'results-content',
+                                    className: 'space-y-4'
+                                }, [
+                                    React.createElement('div', { key: 'total' }, [
+                                        React.createElement('div', {
+                                            key: 'total-label',
+                                            className: 'text-sm font-medium text-gray-700'
+                                        }, language === 'he' ? 'סה"כ צבירה בפרישה' : 'Total at Retirement'),
+                                        React.createElement('div', {
+                                            key: 'total-value',
+                                            className: 'text-2xl font-bold text-green-600'
+                                        }, `₪${(results.totalSavings || 0).toLocaleString()}`)
+                                    ]),
+                                    React.createElement('div', { key: 'monthly' }, [
+                                        React.createElement('div', {
+                                            key: 'monthly-label',
+                                            className: 'text-sm font-medium text-gray-700'
+                                        }, language === 'he' ? 'הכנסה חודשית מפנסיה' : 'Monthly Pension Income'),
+                                        React.createElement('div', {
+                                            key: 'monthly-value',
+                                            className: 'text-2xl font-bold text-blue-600'
+                                        }, `₪${(results.monthlyIncome || 0).toLocaleString()}`)
+                                    ])
+                                ])
+                        ) : React.createElement('div', {
+                            key: 'no-results',
+                            className: 'text-gray-500 text-center py-8'
+                        }, language === 'he' ? 'לחץ על "חשב" לראות תוצאות' : 'Click "Calculate" to see results')
+                    ])
+                ])
+            ]);
+        };
+        
+        // Wait for all modules to load, then render
+        const checkAndRender = () => {
+            const required = ['multiLanguage', 'calculateRetirement', 'formatCurrency'];
+            const missing = required.filter(name => !window[name]);
+            
+            if (missing.length === 0) {
+                console.log('All modules loaded, rendering app...');
+                const rootElement = document.getElementById('root');
+                const root = ReactDOM.createRoot(rootElement);
+                root.render(React.createElement(App));
+            } else {
+                console.log('Still waiting for modules:', missing);
+                setTimeout(checkAndRender, 100);
+            }
+        };
+        
+        // Start checking after a brief delay
+        setTimeout(checkAndRender, 200);
+    </script>
+</body>
+</html>
