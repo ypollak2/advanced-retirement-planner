@@ -78,18 +78,18 @@
     <div id="root" class="min-h-screen gradient-bg"></div>
     
     <!-- Load modules as scripts instead of ES6 imports for GitHub Pages compatibility -->
-    <script src="./src/translations/multiLanguage.js?v=2.7.0"></script>
-    <script src="./src/data/marketConstants.js?v=2.7.0"></script>
-    <script src="./src/utils/retirementCalculations.js?v=2.7.0"></script>
-    <script src="./src/utils/chartDataGenerator.js?v=2.7.0"></script>
-    <script src="./src/components/FinancialChart.js?v=2.7.0"></script>
-    <script src="./src/utils/analyticsTracker.js?v=2.7.0"></script>
-    <script src="./src/utils/stressTestLogic.js?v=2.7.0"></script>
+    <script src="./src/translations/multiLanguage.js?v=2.7.1"></script>
+    <script src="./src/data/marketConstants.js?v=2.7.1"></script>
+    <script src="./src/utils/retirementCalculations.js?v=2.7.1"></script>
+    <script src="./src/utils/chartDataGenerator.js?v=2.7.1"></script>
+    <script src="./src/components/FinancialChart.js?v=2.7.1"></script>
+    <script src="./src/utils/analyticsTracker.js?v=2.7.1"></script>
+    <script src="./src/utils/stressTestLogic.js?v=2.7.1"></script>
     <!-- Load main component files -->
-    <script src="./src/components/RetirementPlannerApp.js?v=2.7.0"></script>
-    <script src="./src/components/RetirementBasicForm.js?v=2.7.0"></script>
-    <script src="./src/components/RetirementAdvancedForm.js?v=2.7.0"></script>
-    <script src="./src/components/RetirementResultsPanel.js?v=2.7.0"></script>
+    <script src="./src/components/RetirementPlannerApp.js?v=2.7.1"></script>
+    <script src="./src/components/RetirementBasicForm.js?v=2.7.1"></script>
+    <script src="./src/components/RetirementAdvancedForm.js?v=2.7.1"></script>
+    <script src="./src/components/RetirementResultsPanel.js?v=2.7.1"></script>
     
     <script>
         // React components and hooks - using React.X to avoid variable conflicts
@@ -152,7 +152,7 @@
 
         // Main App Component using external modules
         const App = () => {
-            // All state declared at the top level
+            // All state declared at the top level to prevent React hooks error
             const [isLoaded, setIsLoaded] = React.useState(false);
             const [loadError, setLoadError] = React.useState(null);
             const [language, setLanguage] = React.useState('he');

@@ -1,5 +1,5 @@
 {
-  "version": "2.7.0",
+  "version": "2.7.1",
   "releaseDate": "2025-07-10",
-  "description": "Added comprehensive testing infrastructure and simplified working version"
+  "description": "Restored full-featured complex version with React hooks fix"
 }
