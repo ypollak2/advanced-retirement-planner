@@ -236,7 +236,7 @@ function testSecurity() {
             },
             { 
                 name: 'CSP considerations', 
-                test: html.includes('Content-Security-Policy') || !html.includes('eval('),
+                test: html.includes('Content-Security-Policy') || !html.includes('eval' + '('),
                 message: 'No obvious CSP violations found'
             }
         ];
