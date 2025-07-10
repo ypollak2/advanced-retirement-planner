@@ -1,7 +1,7 @@
 // Main Retirement Planner Component
 const { useState } = React;
 
-export const RetirementPlanner = () => {
+const RetirementPlanner = () => {
     const [language, setLanguage] = useState('he');
     const [activeTab, setActiveTab] = useState('basic');
     const [results, setResults] = useState(null);

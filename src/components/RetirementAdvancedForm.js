@@ -1,7 +1,7 @@
 // AdvancedInputs.js - Advanced inputs section component
 const { createElement } = React;
 
-export const AdvancedInputs = ({ 
+const AdvancedInputs = ({ 
     inputs, 
     setInputs, 
     language, 

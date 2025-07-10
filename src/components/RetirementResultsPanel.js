@@ -1,7 +1,7 @@
 // ResultsDisplay Component - Displays calculated retirement projections and financial summaries
 const { createElement } = React;
 
-export const ResultsDisplay = ({ 
+const ResultsDisplay = ({ 
     results, 
     inputs, 
     workPeriods, 

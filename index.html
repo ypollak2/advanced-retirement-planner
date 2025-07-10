@@ -177,15 +177,18 @@
 
                         const missing = required.filter(name => !window[name]);
                         
+                        console.log(`Attempt ${attempts}/${maxAttempts}:`);
+                        console.log('Required modules:', required);
+                        console.log('Missing modules:', missing);
+                        console.log('Available modules:', required.filter(name => window[name]));
+                        
                         if (missing.length === 0) {
                             console.log('All modules loaded successfully!');
                             setIsLoaded(true);
                         } else {
-                            console.log('Still loading modules:', missing);
-                            console.log('Available window objects:', Object.keys(window).filter(key => required.includes(key)));
-                            
                             if (attempts >= maxAttempts) {
                                 console.error('Module loading timeout after 10 seconds');
+                                console.error('Still missing:', missing);
                                 setLoadError(new Error('Module loading timeout. Missing modules: ' + missing.join(', ')));
                             } else {
                                 setTimeout(checkModules, 100); // Check again in 100ms

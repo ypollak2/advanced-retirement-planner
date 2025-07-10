@@ -1,7 +1,7 @@
 // BasicInputs.js - Basic inputs section component
 const { createElement } = React;
 
-export const BasicInputs = ({ 
+const BasicInputs = ({ 
     inputs, 
     setInputs, 
     language, 

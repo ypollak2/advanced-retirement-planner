@@ -1,7 +1,7 @@
 // FinancialChart.js - Chart component using Chart.js
 const { useRef, useEffect, createElement } = React;
 
-export const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
+const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
     
