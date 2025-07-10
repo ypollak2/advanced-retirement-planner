@@ -1,11 +1,12 @@
-import Chart from 'chart.js/auto';
+// FinancialChart.js - Chart component using Chart.js
+const { useRef, useEffect, createElement } = React;
 
 export const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
-    const chartRef = React.useRef(null);
-    const chartInstance = React.useRef(null);
+    const chartRef = useRef(null);
+    const chartInstance = useRef(null);
     
-    React.useEffect(() => {
-        if (chartRef.current && data && data.length > 0) {
+    useEffect(() => {
+        if (chartRef.current && data && data.length > 0 && window.Chart) {
             const ctx = chartRef.current.getContext('2d');
             
             // Destroy existing chart
@@ -98,7 +99,7 @@ export const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
                 };
             }
             
-            chartInstance.current = new Chart(ctx, {
+            chartInstance.current = new window.Chart(ctx, {
                 type: type,
                 data: chartData,
                 options: {
@@ -167,5 +168,8 @@ export const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
         }
     }, [data, type, language]);
     
-    return React.createElement('canvas', { ref: chartRef, style: { maxHeight: '400px' } });
+    return createElement('canvas', { ref: chartRef, style: { maxHeight: '400px' } });
 };
+
+// Export to window for global access
+window.SimpleChart = SimpleChart;

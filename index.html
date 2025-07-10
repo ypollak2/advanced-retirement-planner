@@ -157,8 +157,12 @@
             const [loadError, setLoadError] = useState(null);
 
             useEffect(() => {
+                let attempts = 0;
+                const maxAttempts = 100; // 10 seconds maximum
+                
                 // Check if all required modules are loaded
                 const checkModules = () => {
+                    attempts++;
                     try {
                         // Check if all required functions and components are available
                         const required = [
@@ -174,10 +178,18 @@
                         const missing = required.filter(name => !window[name]);
                         
                         if (missing.length === 0) {
+                            console.log('All modules loaded successfully!');
                             setIsLoaded(true);
                         } else {
                             console.log('Still loading modules:', missing);
-                            setTimeout(checkModules, 100); // Check again in 100ms
+                            console.log('Available window objects:', Object.keys(window).filter(key => required.includes(key)));
+                            
+                            if (attempts >= maxAttempts) {
+                                console.error('Module loading timeout after 10 seconds');
+                                setLoadError(new Error('Module loading timeout. Missing modules: ' + missing.join(', ')));
+                            } else {
+                                setTimeout(checkModules, 100); // Check again in 100ms
+                            }
                         }
                     } catch (error) {
                         console.error('Error checking modules:', error);

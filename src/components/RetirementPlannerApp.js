@@ -1,33 +1,35 @@
 // Main Retirement Planner Component
+const { useState } = React;
+
 export const RetirementPlanner = () => {
-    const [language, setLanguage] = React.useState('he');
-    const [activeTab, setActiveTab] = React.useState('basic');
-    const [results, setResults] = React.useState(null);
-    const [chartData, setChartData] = React.useState([]);
-    const [showChart, setShowChart] = React.useState(false);
-    const [showSalaryInput, setShowSalaryInput] = React.useState(false);
-    const [showFamilyPlanning, setShowFamilyPlanning] = React.useState(false);
-    const [familyPlanningEnabled, setFamilyPlanningEnabled] = React.useState(false);
-    const [children, setChildren] = React.useState([]);
-    const [stressTestResults, setStressTestResults] = React.useState(null);
-    const [showStressTest, setShowStressTest] = React.useState(false);
-    const [selectedScenario, setSelectedScenario] = React.useState(null);
-    const [selectedTimeHorizon, setSelectedTimeHorizon] = React.useState(20);
-    const [historicalReturns, setHistoricalReturns] = React.useState({});
-    const [exchangeRatesLoading, setExchangeRatesLoading] = React.useState(false);
-    const [exchangeRatesLastUpdated, setExchangeRatesLastUpdated] = React.useState(null);
-    const [cryptoPrices, setCryptoPrices] = React.useState({
+    const [language, setLanguage] = useState('he');
+    const [activeTab, setActiveTab] = useState('basic');
+    const [results, setResults] = useState(null);
+    const [chartData, setChartData] = useState([]);
+    const [showChart, setShowChart] = useState(false);
+    const [showSalaryInput, setShowSalaryInput] = useState(false);
+    const [showFamilyPlanning, setShowFamilyPlanning] = useState(false);
+    const [familyPlanningEnabled, setFamilyPlanningEnabled] = useState(false);
+    const [children, setChildren] = useState([]);
+    const [stressTestResults, setStressTestResults] = useState(null);
+    const [showStressTest, setShowStressTest] = useState(false);
+    const [selectedScenario, setSelectedScenario] = useState(null);
+    const [selectedTimeHorizon, setSelectedTimeHorizon] = useState(20);
+    const [historicalReturns, setHistoricalReturns] = useState({});
+    const [exchangeRatesLoading, setExchangeRatesLoading] = useState(false);
+    const [exchangeRatesLastUpdated, setExchangeRatesLastUpdated] = useState(null);
+    const [cryptoPrices, setCryptoPrices] = useState({
         bitcoin: 50000,
         ethereum: 3000,
         binancecoin: 300
     });
-    const [cryptoPricesLoading, setCryptoPricesLoading] = React.useState(false);
-    const [cryptoPricesLastUpdated, setCryptoPricesLastUpdated] = React.useState(null);
-    const [indexDataLoading, setIndexDataLoading] = React.useState(false);
-    const [lastUpdated, setLastUpdated] = React.useState(null);
+    const [cryptoPricesLoading, setCryptoPricesLoading] = useState(false);
+    const [cryptoPricesLastUpdated, setCryptoPricesLastUpdated] = useState(null);
+    const [indexDataLoading, setIndexDataLoading] = useState(false);
+    const [lastUpdated, setLastUpdated] = useState(null);
 
     // Initial state with all investment types
-    const [inputs, setInputs] = React.useState({
+    const [inputs, setInputs] = useState({
         currentAge: 30,
         retirementAge: 67,
         currentSavings: 50000,
@@ -81,7 +83,7 @@ export const RetirementPlanner = () => {
         jointRetirementExpenses: 0
     });
 
-    const [workPeriods, setWorkPeriods] = React.useState([
+    const [workPeriods, setWorkPeriods] = useState([
         {
             id: 1,
             country: 'israel',
@@ -96,7 +98,7 @@ export const RetirementPlanner = () => {
         }
     ]);
 
-    const [partnerWorkPeriods, setPartnerWorkPeriods] = React.useState([
+    const [partnerWorkPeriods, setPartnerWorkPeriods] = useState([
         {
             id: 1,
             country: 'israel',
@@ -111,12 +113,12 @@ export const RetirementPlanner = () => {
         }
     ]);
 
-    const [pensionIndexAllocation, setPensionIndexAllocation] = React.useState([
+    const [pensionIndexAllocation, setPensionIndexAllocation] = useState([
         { index: 'S&P 500', percentage: 60, customReturn: null },
         { index: 'Government Bonds', percentage: 40, customReturn: null }
     ]);
 
-    const [trainingFundIndexAllocation, setTrainingFundIndexAllocation] = React.useState([
+    const [trainingFundIndexAllocation, setTrainingFundIndexAllocation] = useState([
         { index: 'Tel Aviv 35', percentage: 100, customReturn: null }
     ]);
 
@@ -149,3 +151,6 @@ export const RetirementPlanner = () => {
         trainingFundIndexAllocation, setTrainingFundIndexAllocation
     };
 };
+
+// Export to window for global access
+window.RetirementPlannerApp = RetirementPlanner;

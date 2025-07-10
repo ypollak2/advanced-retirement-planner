@@ -133,3 +133,6 @@ window.translations = {
         realEstateTax: "Real Estate Tax & Costs (%)"
     }
 };
+
+// Export multiLanguage for module loading check
+window.multiLanguage = window.translations;
