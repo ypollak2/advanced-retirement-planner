@@ -1398,7 +1398,7 @@
                         totalSessions: 0,
                         totalVisitors: 0,
                         lastUpdated: new Date().toISOString(),
-                        version: '2.4.5'
+                        version: '2.4.6'
                     };
                 }
 
@@ -2500,191 +2500,22 @@
                     return;
                 }
 
-                const basePensionWeightedReturn = calculateWeightedReturn(pensionIndexAllocation, yearsToRetirement);
-                const baseTrainingFundWeightedReturn = calculateWeightedReturn(trainingFundIndexAllocation, yearsToRetirement);
+                // Use the window.calculateRetirement function with partner support
+                const results = window.calculateRetirement(
+                    inputs, 
+                    workPeriods, 
+                    pensionIndexAllocation, 
+                    trainingFundIndexAllocation,
+                    historicalReturns,
+                    partnerWorkPeriods
+                );
                 
-                const pensionWeightedReturn = getAdjustedReturn(basePensionWeightedReturn);
-                const trainingFundWeightedReturn = getAdjustedReturn(baseTrainingFundWeightedReturn);
-
-                let totalPensionSavings = inputs.currentSavings;
-                let totalTrainingFund = inputs.currentTrainingFund;
-                let totalPersonalPortfolio = inputs.currentPersonalPortfolio;
-                let totalCrypto = inputs.currentCrypto;
-                let totalRealEstate = inputs.currentRealEstate;
-                let periodResults = [];
-                
-                const sortedPeriods = [...workPeriods].sort((a, b) => a.startAge - b.startAge);
-                
-                for (const period of sortedPeriods) {
-                    const country = countryData[period.country];
-                    const periodYears = Math.max(0, Math.min(period.endAge, inputs.retirementAge) - Math.max(period.startAge, inputs.currentAge));
-                    
-                    if (periodYears > 0) {
-                        const adjustedPensionReturn = getAdjustedReturn(period.pensionReturn);
-                        const effectiveReturn = adjustedPensionReturn - period.pensionAnnualFee;
-                        const monthlyReturn = effectiveReturn / 100 / 12;
-                        const periodMonths = periodYears * 12;
-                        
-                        const existingGrowth = totalPensionSavings * Math.pow(1 + monthlyReturn, periodMonths);
-                        
-                        const netMonthlyContribution = period.monthlyContribution * (1 - period.pensionDepositFee / 100);
-                        const contributionsValue = netMonthlyContribution * (Math.pow(1 + monthlyReturn, periodMonths) - 1) / monthlyReturn;
-                        
-                        const newTotal = existingGrowth + contributionsValue;
-                        
-                        periodResults.push({
-                            country: period.country,
-                            countryName: country.name,
-                            flag: country.flag,
-                            years: periodYears,
-                            contributions: period.monthlyContribution * periodMonths,
-                            netContributions: netMonthlyContribution * periodMonths,
-                            growth: newTotal - totalPensionSavings,
-                            pensionReturn: adjustedPensionReturn,
-                            pensionDepositFee: period.pensionDepositFee,
-                            pensionAnnualFee: period.pensionAnnualFee,
-                            pensionEffectiveReturn: effectiveReturn,
-                            monthlyTrainingFund: period.monthlyTrainingFund
-                        });
-                        
-                        totalPensionSavings = newTotal;
-                    }
-                }
-
-                const adjustedTrainingFundReturn = getAdjustedReturn(inputs.trainingFundReturn);
-                const trainingFundNetReturn = adjustedTrainingFundReturn - inputs.trainingFundManagementFee;
-                
-                totalTrainingFund = totalTrainingFund * Math.pow(1 + trainingFundNetReturn / 100, yearsToRetirement);
-                
-                for (const period of sortedPeriods) {
-                    const periodYears = Math.max(0, Math.min(period.endAge, inputs.retirementAge) - Math.max(period.startAge, inputs.currentAge));
-                    if (periodYears > 0) {
-                        const monthlyReturn = trainingFundNetReturn / 100 / 12;
-                        const periodMonths = periodYears * 12;
-                        const contributionsValue = period.monthlyTrainingFund * (Math.pow(1 + monthlyReturn, periodMonths) - 1) / monthlyReturn;
-                        totalTrainingFund += contributionsValue;
-                    }
-                }
-
-                // Calculate Personal Portfolio
-                const adjustedPersonalPortfolioReturn = getAdjustedReturn(inputs.personalPortfolioReturn);
-                const personalPortfolioMonthlyReturn = adjustedPersonalPortfolioReturn / 100 / 12;
-                const personalPortfolioMonths = yearsToRetirement * 12;
-                
-                const personalPortfolioGrowth = totalPersonalPortfolio * Math.pow(1 + personalPortfolioMonthlyReturn, personalPortfolioMonths);
-                const personalPortfolioContributions = inputs.personalPortfolioMonthly * (Math.pow(1 + personalPortfolioMonthlyReturn, personalPortfolioMonths) - 1) / personalPortfolioMonthlyReturn;
-                totalPersonalPortfolio = personalPortfolioGrowth + personalPortfolioContributions;
-
-                // Calculate Cryptocurrency
-                const adjustedCryptoReturn = getAdjustedReturn(inputs.cryptoReturn);
-                const cryptoMonthlyReturn = adjustedCryptoReturn / 100 / 12;
-                const cryptoMonths = yearsToRetirement * 12;
-                
-                const cryptoGrowth = totalCrypto * Math.pow(1 + cryptoMonthlyReturn, cryptoMonths);
-                const cryptoContributions = inputs.cryptoMonthly * (Math.pow(1 + cryptoMonthlyReturn, cryptoMonths) - 1) / cryptoMonthlyReturn;
-                totalCrypto = cryptoGrowth + cryptoContributions;
-
-                // Calculate Real Estate
-                const adjustedRealEstateReturn = getAdjustedReturn(inputs.realEstateReturn);
-                const realEstateMonthlyReturn = adjustedRealEstateReturn / 100 / 12;
-                const realEstateMonths = yearsToRetirement * 12;
-                
-                const realEstateGrowth = totalRealEstate * Math.pow(1 + realEstateMonthlyReturn, realEstateMonths);
-                const realEstateContributions = inputs.realEstateMonthly * (Math.pow(1 + realEstateMonthlyReturn, realEstateMonths) - 1) / realEstateMonthlyReturn;
-                totalRealEstate = realEstateGrowth + realEstateContributions;
-
-                // Calculate Real Estate Rental Income
-                const realEstateRentalIncome = totalRealEstate * (inputs.realEstateRentalYield / 100) / 12;
-                
-                const monthlyPension = totalPensionSavings * 0.04 / 12;
-                const monthlyTrainingFundIncome = totalTrainingFund * 0.05 / 12;
-                
-                // Calculate monthly income from new investment types
-                const monthlyPersonalPortfolioIncome = totalPersonalPortfolio * 0.04 / 12;
-                const monthlyCryptoIncome = totalCrypto * 0.04 / 12;
-                const monthlyRealEstateIncome = totalRealEstate * 0.04 / 12; // Capital gains withdrawal
-                
-                // Apply taxes to new investment types
-                const personalPortfolioTax = monthlyPersonalPortfolioIncome * (inputs.personalPortfolioTaxRate / 100);
-                const cryptoTax = monthlyCryptoIncome * (inputs.cryptoTaxRate / 100);
-                const realEstateTax = monthlyRealEstateIncome * (inputs.realEstateTaxRate / 100);
-                
-                const netPersonalPortfolioIncome = monthlyPersonalPortfolioIncome - personalPortfolioTax;
-                const netCryptoIncome = monthlyCryptoIncome - cryptoTax;
-                const netRealEstateIncome = monthlyRealEstateIncome - realEstateTax + realEstateRentalIncome;
-                
-                let weightedTaxRate = 0;
-                let totalWeight = 0;
-                
-                for (const result of periodResults) {
-                    const country = countryData[result.country];
-                    weightedTaxRate += country.pensionTax * result.growth;
-                    totalWeight += result.growth;
-                }
-                
-                if (totalWeight > 0) {
-                    weightedTaxRate = weightedTaxRate / totalWeight;
+                if (results) {
+                    setResults(results);
                 } else {
-                    weightedTaxRate = countryData[workPeriods[0].country].pensionTax;
+                    setResults(null);
                 }
-                
-                const pensionTax = monthlyPension * weightedTaxRate;
-                const netPension = monthlyPension - pensionTax;
-                const netTrainingFundIncome = monthlyTrainingFundIncome;
-                
-                const lastCountry = countryData[sortedPeriods[sortedPeriods.length - 1].country];
-                const socialSecurity = lastCountry.socialSecurity;
-                const totalNetIncome = netPension + netTrainingFundIncome + socialSecurity + netPersonalPortfolioIncome + netCryptoIncome + netRealEstateIncome;
-
-                const futureMonthlyExpenses = inputs.currentMonthlyExpenses * Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement);
-                const remainingAfterExpenses = totalNetIncome - futureMonthlyExpenses;
-
-                const currentSalary = workPeriods.length > 0 ? workPeriods[workPeriods.length - 1].salary : 0;
-                const futureTargetSalary = currentSalary * Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement);
-                const targetMonthlyIncome = (futureTargetSalary * inputs.targetReplacement) / 100;
-                const achievesTarget = totalNetIncome >= targetMonthlyIncome;
-
-                setResults({
-                    totalSavings: Math.round(totalPensionSavings),
-                    trainingFundValue: Math.round(totalTrainingFund),
-                    personalPortfolioValue: Math.round(totalPersonalPortfolio),
-                    cryptoValue: Math.round(totalCrypto),
-                    realEstateValue: Math.round(totalRealEstate),
-                    monthlyPension: Math.round(monthlyPension),
-                    monthlyTrainingFundIncome: Math.round(monthlyTrainingFundIncome),
-                    monthlyPersonalPortfolioIncome: Math.round(monthlyPersonalPortfolioIncome),
-                    monthlyCryptoIncome: Math.round(monthlyCryptoIncome),
-                    monthlyRealEstateIncome: Math.round(monthlyRealEstateIncome),
-                    realEstateRentalIncome: Math.round(realEstateRentalIncome),
-                    pensionTax: Math.round(pensionTax),
-                    personalPortfolioTax: Math.round(personalPortfolioTax),
-                    cryptoTax: Math.round(cryptoTax),
-                    realEstateTax: Math.round(realEstateTax),
-                    netPension: Math.round(netPension),
-                    netTrainingFundIncome: Math.round(netTrainingFundIncome),
-                    netPersonalPortfolioIncome: Math.round(netPersonalPortfolioIncome),
-                    netCryptoIncome: Math.round(netCryptoIncome),
-                    netRealEstateIncome: Math.round(netRealEstateIncome),
-                    socialSecurity: socialSecurity,
-                    totalNetIncome: Math.round(totalNetIncome),
-                    periodResults,
-                    lastCountry,
-                    weightedTaxRate: Math.round(weightedTaxRate * 100),
-                    inflationAdjustedIncome: Math.round(totalNetIncome / Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement)),
-                    trainingFundNetReturn: trainingFundNetReturn,
-                    pensionWeightedReturn: pensionWeightedReturn,
-                    trainingFundWeightedReturn: trainingFundWeightedReturn,
-                    futureMonthlyExpenses: Math.round(futureMonthlyExpenses),
-                    remainingAfterExpenses: Math.round(remainingAfterExpenses),
-                    remainingAfterExpensesInflationAdjusted: Math.round(remainingAfterExpenses / Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement)),
-                    targetMonthlyIncome: Math.round(targetMonthlyIncome),
-                    targetMonthlyIncomeInflationAdjusted: Math.round(targetMonthlyIncome / Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement)),
-                    achievesTarget: achievesTarget,
-                    targetGap: Math.round(targetMonthlyIncome - totalNetIncome),
-                    targetGapInflationAdjusted: Math.round((targetMonthlyIncome - totalNetIncome) / Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement)),
-                    riskLevel: inputs.riskTolerance,
-                    riskMultiplier: riskScenarios[inputs.riskTolerance]?.multiplier || 1.0
-                });
+                return;
             };
 
             // Chart generation
@@ -3078,7 +2909,7 @@
             // Auto calculation
             useEffect(() => {
                 calculateRetirement();
-            }, [inputs, workPeriods, pensionIndexAllocation, trainingFundIndexAllocation]);
+            }, [inputs, workPeriods, pensionIndexAllocation, trainingFundIndexAllocation, partnerWorkPeriods]);
 
             // Track retirement conclusions when results change
             useEffect(() => {
@@ -6018,7 +5849,7 @@
                                         ? `© ${new Date().getFullYear()} יהלי פולק - מתכנן הפנסיה המתקדם` 
                                         : `© ${new Date().getFullYear()} Yali Pollak - Advanced Retirement Planner`),
                                 React.createElement('span', { className: "text-gray-400" }, "|"),
-                                React.createElement('span', { className: "text-xs text-gray-400 font-mono" }, "v2.4.5")
+                                React.createElement('span', { className: "text-xs text-gray-400 font-mono" }, "v2.4.6")
                             ])
                         ])
                     ])

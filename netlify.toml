@@ -1,11 +1,11 @@
 [build]
-  # No build command needed - this is a static site with CDN imports
-  command = ""
-  # Directory to publish - root directory contains index.html and all static files
-  publish = "."
+  # Simple build command that creates dist directory and copies files for Netlify compatibility
+  command = "mkdir -p dist && cp -r * dist/ 2>/dev/null || true && cp -r .* dist/ 2>/dev/null || true"
+  # Directory to publish - dist directory that contains all files
+  publish = "dist"
   # Base directory
   base = ""
-  # Ignore package.json build scripts - deploy static files directly
+  # Process all files
   ignore = "false"
   
 [build.environment]

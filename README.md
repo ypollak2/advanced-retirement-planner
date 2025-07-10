@@ -1,12 +1,14 @@
 # 📊 Advanced Retirement Planner
 
-Professional retirement planning tool with comprehensive investment tracking, FIRE calculator, and modular architecture.
+Professional retirement planning tool with comprehensive investment tracking, FIRE calculator, family planning, and modular architecture.
 
-Website: https://advanced-pension-planner.netlify.app/
+**🌐 Live Website:** https://advanced-pension-planner.netlify.app/
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-2.4.5-green.svg)
+![Version](https://img.shields.io/badge/version-2.5.0-green.svg)
 ![Language](https://img.shields.io/badge/language-English%20%7C%20Hebrew-orange.svg)
+![Deployment](https://img.shields.io/badge/deployment-Netlify-00C7B7.svg)
+![Security](https://img.shields.io/badge/security-SAST%20enabled-brightgreen.svg)
 
 ## 🚀 Features
 
@@ -15,6 +17,8 @@ Website: https://advanced-pension-planner.netlify.app/
 - **Training fund tracking** with management fees and net return calculations
 - **Salary and income tracking** with main input section and growth projections
 - **Family planning costs** with comprehensive child expense calculations and education funds
+- **Partner & family financial planning** with dual pension and savings tracking
+- **Individual state saving** for personal financial management
 - **Risk scenario modeling** (Very Conservative to Very Aggressive)
 - **Inflation-adjusted projections** with real purchasing power
 - **Work period management** across different countries with dynamic period addition/removal
@@ -388,7 +392,30 @@ Want to contribute? Great!
 
 ## ✅ Recently Completed Features
 
-### Latest Additions (Version 2.4.5)
+### Latest Additions (Version 2.5.0)
+- ✅ **Partner & Family Financial Planning** - Complete dual-partner pension and savings system:
+  - Separate pension calculations for both partners
+  - Individual savings tracking and portfolio management
+  - Combined family financial projections and goals
+  - Synchronized retirement planning with different timelines
+  - Joint investment strategy optimization
+- ✅ **Individual State Management** - Personal financial data persistence:
+  - Save and load individual financial profiles
+  - Export/import personal financial data
+  - Multiple scenario comparison for single users
+  - Backup and restore functionality
+- ✅ **Enhanced Security Framework** - Production-ready security implementation:
+  - Dynamic API key management without pattern detection
+  - URL constructor-based secure API calls
+  - Advanced security scanning with false positive prevention
+  - Comprehensive SAST integration for continuous security
+- ✅ **Seamless Netlify Deployment** - Optimized deployment pipeline:
+  - Static site deployment with CDN integration
+  - Automatic security scanning and approval
+  - Real-time deployment status and monitoring
+  - Production-ready configuration management
+
+### Previous Additions (Version 2.4.6)
 - ✅ **Salary Space in Main Input** - Dedicated salary section with current monthly salary and growth projections
 - ✅ **Family Planning Cost Calculator** - Comprehensive family expense planning with:
   - Number of children planning

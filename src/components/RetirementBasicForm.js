@@ -319,6 +319,227 @@ export const BasicInputs = ({
                 </div>
             </div>
             
+            {/* Partner Planning Section */}
+            <div className="glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in">
+                <h2 className="text-2xl font-bold text-orange-700 mb-6 flex items-center">
+                    <span className="mr-2">🤝</span>
+                    {language === 'he' ? "תכנון פרישה משותף" : "Partner Planning"}
+                </h2>
+                
+                <div className="bg-orange-50 rounded-lg p-4 mb-6 border border-orange-200">
+                    <p className="text-sm text-orange-700 mb-2">
+                        {language === 'he' ? 
+                            "הגדר פרטי בן/בת הזוג שלך לתכנון פרישה משותף מקיף" : 
+                            "Configure your partner's details for comprehensive joint retirement planning"}
+                    </p>
+                </div>
+                
+                <div className="space-y-4">
+                    <div className="flex items-center">
+                        <input
+                            type="checkbox"
+                            id="partnerPlanning"
+                            checked={inputs.partnerPlanningEnabled}
+                            onChange={(e) => setInputs({...inputs, partnerPlanningEnabled: e.target.checked})}
+                            className="mr-3 h-5 w-5 text-orange-600 rounded border-gray-300 focus:ring-orange-500"
+                        />
+                        <label htmlFor="partnerPlanning" className="text-sm font-medium text-gray-700">
+                            {language === 'he' ? "אפשר תכנון פרישה לבן/בת הזוג" : "Enable partner retirement planning"}
+                        </label>
+                    </div>
+                    
+                    {inputs.partnerPlanningEnabled && (
+                        <div className="mt-4 space-y-4 border-t pt-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        {language === 'he' ? "גיל נוכחי של בן/בת הזוג" : "Partner's Current Age"}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={inputs.partnerCurrentAge}
+                                        onChange={(e) => setInputs({...inputs, partnerCurrentAge: parseInt(e.target.value) || 0})}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        {language === 'he' ? "גיל פרישה של בן/בת הזוג" : "Partner's Retirement Age"}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={inputs.partnerRetirementAge}
+                                        onChange={(e) => setInputs({...inputs, partnerRetirementAge: parseInt(e.target.value) || 0})}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        {language === 'he' ? "חיסכון נוכחי בפנסיה של בן/בת הזוג (₪)" : "Partner's Current Pension Savings (₪)"}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={inputs.partnerCurrentSavings}
+                                        onChange={(e) => setInputs({...inputs, partnerCurrentSavings: parseInt(e.target.value) || 0})}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        {language === 'he' ? "מכלול הכנסות חודשיות נוכחי של בן/בת הזוג (₪)" : "Partner's Current Monthly Salary (₪)"}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={inputs.partnerCurrentSalary}
+                                        onChange={(e) => setInputs({...inputs, partnerCurrentSalary: parseInt(e.target.value) || 0})}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        {language === 'he' ? "יתרת קרן הכשרה נוכחית של בן/בת הזוג (₪)" : "Partner's Current Training Fund Balance (₪)"}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={inputs.partnerCurrentTrainingFund}
+                                        onChange={(e) => setInputs({...inputs, partnerCurrentTrainingFund: parseInt(e.target.value) || 0})}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        {language === 'he' ? "הוצאות חודשיות משותפות (₪)" : "Joint Monthly Expenses (₪)"}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={inputs.jointMonthlyExpenses}
+                                        onChange={(e) => setInputs({...inputs, jointMonthlyExpenses: parseInt(e.target.value) || 0})}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg p-4 border border-orange-200">
+                                <div className="text-sm text-orange-700">
+                                    <p className="font-medium mb-1">
+                                        {language === 'he' ? "הכנסה שנתית של בן/בת הזוג:" : "Partner's Annual Income:"}
+                                    </p>
+                                    <p className="text-lg font-bold">
+                                        {(inputs.partnerCurrentSalary * 12).toLocaleString()} ₪
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+            
+            {/* Save/Load Personal Data Section */}
+            <div className="glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in">
+                <h2 className="text-2xl font-bold text-teal-700 mb-6 flex items-center">
+                    <span className="mr-2">💾</span>
+                    {language === 'he' ? "שמירה וטעינת נתונים" : "Save & Load Data"}
+                </h2>
+                
+                <div className="bg-teal-50 rounded-lg p-4 mb-6 border border-teal-200">
+                    <p className="text-sm text-teal-700 mb-2">
+                        {language === 'he' ? 
+                            "שמור או טען את הנתונים הפיננסיים האישיים שלך לשימוש עתידי" : 
+                            "Save or load your personal financial data for future use"}
+                    </p>
+                </div>
+                
+                <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <button
+                                onClick={() => {
+                                    const dataToSave = {
+                                        inputs,
+                                        workPeriods: window.retirementPlannerState?.workPeriods || [],
+                                        partnerWorkPeriods: window.retirementPlannerState?.partnerWorkPeriods || [],
+                                        pensionIndexAllocation: window.retirementPlannerState?.pensionIndexAllocation || [],
+                                        trainingFundIndexAllocation: window.retirementPlannerState?.trainingFundIndexAllocation || [],
+                                        savedDate: new Date().toISOString()
+                                    };
+                                    const dataStr = JSON.stringify(dataToSave, null, 2);
+                                    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                                    const url = URL.createObjectURL(dataBlob);
+                                    const link = document.createElement('a');
+                                    link.href = url;
+                                    link.download = `retirement-plan-${new Date().toISOString().split('T')[0]}.json`;
+                                    link.click();
+                                    URL.revokeObjectURL(url);
+                                }}
+                                className="w-full p-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all font-medium flex items-center justify-center"
+                            >
+                                <span className="mr-2">💾</span>
+                                {language === 'he' ? "הורד נתונים" : "Download Data"}
+                            </button>
+                        </div>
+                        <div>
+                            <label className="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-medium flex items-center justify-center cursor-pointer">
+                                <span className="mr-2">📁</span>
+                                {language === 'he' ? "טען נתונים" : "Load Data"}
+                                <input
+                                    type="file"
+                                    accept=".json"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onload = (event) => {
+                                                try {
+                                                    const loadedData = JSON.parse(event.target.result);
+                                                    if (loadedData.inputs) {
+                                                        setInputs(loadedData.inputs);
+                                                    }
+                                                    if (loadedData.workPeriods && window.retirementPlannerState?.setWorkPeriods) {
+                                                        window.retirementPlannerState.setWorkPeriods(loadedData.workPeriods);
+                                                    }
+                                                    if (loadedData.partnerWorkPeriods && window.retirementPlannerState?.setPartnerWorkPeriods) {
+                                                        window.retirementPlannerState.setPartnerWorkPeriods(loadedData.partnerWorkPeriods);
+                                                    }
+                                                    if (loadedData.pensionIndexAllocation && window.retirementPlannerState?.setPensionIndexAllocation) {
+                                                        window.retirementPlannerState.setPensionIndexAllocation(loadedData.pensionIndexAllocation);
+                                                    }
+                                                    if (loadedData.trainingFundIndexAllocation && window.retirementPlannerState?.setTrainingFundIndexAllocation) {
+                                                        window.retirementPlannerState.setTrainingFundIndexAllocation(loadedData.trainingFundIndexAllocation);
+                                                    }
+                                                    alert(language === 'he' ? 'הנתונים נטענו בהצלחה!' : 'Data loaded successfully!');
+                                                } catch (error) {
+                                                    console.error('Error loading data:', error);
+                                                    alert(language === 'he' ? 'שגיאה בטעינת הנתונים' : 'Error loading data');
+                                                }
+                                            };
+                                            reader.readAsText(file);
+                                        }
+                                    }}
+                                />
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg p-4 border border-teal-200">
+                        <div className="text-sm text-teal-700">
+                            <p className="font-medium mb-1">
+                                {language === 'he' ? "הערה חשובה:" : "Important Note:"}
+                            </p>
+                            <p>
+                                {language === 'he' ? 
+                                    "הנתונים נשמרים כקובץ JSON על המחשב שלך ולא נשלחים לשרת" : 
+                                    "Data is saved as a JSON file on your computer and not sent to any server"}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             {/* Personal Portfolio Section */}
             <div className="glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in">
                 <h2 className="text-2xl font-bold text-purple-700 mb-6 flex items-center">

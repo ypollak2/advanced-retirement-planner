@@ -56,7 +56,8 @@ window. calculateRetirement = (
     workPeriods, 
     pensionIndexAllocation, 
     trainingFundIndexAllocation,
-    historicalReturns
+    historicalReturns,
+    partnerWorkPeriods = []
 ) => {
     const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
     
@@ -162,6 +163,72 @@ window. calculateRetirement = (
     // Calculate Real Estate Rental Income
     const realEstateRentalIncome = totalRealEstate * (inputs.realEstateRentalYield / 100) / 12;
     
+    // Partner Calculations (if enabled)
+    let partnerResults = null;
+    if (inputs.partnerPlanningEnabled && partnerWorkPeriods.length > 0) {
+        const partnerYearsToRetirement = inputs.partnerRetirementAge - inputs.partnerCurrentAge;
+        
+        if (partnerYearsToRetirement > 0) {
+            // Calculate partner pension
+            let totalPartnerPensionSavings = inputs.partnerCurrentSavings;
+            const partnerPeriodResults = [];
+            
+            for (const period of partnerWorkPeriods) {
+                const startAge = Math.max(period.startAge, inputs.partnerCurrentAge);
+                const endAge = Math.min(period.endAge, inputs.partnerRetirementAge);
+                const years = endAge - startAge;
+                
+                if (years > 0) {
+                    const partnerPensionReturn = calculateWeightedReturn(pensionIndexAllocation, years, historicalReturns);
+                    const adjustedPartnerPensionReturn = getAdjustedReturn(partnerPensionReturn, inputs.riskTolerance);
+                    const partnerMonthlyReturn = adjustedPartnerPensionReturn / 100 / 12;
+                    const months = years * 12;
+                    
+                    const partnerGrowth = totalPartnerPensionSavings * Math.pow(1 + partnerMonthlyReturn, months);
+                    const partnerContributions = period.monthlyContribution * (Math.pow(1 + partnerMonthlyReturn, months) - 1) / partnerMonthlyReturn;
+                    
+                    totalPartnerPensionSavings = partnerGrowth + partnerContributions;
+                    
+                    partnerPeriodResults.push({
+                        country: period.country,
+                        years: years,
+                        growth: partnerGrowth + partnerContributions,
+                        contributions: period.monthlyContribution * months
+                    });
+                }
+            }
+            
+            // Calculate partner training fund
+            let totalPartnerTrainingFund = inputs.partnerCurrentTrainingFund;
+            const partnerTrainingReturn = calculateWeightedReturn(trainingFundIndexAllocation, partnerYearsToRetirement, historicalReturns);
+            const adjustedPartnerTrainingReturn = getAdjustedReturn(partnerTrainingReturn, inputs.riskTolerance);
+            const partnerTrainingMonthlyReturn = adjustedPartnerTrainingReturn / 100 / 12;
+            const partnerTrainingMonths = partnerYearsToRetirement * 12;
+            
+            const partnerTrainingGrowth = totalPartnerTrainingFund * Math.pow(1 + partnerTrainingMonthlyReturn, partnerTrainingMonths);
+            const partnerTrainingContributions = partnerWorkPeriods.reduce((sum, period) => sum + period.monthlyTrainingFund, 0) * (Math.pow(1 + partnerTrainingMonthlyReturn, partnerTrainingMonths) - 1) / partnerTrainingMonthlyReturn;
+            totalPartnerTrainingFund = partnerTrainingGrowth + partnerTrainingContributions;
+            
+            // Calculate partner personal portfolio
+            let totalPartnerPersonalPortfolio = inputs.partnerCurrentPersonalPortfolio;
+            const adjustedPartnerPersonalReturn = getAdjustedReturn(inputs.partnerPersonalPortfolioReturn, inputs.riskTolerance);
+            const partnerPersonalMonthlyReturn = adjustedPartnerPersonalReturn / 100 / 12;
+            const partnerPersonalMonths = partnerYearsToRetirement * 12;
+            
+            const partnerPersonalGrowth = totalPartnerPersonalPortfolio * Math.pow(1 + partnerPersonalMonthlyReturn, partnerPersonalMonths);
+            const partnerPersonalContributions = inputs.partnerPersonalPortfolioMonthly * (Math.pow(1 + partnerPersonalMonthlyReturn, partnerPersonalMonths) - 1) / partnerPersonalMonthlyReturn;
+            totalPartnerPersonalPortfolio = partnerPersonalGrowth + partnerPersonalContributions;
+            
+            partnerResults = {
+                totalPensionSavings: totalPartnerPensionSavings,
+                totalTrainingFund: totalPartnerTrainingFund,
+                totalPersonalPortfolio: totalPartnerPersonalPortfolio,
+                periodResults: partnerPeriodResults,
+                yearsToRetirement: partnerYearsToRetirement
+            };
+        }
+    }
+    
     // Calculate monthly incomes
     const monthlyPension = totalPensionSavings * 0.04 / 12;
     const monthlyTrainingFundIncome = totalTrainingFund * 0.05 / 12;
@@ -202,9 +269,35 @@ window. calculateRetirement = (
     
     const lastCountry = countryData[sortedPeriods[sortedPeriods.length - 1].country];
     const socialSecurity = lastCountry.socialSecurity;
-    const totalNetIncome = netPension + netTrainingFundIncome + socialSecurity + netPersonalPortfolioIncome + netCryptoIncome + netRealEstateIncome;
-
-    const futureMonthlyExpenses = inputs.currentMonthlyExpenses * Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement);
+    
+    // Calculate partner income (if applicable)
+    let partnerNetIncome = 0;
+    let partnerSocialSecurity = 0;
+    if (partnerResults) {
+        const partnerMonthlyPension = partnerResults.totalPensionSavings * 0.04 / 12;
+        const partnerMonthlyTrainingFund = partnerResults.totalTrainingFund * 0.05 / 12;
+        const partnerMonthlyPersonalPortfolio = partnerResults.totalPersonalPortfolio * 0.04 / 12;
+        
+        // Apply taxes to partner income
+        const partnerPensionTax = partnerMonthlyPension * (weightedTaxRate / 100);
+        const partnerPersonalTax = partnerMonthlyPersonalPortfolio * (inputs.partnerPersonalPortfolioTaxRate / 100);
+        
+        const partnerNetPension = partnerMonthlyPension - partnerPensionTax;
+        const partnerNetTrainingFund = partnerMonthlyTrainingFund; // Usually tax-free
+        const partnerNetPersonalPortfolio = partnerMonthlyPersonalPortfolio - partnerPersonalTax;
+        
+        partnerSocialSecurity = lastCountry.socialSecurity; // Same country assumed
+        partnerNetIncome = partnerNetPension + partnerNetTrainingFund + partnerNetPersonalPortfolio + partnerSocialSecurity;
+    }
+    
+    const individualNetIncome = netPension + netTrainingFundIncome + socialSecurity + netPersonalPortfolioIncome + netCryptoIncome + netRealEstateIncome;
+    const totalNetIncome = individualNetIncome + partnerNetIncome;
+    
+    // Calculate expenses (joint if partner enabled, individual otherwise)
+    const baseExpenses = inputs.partnerPlanningEnabled && inputs.jointMonthlyExpenses > 0 
+        ? inputs.jointMonthlyExpenses 
+        : inputs.currentMonthlyExpenses;
+    const futureMonthlyExpenses = baseExpenses * Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement);
     const remainingAfterExpenses = totalNetIncome - futureMonthlyExpenses;
 
     const currentSalary = workPeriods.length > 0 ? workPeriods[workPeriods.length - 1].salary : 0;
@@ -212,6 +305,7 @@ window. calculateRetirement = (
     const achievesTarget = totalNetIncome >= targetMonthlyIncome;
 
     return {
+        // Individual results
         totalSavings: Math.round(totalPensionSavings),
         trainingFundValue: Math.round(totalTrainingFund),
         personalPortfolioValue: Math.round(totalPersonalPortfolio),
@@ -233,7 +327,18 @@ window. calculateRetirement = (
         netCryptoIncome: Math.round(netCryptoIncome),
         netRealEstateIncome: Math.round(netRealEstateIncome),
         socialSecurity: socialSecurity,
+        individualNetIncome: Math.round(individualNetIncome),
+        
+        // Partner results (if enabled)
+        partnerResults: partnerResults,
+        partnerNetIncome: Math.round(partnerNetIncome),
+        partnerSocialSecurity: partnerSocialSecurity,
+        
+        // Combined household results
         totalNetIncome: Math.round(totalNetIncome),
+        isJointPlanning: inputs.partnerPlanningEnabled,
+        
+        // Other calculations
         periodResults,
         lastCountry,
         weightedTaxRate: Math.round(weightedTaxRate * 100),

@@ -61,7 +61,24 @@ export const RetirementPlanner = () => {
         // Salary and family planning
         currentSalary: 20000,
         salaryGrowthRate: 3.5,
-        familyPlanningCosts: 0
+        familyPlanningCosts: 0,
+        // Partner planning
+        partnerPlanningEnabled: false,
+        partnerCurrentAge: 30,
+        partnerRetirementAge: 67,
+        partnerCurrentSavings: 0,
+        partnerCurrentSalary: 0,
+        partnerSalaryGrowthRate: 3.5,
+        partnerCurrentTrainingFund: 0,
+        partnerTrainingFundReturn: 6.5,
+        partnerTrainingFundManagementFee: 0.5,
+        partnerCurrentPersonalPortfolio: 0,
+        partnerPersonalPortfolioMonthly: 0,
+        partnerPersonalPortfolioReturn: 8.0,
+        partnerPersonalPortfolioTaxRate: 25,
+        // Joint household expenses
+        jointMonthlyExpenses: 0,
+        jointRetirementExpenses: 0
     });
 
     const [workPeriods, setWorkPeriods] = React.useState([
@@ -76,6 +93,21 @@ export const RetirementPlanner = () => {
             pensionDepositFee: 0.5,
             pensionAnnualFee: 1.0,
             monthlyTrainingFund: 500
+        }
+    ]);
+
+    const [partnerWorkPeriods, setPartnerWorkPeriods] = React.useState([
+        {
+            id: 1,
+            country: 'israel',
+            startAge: 30,
+            endAge: 67,
+            monthlyContribution: 1500,
+            salary: 12000,
+            pensionReturn: 7.0,
+            pensionDepositFee: 0.5,
+            pensionAnnualFee: 1.0,
+            monthlyTrainingFund: 400
         }
     ]);
 
@@ -112,6 +144,7 @@ export const RetirementPlanner = () => {
         lastUpdated, setLastUpdated,
         inputs, setInputs,
         workPeriods, setWorkPeriods,
+        partnerWorkPeriods, setPartnerWorkPeriods,
         pensionIndexAllocation, setPensionIndexAllocation,
         trainingFundIndexAllocation, setTrainingFundIndexAllocation
     };
