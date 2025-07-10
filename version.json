@@ -1,5 +1,5 @@
 {
-  "version": "2.6.0",
+  "version": "2.6.1",
   "releaseDate": "2025-07-10",
-  "description": "Fixed infinite loading spinner by converting to script-tag compatible format"
+  "description": "Fixed variable redeclaration errors and React namespace conflicts"
 }

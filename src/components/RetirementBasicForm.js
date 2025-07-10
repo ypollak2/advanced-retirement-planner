@@ -1,5 +1,4 @@
 // BasicInputs.js - Basic inputs section component
-const { createElement } = React;
 
 const BasicInputs = ({ 
     inputs, 
@@ -10,26 +9,26 @@ const BasicInputs = ({
     PiggyBank, 
     DollarSign 
 }) => {
-    return createElement('div', { className: "space-y-6" }, [
-        createElement('div', { 
+    return React.createElement('div', { className: "space-y-6" }, [
+        React.createElement('div', { 
             key: 'basic',
             className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in"
         }, [
-            createElement('h2', { 
+            React.createElement('h2', { 
                 key: 'title',
                 className: "text-2xl font-bold text-purple-700 mb-6 flex items-center"
             }, [
-                createElement(Calculator, { key: 'icon', className: "mr-2" }),
+                React.createElement(Calculator, { key: 'icon', className: "mr-2" }),
                 t.basic
             ]),
-            createElement('div', { key: 'content', className: "space-y-4" }, [
-                createElement('div', { key: 'grid', className: "grid grid-cols-2 gap-4" }, [
-                    createElement('div', { key: 'age' }, [
-                        createElement('label', { 
+            React.createElement('div', { key: 'content', className: "space-y-4" }, [
+                React.createElement('div', { key: 'grid', className: "grid grid-cols-2 gap-4" }, [
+                    React.createElement('div', { key: 'age' }, [
+                        React.createElement('label', { 
                             key: 'label',
                             className: "block text-sm font-medium text-gray-700 mb-1"
                         }, t.currentAge),
-                        createElement('input', {
+                        React.createElement('input', {
                             key: 'input',
                             type: "number",
                             value: inputs.currentAge,
@@ -37,12 +36,12 @@ const BasicInputs = ({
                             className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                         })
                     ]),
-                    createElement('div', { key: 'retirement' }, [
-                        createElement('label', { 
+                    React.createElement('div', { key: 'retirement' }, [
+                        React.createElement('label', { 
                             key: 'label',
                             className: "block text-sm font-medium text-gray-700 mb-1"
                         }, t.retirementAge),
-                        createElement('input', {
+                        React.createElement('input', {
                             key: 'input',
                             type: "number",
                             value: inputs.retirementAge,

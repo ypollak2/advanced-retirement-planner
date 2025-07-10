@@ -78,28 +78,27 @@
     <div id="root" class="min-h-screen gradient-bg"></div>
     
     <!-- Load modules as scripts instead of ES6 imports for GitHub Pages compatibility -->
-    <script src="./src/translations/multiLanguage.js?v=2.6.0"></script>
-    <script src="./src/data/marketConstants.js?v=2.6.0"></script>
-    <script src="./src/utils/retirementCalculations.js?v=2.6.0"></script>
-    <script src="./src/utils/chartDataGenerator.js?v=2.6.0"></script>
-    <script src="./src/components/FinancialChart.js?v=2.6.0"></script>
-    <script src="./src/utils/analyticsTracker.js?v=2.6.0"></script>
-    <script src="./src/utils/stressTestLogic.js?v=2.6.0"></script>
+    <script src="./src/translations/multiLanguage.js?v=2.6.1"></script>
+    <script src="./src/data/marketConstants.js?v=2.6.1"></script>
+    <script src="./src/utils/retirementCalculations.js?v=2.6.1"></script>
+    <script src="./src/utils/chartDataGenerator.js?v=2.6.1"></script>
+    <script src="./src/components/FinancialChart.js?v=2.6.1"></script>
+    <script src="./src/utils/analyticsTracker.js?v=2.6.1"></script>
+    <script src="./src/utils/stressTestLogic.js?v=2.6.1"></script>
     <!-- Load main component files -->
-    <script src="./src/components/RetirementPlannerApp.js?v=2.6.0"></script>
-    <script src="./src/components/RetirementBasicForm.js?v=2.6.0"></script>
-    <script src="./src/components/RetirementAdvancedForm.js?v=2.6.0"></script>
-    <script src="./src/components/RetirementResultsPanel.js?v=2.6.0"></script>
+    <script src="./src/components/RetirementPlannerApp.js?v=2.6.1"></script>
+    <script src="./src/components/RetirementBasicForm.js?v=2.6.1"></script>
+    <script src="./src/components/RetirementAdvancedForm.js?v=2.6.1"></script>
+    <script src="./src/components/RetirementResultsPanel.js?v=2.6.1"></script>
     
     <script>
-        // React components and hooks
-        const { useState, useEffect, createElement } = React;
+        // React components and hooks - using React.X to avoid variable conflicts
 
         // Loading indicator
         const LoadingSpinner = ({ size = 32, color = "text-purple-600" }) => {
-            return createElement('div', { 
+            return React.createElement('div', { 
                 className: `${color} text-center py-8`
-            }, createElement('div', {
+            }, React.createElement('div', {
                 className: `inline-block animate-spin rounded-full border-4 border-solid border-current border-r-transparent`,
                 style: { width: `${size}px`, height: `${size}px` }
             }));
@@ -107,10 +106,10 @@
 
         // Error boundary component
         const ErrorBoundary = ({ children }) => {
-            const [hasError, setHasError] = useState(false);
-            const [error, setError] = useState(null);
+            const [hasError, setHasError] = React.useState(false);
+            const [error, setError] = React.useState(null);
 
-            useEffect(() => {
+            React.useEffect(() => {
                 const handleError = (event) => {
                     console.error('Application error:', event.error);
                     setError(event.error);
@@ -127,20 +126,20 @@
             }, []);
 
             if (hasError) {
-                return createElement('div', {
+                return React.createElement('div', {
                     className: 'flex items-center justify-center min-h-screen p-8'
-                }, createElement('div', {
+                }, React.createElement('div', {
                     className: 'glass-effect rounded-2xl p-8 max-w-md mx-auto text-center'
                 }, [
-                    createElement('h2', {
+                    React.createElement('h2', {
                         key: 'title',
                         className: 'text-2xl font-bold text-red-600 mb-4'
                     }, '⚠️ Application Error'),
-                    createElement('p', {
+                    React.createElement('p', {
                         key: 'message',
                         className: 'text-gray-700 mb-4'
                     }, 'The application encountered an error. Please refresh the page to try again.'),
-                    createElement('button', {
+                    React.createElement('button', {
                         key: 'refresh',
                         className: 'px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors',
                         onClick: () => window.location.reload()
@@ -206,20 +205,20 @@
             }, []);
 
             if (loadError) {
-                return createElement('div', {
+                return React.createElement('div', {
                     className: 'flex items-center justify-center min-h-screen p-8'
-                }, createElement('div', {
+                }, React.createElement('div', {
                     className: 'glass-effect rounded-2xl p-8 max-w-md mx-auto text-center'
                 }, [
-                    createElement('h2', {
+                    React.createElement('h2', {
                         key: 'title',
                         className: 'text-2xl font-bold text-red-600 mb-4'
                     }, '⚠️ Loading Error'),
-                    createElement('p', {
+                    React.createElement('p', {
                         key: 'message',
                         className: 'text-gray-700 mb-4'
                     }, 'Failed to load application modules. Please check your internet connection and refresh the page.'),
-                    createElement('button', {
+                    React.createElement('button', {
                         key: 'refresh',
                         className: 'px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors',
                         onClick: () => window.location.reload()
@@ -228,13 +227,13 @@
             }
 
             if (!isLoaded) {
-                return createElement('div', {
+                return React.createElement('div', {
                     className: 'flex items-center justify-center min-h-screen'
-                }, createElement('div', {
+                }, React.createElement('div', {
                     className: 'glass-effect rounded-2xl p-8 text-center'
                 }, [
-                    createElement(LoadingSpinner, { key: 'spinner', size: 48 }),
-                    createElement('p', {
+                    React.createElement(LoadingSpinner, { key: 'spinner', size: 48 }),
+                    React.createElement('p', {
                         key: 'text',
                         className: 'mt-4 text-purple-700 font-semibold'
                     }, 'Loading Advanced Retirement Planner...')
@@ -260,46 +259,46 @@
 
             const t = window.multiLanguage[language];
 
-            return createElement('div', {
+            return React.createElement('div', {
                 className: 'min-h-screen gradient-bg py-8 px-4',
                 dir: language === 'he' ? 'rtl' : 'ltr'
             }, [
                 // Header
-                createElement('div', {
+                React.createElement('div', {
                     key: 'header',
                     className: 'text-center mb-8'
                 }, [
-                    createElement('h1', {
+                    React.createElement('h1', {
                         key: 'title',
                         className: 'text-4xl md:text-6xl font-bold text-white mb-4 animate-fade-in'
                     }, t.title),
-                    createElement('p', {
+                    React.createElement('p', {
                         key: 'subtitle',
                         className: 'text-xl text-white/90 animate-fade-in'
                     }, t.subtitle),
                     // Language Toggle
-                    createElement('div', {
+                    React.createElement('div', {
                         key: 'language',
                         className: 'mt-6'
-                    }, createElement('button', {
+                    }, React.createElement('button', {
                         onClick: () => setLanguage(language === 'he' ? 'en' : 'he'),
                         className: 'px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-all backdrop-blur-sm border border-white/30'
                     }, language === 'he' ? 'English' : 'עברית'))
                 ]),
 
                 // Main Content
-                createElement('div', {
+                React.createElement('div', {
                     key: 'content',
                     className: 'max-w-7xl mx-auto'
                 }, [
                     // Tab Navigation
-                    createElement('div', {
+                    React.createElement('div', {
                         key: 'tabs',
                         className: 'flex justify-center mb-8'
-                    }, createElement('div', {
+                    }, React.createElement('div', {
                         className: 'glass-effect rounded-xl p-2 inline-flex space-x-2'
                     }, [
-                        createElement('button', {
+                        React.createElement('button', {
                             key: 'basic',
                             onClick: () => setActiveTab('basic'),
                             className: `px-6 py-3 rounded-lg font-semibold transition-all ${
@@ -308,7 +307,7 @@
                                     : 'text-purple-700 hover:bg-purple-100'
                             }`
                         }, t.basic),
-                        createElement('button', {
+                        React.createElement('button', {
                             key: 'advanced',
                             onClick: () => setActiveTab('advanced'),
                             className: `px-6 py-3 rounded-lg font-semibold transition-all ${
@@ -320,28 +319,28 @@
                     ])),
 
                     // Tab Content
-                    createElement('div', {
+                    React.createElement('div', {
                         key: 'tab-content',
                         className: 'grid grid-cols-1 lg:grid-cols-3 gap-8'
                     }, [
                         // Forms Column
-                        createElement('div', {
+                        React.createElement('div', {
                             key: 'forms',
                             className: 'lg:col-span-2 space-y-6'
                         }, [
                             // Basic Form
-                            activeTab === 'basic' && createElement(window.BasicInputs, {
+                            activeTab === 'basic' && React.createElement(window.BasicInputs, {
                                 key: 'basic-form',
                                 inputs,
                                 setInputs,
                                 language,
                                 t,
-                                Calculator: () => createElement('span', {}, '📊'),
-                                PiggyBank: () => createElement('span', {}, '🏛️'),
-                                DollarSign: () => createElement('span', {}, '💰')
+                                Calculator: () => React.createElement('span', {}, '📊'),
+                                PiggyBank: () => React.createElement('span', {}, '🏛️'),
+                                DollarSign: () => React.createElement('span', {}, '💰')
                             }),
                             // Advanced Form
-                            activeTab === 'advanced' && createElement(window.AdvancedInputs, {
+                            activeTab === 'advanced' && React.createElement(window.AdvancedInputs, {
                                 key: 'advanced-form',
                                 inputs,
                                 setInputs,
@@ -359,10 +358,10 @@
                         ]),
 
                         // Results Column
-                        createElement('div', {
+                        React.createElement('div', {
                             key: 'results',
                             className: 'lg:col-span-1'
-                        }, results && createElement(window.ResultsPanel, {
+                        }, results && React.createElement(window.ResultsPanel, {
                             results,
                             language,
                             t,
@@ -381,8 +380,8 @@
         const root = ReactDOM.createRoot(rootElement);
         
         root.render(
-            createElement(ErrorBoundary, {}, 
-                createElement(App)
+            React.createElement(ErrorBoundary, {}, 
+                React.createElement(App)
             )
         );
     </script>

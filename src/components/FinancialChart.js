@@ -1,11 +1,10 @@
 // FinancialChart.js - Chart component using Chart.js
-const { useRef, useEffect, createElement } = React;
 
 const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
-    const chartRef = useRef(null);
-    const chartInstance = useRef(null);
+    const chartRef = React.useRef(null);
+    const chartInstance = React.useRef(null);
     
-    useEffect(() => {
+    React.useEffect(() => {
         if (chartRef.current && data && data.length > 0 && window.Chart) {
             const ctx = chartRef.current.getContext('2d');
             
@@ -168,7 +167,7 @@ const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
         }
     }, [data, type, language]);
     
-    return createElement('canvas', { ref: chartRef, style: { maxHeight: '400px' } });
+    return React.createElement('canvas', { ref: chartRef, style: { maxHeight: '400px' } });
 };
 
 // Export to window for global access
