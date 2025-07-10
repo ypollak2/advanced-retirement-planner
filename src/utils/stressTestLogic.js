@@ -1,7 +1,7 @@
 // Stress Testing Logic for Retirement Planning
-import { calculateRetirement } from './retirementCalculations.js';
+// Dependencies: calculateRetirement from retirementCalculations.js
 
-export const runStressTest = (scenarioType, inputs, workPeriods, pensionIndexAllocation, trainingFundIndexAllocation, historicalReturns, language) => {
+const runStressTest = (scenarioType, inputs, workPeriods, pensionIndexAllocation, trainingFundIndexAllocation, historicalReturns, language) => {
     // Immediate safety check
     if (typeof scenarioType !== 'string') {
         console.error('Invalid scenario type');
@@ -110,4 +110,7 @@ const generateStressTestRecommendations = (scenario, stressedResults, language) 
     return recommendations;
 };
 
-export { calculateStressedResults, generateStressTestRecommendations };
+// Export to window for global access
+window.runStressTest = runStressTest;
+window.calculateStressedResults = calculateStressedResults;
+window.generateStressTestRecommendations = generateStressTestRecommendations;

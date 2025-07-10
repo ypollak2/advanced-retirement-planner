@@ -1,5 +1,5 @@
 // Analytics Tracking for Retirement Planner
-export const AnalyticsManager = {
+const AnalyticsManager = {
     // Initialize analytics
     init: function() {
         const storageKey = 'retirement_planner_analytics';
@@ -174,3 +174,6 @@ export const AnalyticsManager = {
         sessionStorage.removeItem('current_session_id');
     }
 };
+
+// Export to window for global access
+window.AnalyticsManager = AnalyticsManager;
