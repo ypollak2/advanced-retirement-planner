@@ -240,24 +240,41 @@
                 ]));
             }
 
-            // Use the external RetirementPlannerApp hook for state management
-            const appState = window.RetirementPlannerApp();
-            
-            // Extract state and functions from the hook
-            const {
-                language, setLanguage,
-                activeTab, setActiveTab,
-                results, setResults,
-                chartData, setChartData,
-                showChart, setShowChart,
-                inputs, setInputs,
-                workPeriods, setWorkPeriods,
-                partnerWorkPeriods, setPartnerWorkPeriods,
-                pensionIndexAllocation, setPensionIndexAllocation,
-                trainingFundIndexAllocation, setTrainingFundIndexAllocation
-            } = appState;
+            // Use state directly in the App component instead of calling external hook
+            const [language, setLanguage] = React.useState('he');
+            const [activeTab, setActiveTab] = React.useState('basic');
+            const [results, setResults] = React.useState(null);
+            const [inputs, setInputs] = React.useState({
+                currentAge: 30,
+                retirementAge: 67,
+                currentSavings: 50000,
+                currentMonthlyExpenses: 12000,
+                targetReplacement: 75,
+                inflationRate: 3
+            });
 
             const t = window.multiLanguage[language];
+
+            // Simple calculate function
+            const handleCalculate = () => {
+                if (window.calculateRetirement) {
+                    const workPeriods = [{
+                        id: 1,
+                        country: 'israel',
+                        startAge: inputs.currentAge,
+                        endAge: inputs.retirementAge,
+                        monthlyContribution: 2000,
+                        salary: 15000,
+                        pensionReturn: 7.0,
+                        pensionDepositFee: 0.5,
+                        pensionAnnualFee: 1.0,
+                        monthlyTrainingFund: 500
+                    }];
+                    
+                    const result = window.calculateRetirement(inputs, workPeriods, [], []);
+                    setResults(result);
+                }
+            };
 
             return React.createElement('div', {
                 className: 'min-h-screen gradient-bg py-8 px-4',
@@ -344,17 +361,26 @@
                                 key: 'advanced-form',
                                 inputs,
                                 setInputs,
-                                workPeriods,
-                                setWorkPeriods,
-                                partnerWorkPeriods,
-                                setPartnerWorkPeriods,
-                                pensionIndexAllocation,
-                                setPensionIndexAllocation,
-                                trainingFundIndexAllocation,
-                                setTrainingFundIndexAllocation,
                                 language,
-                                t
-                            })
+                                t,
+                                Settings: () => React.createElement('span', {}, '⚙️'),
+                                PiggyBank: () => React.createElement('span', {}, '🏛️'),
+                                DollarSign: () => React.createElement('span', {}, '💰'),
+                                TrendingUp: () => React.createElement('span', {}, '📈'),
+                                Building: () => React.createElement('span', {}, '🏢'),
+                                Globe: () => React.createElement('span', {}, '🌍'),
+                                Plus: () => React.createElement('span', {}, '➕'),
+                                Trash2: () => React.createElement('span', {}, '🗑️')
+                            }),
+                            
+                            // Calculate Button
+                            React.createElement('div', {
+                                key: 'calculate-button',
+                                className: 'text-center'
+                            }, React.createElement('button', {
+                                onClick: handleCalculate,
+                                className: 'px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg'
+                            }, t.calculate || 'Calculate'))
                         ]),
 
                         // Results Column
@@ -363,12 +389,25 @@
                             className: 'lg:col-span-1'
                         }, results && React.createElement(window.ResultsPanel, {
                             results,
+                            inputs: {},
+                            workPeriods: [],
                             language,
                             t,
-                            chartData,
-                            setChartData,
-                            showChart,
-                            setShowChart
+                            formatCurrency: window.formatCurrency,
+                            convertCurrency: window.convertCurrency,
+                            generateChartData: window.generateChartData,
+                            showChart: false,
+                            chartData: [],
+                            claudeInsights: null,
+                            exportRetirementSummary: () => {},
+                            exportAsImage: () => {},
+                            PiggyBank: () => React.createElement('span', {}, '🏛️'),
+                            Calculator: () => React.createElement('span', {}, '📊'),
+                            DollarSign: () => React.createElement('span', {}, '💰'),
+                            Target: () => React.createElement('span', {}, '🎯'),
+                            AlertCircle: () => React.createElement('span', {}, '⚠️'),
+                            TrendingUp: () => React.createElement('span', {}, '📈'),
+                            SimpleChart: window.SimpleChart
                         }))
                     ])
                 ])
