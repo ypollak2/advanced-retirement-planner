@@ -25,10 +25,10 @@
     Content-Type = "application/javascript"
     Access-Control-Allow-Origin = "*"
 
-# Redirect rules
+# Redirect rules for legacy versions
 [[redirects]]
-  from = "/modular"
-  to = "/index-modular-broken.html"
+  from = "/monolithic"
+  to = "/index-monolithic.html"
   status = 200
 
 # Custom domain (optional)

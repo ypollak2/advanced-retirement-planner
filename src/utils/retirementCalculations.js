@@ -19,11 +19,11 @@ window.convertCurrency = (amount, currency, exchangeRates) => {
     return formatters[currency].format(convertedAmount);
 };
 
-window. getNetReturn = (grossReturn, managementFee) => {
+window.getNetReturn = (grossReturn, managementFee) => {
     return grossReturn - managementFee;
 };
 
-window. calculateWeightedReturn = (allocations, timeHorizon = 20, historicalReturns) => {
+window.calculateWeightedReturn = (allocations, timeHorizon = 20, historicalReturns) => {
     let totalReturn = 0;
     let totalPercentage = 0;
     
@@ -46,12 +46,12 @@ window. calculateWeightedReturn = (allocations, timeHorizon = 20, historicalRetu
     return totalPercentage > 0 ? totalReturn : 0;
 };
 
-window. getAdjustedReturn = (baseReturn, riskLevel = 'moderate') => {
+window.getAdjustedReturn = (baseReturn, riskLevel = 'moderate') => {
     const riskMultiplier = riskScenarios[riskLevel]?.multiplier || 1.0;
     return baseReturn * riskMultiplier;
 };
 
-window. calculateRetirement = (
+window.calculateRetirement = (
     inputs, 
     workPeriods, 
     pensionIndexAllocation, 
