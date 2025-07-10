@@ -228,16 +228,40 @@ git commit -m "Initial commit"
 git push
 ```
 
+## 🔄 Version Management
+
+This project uses centralized version management:
+
+1. **Update version**: Edit `version.json`
+2. **Apply changes**: Run `node update-version.js`
+3. **Commit**: Git commit and push
+
+The script automatically updates:
+- README badge
+- HTML page title
+- Script cache-busting parameters
+- Analytics version tracking
+
 ## 🛠️ Project Structure
 
 ```
 advanced-retirement-planner/
 │
-├── index.html          # Main file - complete application
-├── README.md           # This file
-├── package.json        # Project metadata (optional)
-├── LICENSE             # MIT license
-└── .gitignore          # Git ignore rules
+├── index.html              # Main HTML file
+├── version.json            # ⭐ Central version config
+├── update-version.js       # ⭐ Version update script
+├── README.md               # Documentation
+├── package.json            # Project metadata
+├── LICENSE                 # MIT license
+├── .gitignore              # Git ignore rules
+│
+├── src/
+│   ├── components/         # React components
+│   ├── utils/             # Calculation utilities
+│   ├── data/              # Market data & constants
+│   └── translations/      # Multi-language support
+│
+└── netlify.toml           # Netlify deployment config
 ```
 
 ## 💡 Recommended Website URLs
