@@ -152,10 +152,10 @@
 
         // Main App Component using external modules
         const App = () => {
-            const [isLoaded, setIsLoaded] = useState(false);
-            const [loadError, setLoadError] = useState(null);
+            const [isLoaded, setIsLoaded] = React.useState(false);
+            const [loadError, setLoadError] = React.useState(null);
 
-            useEffect(() => {
+            React.useEffect(() => {
                 let attempts = 0;
                 const maxAttempts = 100; // 10 seconds maximum
                 
