@@ -500,7 +500,7 @@
             // Export Buttons
             React.createElement('div', {
                 key: 'export-buttons',
-                className: "border-t border-gray-200 pt-4 space-y-2"
+                className: "mt-6 bg-white rounded-lg shadow p-4 border border-gray-200 flex flex-col gap-3"
             }, [
                 React.createElement('div', { 
                     key: 'export-title',
@@ -510,7 +510,7 @@
                 React.createElement('button', {
                     key: 'export-png',
                     onClick: exportToPNG,
-                    className: "btn-primary w-full text-sm flex items-center justify-center space-x-2"
+                    className: "btn-primary w-full text-sm flex items-center justify-center space-x-2 py-3 text-base"
                 }, [
                     React.createElement('span', { key: 'icon' }, '🖼️'),
                     React.createElement('span', { key: 'text' }, language === 'he' ? 'ייצא כתמונה' : 'Export as PNG')
@@ -519,7 +519,7 @@
                 React.createElement('button', {
                     key: 'export-ai',
                     onClick: exportForAI,
-                    className: "btn-primary w-full text-sm flex items-center justify-center space-x-2"
+                    className: "btn-primary w-full text-sm flex items-center justify-center space-x-2 py-3 text-base"
                 }, [
                     React.createElement('span', { key: 'icon' }, '🤖'),
                     React.createElement('span', { key: 'text' }, language === 'he' ? 'ייצא לכלי AI' : 'Export for AI Tools')
@@ -528,7 +528,7 @@
                 React.createElement('button', {
                     key: 'show-chart',
                     onClick: () => setShowChart(true),
-                    className: "btn-primary w-full text-sm flex items-center justify-center space-x-2"
+                    className: "btn-primary w-full text-sm flex items-center justify-center space-x-2 py-3 text-base"
                 }, [
                     React.createElement('span', { key: 'icon' }, '📊'),
                     React.createElement('span', { key: 'text' }, language === 'he' ? 'ייצוג גרפי' : 'Graphical View')
@@ -537,7 +537,7 @@
                 React.createElement('button', {
                     key: 'llm-analysis',
                     onClick: generateLLMAnalysis,
-                    className: "btn-primary w-full text-sm flex items-center justify-center space-x-2"
+                    className: "btn-primary w-full text-sm flex items-center justify-center space-x-2 py-3 text-base"
                 }, [
                     React.createElement('span', { key: 'icon' }, '🧠'),
                     React.createElement('span', { key: 'text' }, language === 'he' ? 'ניתוח AI' : 'LLM Analysis')
