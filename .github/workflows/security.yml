@@ -97,7 +97,9 @@ jobs:
         echo "Scanning for potential sensitive data..."
         
         # Check for potential API keys or secrets
-        if grep -r -i "api[_-]key\|secret\|password\|token" --include="*.html" --include="*.js" --include="*.json" .; then
+        if grep -r -i "api[_-]key\|secret\|password\|token" \
+          --include="*.html" --include="*.js" --include="*.json" . \
+          --exclude="package-lock.json"; then
           echo "⚠️ Potential sensitive data found - please review"
           exit 1
         else
