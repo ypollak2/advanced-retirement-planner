@@ -649,49 +649,47 @@
                 await loadScript('./src/core/app-main.js?v=4.2.1');
                 console.log('✅ Core application loaded');
 
-                // Initialize the core application with ErrorBoundary
-                if (window.initializeRetirementPlannerCore) {
-                    console.log('🎉 Initializing core application with ErrorBoundary...');
-                    window.initializeRetirementPlannerCore();
-                    
-                    // Preload critical modules in background
-                    setTimeout(() => {
-                        if (window.moduleLoader) {
-                            console.log('🚀 Starting background preload of critical modules...');
-                            window.moduleLoader.preloadCriticalModules();
-                        }
-                    }, 2000);
-                    
-                } else {
-                    console.error('❌ Core application initialization function not found');
-                    console.log('Available window functions:', Object.keys(window).filter(k => k.includes('initialize') || k.includes('Retirement')));
-                    
-                    // Show error without throwing
-                    safeSetHTML(document.getElementById('root'), `
-                        <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
-                            <div class="text-center max-w-md">
-                                <div class="text-red-500 text-6xl mb-4">⚠️</div>
-                                <h2 class="text-2xl font-bold text-red-700 mb-4">Initialization Error</h2>
-                                <p class="text-gray-700 mb-4">
-                                    Core application initialization function not found. Please refresh the page.
-                                </p>
-                                <button id="refreshBtn1" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
-                                    Refresh Page
-                                </button>
+                // Poll for the initialization function to be available
+                const startTime = Date.now();
+                const pollForInitialization = () => {
+                    if (window.initializeRetirementPlannerCore) {
+                        console.log('🎉 Initializing core application with ErrorBoundary...');
+                        window.initializeRetirementPlannerCore();
+
+                        // Preload critical modules in background
+                        setTimeout(() => {
+                            if (window.moduleLoader) {
+                                console.log('🚀 Starting background preload of critical modules...');
+                                window.moduleLoader.preloadCriticalModules();
+                            }
+                        }, 2000);
+                    } else if (Date.now() - startTime > 5000) { // 5-second timeout
+                        console.error('❌ Core application initialization function not found after timeout');
+                        safeSetHTML(document.getElementById('root'), `
+                            <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
+                                <div class="text-center max-w-md">
+                                    <div class="text-red-500 text-6xl mb-4">⚠️</div>
+                                    <h2 class="text-2xl font-bold text-red-700 mb-4">Initialization Error</h2>
+                                    <p class="text-gray-700 mb-4">
+                                        Core application initialization function not found. Please refresh the page.
+                                    </p>
+                                    <button id="refreshBtn1" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                                        Refresh Page
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    `);
-                    
-                    // Add event listener for refresh button
-                    setTimeout(() => {
-                        const refreshBtn = document.getElementById('refreshBtn1');
-                        if (refreshBtn) {
-                            refreshBtn.addEventListener('click', () => location.reload());
-                        }
-                    }, 100);
-                    
-                    return; // Don't continue with initialization
-                }
+                        `);
+                        setTimeout(() => {
+                            const refreshBtn = document.getElementById('refreshBtn1');
+                            if (refreshBtn) {
+                                refreshBtn.addEventListener('click', () => location.reload());
+                            }
+                        }, 100);
+                    } else {
+                        setTimeout(pollForInitialization, 100);
+                    }
+                };
+                pollForInitialization();
 
             } catch (error) {
                 console.error('❌ Application initialization failed:', error);
