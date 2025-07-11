@@ -47,7 +47,6 @@ jobs:
     - name: 🐳 Start web server
       run: |
         python3 -m http.server 8080 &
-        sleep 3
         
     - name: 🔗 Test basic connectivity
       run: |
@@ -74,27 +73,23 @@ jobs:
           fi
         done
         
-    - name: 🎯 Test application initialization
+    - name: 🌐 Run Puppeteer browser test
       run: |
-        # Test if the application can be initialized in a headless environment
-        timeout 30 bash -c '
-        python3 -m http.server 8081 > /dev/null 2>&1 &
-        SERVER_PID=$!
-        sleep 5
-        
-        # Test if page loads without errors
-        response=$(curl -s http://localhost:8081/)
-        if echo "$response" | grep -q "initializeRetirementPlannerCore"; then
-          echo "✅ Initialization function found in HTML"
-        else
-          echo "❌ Initialization function NOT found"
-          kill $SERVER_PID
-          exit 1
-        fi
-        
-        kill $SERVER_PID
-        echo "✅ Application initialization test passed"
-        ' || echo "⚠️ Application test completed with timeout"
+        npm install # Install puppeteer
+        node -e 'const puppeteer = require("puppeteer");
+        (async () => {
+          const browser = await puppeteer.launch();
+          const page = await browser.newPage();
+          await page.goto("http://localhost:8080");
+          const appElement = await page.$("#root");
+          if (appElement) {
+            console.log("✅ App element found");
+          } else {
+            console.error("❌ App element not found");
+            process.exit(1);
+          }
+          await browser.close();
+        })();'
 
   deploy:
     name: 🚀 Deploy to GitHub Pages

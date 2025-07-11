@@ -1,4 +1,4 @@
-# Advanced Retirement Planner v4.1.0 - Modern Architecture & Software Design
+# Advanced Retirement Planner v4.2.2 - Modern Architecture & Software Design
 
 ## Table of Contents
 1. [System Overview](#system-overview)
@@ -14,12 +14,12 @@
 
 ## System Overview
 
-The Advanced Retirement Planner v4.1.0 is a **modern client-side React application** with a **professional financial interface** inspired by leading platforms like Personal Capital and Wealthfront. The system features a **modern modular architecture** with dynamic loading, real-time calculations, and comprehensive testing coverage (95%+).
+The Advanced Retirement Planner v4.2.2 is a **modern client-side React application** with a **professional financial interface** inspired by leading platforms like Personal Capital and Wealthfront. The system features a **modern modular architecture** with dynamic loading, real-time calculations, and comprehensive testing coverage (95%+).
 
-### Key Features v4.1.0
-- **Modern Financial UI**: Professional interface with financial card-based layout and Inter typography
+### Key Features v4.2.2
+- **Modern Financial UI**: Professional interface with financial card-based layout and 80s retro design theme.
 - **Real-time Calculations**: Automatic calculation engine with 300ms debouncing for seamless UX
-- **Comprehensive Testing**: 95%+ test coverage including stress testing verification
+- **Comprehensive Testing**: 95%+ test coverage including stress testing verification and robust error boundary testing.
 - **Enhanced Security**: Removed all eval() usage, XSS protection, CSP compliance
 - **Multi-country Tax**: Israel, UK, US tax calculations with net take-home salary display
 - **Advanced Stress Testing**: Economic crisis scenarios with visual timeline comparisons
@@ -28,7 +28,7 @@ The Advanced Retirement Planner v4.1.0 is a **modern client-side React applicati
 
 ## Architecture Patterns
 
-### 1. Modern Modular Architecture v4.1.0
+### 1. Modern Modular Architecture v4.2.2
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        index.html                               │
@@ -55,20 +55,19 @@ The Advanced Retirement Planner v4.1.0 is a **modern client-side React applicati
 │  │  └─────────────────┘ │ │ │     Export Functions        │ │ │ │ │
 │  │                       │ │ │    (PNG/AI/LLM)             │ │ │ │ │
 │  │                       │ │ └─────────────────────────────┘ │ │ │ │
-│  │                       │ └─────────────────────────────────┘ │ │ │
 │  │                       └───────────────────────────────────┘ │ │
 │  └─────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### 2. Real-time State Management Pattern v4.1.0
+### 2. Real-time State Management Pattern v4.2.2
 - **React Hooks**: `useState`, `useEffect` with automatic calculation triggers
 - **Debounced Updates**: 300ms debouncing for real-time calculation without performance impact
-- **Error Boundaries**: Comprehensive error handling with fallback UI
+- **Error Boundaries**: Comprehensive error handling with fallback UI, tested for robustness.
 - **Loading States**: Smart loading indicators for dynamic modules
 - **Local Storage**: Persistence for user preferences and analytics
 
-### 3. Modern Data Processing Pattern v4.1.0
+### 3. Modern Data Processing Pattern v4.2.2
 ```
 User Input → Debounced Validation → Real-time Calculation → Auto-Update → Visualization
      ↓              ↓                        ↓                ↓              ↓
@@ -77,12 +76,12 @@ User Input → Debounced Validation → Real-time Calculation → Auto-Update �
 Tax Country → Multi-tax Calc → Net Salary → PNG/AI → Chart.js + Canvas
 ```
 
-## File Structure v4.1.0
+## File Structure v4.2.2
 
 ```
 advanced-retirement-planner/
 ├── index.html                      # Modern Financial UI (10.3KB) ✅
-├── version.json                    # Version tracking (v4.1.0) ✅
+├── version.json                    # Version tracking (v4.2.2) ✅
 ├── package.json                    # Dependencies and scripts ✅
 ├── e2e-test.js                     # Comprehensive E2E testing (95%+ coverage) ✅
 ├── comprehensive-test-suite.js     # Security & functionality tests ✅
@@ -117,6 +116,8 @@ advanced-retirement-planner/
 │
 ├── ARCHITECTURE.md             # This file (updated)
 ├── MODULAR_ARCHITECTURE.md     # Modular design documentation
+├── MODULAR_ARCHITECTURE_EN.md  # English translation of modular design documentation
+├── COMPONENT_PROPS.md          # Component prop system documentation
 ├── README.md                   # Main documentation (updated)
 └── docs/
     ├── API_DOCUMENTATION.md    # API documentation
@@ -132,15 +133,13 @@ advanced-retirement-planner/
 - `inputs`: Current form values
 - `setInputs`: State setter function
 - `language`: Current language ('he'/'en')
-- `showSalaryInput`: Boolean for salary section visibility
-- `showFamilyPlanning`: Boolean for family planning section
+- `t`: Translation object
+- `Calculator`: Icon component for calculator
+- `PiggyBank`: Icon component for piggy bank
+- `DollarSign`: Icon component for dollar sign
 
 **Sections**:
 - Basic data (age, savings, inflation)
-- Training fund configuration
-- Salary and income projections
-- Family planning costs
-- Personal portfolio settings
 
 ### 2. RetirementAdvancedForm Component
 **Purpose**: Advanced investment and allocation settings
@@ -378,6 +377,6 @@ This architecture document serves as the foundation for:
 
 ---
 
-*Last updated: 2025-07-11*
-*Version: 4.1.0*
+*Last updated: 2025-07-12*
+*Version: 4.2.2*
 *Contributors: Advanced Retirement Planner Team*
