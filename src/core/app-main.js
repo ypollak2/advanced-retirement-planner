@@ -120,9 +120,9 @@
         const yearsToRetirement = (inputs.retirementAge || 67) - (inputs.currentAge || 30);
         const monthlyTotal = (inputs.currentMonthlySalary || 15000) * 0.18 + (inputs.trainingFundContribution || 0); // 18% pension contribution + training fund
         
-        // Calculate projected value with management fees impact
-        const netPensionReturn = (inputs.expectedReturn || 7) - (inputs.managementFees || 1.0);
-        const netTrainingReturn = (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.5);
+        // Calculate projected value with management fees impact (ensure minimum 0.1% to avoid division by zero)
+        const netPensionReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.managementFees || 1.0));
+        const netTrainingReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.5));
         const avgNetReturn = (netPensionReturn + netTrainingReturn) / 2; // Average return
         
         const projectedWithGrowth = totalSavings * Math.pow(1 + avgNetReturn/100, yearsToRetirement) + 
@@ -592,9 +592,9 @@
             const monthlyContribution = inputs.currentMonthlySalary * 0.186; // 18.6% pension contribution
             const annualContribution = monthlyContribution * 12;
             
-            // Calculate net return after management fees
-            const netPensionReturn = (inputs.expectedReturn || 7) - (inputs.managementFees || 1.0);
-            const netTrainingReturn = (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.5);
+            // Calculate net return after management fees (ensure minimum 0.1% to avoid division by zero)
+            const netPensionReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.managementFees || 1.0));
+            const netTrainingReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.5));
             
             // Pension calculation with management fees
             const pensionFutureValue = inputs.currentSavings * Math.pow(1 + netPensionReturn/100, yearsToRetirement) +
