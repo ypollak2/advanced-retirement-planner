@@ -1505,6 +1505,172 @@
             }, 2000); // Increased delay to ensure moduleLoader is ready
         }, []);
 
+        // Export Functions - Dynamic with access to component state
+        const exportToPNG = async () => {
+            try {
+                console.log('🖼️ Starting PNG export...');
+                
+                // Check if we have data to export
+                if (!results) {
+                    alert(language === 'he' ? 'אין נתונים לייצוא. אנא בצע חישוב תחילה.' : 'No data to export. Please calculate first.');
+                    return;
+                }
+                
+                // Create a canvas element for export
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 800;
+                canvas.height = 1000;
+                
+                // Set background gradient (manual implementation since canvas doesn't support CSS gradients)
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, '#667eea');
+                gradient.addColorStop(1, '#764ba2');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Add content (simplified for now)
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 32px Arial';
+                ctx.fillText(language === 'he' ? 'מתכנן הפרישה המתקדם' : 'Advanced Retirement Planner', 50, 100);
+                
+                ctx.font = '16px Arial';
+                ctx.fillText(`Current Age: ${inputs.currentAge}`, 50, 150);
+                ctx.fillText(`Retirement Age: ${inputs.retirementAge}`, 50, 180);
+                ctx.fillText(`Current Savings: ₪${inputs.currentSavings?.toLocaleString()}`, 50, 210);
+                ctx.fillText(`Monthly Salary: ₪${inputs.currentMonthlySalary?.toLocaleString()}`, 50, 240);
+                
+                if (results) {
+                    ctx.fillText(`Projected Total: ₪${results.projectedTotal?.toLocaleString()}`, 50, 300);
+                    ctx.fillText(`Monthly Income: ₪${results.monthlyIncomeAtRetirement?.toLocaleString()}`, 50, 330);
+                }
+                
+                // Export as PNG
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `retirement-plan-${new Date().toISOString().split('T')[0]}.png`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+                
+                console.log('✅ PNG export completed');
+            } catch (error) {
+                console.error('Error exporting PNG:', error);
+                alert(language === 'he' ? 'שגיאה בייצוא PNG' : 'Error exporting PNG');
+            }
+        };
+
+        const generateLLMAnalysis = () => {
+            try {
+                const taxResult = calculateNetSalary(inputs.currentMonthlySalary || 15000, inputs.taxCountry || 'israel');
+                const totalSavings = (inputs.currentSavings || 0) + (inputs.trainingFund || 0);
+                const yearsToRetirement = (inputs.retirementAge || 67) - (inputs.currentAge || 30);
+                const monthlyContributions = (inputs.currentMonthlySalary || 15000) * 0.186;
+                
+                const analysis = `
+# ${language === 'he' ? 'ניתוח תכנית הפרישה' : 'Retirement Plan Analysis'}
+
+## ${language === 'he' ? 'נתונים בסיסיים' : 'Basic Information'}
+- ${language === 'he' ? 'גיל נוכחי' : 'Current Age'}: ${inputs.currentAge}
+- ${language === 'he' ? 'גיל פרישה' : 'Retirement Age'}: ${inputs.retirementAge}
+- ${language === 'he' ? 'שנים לפרישה' : 'Years to Retirement'}: ${yearsToRetirement}
+
+## ${language === 'he' ? 'מצב פיננסי נוכחי' : 'Current Financial Status'}
+- ${language === 'he' ? 'חיסכון נוכחי' : 'Current Savings'}: ₪${totalSavings.toLocaleString()}
+- ${language === 'he' ? 'משכורת חודשית ברוטו' : 'Monthly Gross Salary'}: ₪${inputs.currentMonthlySalary?.toLocaleString()}
+- ${language === 'he' ? 'משכורת חודשית נטו' : 'Monthly Net Salary'}: ₪${taxResult.netSalary.toLocaleString()}
+- ${language === 'he' ? 'הפקדות חודשיות' : 'Monthly Contributions'}: ₪${monthlyContributions.toLocaleString()}
+
+${results ? `
+## ${language === 'he' ? 'תחזיות פרישה' : 'Retirement Projections'}
+- ${language === 'he' ? 'צבירה צפויה' : 'Projected Total'}: ₪${results.projectedTotal?.toLocaleString()}
+- ${language === 'he' ? 'הכנסה חודשית בפרישה' : 'Monthly Retirement Income'}: ₪${results.monthlyIncomeAtRetirement?.toLocaleString()}
+- ${language === 'he' ? 'אחוז החלפת הכנסה' : 'Income Replacement Ratio'}: ${((results.monthlyIncomeAtRetirement / taxResult.netSalary) * 100).toFixed(1)}%
+` : ''}
+
+## ${language === 'he' ? 'המלצות' : 'Recommendations'}
+${language === 'he' ? 
+'1. שקול להגדיל את ההפקדות החודשיות אם אפשר\n2. בדוק אופציות השקעה עם תשואה גבוהה יותר\n3. עדכן את התכנית מדי שנה' :
+'1. Consider increasing monthly contributions if possible\n2. Explore higher-yield investment options\n3. Review and update your plan annually'}
+                `;
+                
+                setLlmAnalysis(analysis);
+                console.log('✅ LLM Analysis generated');
+            } catch (error) {
+                console.error('Error generating LLM analysis:', error);
+                setLlmAnalysis("Error generating analysis. Please ensure all required fields are filled.");
+            }
+        };
+
+        const exportForAI = () => {
+            try {
+                console.log('🤖 Starting AI export...');
+                
+                // Check if we have data to export
+                if (!results) {
+                    alert(language === 'he' ? 'אין נתונים לייצוא. אנא בצע חישוב תחילה.' : 'No data to export. Please calculate first.');
+                    return;
+                }
+                
+                const taxResult = calculateNetSalary(inputs.currentMonthlySalary || 15000, inputs.taxCountry || 'israel');
+                
+                const aiData = {
+                    metadata: {
+                        exportDate: new Date().toISOString(),
+                        version: "4.2.0",
+                        language: language,
+                        purpose: "AI analysis and recommendations"
+                    },
+                    personalInfo: {
+                        currentAge: inputs.currentAge,
+                        retirementAge: inputs.retirementAge,
+                        yearsToRetirement: (inputs.retirementAge || 67) - (inputs.currentAge || 30),
+                        planningType: inputs.planningType || 'single'
+                    },
+                    financialData: {
+                        currentSavings: inputs.currentSavings || 0,
+                        trainingFund: inputs.trainingFund || 0,
+                        totalCurrentSavings: (inputs.currentSavings || 0) + (inputs.trainingFund || 0),
+                        monthlySalaryGross: inputs.currentMonthlySalary || 15000,
+                        monthlySalaryNet: taxResult.netSalary,
+                        monthlyContributions: (inputs.currentMonthlySalary || 15000) * 0.186,
+                        taxCountry: inputs.taxCountry || 'israel',
+                        taxRate: taxResult.taxRate
+                    },
+                    investmentParameters: {
+                        expectedReturn: inputs.expectedReturn || 7,
+                        contributionFees: inputs.contributionFees || 1.0,
+                        accumulationFees: inputs.accumulationFees || 0.1,
+                        trainingFundFees: inputs.trainingFundFees || 0.6,
+                        inflationRate: inputs.inflationRate || 3
+                    },
+                    projections: results ? {
+                        projectedTotal: results.projectedTotal,
+                        monthlyIncomeAtRetirement: results.monthlyIncomeAtRetirement,
+                        incomeReplacementRatio: (results.monthlyIncomeAtRetirement / taxResult.netSalary) * 100,
+                        buyingPowerToday: results.buyingPowerToday
+                    } : null,
+                    promptSuggestion: `Please analyze this retirement plan data and provide personalized recommendations for improving the retirement strategy. Consider the current savings rate, expected returns, and retirement timeline. Suggest specific actions for optimizing contributions, investment allocation, and retirement readiness.`
+                };
+                
+                const jsonString = JSON.stringify(aiData, null, 2);
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `retirement-plan-ai-data-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                console.log('✅ AI export completed');
+            } catch (error) {
+                console.error('Error exporting for AI:', error);
+                alert(language === 'he' ? 'שגיאה בייצוא נתונים' : 'Error exporting data');
+            }
+        };
+
         // Generate chart data for accumulation over time
         const generateChartData = () => {
             if (!results) return [];
@@ -1740,7 +1906,7 @@
                     // Forms Column
                     React.createElement('div', {
                         key: 'forms',
-                        className: 'lg:col-span-2 space-y-6'
+                        className: 'forms-column space-y-6'
                     }, [
                         // Basic Tab
                         activeTab === 'basic' && React.createElement(BasicInputs, {
@@ -1798,7 +1964,7 @@
                     // Results Column with Side Panel
                     React.createElement('div', {
                         key: 'results',
-                        className: 'lg:col-span-1 space-y-6 sidebar-panel'
+                        className: 'results-column space-y-6 sidebar-panel'
                     }, [
                         // Real-time Summary Panel (with calculated values)
                         (() => {
