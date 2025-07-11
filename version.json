@@ -1,5 +1,5 @@
 {
-  "version": "3.2.0",
+  "version": "4.0.0",
   "releaseDate": "2025-07-11",
-  "description": "Management Fees & Yield Control: דמי ניהול for pension and training fund, customizable inflation rates, free yield input control, enhanced real-time calculations with net returns, fee impact analysis"
+  "description": "Tax Calculations & Fee Restructuring: Separate contribution/accumulation fees, multi-country tax calculations (Israel/UK/US), net salary display, decimal precision removal, enhanced financial accuracy"
 }

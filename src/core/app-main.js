@@ -239,21 +239,33 @@
                     language === 'he' ? `תשואה נטו ממוצעת: ${avgNetReturn.toFixed(1)}%` : `Avg Net Return: ${avgNetReturn.toFixed(1)}%`)
             ]),
             
-            // Buying Power
+            // Buying Power - Total and Monthly
             React.createElement('div', {
                 key: 'buying-power',
                 className: "bg-orange-50 rounded-lg p-3 mb-4 border border-orange-200"
             }, [
-                React.createElement('div', { className: "text-sm text-orange-700 font-medium" }, 
+                React.createElement('div', { className: "text-sm text-orange-700 font-medium mb-2" }, 
                     language === 'he' ? 'כוח קנייה היום' : 'Today\'s Buying Power'),
-                React.createElement('div', { className: "text-lg font-bold text-orange-800" }, 
-                    formatCurrency(buyingPowerToday))
+                React.createElement('div', { className: "grid grid-cols-2 gap-2" }, [
+                    React.createElement('div', { key: 'total' }, [
+                        React.createElement('div', { className: "text-xs text-orange-600" }, 
+                            language === 'he' ? 'סה״כ:' : 'Total:'),
+                        React.createElement('div', { className: "text-base font-bold text-orange-800" }, 
+                            formatCurrency(buyingPowerToday))
+                    ]),
+                    React.createElement('div', { key: 'monthly' }, [
+                        React.createElement('div', { className: "text-xs text-orange-600" }, 
+                            language === 'he' ? 'חודשי:' : 'Monthly:'),
+                        React.createElement('div', { className: "text-base font-bold text-orange-800" }, 
+                            formatCurrency(buyingPowerToday * (avgNetReturn/100) / 12))
+                    ])
+                ])
             ]),
             
             // Multi-Currency Display
             React.createElement('div', {
                 key: 'currencies',
-                className: "border-t border-gray-200 pt-4"
+                className: "border-t border-gray-200 pt-4 mb-4"
             }, [
                 React.createElement('div', { 
                     key: 'currency-title',
@@ -278,6 +290,53 @@
                         )
                     ])
                 ))
+            ]),
+            
+            // Export Buttons
+            React.createElement('div', {
+                key: 'export-buttons',
+                className: "border-t border-gray-200 pt-4 space-y-2"
+            }, [
+                React.createElement('div', { 
+                    key: 'export-title',
+                    className: "text-sm font-medium text-gray-700 mb-3" 
+                }, language === 'he' ? 'ייצוא נתונים' : 'Export Data'),
+                
+                React.createElement('button', {
+                    key: 'export-png',
+                    onClick: exportToPNG,
+                    className: "w-full px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm flex items-center justify-center space-x-2"
+                }, [
+                    React.createElement('span', { key: 'icon' }, '🖼️'),
+                    React.createElement('span', { key: 'text' }, language === 'he' ? 'ייצא כתמונה' : 'Export as PNG')
+                ]),
+                
+                React.createElement('button', {
+                    key: 'export-ai',
+                    onClick: exportForAI,
+                    className: "w-full px-3 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm flex items-center justify-center space-x-2"
+                }, [
+                    React.createElement('span', { key: 'icon' }, '🤖'),
+                    React.createElement('span', { key: 'text' }, language === 'he' ? 'ייצא לכלי AI' : 'Export for AI Tools')
+                ]),
+                
+                React.createElement('button', {
+                    key: 'show-chart',
+                    onClick: () => setShowChart(true),
+                    className: "w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm flex items-center justify-center space-x-2"
+                }, [
+                    React.createElement('span', { key: 'icon' }, '📊'),
+                    React.createElement('span', { key: 'text' }, language === 'he' ? 'ייצוג גרפי' : 'Graphical View')
+                ]),
+                
+                React.createElement('button', {
+                    key: 'llm-analysis',
+                    onClick: generateLLMAnalysis,
+                    className: "w-full px-3 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors text-sm flex items-center justify-center space-x-2"
+                }, [
+                    React.createElement('span', { key: 'icon' }, '🧠'),
+                    React.createElement('span', { key: 'text' }, language === 'he' ? 'ניתוח AI' : 'LLM Analysis')
+                ])
             ])
         ]);
     };
@@ -393,7 +452,7 @@
                             React.createElement('input', {
                                 type: 'number',
                                 step: '0.1',
-                                value: inputs.contributionFees || 0.5,
+                                value: inputs.contributionFees || 1.0,
                                 onChange: (e) => setInputs({...inputs, contributionFees: parseFloat(e.target.value) || 0}),
                                 className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                             })
@@ -422,7 +481,7 @@
                             React.createElement('input', {
                                 type: 'number',
                                 step: '0.1',
-                                value: inputs.accumulationFees || 1.0,
+                                value: inputs.accumulationFees || 0.1,
                                 onChange: (e) => setInputs({...inputs, accumulationFees: parseFloat(e.target.value) || 0}),
                                 className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                             })
@@ -451,7 +510,7 @@
                             React.createElement('input', {
                                 type: 'number',
                                 step: '0.1',
-                                value: inputs.trainingFundFees || 0.5,
+                                value: inputs.trainingFundFees || 0.6,
                                 onChange: (e) => setInputs({...inputs, trainingFundFees: parseFloat(e.target.value) || 0}),
                                 className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                             })
@@ -631,8 +690,313 @@
         };
     };
 
+    // Export Functions - PNG and AI-compatible exports
+    const exportToPNG = async () => {
+        try {
+            // Create a canvas element for export
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 800;
+            canvas.height = 1000;
+            
+            // Set background
+            ctx.fillStyle = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Add white background for content
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.roundRect = function(x, y, width, height, radius) {
+                this.beginPath();
+                this.moveTo(x + radius, y);
+                this.lineTo(x + width - radius, y);
+                this.quadraticCurveTo(x + width, y, x + width, y + radius);
+                this.lineTo(x + width, y + height - radius);
+                this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                this.lineTo(x + radius, y + height);
+                this.quadraticCurveTo(x, y + height, x, y + height - radius);
+                this.lineTo(x, y + radius);
+                this.quadraticCurveTo(x, y, x + radius, y);
+                this.closePath();
+            };
+            ctx.roundRect(50, 50, 700, 900, 20);
+            ctx.fill();
+            
+            // Add title
+            ctx.fillStyle = '#4C1D95';
+            ctx.font = 'bold 32px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(language === 'he' ? 'סיכום תכנון פרישה' : 'Retirement Planning Summary', 400, 120);
+            
+            // Add current data
+            const taxResult = calculateNetSalary(inputs.currentMonthlySalary || 15000, inputs.taxCountry || 'israel');
+            const totalSavings = (inputs.currentSavings || 0) + (inputs.trainingFund || 0);
+            
+            let yPos = 180;
+            ctx.font = '18px Arial';
+            ctx.textAlign = 'left';
+            
+            // Personal Info
+            ctx.fillStyle = '#1F2937';
+            ctx.fillText(language === 'he' ? 'פרטים אישיים:' : 'Personal Information:', 80, yPos);
+            yPos += 40;
+            ctx.font = '16px Arial';
+            ctx.fillText(`${language === 'he' ? 'גיל:' : 'Age:'} ${inputs.currentAge}`, 100, yPos);
+            yPos += 30;
+            ctx.fillText(`${language === 'he' ? 'גיל פרישה:' : 'Retirement Age:'} ${inputs.retirementAge}`, 100, yPos);
+            yPos += 30;
+            
+            // Financial Info
+            yPos += 20;
+            ctx.font = '18px Arial';
+            ctx.fillText(language === 'he' ? 'מידע פיננסי:' : 'Financial Information:', 80, yPos);
+            yPos += 40;
+            ctx.font = '16px Arial';
+            ctx.fillText(`${language === 'he' ? 'משכורת ברוטו:' : 'Gross Salary:'} ₪${(inputs.currentMonthlySalary || 0).toLocaleString()}`, 100, yPos);
+            yPos += 30;
+            ctx.fillText(`${language === 'he' ? 'משכורת נטו:' : 'Net Salary:'} ₪${taxResult.netSalary.toLocaleString()}`, 100, yPos);
+            yPos += 30;
+            ctx.fillText(`${language === 'he' ? 'חיסכון נוכחי:' : 'Current Savings:'} ₪${totalSavings.toLocaleString()}`, 100, yPos);
+            yPos += 30;
+            
+            // Tax & Fees Info
+            yPos += 20;
+            ctx.font = '18px Arial';
+            ctx.fillText(language === 'he' ? 'מסים ודמי ניהול:' : 'Taxes & Fees:', 80, yPos);
+            yPos += 40;
+            ctx.font = '16px Arial';
+            ctx.fillText(`${language === 'he' ? 'שיעור מס:' : 'Tax Rate:'} ${taxResult.taxRate}%`, 100, yPos);
+            yPos += 30;
+            ctx.fillText(`${language === 'he' ? 'דמי ניהול הפקדות:' : 'Contribution Fees:'} ${inputs.contributionFees || 0.5}%`, 100, yPos);
+            yPos += 30;
+            ctx.fillText(`${language === 'he' ? 'דמי ניהול צבירה:' : 'Accumulation Fees:'} ${inputs.accumulationFees || 1.0}%`, 100, yPos);
+            yPos += 30;
+            
+            // Results (if available)
+            if (results) {
+                yPos += 20;
+                ctx.font = '18px Arial';
+                ctx.fillText(language === 'he' ? 'תוצאות:' : 'Results:', 80, yPos);
+                yPos += 40;
+                ctx.font = '16px Arial';
+                ctx.fillText(`${language === 'he' ? 'צבירה צפויה:' : 'Expected Total:'} ₪${Math.round(results.totalSavings).toLocaleString()}`, 100, yPos);
+                yPos += 30;
+                ctx.fillText(`${language === 'he' ? 'הכנסה חודשית:' : 'Monthly Income:'} ₪${Math.round(results.monthlyIncome).toLocaleString()}`, 100, yPos);
+                yPos += 30;
+            }
+            
+            // Footer
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#6B7280';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Generated on ${new Date().toLocaleDateString()} | Advanced Retirement Planner v4.0.0`, 400, 920);
+            
+            // Convert to blob and download
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `retirement-summary-${new Date().toISOString().split('T')[0]}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+            
+        } catch (error) {
+            console.error('Error exporting PNG:', error);
+            alert(language === 'he' ? 'שגיאה בייצוא PNG' : 'Error exporting PNG');
+        }
+    };
+
+    // LLM Analysis Generation - Generate insights about retirement plan
+    const generateLLMAnalysis = () => {
+        try {
+            const taxResult = calculateNetSalary(inputs.currentMonthlySalary || 15000, inputs.taxCountry || 'israel');
+            const totalSavings = (inputs.currentSavings || 0) + (inputs.trainingFund || 0);
+            const yearsToRetirement = (inputs.retirementAge || 67) - (inputs.currentAge || 30);
+            
+            let analysis = "## Retirement Plan Analysis\n\n";
+            
+            // Current Status Analysis
+            analysis += "### Current Financial Status\n";
+            analysis += `- Age: ${inputs.currentAge}, planning to retire at ${inputs.retirementAge} (${yearsToRetirement} years)\n`;
+            analysis += `- Monthly gross salary: ₪${(inputs.currentMonthlySalary || 0).toLocaleString()}\n`;
+            analysis += `- Monthly net salary: ₪${taxResult.netSalary.toLocaleString()} (${taxResult.taxRate}% tax)\n`;
+            analysis += `- Current total savings: ₪${totalSavings.toLocaleString()}\n\n`;
+            
+            // Results Analysis
+            if (results) {
+                analysis += "### Projected Retirement Outlook\n";
+                analysis += `- Expected total accumulation: ₪${Math.round(results.totalSavings).toLocaleString()}\n`;
+                analysis += `- Monthly retirement income: ₪${Math.round(results.monthlyIncome).toLocaleString()}\n`;
+                analysis += `- Replacement ratio: ${((results.monthlyIncome / inputs.currentMonthlySalary) * 100).toFixed(1)}% of current salary\n\n`;
+                
+                // Recommendations based on results
+                analysis += "### Recommendations\n";
+                const replacementRatio = (results.monthlyIncome / inputs.currentMonthlySalary) * 100;
+                
+                if (replacementRatio >= 70) {
+                    analysis += "✅ **Excellent**: Your plan provides a strong replacement ratio of " + replacementRatio.toFixed(1) + "%\n";
+                } else if (replacementRatio >= 50) {
+                    analysis += "⚠️ **Moderate**: Your plan provides " + replacementRatio.toFixed(1) + "% replacement. Consider:\n";
+                    analysis += "- Increasing monthly contributions\n";
+                    analysis += "- Extending working years\n";
+                    analysis += "- Reducing management fees if possible\n";
+                } else {
+                    analysis += "🚨 **Attention Needed**: Only " + replacementRatio.toFixed(1) + "% replacement ratio. Urgent action required:\n";
+                    analysis += "- Significantly increase savings rate\n";
+                    analysis += "- Consider postponing retirement\n";
+                    analysis += "- Optimize investment strategy\n";
+                }
+                
+                // Fee Impact Analysis
+                const feeImpactPercent = (results.managementFeeImpact / results.totalSavings) * 100;
+                analysis += `\n### Fee Impact Analysis\n`;
+                analysis += `- Total fee impact: ₪${Math.round(results.managementFeeImpact).toLocaleString()} (${feeImpactPercent.toFixed(1)}% of total)\n`;
+                analysis += `- Annual fee structure: ${inputs.contributionFees}% on contributions + ${inputs.accumulationFees}% on accumulation\n`;
+                
+                if (feeImpactPercent > 15) {
+                    analysis += "⚠️ **High fees**: Consider negotiating lower fees or changing providers\n";
+                } else if (feeImpactPercent > 10) {
+                    analysis += "💡 **Moderate fees**: Reasonable but monitor for better options\n";
+                } else {
+                    analysis += "✅ **Low fees**: Excellent fee structure\n";
+                }
+            }
+            
+            // Tax Optimization
+            analysis += `\n### Tax Considerations (${inputs.taxCountry?.toUpperCase()})\n`;
+            analysis += `- Current effective tax rate: ${taxResult.taxRate}%\n`;
+            if (inputs.taxCountry === 'israel') {
+                analysis += "- Consider maximizing pension contributions for tax benefits\n";
+                analysis += "- Training fund provides tax-free withdrawals after 6 years\n";
+            }
+            
+            // Next Steps
+            analysis += "\n### Recommended Next Steps\n";
+            analysis += "1. Review and adjust savings rate based on replacement ratio\n";
+            analysis += "2. Optimize fee structure with your pension provider\n";
+            analysis += "3. Consider additional savings vehicles (real estate, stocks)\n";
+            analysis += "4. Plan for inflation impact on purchasing power\n";
+            analysis += "5. Reassess plan annually or after major life changes\n";
+            
+            setLlmAnalysis(analysis);
+            
+        } catch (error) {
+            console.error('Error generating LLM analysis:', error);
+            setLlmAnalysis("Error generating analysis. Please ensure all required fields are filled.");
+        }
+    };
+
+    // AI Tools Export - Generate structured data for Gemini/OpenAI
+    const exportForAI = () => {
+        try {
+            const taxResult = calculateNetSalary(inputs.currentMonthlySalary || 15000, inputs.taxCountry || 'israel');
+            const totalSavings = (inputs.currentSavings || 0) + (inputs.trainingFund || 0);
+            
+            const aiData = {
+                version: "4.0.0",
+                timestamp: new Date().toISOString(),
+                language: language,
+                personalInfo: {
+                    currentAge: inputs.currentAge,
+                    retirementAge: inputs.retirementAge,
+                    yearsToRetirement: (inputs.retirementAge || 67) - (inputs.currentAge || 30)
+                },
+                financial: {
+                    grossMonthlySalary: inputs.currentMonthlySalary || 0,
+                    netMonthlySalary: taxResult.netSalary,
+                    currentSavings: inputs.currentSavings || 0,
+                    trainingFund: inputs.trainingFund || 0,
+                    totalCurrentSavings: totalSavings,
+                    currency: "NIS"
+                },
+                taxAndFees: {
+                    taxCountry: inputs.taxCountry || 'israel',
+                    taxRate: taxResult.taxRate,
+                    contributionFees: inputs.contributionFees || 0.5,
+                    accumulationFees: inputs.accumulationFees || 1.0,
+                    trainingFundFees: inputs.trainingFundFees || 0.5
+                },
+                assumptions: {
+                    expectedReturn: inputs.expectedReturn || 7,
+                    inflationRate: inputs.inflationRate || 3,
+                    pensionContributionRate: 18.6
+                },
+                results: results ? {
+                    totalExpectedSavings: Math.round(results.totalSavings),
+                    pensionSavings: Math.round(results.pensionSavings),
+                    trainingFundSavings: Math.round(results.trainingFundSavings),
+                    monthlyRetirementIncome: Math.round(results.monthlyIncome),
+                    managementFeeImpact: Math.round(results.managementFeeImpact),
+                    achievesTarget: results.achievesTarget
+                } : null,
+                metadata: {
+                    calculationDate: new Date().toISOString(),
+                    plannerVersion: "4.0.0",
+                    autoCalculation: true,
+                    exportFormat: "AI_COMPATIBLE"
+                }
+            };
+            
+            // Create downloadable JSON file
+            const jsonString = JSON.stringify(aiData, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `retirement-plan-ai-export-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            // Also copy to clipboard for easy pasting
+            navigator.clipboard.writeText(jsonString).then(() => {
+                alert(language === 'he' ? 'נתונים הועתקו ללוח והורדו כקובץ JSON' : 'Data copied to clipboard and downloaded as JSON file');
+            }).catch(() => {
+                alert(language === 'he' ? 'נתונים הורדו כקובץ JSON' : 'Data downloaded as JSON file');
+            });
+            
+        } catch (error) {
+            console.error('Error exporting for AI:', error);
+            alert(language === 'he' ? 'שגיאה בייצוא נתונים' : 'Error exporting data');
+        }
+    };
+
     // Basic Results Component - Basic results display
-    const BasicResults = ({ results, language, t }) => {
+    const BasicResults = ({ results, inputs, language, t }) => {
+        // Check if we have minimum required inputs
+        const hasRequiredInputs = inputs.currentAge && inputs.retirementAge && 
+                                 inputs.currentMonthlySalary && inputs.expectedReturn && 
+                                 inputs.currentAge < inputs.retirementAge;
+        
+        if (!results && !hasRequiredInputs) {
+            return React.createElement('div', { 
+                className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" 
+            }, [
+                React.createElement('h2', { 
+                    key: 'title',
+                    className: "text-2xl font-bold text-gray-600 mb-6 flex items-center" 
+                }, [
+                    React.createElement('span', { key: 'icon', className: "mr-2" }, '📋'),
+                    language === 'he' ? 'תוצאות חישוב' : 'Calculation Results'
+                ]),
+                React.createElement('div', {
+                    key: 'placeholder',
+                    className: "text-center py-8"
+                }, [
+                    React.createElement('div', { className: "text-6xl mb-4" }, '💡'),
+                    React.createElement('p', { 
+                        className: "text-gray-600 text-lg mb-2" 
+                    }, language === 'he' ? 'יש להזין פרטים בסיסיים לחישוב' : 'Enter basic information to start calculations'),
+                    React.createElement('p', { 
+                        className: "text-gray-500 text-sm" 
+                    }, language === 'he' ? 'הזן גיל, משכורת ותשואה צפויה' : 'Enter age, salary, and expected return')
+                ])
+            ]);
+        }
+        
         if (!results) return null;
 
         return React.createElement('div', { className: "space-y-4" }, [
@@ -705,7 +1069,7 @@
                             React.createElement('div', { className: "text-base font-bold text-red-800 mt-1" }, 
                                 `₪${Math.round(results.managementFeeImpact || 0).toLocaleString()}`),
                             React.createElement('div', { className: "text-xs text-red-600 mt-1" }, 
-                                language === 'he' ? `דמי ניהול: ${(inputs.contributionFees || 0.5)}% הפקדות + ${(inputs.accumulationFees || 1.0)}% צבירה` : `Fees: ${(inputs.contributionFees || 0.5)}% contributions + ${(inputs.accumulationFees || 1.0)}% accumulation`),
+                                language === 'he' ? `דמי ניהול: ${(inputs.contributionFees || 1.0)}% הפקדות + ${(inputs.accumulationFees || 0.1)}% צבירה` : `Fees: ${(inputs.contributionFees || 1.0)}% contributions + ${(inputs.accumulationFees || 0.1)}% accumulation`),
                             React.createElement('div', { className: "text-xs text-red-600 mt-1" }, 
                                 language === 'he' ? `תשואה נטו: ${(results.netReturn || 0).toFixed(1)}%` : `Net Return: ${(results.netReturn || 0).toFixed(1)}%`)
                         ])
@@ -734,7 +1098,7 @@
     // Main Application Component - Main application component
     const RetirementPlannerCore = () => {
         // State management
-        const [language, setLanguage] = React.useState('he');
+        const [language, setLanguage] = React.useState('en');
         const [activeTab, setActiveTab] = React.useState('basic');
         const [inputs, setInputs] = React.useState({
             currentAge: 30,
@@ -745,13 +1109,45 @@
             trainingFundContribution: 1125, // 7.5% of 15000
             inflationRate: 3,
             expectedReturn: 7,
-            contributionFees: 0.5, // Management fees on contributions (%)
-            accumulationFees: 1.0, // Management fees on accumulation (%)
-            trainingFundFees: 0.5, // 0.5% annual management fees for training fund
+            contributionFees: 1.0, // Management fees on contributions (%)
+            accumulationFees: 0.1, // Management fees on accumulation (%)
+            trainingFundFees: 0.6, // 0.6% annual management fees for training fund
             taxCountry: 'israel' // Tax calculation country
         });
         const [results, setResults] = React.useState(null);
         const [loadingTabs, setLoadingTabs] = React.useState({});
+        const [showChart, setShowChart] = React.useState(false);
+        const [llmAnalysis, setLlmAnalysis] = React.useState(null);
+
+        // Auto-calculation effect - calculate when required inputs change
+        React.useEffect(() => {
+            // Check if we have minimum required inputs for calculation
+            const hasRequiredInputs = inputs.currentAge && inputs.retirementAge && 
+                                     inputs.currentMonthlySalary && inputs.expectedReturn && 
+                                     inputs.currentAge < inputs.retirementAge;
+            
+            if (hasRequiredInputs) {
+                // Automatically calculate with a small delay to avoid excessive calculations
+                const timeoutId = setTimeout(() => {
+                    calculateBasic();
+                }, 300); // 300ms delay for debouncing
+                
+                return () => clearTimeout(timeoutId);
+            }
+        }, [
+            inputs.currentAge,
+            inputs.retirementAge, 
+            inputs.currentSavings,
+            inputs.currentMonthlySalary,
+            inputs.trainingFund,
+            inputs.trainingFundContribution,
+            inputs.inflationRate,
+            inputs.expectedReturn,
+            inputs.contributionFees,
+            inputs.accumulationFees,
+            inputs.trainingFundFees,
+            inputs.taxCountry
+        ]);
 
         // Auto-load advanced modules for better UX (like versions 2.3-2.4)
         React.useEffect(() => {
@@ -808,6 +1204,31 @@
             }, 2000); // Increased delay to ensure moduleLoader is ready
         }, []);
 
+        // Generate chart data for accumulation over time
+        const generateChartData = () => {
+            if (!results) return [];
+            
+            const chartData = [];
+            const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
+            const monthlyContribution = inputs.currentMonthlySalary * 0.186;
+            const annualContribution = monthlyContribution * 12;
+            const netPensionReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.accumulationFees || 0.1));
+            
+            for (let year = 0; year <= yearsToRetirement; year++) {
+                const age = inputs.currentAge + year;
+                const futureValue = inputs.currentSavings * Math.pow(1 + netPensionReturn/100, year) +
+                    annualContribution * (year > 0 ? (Math.pow(1 + netPensionReturn/100, year) - 1) / (netPensionReturn/100) : 0);
+                
+                chartData.push({
+                    age: age,
+                    value: Math.round(futureValue),
+                    totalSavings: Math.round(futureValue)
+                });
+            }
+            
+            return chartData;
+        };
+
         // Basic calculation function with separate contribution and accumulation fees
         const calculateBasic = () => {
             const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
@@ -819,8 +1240,8 @@
             const netTrainingReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.5));
             
             // Apply contribution fees to annual contributions
-            const netAnnualContribution = annualContribution * (1 - (inputs.contributionFees || 0.5) / 100);
-            const netTrainingAnnualContribution = (inputs.trainingFundContribution || 0) * 12 * (1 - (inputs.contributionFees || 0.5) / 100);
+            const netAnnualContribution = annualContribution * (1 - (inputs.contributionFees || 1.0) / 100);
+            const netTrainingAnnualContribution = (inputs.trainingFundContribution || 0) * 12 * (1 - (inputs.contributionFees || 1.0) / 100);
             
             // Pension calculation with separate contribution and accumulation fees
             const pensionFutureValue = inputs.currentSavings * Math.pow(1 + netPensionReturn/100, yearsToRetirement) +
@@ -834,8 +1255,8 @@
             const monthlyIncome = totalFutureValue * (netPensionReturn/100) / 12;
             
             // Calculate total fees impact (contribution fees + accumulation fees)
-            const totalContributionFeesImpact = (annualContribution + (inputs.trainingFundContribution || 0) * 12) * (inputs.contributionFees || 0.5) / 100 * yearsToRetirement;
-            const totalAccumulationFeesImpact = totalFutureValue * (inputs.accumulationFees || 1.0) / 100 * yearsToRetirement;
+            const totalContributionFeesImpact = (annualContribution + (inputs.trainingFundContribution || 0) * 12) * (inputs.contributionFees || 1.0) / 100 * yearsToRetirement;
+            const totalAccumulationFeesImpact = totalFutureValue * (inputs.accumulationFees || 0.1) / 100 * yearsToRetirement;
             
             setResults({
                 totalSavings: Math.round(totalFutureValue),
@@ -907,9 +1328,10 @@
                 scenarios: 'תרחישים',
                 fire: 'FIRE',
                 stress: 'בדיקות לחץ',
-                calculate: 'חשב',
                 currentAge: 'גיל נוכחי',
-                retirementAge: 'גיל פרישה'
+                retirementAge: 'גיל פרישה',
+                autoCalcActive: 'חישוב אוטומטי פעיל',
+                enterBasicInfo: 'יש להזין פרטים בסיסיים לחישוב'
             },
             en: {
                 title: 'Advanced Retirement Planner',
@@ -920,9 +1342,10 @@
                 scenarios: 'Scenarios',
                 fire: 'FIRE',
                 stress: 'Stress Tests',
-                calculate: 'Calculate',
                 currentAge: 'Current Age',
-                retirementAge: 'Retirement Age'
+                retirementAge: 'Retirement Age',
+                autoCalcActive: 'Auto-calculation active',
+                enterBasicInfo: 'Enter basic information to start calculations'
             }
         };
 
@@ -1031,14 +1454,16 @@
                             inputs, setInputs, language, t: currentT
                         }),
                         
-                        // Calculate Button
+                        // Auto-calculation status indicator
                         React.createElement('div', {
-                            key: 'calculate-button',
-                            className: 'text-center'
-                        }, React.createElement('button', {
-                            onClick: calculateBasic,
-                            className: 'px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg'
-                        }, currentT.calculate))
+                            key: 'auto-calc-status',
+                            className: 'text-center text-sm text-white/70 mt-4'
+                        }, React.createElement('div', {
+                            className: 'flex items-center justify-center space-x-2'
+                        }, [
+                            React.createElement('span', { key: 'icon', className: 'text-green-400' }, '⚡'),
+                            React.createElement('span', { key: 'text' }, currentT.autoCalcActive)
+                        ]))
                     ]),
 
                     // Results Column with Side Panel
@@ -1058,12 +1483,68 @@
                         React.createElement(BasicResults, {
                             key: 'basic-results',
                             results,
+                            inputs,
                             language,
                             t: currentT
-                        })
+                        }),
+                        
+                        // LLM Analysis Display
+                        llmAnalysis && React.createElement('div', {
+                            key: 'llm-analysis',
+                            className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in"
+                        }, [
+                            React.createElement('div', {
+                                className: "flex justify-between items-center mb-4"
+                            }, [
+                                React.createElement('h3', {
+                                    className: "text-xl font-bold text-indigo-700"
+                                }, '🧠 AI Analysis & Recommendations'),
+                                React.createElement('button', {
+                                    onClick: () => setLlmAnalysis(null),
+                                    className: "text-gray-500 hover:text-gray-700"
+                                }, '✕')
+                            ]),
+                            React.createElement('div', {
+                                className: "prose prose-sm max-w-none text-gray-700",
+                                style: { whiteSpace: 'pre-line' }
+                            }, llmAnalysis)
+                        ])
                     ])
                 ])
-            ])
+            ]),
+            
+            // Chart Modal
+            showChart && React.createElement('div', {
+                key: 'chart-modal',
+                className: 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50',
+                onClick: () => setShowChart(false)
+            }, React.createElement('div', {
+                className: 'bg-white rounded-2xl p-6 max-w-4xl max-h-[90vh] overflow-auto m-4',
+                onClick: (e) => e.stopPropagation()
+            }, [
+                React.createElement('div', {
+                    key: 'header',
+                    className: 'flex justify-between items-center mb-6'
+                }, [
+                    React.createElement('h2', {
+                        className: 'text-2xl font-bold text-gray-800'
+                    }, '📊 Retirement Accumulation Projection'),
+                    React.createElement('button', {
+                        onClick: () => setShowChart(false),
+                        className: 'text-gray-500 hover:text-gray-700 text-2xl'
+                    }, '✕')
+                ]),
+                React.createElement('div', {
+                    key: 'chart-container',
+                    className: 'h-96'
+                }, results ? React.createElement(SimpleChart, {
+                    data: generateChartData(),
+                    type: 'line',
+                    language: language
+                }) : React.createElement('div', {
+                    className: 'flex items-center justify-center h-full text-gray-500'
+                }, 'Complete your inputs to see the chart'))
+            ]))
         ]);
     };
 
