@@ -79,10 +79,11 @@ jobs:
         node -e 'const puppeteer = require("puppeteer");
         (async () => {
           const browser = await puppeteer.launch({
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            args: ["--no-sandbox", "--disable-setuid-sandbox"],
           });
           const page = await browser.newPage();
           await page.goto("http://localhost:8080");
+          await page.waitForSelector("#root", { timeout: 5000 });
           const appElement = await page.$("#root");
           if (appElement) {
             console.log("✅ App element found");
