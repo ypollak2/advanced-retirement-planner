@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Test</title>
+</head>
+<body>
+    <div id="debug">Testing...</div>
+    
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const debugDiv = document.getElementById('debug');
+            
+            // Test dependencies
+            const tests = [];
+            tests.push(`React: ${typeof React !== 'undefined' ? '✅' : '❌'}`);
+            tests.push(`ReactDOM: ${typeof ReactDOM !== 'undefined' ? '✅' : '❌'}`);
+            tests.push(`Chart: ${typeof Chart !== 'undefined' ? '✅' : '❌'}`);
+            
+            debugDiv.innerHTML = tests.join('<br>');
+            
+            // Test core files
+            fetch('./src/core/dynamic-loader.js')
+                .then(response => {
+                    tests.push(`dynamic-loader.js: ${response.ok ? '✅' : '❌'}`);
+                    return fetch('./src/core/app-main.js');
+                })
+                .then(response => {
+                    tests.push(`app-main.js: ${response.ok ? '✅' : '❌'}`);
+                    debugDiv.innerHTML = tests.join('<br>');
+                })
+                .catch(error => {
+                    tests.push(`Error: ${error.message}`);
+                    debugDiv.innerHTML = tests.join('<br>');
+                });
+        });
+    </script>
+</body>
+</html>

@@ -7,8 +7,8 @@
     <meta name="description" content="Advanced retirement planning tool with comprehensive investment tracking, FIRE calculator, partner planning, and stress testing">
     <meta name="keywords" content="retirement, pension planning, retirement calculator, pension savings, training fund, investment planning, partner planning, family financial planning">
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS via CDN (optimized for production) -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     
     <!-- React & ReactDOM from CDN -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
@@ -340,7 +340,7 @@
                             </button>
                         </div>
                     </div>
-                `;
+                `);
                 // Add event listener for retry button
                 setTimeout(() => {
                     const retryBtn = document.getElementById('retryBtn2');
