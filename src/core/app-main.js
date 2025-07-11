@@ -1561,6 +1561,39 @@ ${language === 'he' ?
 
         const currentT = t[language];
 
+        // Calculate values needed for SavingsSummaryPanel and BottomLineSummary
+        // IMPORTANT: ALL calculated values below must be passed as props to components
+        // If adding new calculated values, update component prop lists accordingly
+        const totalSavings = Math.max(0, (inputs.currentSavings || 0) + (inputs.trainingFund || 0));
+        const yearsToRetirement = Math.max(0, (inputs.retirementAge || 67) - (inputs.currentAge || 30));
+        const totalMonthlySalary = inputs.planningType === 'couple' 
+            ? (inputs.currentMonthlySalary || 15000) + (inputs.partner1Salary || 0) + (inputs.partner2Salary || 0)
+            : (inputs.currentMonthlySalary || 15000);
+        const monthlyTotal = Math.max(0, totalMonthlySalary * 0.186 + (inputs.trainingFundContribution || 0));
+        
+        const netPensionReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.accumulationFees || 1.0));
+        const netTrainingReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.6));
+        const avgNetReturn = Math.max(0.1, (netPensionReturn + netTrainingReturn) / 2);
+        
+        let projectedWithGrowth = 0;
+        if (yearsToRetirement > 0 && avgNetReturn > 0) {
+            const returnRate = avgNetReturn / 100;
+            const futureValueCurrent = totalSavings * Math.pow(1 + returnRate, yearsToRetirement);
+            const futureValueContributions = (monthlyTotal * 12) * ((Math.pow(1 + returnRate, yearsToRetirement) - 1) / returnRate);
+            projectedWithGrowth = futureValueCurrent + futureValueContributions;
+        } else {
+            projectedWithGrowth = totalSavings + (monthlyTotal * 12 * yearsToRetirement);
+        }
+        
+        const inflationRate = Math.max(0, Math.min(20, (inputs.inflationRate || 3))) / 100;
+        const buyingPowerToday = yearsToRetirement > 0 ? 
+            projectedWithGrowth / Math.pow(1 + inflationRate, yearsToRetirement) : 
+            projectedWithGrowth;
+        
+        const estimatedMonthlyIncome = yearsToRetirement > 0 ? 
+            (projectedWithGrowth * (avgNetReturn / 100)) / 12 : 
+            0;
+
         return React.createElement('div', {
             className: 'min-h-screen py-6 px-4',
             dir: language === 'he' ? 'rtl' : 'ltr',
@@ -1678,56 +1711,24 @@ ${language === 'he' ?
                     ]),
 
                     // Results Column with Side Panel
+                    // Results Column with Side Panel
                     React.createElement('div', {
                         key: 'results',
                         className: 'results-column space-y-6 sidebar-panel'
                     }, [
                         // Real-time Summary Panel (with calculated values)
-                        // Calculate values needed for SavingsSummaryPanel and BottomLineSummary
-                            // IMPORTANT: ALL calculated values below must be passed as props to components
-                            // If adding new calculated values, update component prop lists accordingly
-                            const totalSavings = Math.max(0, (inputs.currentSavings || 0) + (inputs.trainingFund || 0));
-                            const yearsToRetirement = Math.max(0, (inputs.retirementAge || 67) - (inputs.currentAge || 30));
-                            const totalMonthlySalary = inputs.planningType === 'couple' 
-                                ? (inputs.currentMonthlySalary || 15000) + (inputs.partner1Salary || 0) + (inputs.partner2Salary || 0)
-                                : (inputs.currentMonthlySalary || 15000);
-                            const monthlyTotal = Math.max(0, totalMonthlySalary * 0.186 + (inputs.trainingFundContribution || 0));
-                            
-                            const netPensionReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.accumulationFees || 1.0));
-                            const netTrainingReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.6));
-                            const avgNetReturn = Math.max(0.1, (netPensionReturn + netTrainingReturn) / 2);
-                            
-                            let projectedWithGrowth = 0;
-                            if (yearsToRetirement > 0 && avgNetReturn > 0) {
-                                const returnRate = avgNetReturn / 100;
-                                const futureValueCurrent = totalSavings * Math.pow(1 + returnRate, yearsToRetirement);
-                                const futureValueContributions = (monthlyTotal * 12) * ((Math.pow(1 + returnRate, yearsToRetirement) - 1) / returnRate);
-                                projectedWithGrowth = futureValueCurrent + futureValueContributions;
-                            } else {
-                                projectedWithGrowth = totalSavings + (monthlyTotal * 12 * yearsToRetirement);
-                            }
-                            
-                            const inflationRate = Math.max(0, Math.min(20, (inputs.inflationRate || 3))) / 100;
-                            const buyingPowerToday = yearsToRetirement > 0 ? 
-                                projectedWithGrowth / Math.pow(1 + inflationRate, yearsToRetirement) : 
-                                projectedWithGrowth;
-                            
-                            const estimatedMonthlyIncome = yearsToRetirement > 0 ? 
-                                (projectedWithGrowth * (avgNetReturn / 100)) / 12 : 
-                                0;
-                            
-                            React.createElement(SavingsSummaryPanel, {
+                        React.createElement(SavingsSummaryPanel, {
                             key: 'summary-panel',
                             inputs,
                             language,
                             t: currentT,
-                            totalMonthlySalary,
-                            yearsToRetirement,
-                            estimatedMonthlyIncome,
-                            projectedWithGrowth,
-                            buyingPowerToday,
-                            monthlyTotal,
-                            avgNetReturn,
+                            totalMonthlySalary: totalMonthlySalary,
+                            yearsToRetirement: yearsToRetirement,
+                            estimatedMonthlyIncome: estimatedMonthlyIncome,
+                            projectedWithGrowth: projectedWithGrowth,
+                            buyingPowerToday: buyingPowerToday,
+                            monthlyTotal: monthlyTotal,
+                            avgNetReturn: avgNetReturn,
                             exportToPNG,
                             exportForAI,
                             setShowChart,
