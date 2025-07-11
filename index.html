@@ -786,19 +786,9 @@
             });
         }
 
-        // Wait for dependencies and initialize
-        const maxWaitTime = 10000; // 10 seconds
-        let waitTime = 0;
-        const checkInterval = setInterval(() => {
-            if (checkDependencies()) {
-                clearInterval(checkInterval);
-                initializeApp();
-            } else if (waitTime > maxWaitTime) {
-                clearInterval(checkInterval);
-                console.error('⏰ Dependency loading timeout');
-            }
-            waitTime += 100;
-        }, 100);
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
     </script>
 </body>
 </html>

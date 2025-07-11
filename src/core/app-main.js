@@ -1,8 +1,7 @@
 // Core Application - Advanced Retirement Planner
 // Core application with basic components and dynamic loading
 
-(function() {
-    'use strict';
+'use strict';
 
     // Icon Components - Simple icon components
     const Calculator = ({ size = 16, className = "" }) => React.createElement('span', { 
@@ -1882,4 +1881,3 @@ ${language === 'he' ?
     // Dispatch a custom event to signal that the app is ready
     document.dispatchEvent(new CustomEvent('appReady'));
 
-})();
