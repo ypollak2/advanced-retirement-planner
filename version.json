@@ -1,5 +1,5 @@
 {
-  "version": "4.2.0",
-  "releaseDate": "2025-07-11",
-  "description": "Enhanced UI Visibility and Export Fixes: Improved headline and button visibility with enhanced CSS, fixed PNG and AI export functionality, enhanced chart display, added dynamic LLM recommendations, improved sidebar summary for bottom line viewing, comprehensive bug fixes"
+  "version": "4.2.1",
+  "releaseDate": "2025-07-12",
+  "description": "Bugfix: Resolved a critical ReferenceError caused by duplicate, out-of-scope function definitions. Removed outdated global functions and updated the SavingsSummaryPanel component to accept required functions as props, ensuring proper functionality. Incremented script version to prevent browser caching issues."
 }

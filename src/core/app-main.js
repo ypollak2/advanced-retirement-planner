@@ -181,7 +181,12 @@
     // Props: inputs, language, t, totalMonthlySalary, yearsToRetirement, estimatedMonthlyIncome, 
     //        projectedWithGrowth, buyingPowerToday, monthlyTotal, avgNetReturn
     // Each prop has a safe fallback calculation to ensure robust operation
-    const SavingsSummaryPanel = ({ inputs, language, t, totalMonthlySalary, yearsToRetirement, estimatedMonthlyIncome, projectedWithGrowth, buyingPowerToday, monthlyTotal, avgNetReturn }) => {
+    const SavingsSummaryPanel = ({ 
+        inputs, language, t, totalMonthlySalary, yearsToRetirement, 
+        estimatedMonthlyIncome, projectedWithGrowth, buyingPowerToday, 
+        monthlyTotal, avgNetReturn, exportToPNG, exportForAI, 
+        setShowChart, generateLLMAnalysis
+    }) => {
         const [exchangeRates, setExchangeRates] = React.useState({
             USD: 3.6, EUR: 4.0, GBP: 4.7, BTC: 180000, ETH: 9000
         });
@@ -972,298 +977,7 @@
         };
     };
 
-    // Export Functions - PNG and AI-compatible exports
-    const exportToPNG = async () => {
-        try {
-            console.log('🖼️ Starting PNG export...');
-            
-            // Check if we have data to export
-            if (!results) {
-                alert(language === 'he' ? 'אין נתונים לייצוא. אנא בצע חישוב תחילה.' : 'No data to export. Please calculate first.');
-                return;
-            }
-            
-            // Create a canvas element for export
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 800;
-            canvas.height = 1000;
-            
-            // Set background gradient (manual implementation since canvas doesn't support CSS gradients)
-            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            gradient.addColorStop(0, '#667eea');
-            gradient.addColorStop(1, '#764ba2');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Add white background for content
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-            ctx.roundRect = function(x, y, width, height, radius) {
-                this.beginPath();
-                this.moveTo(x + radius, y);
-                this.lineTo(x + width - radius, y);
-                this.quadraticCurveTo(x + width, y, x + width, y + radius);
-                this.lineTo(x + width, y + height - radius);
-                this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-                this.lineTo(x + radius, y + height);
-                this.quadraticCurveTo(x, y + height, x, y + height - radius);
-                this.lineTo(x, y + radius);
-                this.quadraticCurveTo(x, y, x + radius, y);
-                this.closePath();
-            };
-            ctx.roundRect(50, 50, 700, 900, 20);
-            ctx.fill();
-            
-            // Add title
-            ctx.fillStyle = '#4C1D95';
-            ctx.font = 'bold 32px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(language === 'he' ? 'סיכום תכנון פרישה' : 'Retirement Planning Summary', 400, 120);
-            
-            // Add current data
-            const taxResult = calculateNetSalary(inputs.currentMonthlySalary || 15000, inputs.taxCountry || 'israel');
-            const totalSavings = (inputs.currentSavings || 0) + (inputs.trainingFund || 0);
-            
-            let yPos = 180;
-            ctx.font = '18px Arial';
-            ctx.textAlign = 'left';
-            
-            // Personal Info
-            ctx.fillStyle = '#1F2937';
-            ctx.fillText(language === 'he' ? 'פרטים אישיים:' : 'Personal Information:', 80, yPos);
-            yPos += 40;
-            ctx.font = '16px Arial';
-            ctx.fillText(`${language === 'he' ? 'גיל:' : 'Age:'} ${inputs.currentAge}`, 100, yPos);
-            yPos += 30;
-            ctx.fillText(`${language === 'he' ? 'גיל פרישה:' : 'Retirement Age:'} ${inputs.retirementAge}`, 100, yPos);
-            yPos += 30;
-            
-            // Financial Info
-            yPos += 20;
-            ctx.font = '18px Arial';
-            ctx.fillText(language === 'he' ? 'מידע פיננסי:' : 'Financial Information:', 80, yPos);
-            yPos += 40;
-            ctx.font = '16px Arial';
-            ctx.fillText(`${language === 'he' ? 'משכורת ברוטו:' : 'Gross Salary:'} ₪${(inputs.currentMonthlySalary || 0).toLocaleString()}`, 100, yPos);
-            yPos += 30;
-            ctx.fillText(`${language === 'he' ? 'משכורת נטו:' : 'Net Salary:'} ₪${taxResult.netSalary.toLocaleString()}`, 100, yPos);
-            yPos += 30;
-            ctx.fillText(`${language === 'he' ? 'חיסכון נוכחי:' : 'Current Savings:'} ₪${totalSavings.toLocaleString()}`, 100, yPos);
-            yPos += 30;
-            
-            // Tax & Fees Info
-            yPos += 20;
-            ctx.font = '18px Arial';
-            ctx.fillText(language === 'he' ? 'מסים ודמי ניהול:' : 'Taxes & Fees:', 80, yPos);
-            yPos += 40;
-            ctx.font = '16px Arial';
-            ctx.fillText(`${language === 'he' ? 'שיעור מס:' : 'Tax Rate:'} ${taxResult.taxRate}%`, 100, yPos);
-            yPos += 30;
-            ctx.fillText(`${language === 'he' ? 'דמי ניהול הפקדות:' : 'Contribution Fees:'} ${inputs.contributionFees || 0.5}%`, 100, yPos);
-            yPos += 30;
-            ctx.fillText(`${language === 'he' ? 'דמי ניהול צבירה:' : 'Accumulation Fees:'} ${inputs.accumulationFees || 1.0}%`, 100, yPos);
-            yPos += 30;
-            
-            // Results (if available)
-            if (results) {
-                yPos += 20;
-                ctx.font = '18px Arial';
-                ctx.fillText(language === 'he' ? 'תוצאות:' : 'Results:', 80, yPos);
-                yPos += 40;
-                ctx.font = '16px Arial';
-                ctx.fillText(`${language === 'he' ? 'צבירה צפויה:' : 'Expected Total:'} ₪${Math.round(results.totalSavings).toLocaleString()}`, 100, yPos);
-                yPos += 30;
-                ctx.fillText(`${language === 'he' ? 'הכנסה חודשית:' : 'Monthly Income:'} ₪${Math.round(results.monthlyIncome).toLocaleString()}`, 100, yPos);
-                yPos += 30;
-            }
-            
-            // Footer
-            ctx.font = '12px Arial';
-            ctx.fillStyle = '#6B7280';
-            ctx.textAlign = 'center';
-            ctx.fillText(`Generated on ${new Date().toLocaleDateString()} | Advanced Retirement Planner v4.2.0`, 400, 920);
-            
-            // Convert to blob and download
-            canvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `retirement-summary-${new Date().toISOString().split('T')[0]}.png`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            });
-            
-        } catch (error) {
-            console.error('Error exporting PNG:', error);
-            alert(language === 'he' ? 'שגיאה בייצוא PNG' : 'Error exporting PNG');
-        }
-    };
-
-    // LLM Analysis Generation - Generate insights about retirement plan
-    const generateLLMAnalysis = () => {
-        try {
-            const taxResult = calculateNetSalary(inputs.currentMonthlySalary || 15000, inputs.taxCountry || 'israel');
-            const totalSavings = (inputs.currentSavings || 0) + (inputs.trainingFund || 0);
-            const yearsToRetirement = (inputs.retirementAge || 67) - (inputs.currentAge || 30);
-            
-            let analysis = "## Retirement Plan Analysis\n\n";
-            
-            // Current Status Analysis
-            analysis += "### Current Financial Status\n";
-            analysis += `- Age: ${inputs.currentAge}, planning to retire at ${inputs.retirementAge} (${yearsToRetirement} years)\n`;
-            analysis += `- Monthly gross salary: ₪${(inputs.currentMonthlySalary || 0).toLocaleString()}\n`;
-            analysis += `- Monthly net salary: ₪${taxResult.netSalary.toLocaleString()} (${taxResult.taxRate}% tax)\n`;
-            analysis += `- Current total savings: ₪${totalSavings.toLocaleString()}\n\n`;
-            
-            // Results Analysis
-            if (results) {
-                analysis += "### Projected Retirement Outlook\n";
-                analysis += `- Expected total accumulation: ₪${Math.round(results.totalSavings).toLocaleString()}\n`;
-                analysis += `- Monthly retirement income: ₪${Math.round(results.monthlyIncome).toLocaleString()}\n`;
-                analysis += `- Replacement ratio: ${((results.monthlyIncome / inputs.currentMonthlySalary) * 100).toFixed(1)}% of current salary\n\n`;
-                
-                // Recommendations based on results
-                analysis += "### Recommendations\n";
-                const replacementRatio = (results.monthlyIncome / inputs.currentMonthlySalary) * 100;
-                
-                if (replacementRatio >= 70) {
-                    analysis += "✅ **Excellent**: Your plan provides a strong replacement ratio of " + replacementRatio.toFixed(1) + "%\n";
-                } else if (replacementRatio >= 50) {
-                    analysis += "⚠️ **Moderate**: Your plan provides " + replacementRatio.toFixed(1) + "% replacement. Consider:\n";
-                    analysis += "- Increasing monthly contributions\n";
-                    analysis += "- Extending working years\n";
-                    analysis += "- Reducing management fees if possible\n";
-                } else {
-                    analysis += "🚨 **Attention Needed**: Only " + replacementRatio.toFixed(1) + "% replacement ratio. Urgent action required:\n";
-                    analysis += "- Significantly increase savings rate\n";
-                    analysis += "- Consider postponing retirement\n";
-                    analysis += "- Optimize investment strategy\n";
-                }
-                
-                // Fee Impact Analysis
-                const feeImpactPercent = (results.managementFeeImpact / results.totalSavings) * 100;
-                analysis += `\n### Fee Impact Analysis\n`;
-                analysis += `- Total fee impact: ₪${Math.round(results.managementFeeImpact).toLocaleString()} (${feeImpactPercent.toFixed(1)}% of total)\n`;
-                analysis += `- Annual fee structure: ${inputs.contributionFees}% on contributions + ${inputs.accumulationFees}% on accumulation\n`;
-                
-                if (feeImpactPercent > 15) {
-                    analysis += "⚠️ **High fees**: Consider negotiating lower fees or changing providers\n";
-                } else if (feeImpactPercent > 10) {
-                    analysis += "💡 **Moderate fees**: Reasonable but monitor for better options\n";
-                } else {
-                    analysis += "✅ **Low fees**: Excellent fee structure\n";
-                }
-            }
-            
-            // Tax Optimization
-            analysis += `\n### Tax Considerations (${inputs.taxCountry?.toUpperCase()})\n`;
-            analysis += `- Current effective tax rate: ${taxResult.taxRate}%\n`;
-            if (inputs.taxCountry === 'israel') {
-                analysis += "- Consider maximizing pension contributions for tax benefits\n";
-                analysis += "- Training fund provides tax-free withdrawals after 6 years\n";
-            }
-            
-            // Next Steps
-            analysis += "\n### Recommended Next Steps\n";
-            analysis += "1. Review and adjust savings rate based on replacement ratio\n";
-            analysis += "2. Optimize fee structure with your pension provider\n";
-            analysis += "3. Consider additional savings vehicles (real estate, stocks)\n";
-            analysis += "4. Plan for inflation impact on purchasing power\n";
-            analysis += "5. Reassess plan annually or after major life changes\n";
-            
-            setLlmAnalysis(analysis);
-            
-        } catch (error) {
-            console.error('Error generating LLM analysis:', error);
-            setLlmAnalysis("Error generating analysis. Please ensure all required fields are filled.");
-        }
-    };
-
-    // AI Tools Export - Generate structured data for Gemini/OpenAI
-    const exportForAI = () => {
-        try {
-            console.log('🤖 Starting AI export...');
-            
-            // Check if we have data to export
-            if (!results) {
-                alert(language === 'he' ? 'אין נתונים לייצוא. אנא בצע חישוב תחילה.' : 'No data to export. Please calculate first.');
-                return;
-            }
-            
-            const taxResult = calculateNetSalary(inputs.currentMonthlySalary || 15000, inputs.taxCountry || 'israel');
-            const totalSavings = (inputs.currentSavings || 0) + (inputs.trainingFund || 0);
-            
-            const aiData = {
-                version: "4.2.0",
-                timestamp: new Date().toISOString(),
-                language: language,
-                personalInfo: {
-                    currentAge: inputs.currentAge,
-                    retirementAge: inputs.retirementAge,
-                    yearsToRetirement: (inputs.retirementAge || 67) - (inputs.currentAge || 30)
-                },
-                financial: {
-                    grossMonthlySalary: inputs.currentMonthlySalary || 0,
-                    netMonthlySalary: taxResult.netSalary,
-                    currentSavings: inputs.currentSavings || 0,
-                    trainingFund: inputs.trainingFund || 0,
-                    totalCurrentSavings: totalSavings,
-                    currency: "NIS"
-                },
-                taxAndFees: {
-                    taxCountry: inputs.taxCountry || 'israel',
-                    taxRate: taxResult.taxRate,
-                    contributionFees: inputs.contributionFees || 0.5,
-                    accumulationFees: inputs.accumulationFees || 1.0,
-                    trainingFundFees: inputs.trainingFundFees || 0.5
-                },
-                assumptions: {
-                    expectedReturn: inputs.expectedReturn || 7,
-                    inflationRate: inputs.inflationRate || 3,
-                    pensionContributionRate: 18.6
-                },
-                results: results ? {
-                    totalExpectedSavings: Math.round(results.totalSavings),
-                    pensionSavings: Math.round(results.pensionSavings),
-                    trainingFundSavings: Math.round(results.trainingFundSavings),
-                    monthlyRetirementIncome: Math.round(results.monthlyIncome),
-                    managementFeeImpact: Math.round(results.managementFeeImpact),
-                    achievesTarget: results.achievesTarget
-                } : null,
-                metadata: {
-                    calculationDate: new Date().toISOString(),
-                    plannerVersion: "4.2.0",
-                    autoCalculation: true,
-                    exportFormat: "AI_COMPATIBLE"
-                }
-            };
-            
-            // Create downloadable JSON file
-            const jsonString = JSON.stringify(aiData, null, 2);
-            const blob = new Blob([jsonString], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `retirement-plan-ai-export-${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            // Also copy to clipboard for easy pasting
-            navigator.clipboard.writeText(jsonString).then(() => {
-                alert(language === 'he' ? 'נתונים הועתקו ללוח והורדו כקובץ JSON' : 'Data copied to clipboard and downloaded as JSON file');
-            }).catch(() => {
-                alert(language === 'he' ? 'נתונים הורדו כקובץ JSON' : 'Data downloaded as JSON file');
-            });
-            
-        } catch (error) {
-            console.error('Error exporting for AI:', error);
-            alert(language === 'he' ? 'שגיאה בייצוא נתונים' : 'Error exporting data');
-        }
-    };
+    
 
     // Basic Results Component - Basic results display
     const BasicResults = ({ results, inputs, language, t }) => {
@@ -2001,20 +1715,23 @@ ${language === 'he' ?
                                 (projectedWithGrowth * (avgNetReturn / 100)) / 12 : 
                                 0;
                             
-                            return React.createElement(SavingsSummaryPanel, {
-                                key: 'summary-panel',
-                                inputs,
-                                language,
-                                t: currentT,
-                                // Pass calculated values
-                                totalMonthlySalary,
-                                yearsToRetirement,
-                                estimatedMonthlyIncome,
-                                projectedWithGrowth,
-                                buyingPowerToday,
-                                monthlyTotal,
-                                avgNetReturn
-                            });
+                            React.createElement(SavingsSummaryPanel, {
+                            key: 'summary-panel',
+                            inputs,
+                            language,
+                            t: currentT,
+                            totalMonthlySalary,
+                            yearsToRetirement,
+                            estimatedMonthlyIncome,
+                            projectedWithGrowth,
+                            buyingPowerToday,
+                            monthlyTotal,
+                            avgNetReturn,
+                            exportToPNG,
+                            exportForAI,
+                            setShowChart,
+                            generateLLMAnalysis
+                        }),
                         })(),
                         
                         // Basic Results
