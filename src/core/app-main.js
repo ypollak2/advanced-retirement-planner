@@ -116,31 +116,113 @@
         });
     };
 
+    // Bottom Line Summary Component - Key metrics display
+    const BottomLineSummary = ({ inputs, language, totalMonthlySalary, yearsToRetirement, estimatedMonthlyIncome, projectedWithGrowth, buyingPowerToday, formatCurrency }) => {
+        return React.createElement('div', {
+            className: "border-t border-gray-200 pt-4 mb-4"
+        }, [
+            React.createElement('div', { 
+                key: 'summary-title',
+                className: "header-primary text-sm font-bold text-gray-900 mb-3 flex items-center" 
+            }, [
+                React.createElement('span', { key: 'icon', className: "mr-2" }, '📍'),
+                language === 'he' ? 'השורה התחתונה' : 'Bottom Line'
+            ]),
+            
+            // Key Metrics Cards
+            React.createElement('div', { 
+                key: 'key-metrics',
+                className: "space-y-2" 
+            }, [
+                // Monthly income in retirement
+                React.createElement('div', {
+                    key: 'monthly-retirement',
+                    className: "metric-card p-4 border-2 border-indigo-300 bg-indigo-50"
+                }, [
+                    React.createElement('div', { className: "text-xs font-semibold text-indigo-600 uppercase tracking-wide" }, 
+                        language === 'he' ? 'הכנסה חודשית בפרישה' : 'Monthly Retirement Income'),
+                    React.createElement('div', { className: "text-2xl font-bold text-indigo-800 wealth-amount mt-1" }, 
+                        formatCurrency(estimatedMonthlyIncome || 0)),
+                    React.createElement('div', { className: "text-xs text-indigo-600 mt-1" }, 
+                        `${totalMonthlySalary > 0 ? ((estimatedMonthlyIncome / totalMonthlySalary) * 100).toFixed(0) : 0}% ${language === 'he' ? 'מהמשכורת הנוכחית' : 'of current salary'}`)
+                ]),
+                
+                // Years to retirement
+                React.createElement('div', {
+                    key: 'years-countdown',
+                    className: "metric-card p-3 border-2 border-purple-300 bg-purple-50"
+                }, [
+                    React.createElement('div', { className: "text-xs font-semibold text-purple-600 uppercase tracking-wide" }, 
+                        language === 'he' ? 'זמן לפרישה' : 'Time to Retirement'),
+                    React.createElement('div', { className: "text-xl font-bold text-purple-800" }, 
+                        `${yearsToRetirement || 0} ${language === 'he' ? 'שנים' : 'years'}`),
+                    React.createElement('div', { className: "text-xs text-purple-600" }, 
+                        `${language === 'he' ? 'עד גיל' : 'Until age'} ${inputs.retirementAge || 67}`)
+                ]),
+                
+                // Total projected savings
+                React.createElement('div', {
+                    key: 'total-savings',
+                    className: "metric-card p-3 border-2 border-green-300 bg-green-50"
+                }, [
+                    React.createElement('div', { className: "text-xs font-semibold text-green-600 uppercase tracking-wide" }, 
+                        language === 'he' ? 'צבירה כוללת צפויה' : 'Total Projected Savings'),
+                    React.createElement('div', { className: "text-xl font-bold text-green-800 wealth-amount" }, 
+                        formatCurrency(projectedWithGrowth || 0)),
+                    React.createElement('div', { className: "text-xs text-green-600" }, 
+                        `${language === 'he' ? 'כוח קנייה:' : 'Buying power:'} ${formatCurrency(buyingPowerToday || 0)}`)
+                ])
+            ])
+        ]);
+    };
+
     // Savings Summary Panel Component - Real-time savings overview with multi-currency support
     const SavingsSummaryPanel = ({ inputs, language, t }) => {
         const [exchangeRates, setExchangeRates] = React.useState({
             USD: 3.6, EUR: 4.0, GBP: 4.7, BTC: 180000, ETH: 9000
         });
         
-        // Calculate real-time totals with separate contribution and accumulation fees
-        const totalSavings = (inputs.currentSavings || 0) + (inputs.trainingFund || 0);
-        const yearsToRetirement = (inputs.retirementAge || 67) - (inputs.currentAge || 30);
-        const monthlyTotal = (inputs.currentMonthlySalary || 15000) * 0.18 + (inputs.trainingFundContribution || 0); // 18% pension contribution + training fund
+        // Calculate real-time totals with safe defaults and error handling
+        const totalSavings = Math.max(0, (inputs.currentSavings || 0) + (inputs.trainingFund || 0));
+        const yearsToRetirement = Math.max(0, (inputs.retirementAge || 67) - (inputs.currentAge || 30));
+        const totalMonthlySalary = inputs.planningType === 'couple' 
+            ? (inputs.currentMonthlySalary || 15000) + (inputs.partner1Salary || 0) + (inputs.partner2Salary || 0)
+            : (inputs.currentMonthlySalary || 15000);
+        const monthlyTotal = Math.max(0, totalMonthlySalary * 0.186 + (inputs.trainingFundContribution || 0)); // 18.6% pension contribution + training fund
         
         // Calculate projected value with separate contribution and accumulation fees (ensure minimum 0.1% to avoid division by zero)
         const netPensionReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.accumulationFees || 1.0));
-        const netTrainingReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.5));
-        const avgNetReturn = (netPensionReturn + netTrainingReturn) / 2; // Average return
+        const netTrainingReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.6));
+        const avgNetReturn = Math.max(0.1, (netPensionReturn + netTrainingReturn) / 2); // Average return
         
-        const projectedWithGrowth = totalSavings * Math.pow(1 + avgNetReturn/100, yearsToRetirement) + 
-            (monthlyTotal * 12) * (Math.pow(1 + avgNetReturn/100, yearsToRetirement) - 1) / (avgNetReturn/100);
+        // Safe calculation with error handling for edge cases
+        let projectedWithGrowth = 0;
+        if (yearsToRetirement > 0 && avgNetReturn > 0) {
+            const returnRate = avgNetReturn / 100;
+            const futureValueCurrent = totalSavings * Math.pow(1 + returnRate, yearsToRetirement);
+            const futureValueContributions = (monthlyTotal * 12) * ((Math.pow(1 + returnRate, yearsToRetirement) - 1) / returnRate);
+            projectedWithGrowth = futureValueCurrent + futureValueContributions;
+        } else {
+            projectedWithGrowth = totalSavings + (monthlyTotal * 12 * yearsToRetirement);
+        }
         
-        // Inflation calculations
-        const inflationRate = (inputs.inflationRate || 3) / 100;
-        const buyingPowerToday = projectedWithGrowth / Math.pow(1 + inflationRate, yearsToRetirement);
+        // Safe inflation calculations
+        const inflationRate = Math.max(0, Math.min(20, (inputs.inflationRate || 3))) / 100; // Cap inflation at 20%
+        const buyingPowerToday = yearsToRetirement > 0 ? 
+            projectedWithGrowth / Math.pow(1 + inflationRate, yearsToRetirement) : 
+            projectedWithGrowth;
+        
+        // Calculate estimated monthly income in retirement
+        const estimatedMonthlyIncome = yearsToRetirement > 0 ? 
+            (projectedWithGrowth * (avgNetReturn / 100)) / 12 : 
+            0;
         
         const formatCurrency = (amount, symbol = '₪') => {
-            return `${symbol}${Math.round(amount).toLocaleString()}`;
+            // Safety check for invalid numbers
+            if (!amount || isNaN(amount) || !isFinite(amount)) {
+                return `${symbol}0`;
+            }
+            return `${symbol}${Math.round(Math.abs(amount)).toLocaleString()}`;
         };
         
         return React.createElement('div', { 
@@ -374,64 +456,18 @@
                 ])
             ]),
             
-            // Bottom Line Summary - Key metrics at a glance
-            React.createElement('div', {
+            // Bottom Line Summary - rendered within SavingsSummaryPanel
+            React.createElement(BottomLineSummary, {
                 key: 'bottom-line-summary',
-                className: "border-t border-gray-200 pt-4 mb-4"
-            }, [
-                React.createElement('div', { 
-                    key: 'summary-title',
-                    className: "header-primary text-sm font-bold text-gray-900 mb-3 flex items-center" 
-                }, [
-                    React.createElement('span', { key: 'icon', className: "mr-2" }, '📍'),
-                    language === 'he' ? 'השורה התחתונה' : 'Bottom Line'
-                ]),
-                
-                // Key Metrics Cards
-                React.createElement('div', { 
-                    key: 'key-metrics',
-                    className: "space-y-2" 
-                }, [
-                    // Monthly income in retirement
-                    React.createElement('div', {
-                        key: 'monthly-retirement',
-                        className: "metric-card p-4 border-2 border-indigo-300 bg-indigo-50"
-                    }, [
-                        React.createElement('div', { className: "text-xs font-semibold text-indigo-600 uppercase tracking-wide" }, 
-                            language === 'he' ? 'הכנסה חודשית בפרישה' : 'Monthly Retirement Income'),
-                        React.createElement('div', { className: "text-2xl font-bold text-indigo-800 wealth-amount mt-1" }, 
-                            formatCurrency(estimatedMonthlyIncome)),
-                        React.createElement('div', { className: "text-xs text-indigo-600 mt-1" }, 
-                            `${((estimatedMonthlyIncome / totalMonthlySalary) * 100).toFixed(0)}% ${language === 'he' ? 'מהמשכורת הנוכחית' : 'of current salary'}`)
-                    ]),
-                    
-                    // Years to retirement
-                    React.createElement('div', {
-                        key: 'years-countdown',
-                        className: "metric-card p-3 border-2 border-purple-300 bg-purple-50"
-                    }, [
-                        React.createElement('div', { className: "text-xs font-semibold text-purple-600 uppercase tracking-wide" }, 
-                            language === 'he' ? 'זמן לפרישה' : 'Time to Retirement'),
-                        React.createElement('div', { className: "text-xl font-bold text-purple-800" }, 
-                            `${yearsToRetirement} ${language === 'he' ? 'שנים' : 'years'}`),
-                        React.createElement('div', { className: "text-xs text-purple-600" }, 
-                            `${language === 'he' ? 'עד גיל' : 'Until age'} ${inputs.retirementAge || 67}`)
-                    ]),
-                    
-                    // Total projected savings
-                    React.createElement('div', {
-                        key: 'total-savings',
-                        className: "metric-card p-3 border-2 border-green-300 bg-green-50"
-                    }, [
-                        React.createElement('div', { className: "text-xs font-semibold text-green-600 uppercase tracking-wide" }, 
-                            language === 'he' ? 'צבירה כוללת צפויה' : 'Total Projected Savings'),
-                        React.createElement('div', { className: "text-xl font-bold text-green-800 wealth-amount" }, 
-                            formatCurrency(projectedWithGrowth)),
-                        React.createElement('div', { className: "text-xs text-green-600" }, 
-                            `${language === 'he' ? 'כוח קנייה:' : 'Buying power:'} ${formatCurrency(buyingPowerToday)}`)
-                    ])
-                ])
-            ]),
+                inputs,
+                language,
+                totalMonthlySalary,
+                yearsToRetirement,
+                estimatedMonthlyIncome,
+                projectedWithGrowth,
+                buyingPowerToday,
+                formatCurrency
+            }),
             
             // Export Buttons
             React.createElement('div', {
