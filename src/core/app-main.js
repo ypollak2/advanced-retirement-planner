@@ -1879,9 +1879,6 @@ ${language === 'he' ?
 
     console.log('🚀 Retirement Planner Core loaded successfully');
 
-    // Dispatch a custom event to signal that the app is ready
-    document.dispatchEvent(new CustomEvent('appReady'));
-
 })();
 
     
