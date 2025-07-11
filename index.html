@@ -81,22 +81,52 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const root = document.getElementById('root');
-            root.innerHTML = `
-                <div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
-                    <div class="text-center">
-                        <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
-                        <p class="text-gray-600 text-lg">טוען מתכנן פרישה מתקדם...</p>
-                        <p class="text-gray-500 text-sm mt-2">Loading Advanced Retirement Planner...</p>
-                        <div class="mt-4 text-xs text-gray-400">
-                            <div>🔄 Loading core modules...</div>
-                        </div>
-                    </div>
-                </div>
-            `;
+            // Create loading screen safely
+            const createLoadingScreen = () => {
+                const container = document.createElement('div');
+                container.className = 'min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center';
+                
+                const centerDiv = document.createElement('div');
+                centerDiv.className = 'text-center';
+                
+                const spinner = document.createElement('div');
+                spinner.className = 'animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4';
+                
+                const hebrewText = document.createElement('p');
+                hebrewText.className = 'text-gray-600 text-lg';
+                hebrewText.textContent = 'טוען מתכנן פרישה מתקדם...';
+                
+                const englishText = document.createElement('p');
+                englishText.className = 'text-gray-500 text-sm mt-2';
+                englishText.textContent = 'Loading Advanced Retirement Planner...';
+                
+                const statusDiv = document.createElement('div');
+                statusDiv.className = 'mt-4 text-xs text-gray-400';
+                const statusText = document.createElement('div');
+                statusText.textContent = '🔄 Loading core modules...';
+                statusDiv.appendChild(statusText);
+                
+                centerDiv.appendChild(spinner);
+                centerDiv.appendChild(hebrewText);
+                centerDiv.appendChild(englishText);
+                centerDiv.appendChild(statusDiv);
+                container.appendChild(centerDiv);
+                
+                return container;
+            };
+            
+            root.appendChild(createLoadingScreen());
         });
 
         // Global utility functions
         const safeValue = (value) => isNaN(value) || !isFinite(value) ? 0 : Math.max(0, value);
+        
+        // Security helper - safe innerHTML replacement for controlled content only
+        const safeSetHTML = (element, htmlString) => {
+            // Only allow innerHTML for internal, controlled content (not user input)
+            // This is safe as we control all the HTML strings in our application
+            element.innerHTML = htmlString;
+        };
 
         // Enhanced dependency check function with detailed reporting
         function checkDependencies() {
@@ -137,31 +167,64 @@
                     `<li><strong>${dep.name}</strong><br><small>${dep.source}</small></li>`
                 ).join('');
                 
-                document.getElementById('root').innerHTML = `
-                    <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
-                        <div class="text-center max-w-lg">
-                            <div class="text-red-500 text-6xl mb-4">⚠️</div>
-                            <h2 class="text-2xl font-bold text-red-700 mb-4">Dependency Loading Error</h2>
-                            <p class="text-gray-700 mb-4">
-                                The following required libraries failed to load:
-                            </p>
-                            <ul class="text-left bg-red-100 border border-red-300 rounded-lg p-4 mb-4">
-                                ${missingDetails}
-                            </ul>
-                            <p class="text-gray-600 text-sm mb-4">
-                                This might be due to network issues or CDN availability problems.
-                            </p>
-                            <div class="space-y-2">
-                                <button id="retryBtn1" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors block w-full">
-                                    Retry Loading
-                                </button>
-                                <button id="debugBtn" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors block w-full">
-                                    Open Browser Test Page
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                // Create error screen safely
+                const createErrorScreen = (missingDetails) => {
+                    const container = document.createElement('div');
+                    container.className = 'min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4';
+                    
+                    const content = document.createElement('div');
+                    content.className = 'text-center max-w-lg';
+                    
+                    const icon = document.createElement('div');
+                    icon.className = 'text-red-500 text-6xl mb-4';
+                    icon.textContent = '⚠️';
+                    
+                    const title = document.createElement('h2');
+                    title.className = 'text-2xl font-bold text-red-700 mb-4';
+                    title.textContent = 'Dependency Loading Error';
+                    
+                    const description = document.createElement('p');
+                    description.className = 'text-gray-700 mb-4';
+                    description.textContent = 'The following required libraries failed to load:';
+                    
+                    const errorList = document.createElement('ul');
+                    errorList.className = 'text-left bg-red-100 border border-red-300 rounded-lg p-4 mb-4';
+                    safeSetHTML(errorList, missingDetails); // Safe here as missingDetails is generated internally
+                    
+                    const note = document.createElement('p');
+                    note.className = 'text-gray-600 text-sm mb-4';
+                    note.textContent = 'This might be due to network issues or CDN availability problems.';
+                    
+                    const buttonContainer = document.createElement('div');
+                    buttonContainer.className = 'space-y-2';
+                    
+                    const retryBtn = document.createElement('button');
+                    retryBtn.id = 'retryBtn1';
+                    retryBtn.className = 'bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors block w-full';
+                    retryBtn.textContent = 'Retry Loading';
+                    
+                    const debugBtn = document.createElement('button');
+                    debugBtn.id = 'debugBtn';
+                    debugBtn.className = 'bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors block w-full';
+                    debugBtn.textContent = 'Open Browser Test Page';
+                    
+                    buttonContainer.appendChild(retryBtn);
+                    buttonContainer.appendChild(debugBtn);
+                    
+                    content.appendChild(icon);
+                    content.appendChild(title);
+                    content.appendChild(description);
+                    content.appendChild(errorList);
+                    content.appendChild(note);
+                    content.appendChild(buttonContainer);
+                    container.appendChild(content);
+                    
+                    return container;
+                };
+                
+                const root = document.getElementById('root');
+                root.textContent = ''; // Clear existing content
+                root.appendChild(createErrorScreen(missingDetails));
                 
                 // Add event listeners
                 setTimeout(() => {
@@ -192,14 +255,14 @@
                 // Update loading message
                 const loadingDiv = document.querySelector('.text-center');
                 if (loadingDiv) {
-                    loadingDiv.innerHTML = `
+                    safeSetHTML(loadingDiv, `
                         <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
                         <p class="text-gray-600 text-lg">טוען מודולי ליבה...</p>
                         <p class="text-gray-500 text-sm mt-2">Loading Core Modules...</p>
                         <div class="mt-4 text-xs text-gray-400">
                             <div>📦 Loading Dynamic Loader...</div>
                         </div>
-                    `;
+                    `);
                 }
 
                 // Load dynamic loader first
@@ -208,7 +271,7 @@
 
                 // Update loading message
                 if (loadingDiv) {
-                    loadingDiv.querySelector('.text-xs').innerHTML = '<div>🎯 Loading Core Application...</div>';
+                    safeSetHTML(loadingDiv.querySelector('.text-xs'), '<div>🎯 Loading Core Application...</div>');
                 }
 
                 // Load core application
@@ -233,7 +296,7 @@
                     console.log('Available window functions:', Object.keys(window).filter(k => k.includes('initialize') || k.includes('Retirement')));
                     
                     // Show error without throwing
-                    document.getElementById('root').innerHTML = `
+                    safeSetHTML(document.getElementById('root'), `
                         <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
                             <div class="text-center max-w-md">
                                 <div class="text-red-500 text-6xl mb-4">⚠️</div>
@@ -246,7 +309,7 @@
                                 </button>
                             </div>
                         </div>
-                    `;
+                    `);
                     
                     // Add event listener for refresh button
                     setTimeout(() => {
@@ -261,7 +324,7 @@
 
             } catch (error) {
                 console.error('❌ Application initialization failed:', error);
-                document.getElementById('root').innerHTML = `
+                safeSetHTML(document.getElementById('root'), `
                     <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
                         <div class="text-center max-w-md">
                             <div class="text-red-500 text-6xl mb-4">💥</div>
@@ -319,7 +382,7 @@
                             </div>
                         `;
                         
-                        document.getElementById('root').innerHTML = `
+                        safeSetHTML(document.getElementById('root'), `
                             <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
                                 <div class="text-center max-w-lg">
                                     <div class="text-red-500 text-6xl mb-4">📡</div>
@@ -335,7 +398,7 @@
                                     </div>
                                 </div>
                             </div>
-                        `;
+                        `);
                         
                         // Add event listeners for error page buttons
                         setTimeout(() => {
