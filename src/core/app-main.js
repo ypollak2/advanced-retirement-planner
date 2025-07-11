@@ -115,13 +115,13 @@
             USD: 3.6, EUR: 4.0, GBP: 4.7, BTC: 180000, ETH: 9000
         });
         
-        // Calculate real-time totals with management fees
+        // Calculate real-time totals with separate contribution and accumulation fees
         const totalSavings = (inputs.currentSavings || 0) + (inputs.trainingFund || 0);
         const yearsToRetirement = (inputs.retirementAge || 67) - (inputs.currentAge || 30);
         const monthlyTotal = (inputs.currentMonthlySalary || 15000) * 0.18 + (inputs.trainingFundContribution || 0); // 18% pension contribution + training fund
         
-        // Calculate projected value with management fees impact (ensure minimum 0.1% to avoid division by zero)
-        const netPensionReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.managementFees || 1.0));
+        // Calculate projected value with separate contribution and accumulation fees (ensure minimum 0.1% to avoid division by zero)
+        const netPensionReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.accumulationFees || 1.0));
         const netTrainingReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.5));
         const avgNetReturn = (netPensionReturn + netTrainingReturn) / 2; // Average return
         
@@ -133,7 +133,7 @@
         const buyingPowerToday = projectedWithGrowth / Math.pow(1 + inflationRate, yearsToRetirement);
         
         const formatCurrency = (amount, symbol = '₪') => {
-            return `${symbol}${amount.toLocaleString()}`;
+            return `${symbol}${Math.round(amount).toLocaleString()}`;
         };
         
         return React.createElement('div', { 
@@ -183,6 +183,38 @@
                 ])
             ]),
             
+            // Monthly Salary & Tax Calculation
+            React.createElement('div', {
+                key: 'salary-section',
+                className: "bg-blue-50 rounded-lg p-3 mb-4 border border-blue-200"
+            }, (() => {
+                const taxResult = calculateNetSalary(inputs.currentMonthlySalary || 15000, inputs.taxCountry || 'israel');
+                const countryName = inputs.taxCountry === 'israel' ? (language === 'he' ? 'ישראל' : 'Israel') :
+                                   inputs.taxCountry === 'uk' ? (language === 'he' ? 'בריטניה' : 'UK') :
+                                   inputs.taxCountry === 'us' ? (language === 'he' ? 'ארה״ב' : 'US') : '';
+                
+                return [
+                    React.createElement('div', { className: "text-sm text-blue-700 font-medium mb-2" }, 
+                        language === 'he' ? `משכורת חודשית (${countryName})` : `Monthly Salary (${countryName})`),
+                    React.createElement('div', { className: "grid grid-cols-2 gap-2 text-xs" }, [
+                        React.createElement('div', { key: 'gross' }, [
+                            React.createElement('div', { className: "text-blue-600" }, 
+                                language === 'he' ? 'ברוטו:' : 'Gross:'),
+                            React.createElement('div', { className: "font-bold" }, 
+                                formatCurrency(inputs.currentMonthlySalary || 15000))
+                        ]),
+                        React.createElement('div', { key: 'net' }, [
+                            React.createElement('div', { className: "text-blue-600" }, 
+                                language === 'he' ? 'נטו:' : 'Net:'),
+                            React.createElement('div', { className: "font-bold text-blue-800" }, 
+                                formatCurrency(taxResult.netSalary))
+                        ])
+                    ]),
+                    React.createElement('div', { className: "text-xs text-blue-600 mt-1" }, 
+                        language === 'he' ? `שיעור מס: ${taxResult.taxRate}%` : `Tax Rate: ${taxResult.taxRate}%`)
+                ];
+            })()),
+
             // Monthly Contributions
             React.createElement('div', {
                 key: 'monthly',
@@ -354,15 +386,15 @@
                         key: 'row4',
                         className: "grid grid-cols-2 gap-4" 
                     }, [
-                        React.createElement('div', { key: 'management-fees' }, [
+                        React.createElement('div', { key: 'contribution-fees' }, [
                             React.createElement('label', { 
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, language === 'he' ? "דמי ניהול פנסיה שנתיים (%)" : "Annual Pension Management Fees (%)"),
+                            }, language === 'he' ? "דמי ניהול מהפקדות (%)" : "Management Fees on Contributions (%)"),
                             React.createElement('input', {
                                 type: 'number',
                                 step: '0.1',
-                                value: inputs.managementFees || 1.0,
-                                onChange: (e) => setInputs({...inputs, managementFees: parseFloat(e.target.value) || 0}),
+                                value: inputs.contributionFees || 0.5,
+                                onChange: (e) => setInputs({...inputs, contributionFees: parseFloat(e.target.value) || 0}),
                                 className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                             })
                         ]),
@@ -383,6 +415,18 @@
                         key: 'row5',
                         className: "grid grid-cols-2 gap-4" 
                     }, [
+                        React.createElement('div', { key: 'accumulation-fees' }, [
+                            React.createElement('label', { 
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, language === 'he' ? "דמי ניהול מצבירה (%)" : "Management Fees on Accumulation (%)"),
+                            React.createElement('input', {
+                                type: 'number',
+                                step: '0.1',
+                                value: inputs.accumulationFees || 1.0,
+                                onChange: (e) => setInputs({...inputs, accumulationFees: parseFloat(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                            })
+                        ]),
                         React.createElement('div', { key: 'inflation' }, [
                             React.createElement('label', { 
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
@@ -394,7 +438,12 @@
                                 onChange: (e) => setInputs({...inputs, inflationRate: parseFloat(e.target.value) || 0}),
                                 className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                             })
-                        ]),
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'row6',
+                        className: "grid grid-cols-2 gap-4" 
+                    }, [
                         React.createElement('div', { key: 'training-fund-fees' }, [
                             React.createElement('label', { 
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
@@ -406,11 +455,180 @@
                                 onChange: (e) => setInputs({...inputs, trainingFundFees: parseFloat(e.target.value) || 0}),
                                 className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                             })
+                        ]),
+                        React.createElement('div', { key: 'tax-country' }, [
+                            React.createElement('label', { 
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, language === 'he' ? "מדינה למס הכנסה" : "Tax Country"),
+                            React.createElement('select', {
+                                value: inputs.taxCountry || 'israel',
+                                onChange: (e) => setInputs({...inputs, taxCountry: e.target.value}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                            }, [
+                                React.createElement('option', { key: 'israel', value: 'israel' }, 
+                                    language === 'he' ? 'ישראל' : 'Israel'),
+                                React.createElement('option', { key: 'uk', value: 'uk' }, 
+                                    language === 'he' ? 'בריטניה' : 'United Kingdom'),
+                                React.createElement('option', { key: 'us', value: 'us' }, 
+                                    language === 'he' ? 'ארה״ב' : 'United States')
+                            ])
                         ])
                     ])
                 ])
             ])
         ]);
+    };
+
+    // Tax Calculation Functions - Calculate net take-home salary by country
+    const calculateNetSalary = (grossSalary, taxCountry) => {
+        switch (taxCountry) {
+            case 'israel':
+                return calculateIsraeliTax(grossSalary);
+            case 'uk':
+                return calculateUKTax(grossSalary);
+            case 'us':
+                return calculateUSTax(grossSalary);
+            default:
+                return { netSalary: grossSalary, taxRate: 0 };
+        }
+    };
+
+    // Israeli Tax Calculation (2024 rates)
+    const calculateIsraeliTax = (monthlyGross) => {
+        const annualGross = monthlyGross * 12;
+        let totalTax = 0;
+        let remainingIncome = annualGross;
+
+        // Israeli tax brackets 2024 (NIS)
+        const brackets = [
+            { min: 0, max: 81480, rate: 0.10 },
+            { min: 81480, max: 116760, rate: 0.14 },
+            { min: 116760, max: 188280, rate: 0.20 },
+            { min: 188280, max: 269280, rate: 0.31 },
+            { min: 269280, max: 558240, rate: 0.35 },
+            { min: 558240, max: 718440, rate: 0.47 },
+            { min: 718440, max: Infinity, rate: 0.50 }
+        ];
+
+        // Calculate tax by brackets
+        for (const bracket of brackets) {
+            if (remainingIncome <= 0) break;
+            
+            const taxableInThisBracket = Math.min(remainingIncome, bracket.max - bracket.min);
+            if (taxableInThisBracket > 0) {
+                totalTax += taxableInThisBracket * bracket.rate;
+                remainingIncome -= taxableInThisBracket;
+            }
+        }
+
+        // Health insurance (2.5%) and National Insurance (12% up to ceiling)
+        const healthInsurance = annualGross * 0.025;
+        const nationalInsuranceCeiling = 481620; // 2024 ceiling
+        const nationalInsurance = Math.min(annualGross, nationalInsuranceCeiling) * 0.12;
+
+        const totalDeductions = totalTax + healthInsurance + nationalInsurance;
+        const netAnnual = annualGross - totalDeductions;
+        const netMonthly = netAnnual / 12;
+
+        return {
+            netSalary: Math.round(netMonthly),
+            taxRate: Math.round((totalDeductions / annualGross) * 100),
+            breakdown: {
+                incomeTax: Math.round(totalTax),
+                healthInsurance: Math.round(healthInsurance),
+                nationalInsurance: Math.round(nationalInsurance)
+            }
+        };
+    };
+
+    // UK Tax Calculation (2024/25 rates) - Simplified
+    const calculateUKTax = (monthlyGross) => {
+        const annualGross = monthlyGross * 12;
+        let incomeTax = 0;
+        
+        // UK tax brackets 2024/25 (GBP converted to NIS at ~4.7 rate)
+        const personalAllowance = 12570 * 4.7; // £12,570 -> NIS
+        const basicRateLimit = 50270 * 4.7; // £50,270 -> NIS
+        const higherRateLimit = 125140 * 4.7; // £125,140 -> NIS
+
+        if (annualGross > personalAllowance) {
+            const taxableIncome = annualGross - personalAllowance;
+            
+            if (taxableIncome <= basicRateLimit - personalAllowance) {
+                incomeTax = taxableIncome * 0.20;
+            } else if (taxableIncome <= higherRateLimit - personalAllowance) {
+                incomeTax = (basicRateLimit - personalAllowance) * 0.20 + 
+                           (taxableIncome - (basicRateLimit - personalAllowance)) * 0.40;
+            } else {
+                incomeTax = (basicRateLimit - personalAllowance) * 0.20 + 
+                           (higherRateLimit - basicRateLimit) * 0.40 + 
+                           (taxableIncome - (higherRateLimit - personalAllowance)) * 0.45;
+            }
+        }
+
+        // National Insurance (12% on income above £12,570)
+        const nationalInsurance = Math.max(0, (annualGross - personalAllowance) * 0.12);
+        
+        const totalDeductions = incomeTax + nationalInsurance;
+        const netMonthly = (annualGross - totalDeductions) / 12;
+
+        return {
+            netSalary: Math.round(netMonthly),
+            taxRate: Math.round((totalDeductions / annualGross) * 100),
+            breakdown: {
+                incomeTax: Math.round(incomeTax),
+                nationalInsurance: Math.round(nationalInsurance)
+            }
+        };
+    };
+
+    // US Tax Calculation (2024 rates) - Simplified federal only
+    const calculateUSTax = (monthlyGross) => {
+        const annualGross = monthlyGross * 12;
+        let federalTax = 0;
+        
+        // US federal tax brackets 2024 (USD converted to NIS at ~3.6 rate)
+        const standardDeduction = 14600 * 3.6; // $14,600 -> NIS
+        const brackets = [
+            { min: 0, max: 11000 * 3.6, rate: 0.10 },
+            { min: 11000 * 3.6, max: 44725 * 3.6, rate: 0.12 },
+            { min: 44725 * 3.6, max: 95375 * 3.6, rate: 0.22 },
+            { min: 95375 * 3.6, max: 182050 * 3.6, rate: 0.24 },
+            { min: 182050 * 3.6, max: 231250 * 3.6, rate: 0.32 },
+            { min: 231250 * 3.6, max: 578125 * 3.6, rate: 0.35 },
+            { min: 578125 * 3.6, max: Infinity, rate: 0.37 }
+        ];
+
+        const taxableIncome = Math.max(0, annualGross - standardDeduction);
+        let remainingIncome = taxableIncome;
+
+        for (const bracket of brackets) {
+            if (remainingIncome <= 0) break;
+            
+            const taxableInThisBracket = Math.min(remainingIncome, bracket.max - bracket.min);
+            if (taxableInThisBracket > 0) {
+                federalTax += taxableInThisBracket * bracket.rate;
+                remainingIncome -= taxableInThisBracket;
+            }
+        }
+
+        // Social Security and Medicare (7.65% total)
+        const socialSecurityLimit = 160200 * 3.6; // $160,200 -> NIS
+        const socialSecurity = Math.min(annualGross, socialSecurityLimit) * 0.062;
+        const medicare = annualGross * 0.0145;
+        
+        const totalDeductions = federalTax + socialSecurity + medicare;
+        const netMonthly = (annualGross - totalDeductions) / 12;
+
+        return {
+            netSalary: Math.round(netMonthly),
+            taxRate: Math.round((totalDeductions / annualGross) * 100),
+            breakdown: {
+                federalTax: Math.round(federalTax),
+                socialSecurity: Math.round(socialSecurity),
+                medicare: Math.round(medicare)
+            }
+        };
     };
 
     // Basic Results Component - Basic results display
@@ -440,7 +658,7 @@
                         React.createElement('div', { className: "text-sm text-green-700" }, [
                             React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה:" : "Total Expected Accumulation:"),
                             React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
-                                `₪${(results.totalSavings || 0).toLocaleString()}`)
+                                `₪${Math.round(results.totalSavings || 0).toLocaleString()}`)
                         ])
                     ]),
                     React.createElement('div', { 
@@ -454,7 +672,7 @@
                             React.createElement('div', { className: "text-sm text-blue-700" }, [
                                 React.createElement('strong', null, language === 'he' ? "פנסיה:" : "Pension:"),
                                 React.createElement('div', { className: "text-lg font-bold text-blue-800 mt-1" }, 
-                                    `₪${(results.pensionSavings || 0).toLocaleString()}`)
+                                    `₪${Math.round(results.pensionSavings || 0).toLocaleString()}`)
                             ])
                         ]),
                         React.createElement('div', { 
@@ -464,7 +682,7 @@
                             React.createElement('div', { className: "text-sm text-purple-700" }, [
                                 React.createElement('strong', null, language === 'he' ? "קרן השתלמות:" : "Training Fund:"),
                                 React.createElement('div', { className: "text-lg font-bold text-purple-800 mt-1" }, 
-                                    `₪${(results.trainingFundSavings || 0).toLocaleString()}`)
+                                    `₪${Math.round(results.trainingFundSavings || 0).toLocaleString()}`)
                             ])
                         ])
                     ]),
@@ -475,7 +693,7 @@
                         React.createElement('div', { className: "text-sm text-orange-700" }, [
                             React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה:" : "Monthly Retirement Income:"),
                             React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
-                                `₪${(results.monthlyIncome || 0).toLocaleString()}`)
+                                `₪${Math.round(results.monthlyIncome || 0).toLocaleString()}`)
                         ])
                     ]),
                     React.createElement('div', { 
@@ -485,7 +703,9 @@
                         React.createElement('div', { className: "text-sm text-red-700" }, [
                             React.createElement('strong', null, language === 'he' ? "השפעת דמי ניהול:" : "Management Fees Impact:"),
                             React.createElement('div', { className: "text-base font-bold text-red-800 mt-1" }, 
-                                `₪${(results.managementFeeImpact || 0).toLocaleString()}`),
+                                `₪${Math.round(results.managementFeeImpact || 0).toLocaleString()}`),
+                            React.createElement('div', { className: "text-xs text-red-600 mt-1" }, 
+                                language === 'he' ? `דמי ניהול: ${(inputs.contributionFees || 0.5)}% הפקדות + ${(inputs.accumulationFees || 1.0)}% צבירה` : `Fees: ${(inputs.contributionFees || 0.5)}% contributions + ${(inputs.accumulationFees || 1.0)}% accumulation`),
                             React.createElement('div', { className: "text-xs text-red-600 mt-1" }, 
                                 language === 'he' ? `תשואה נטו: ${(results.netReturn || 0).toFixed(1)}%` : `Net Return: ${(results.netReturn || 0).toFixed(1)}%`)
                         ])
@@ -525,8 +745,10 @@
             trainingFundContribution: 1125, // 7.5% of 15000
             inflationRate: 3,
             expectedReturn: 7,
-            managementFees: 1.0, // 1% annual management fees for pension
-            trainingFundFees: 0.5 // 0.5% annual management fees for training fund
+            contributionFees: 0.5, // Management fees on contributions (%)
+            accumulationFees: 1.0, // Management fees on accumulation (%)
+            trainingFundFees: 0.5, // 0.5% annual management fees for training fund
+            taxCountry: 'israel' // Tax calculation country
         });
         const [results, setResults] = React.useState(null);
         const [loadingTabs, setLoadingTabs] = React.useState({});
@@ -586,27 +808,34 @@
             }, 2000); // Increased delay to ensure moduleLoader is ready
         }, []);
 
-        // Basic calculation function
+        // Basic calculation function with separate contribution and accumulation fees
         const calculateBasic = () => {
             const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
             const monthlyContribution = inputs.currentMonthlySalary * 0.186; // 18.6% pension contribution
             const annualContribution = monthlyContribution * 12;
             
-            // Calculate net return after management fees (ensure minimum 0.1% to avoid division by zero)
-            const netPensionReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.managementFees || 1.0));
+            // Calculate net returns after separate contribution and accumulation fees (ensure minimum 0.1% to avoid division by zero)
+            const netPensionReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.accumulationFees || 1.0));
             const netTrainingReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.5));
             
-            // Pension calculation with management fees
+            // Apply contribution fees to annual contributions
+            const netAnnualContribution = annualContribution * (1 - (inputs.contributionFees || 0.5) / 100);
+            const netTrainingAnnualContribution = (inputs.trainingFundContribution || 0) * 12 * (1 - (inputs.contributionFees || 0.5) / 100);
+            
+            // Pension calculation with separate contribution and accumulation fees
             const pensionFutureValue = inputs.currentSavings * Math.pow(1 + netPensionReturn/100, yearsToRetirement) +
-                annualContribution * (Math.pow(1 + netPensionReturn/100, yearsToRetirement) - 1) / (netPensionReturn/100);
+                netAnnualContribution * (Math.pow(1 + netPensionReturn/100, yearsToRetirement) - 1) / (netPensionReturn/100);
             
             // Training fund calculation with its own fees
-            const trainingAnnualContribution = (inputs.trainingFundContribution || 0) * 12;
             const trainingFutureValue = (inputs.trainingFund || 0) * Math.pow(1 + netTrainingReturn/100, yearsToRetirement) +
-                trainingAnnualContribution * (Math.pow(1 + netTrainingReturn/100, yearsToRetirement) - 1) / (netTrainingReturn/100);
+                netTrainingAnnualContribution * (Math.pow(1 + netTrainingReturn/100, yearsToRetirement) - 1) / (netTrainingReturn/100);
             
             const totalFutureValue = pensionFutureValue + trainingFutureValue;
             const monthlyIncome = totalFutureValue * (netPensionReturn/100) / 12;
+            
+            // Calculate total fees impact (contribution fees + accumulation fees)
+            const totalContributionFeesImpact = (annualContribution + (inputs.trainingFundContribution || 0) * 12) * (inputs.contributionFees || 0.5) / 100 * yearsToRetirement;
+            const totalAccumulationFeesImpact = totalFutureValue * (inputs.accumulationFees || 1.0) / 100 * yearsToRetirement;
             
             setResults({
                 totalSavings: Math.round(totalFutureValue),
@@ -615,7 +844,7 @@
                 monthlyIncome: Math.round(monthlyIncome),
                 achievesTarget: monthlyIncome > (inputs.currentMonthlySalary * 0.75),
                 netReturn: netPensionReturn,
-                managementFeeImpact: Math.round(totalFutureValue * (inputs.managementFees/100) * yearsToRetirement)
+                managementFeeImpact: Math.round(totalContributionFeesImpact + totalAccumulationFeesImpact)
             });
         };
 
