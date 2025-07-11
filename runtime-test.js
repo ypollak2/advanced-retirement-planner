@@ -136,7 +136,9 @@ class RuntimeTestSuite {
             await this.page.waitForTimeout(2000);
             
             // Check if main title is rendered
-            const titleExists = await this.page.$eval('h1', el => el.textContent.includes('Advanced Retirement Planner') || el.textContent.includes('מתכנן הפרישה'));
+            const titleElement = await this.page.$('h1');
+            const titleText = await this.page.evaluate(el => el ? el.textContent : '', titleElement);
+            const titleExists = titleText.includes('Advanced Retirement Planner') || titleText.includes('מתכנן הפרישה');
             
             if (!titleExists) {
                 this.logTest('Main Title Rendering', false, 'Main title not found');
@@ -144,9 +146,11 @@ class RuntimeTestSuite {
             }
             
             // Check if tabs are rendered
-            const tabsExist = await this.page.$$eval('button', buttons => 
-                buttons.some(btn => btn.textContent.includes('Basic') || btn.textContent.includes('בסיסי'))
+            const buttonElements = await this.page.$$('button');
+            const buttonTexts = await Promise.all(
+                buttonElements.map(btn => this.page.evaluate(el => el.textContent, btn))
             );
+            const tabsExist = buttonTexts.some(text => text.includes('Basic') || text.includes('בסיסי'));
             
             if (!tabsExist) {
                 this.logTest('Tab Navigation Rendering', false, 'Navigation tabs not found');
@@ -198,14 +202,16 @@ class RuntimeTestSuite {
     async testExportFunctionality() {
         try {
             // Look for export buttons
-            const exportButtons = await this.page.$$eval('button', buttons => 
-                buttons.filter(btn => 
-                    btn.textContent.includes('Export') || 
-                    btn.textContent.includes('ייצא') ||
-                    btn.textContent.includes('PNG') ||
-                    btn.textContent.includes('AI')
-                ).length
+            const exportButtonElements = await this.page.$$('button');
+            const exportButtonTexts = await Promise.all(
+                exportButtonElements.map(btn => this.page.evaluate(el => el.textContent, btn))
             );
+            const exportButtons = exportButtonTexts.filter(text => 
+                text.includes('Export') || 
+                text.includes('ייצא') ||
+                text.includes('PNG') ||
+                text.includes('AI')
+            ).length;
             
             if (exportButtons === 0) {
                 this.logTest('Export Buttons', false, 'No export buttons found');
@@ -245,9 +251,11 @@ class RuntimeTestSuite {
     async testStressTestingModule() {
         try {
             // Try to click on stress testing tab
-            const stressTabExists = await this.page.$$eval('button', buttons => 
-                buttons.some(btn => btn.textContent.includes('Stress') || btn.textContent.includes('לחץ'))
+            const stressButtonElements = await this.page.$$('button');
+            const stressButtonTexts = await Promise.all(
+                stressButtonElements.map(btn => this.page.evaluate(el => el.textContent, btn))
             );
+            const stressTabExists = stressButtonTexts.some(text => text.includes('Stress') || text.includes('לחץ'));
             
             if (!stressTabExists) {
                 this.logTest('Stress Testing Tab', false, 'Stress testing tab not found');
@@ -270,10 +278,12 @@ class RuntimeTestSuite {
             await this.page.waitForTimeout(1000);
             
             // Check if elements are still visible
-            const elementsVisible = await this.page.$eval('h1', el => {
+            const h1Element = await this.page.$('h1');
+            const elementsVisible = await this.page.evaluate(el => {
+                if (!el) return false;
                 const rect = el.getBoundingClientRect();
                 return rect.width > 0 && rect.height > 0;
-            });
+            }, h1Element);
             
             if (!elementsVisible) {
                 this.logTest('Mobile Responsive Design', false, 'Elements not visible on mobile');
