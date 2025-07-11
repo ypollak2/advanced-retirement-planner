@@ -1,5 +1,5 @@
 {
-  "version": "3.0.3",
+  "version": "3.0.4",
   "releaseDate": "2025-07-11",
-  "description": "Critical fix: Proper React class-based ErrorBoundary for CDN compatibility"
+  "description": "Final deployment fix: Updated HTML entry point and test suite for modular architecture"
 }

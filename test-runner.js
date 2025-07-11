@@ -138,11 +138,11 @@ function testHtmlStructure() {
         const checks = [
             { name: 'React CDN', test: html.includes('react.production.min.js') || html.includes('react.development.js') },
             { name: 'ReactDOM CDN', test: html.includes('react-dom.production.min.js') || html.includes('react-dom.development.js') },
-            { name: 'Script tags for components', test: html.includes('src/components/') },
+            { name: 'Script tags for components', test: html.includes('src/core/') || html.includes('src/modules/') },
             { name: 'Cache busting parameters', test: html.includes('?v=') },
             { name: 'Error boundary', test: html.includes('ErrorBoundary') },
-            { name: 'Module loading check', test: html.includes('checkModules') },
-            { name: 'Required modules array', test: html.includes('RetirementPlannerApp') && html.includes('BasicInputs') }
+            { name: 'Module loading check', test: html.includes('checkDependencies') || html.includes('checkModules') },
+            { name: 'Required modules array', test: html.includes('initializeRetirementPlannerCore') || (html.includes('RetirementPlannerApp') && html.includes('BasicInputs')) }
         ];
         
         checks.forEach(check => {
