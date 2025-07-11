@@ -177,7 +177,7 @@
     };
 
     // Savings Summary Panel Component - Real-time savings overview with multi-currency support
-    const SavingsSummaryPanel = ({ inputs, language, t, totalMonthlySalary, yearsToRetirement, estimatedMonthlyIncome, projectedWithGrowth, buyingPowerToday, monthlyTotal }) => {
+    const SavingsSummaryPanel = ({ inputs, language, t, totalMonthlySalary, yearsToRetirement, estimatedMonthlyIncome, projectedWithGrowth, buyingPowerToday, monthlyTotal, avgNetReturn }) => {
         const [exchangeRates, setExchangeRates] = React.useState({
             USD: 3.6, EUR: 4.0, GBP: 4.7, BTC: 180000, ETH: 9000
         });
@@ -188,6 +188,7 @@
         const safeEstimatedMonthlyIncome = estimatedMonthlyIncome || 0;
         const safeProjectedWithGrowth = projectedWithGrowth || 0;
         const safeBuyingPowerToday = buyingPowerToday || 0;
+        const safeAvgNetReturn = avgNetReturn || Math.max(0.1, ((inputs.expectedReturn || 7) - (inputs.accumulationFees || 1.0) + (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.6)) / 2);
         const totalSavings = Math.max(0, (inputs.currentSavings || 0) + (inputs.trainingFund || 0));
         
         const formatCurrency = (amount, symbol = '₪') => {
@@ -298,7 +299,7 @@
                 React.createElement('div', { className: "text-lg font-bold text-yellow-800" }, 
                     formatCurrency(projectedWithGrowth)),
                 React.createElement('div', { className: "text-xs text-yellow-600 mt-1" }, 
-                    language === 'he' ? `תשואה נטו ממוצעת: ${avgNetReturn.toFixed(1)}%` : `Avg Net Return: ${avgNetReturn.toFixed(1)}%`)
+                    language === 'he' ? `תשואה נטו ממוצעת: ${safeAvgNetReturn.toFixed(1)}%` : `Avg Net Return: ${safeAvgNetReturn.toFixed(1)}%`)
             ]),
             
             // Buying Power - Total and Monthly
@@ -319,7 +320,7 @@
                         React.createElement('div', { className: "text-xs text-orange-600" }, 
                             language === 'he' ? 'חודשי:' : 'Monthly:'),
                         React.createElement('div', { className: "text-base font-bold text-orange-800" }, 
-                            formatCurrency(buyingPowerToday * (avgNetReturn/100) / 12))
+                            formatCurrency(buyingPowerToday * (safeAvgNetReturn/100) / 12))
                     ])
                 ])
             ]),
@@ -403,9 +404,9 @@
                         React.createElement('div', { className: "text-xs text-gray-600" }, 
                             language === 'he' ? 'הכנסה חודשית בפרישה' : 'Monthly Retirement Income'),
                         React.createElement('div', { className: "text-lg font-bold text-blue-700 wealth-amount" }, 
-                            formatCurrency(projectedWithGrowth * (avgNetReturn/100) / 12)),
+                            formatCurrency(projectedWithGrowth * (safeAvgNetReturn/100) / 12)),
                         React.createElement('div', { className: "text-xs text-gray-500 mt-1" }, 
-                            `${(avgNetReturn).toFixed(1)}% ${language === 'he' ? 'תשואה שנתית' : 'annual return'}`)
+                            `${(safeAvgNetReturn).toFixed(1)}% ${language === 'he' ? 'תשואה שנתית' : 'annual return'}`)
                     ])
                 ]),
                 
@@ -1839,7 +1840,8 @@
                                 estimatedMonthlyIncome,
                                 projectedWithGrowth,
                                 buyingPowerToday,
-                                monthlyTotal
+                                monthlyTotal,
+                                avgNetReturn
                             });
                         })(),
                         
