@@ -115,15 +115,22 @@
             USD: 3.6, EUR: 4.0, GBP: 4.7, BTC: 180000, ETH: 9000
         });
         
-        // Calculate real-time totals
+        // Calculate real-time totals with management fees
         const totalSavings = (inputs.currentSavings || 0) + (inputs.trainingFund || 0);
         const yearsToRetirement = (inputs.retirementAge || 67) - (inputs.currentAge || 30);
         const monthlyTotal = (inputs.currentMonthlySalary || 15000) * 0.18 + (inputs.trainingFundContribution || 0); // 18% pension contribution + training fund
-        const totalProjected = totalSavings + (monthlyTotal * 12 * yearsToRetirement);
+        
+        // Calculate projected value with management fees impact
+        const netPensionReturn = (inputs.expectedReturn || 7) - (inputs.managementFees || 1.0);
+        const netTrainingReturn = (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.5);
+        const avgNetReturn = (netPensionReturn + netTrainingReturn) / 2; // Average return
+        
+        const projectedWithGrowth = totalSavings * Math.pow(1 + avgNetReturn/100, yearsToRetirement) + 
+            (monthlyTotal * 12) * (Math.pow(1 + avgNetReturn/100, yearsToRetirement) - 1) / (avgNetReturn/100);
         
         // Inflation calculations
         const inflationRate = (inputs.inflationRate || 3) / 100;
-        const buyingPowerToday = totalProjected / Math.pow(1 + inflationRate, yearsToRetirement);
+        const buyingPowerToday = projectedWithGrowth / Math.pow(1 + inflationRate, yearsToRetirement);
         
         const formatCurrency = (amount, symbol = '₪') => {
             return `${symbol}${amount.toLocaleString()}`;
@@ -193,9 +200,11 @@
                 className: "bg-yellow-50 rounded-lg p-3 mb-4 border border-yellow-200"
             }, [
                 React.createElement('div', { className: "text-sm text-yellow-700 font-medium" }, 
-                    language === 'he' ? 'צפי בפרישה' : 'Projected at Retirement'),
+                    language === 'he' ? 'צפי בפרישה (אחרי דמי ניהול)' : 'Projected at Retirement (After Fees)'),
                 React.createElement('div', { className: "text-lg font-bold text-yellow-800" }, 
-                    formatCurrency(totalProjected))
+                    formatCurrency(projectedWithGrowth)),
+                React.createElement('div', { className: "text-xs text-yellow-600 mt-1" }, 
+                    language === 'he' ? `תשואה נטו ממוצעת: ${avgNetReturn.toFixed(1)}%` : `Avg Net Return: ${avgNetReturn.toFixed(1)}%`)
             ]),
             
             // Buying Power
@@ -340,6 +349,64 @@
                                 className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                             })
                         ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'row4',
+                        className: "grid grid-cols-2 gap-4" 
+                    }, [
+                        React.createElement('div', { key: 'management-fees' }, [
+                            React.createElement('label', { 
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, language === 'he' ? "דמי ניהול פנסיה שנתיים (%)" : "Annual Pension Management Fees (%)"),
+                            React.createElement('input', {
+                                type: 'number',
+                                step: '0.1',
+                                value: inputs.managementFees || 1.0,
+                                onChange: (e) => setInputs({...inputs, managementFees: parseFloat(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                            })
+                        ]),
+                        React.createElement('div', { key: 'expected-yield' }, [
+                            React.createElement('label', { 
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, language === 'he' ? "תשואה שנתית צפויה (%)" : "Expected Annual Yield (%)"),
+                            React.createElement('input', {
+                                type: 'number',
+                                step: '0.1',
+                                value: inputs.expectedReturn || 7,
+                                onChange: (e) => setInputs({...inputs, expectedReturn: parseFloat(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                            })
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'row5',
+                        className: "grid grid-cols-2 gap-4" 
+                    }, [
+                        React.createElement('div', { key: 'inflation' }, [
+                            React.createElement('label', { 
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, language === 'he' ? "שיעור אינפלציה שנתי (%)" : "Annual Inflation Rate (%)"),
+                            React.createElement('input', {
+                                type: 'number',
+                                step: '0.1',
+                                value: inputs.inflationRate || 3,
+                                onChange: (e) => setInputs({...inputs, inflationRate: parseFloat(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                            })
+                        ]),
+                        React.createElement('div', { key: 'training-fund-fees' }, [
+                            React.createElement('label', { 
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, language === 'he' ? "דמי ניהול קרן השתלמות (%)" : "Training Fund Management Fees (%)"),
+                            React.createElement('input', {
+                                type: 'number',
+                                step: '0.1',
+                                value: inputs.trainingFundFees || 0.5,
+                                onChange: (e) => setInputs({...inputs, trainingFundFees: parseFloat(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                            })
+                        ])
                     ])
                 ])
             ])
@@ -377,13 +444,50 @@
                         ])
                     ]),
                     React.createElement('div', { 
-                        key: 'monthly',
-                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                        key: 'pension-breakdown',
+                        className: "grid grid-cols-2 gap-4" 
                     }, [
-                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                        React.createElement('div', { 
+                            key: 'pension',
+                            className: "bg-blue-50 rounded-lg p-3 border border-blue-200" 
+                        }, [
+                            React.createElement('div', { className: "text-sm text-blue-700" }, [
+                                React.createElement('strong', null, language === 'he' ? "פנסיה:" : "Pension:"),
+                                React.createElement('div', { className: "text-lg font-bold text-blue-800 mt-1" }, 
+                                    `₪${(results.pensionSavings || 0).toLocaleString()}`)
+                            ])
+                        ]),
+                        React.createElement('div', { 
+                            key: 'training',
+                            className: "bg-purple-50 rounded-lg p-3 border border-purple-200" 
+                        }, [
+                            React.createElement('div', { className: "text-sm text-purple-700" }, [
+                                React.createElement('strong', null, language === 'he' ? "קרן השתלמות:" : "Training Fund:"),
+                                React.createElement('div', { className: "text-lg font-bold text-purple-800 mt-1" }, 
+                                    `₪${(results.trainingFundSavings || 0).toLocaleString()}`)
+                            ])
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
                             React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה:" : "Monthly Retirement Income:"),
-                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
                                 `₪${(results.monthlyIncome || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'fees-impact',
+                        className: "bg-red-50 rounded-lg p-3 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "השפעת דמי ניהול:" : "Management Fees Impact:"),
+                            React.createElement('div', { className: "text-base font-bold text-red-800 mt-1" }, 
+                                `₪${(results.managementFeeImpact || 0).toLocaleString()}`),
+                            React.createElement('div', { className: "text-xs text-red-600 mt-1" }, 
+                                language === 'he' ? `תשואה נטו: ${(results.netReturn || 0).toFixed(1)}%` : `Net Return: ${(results.netReturn || 0).toFixed(1)}%`)
                         ])
                     ])
                 ])
@@ -420,7 +524,9 @@
             trainingFund: 25000,
             trainingFundContribution: 1125, // 7.5% of 15000
             inflationRate: 3,
-            expectedReturn: 7
+            expectedReturn: 7,
+            managementFees: 1.0, // 1% annual management fees for pension
+            trainingFundFees: 0.5 // 0.5% annual management fees for training fund
         });
         const [results, setResults] = React.useState(null);
         const [loadingTabs, setLoadingTabs] = React.useState({});
@@ -486,16 +592,30 @@
             const monthlyContribution = inputs.currentMonthlySalary * 0.186; // 18.6% pension contribution
             const annualContribution = monthlyContribution * 12;
             
-            // Simple compound interest calculation
-            const futureValue = inputs.currentSavings * Math.pow(1 + inputs.expectedReturn/100, yearsToRetirement) +
-                annualContribution * (Math.pow(1 + inputs.expectedReturn/100, yearsToRetirement) - 1) / (inputs.expectedReturn/100);
+            // Calculate net return after management fees
+            const netPensionReturn = (inputs.expectedReturn || 7) - (inputs.managementFees || 1.0);
+            const netTrainingReturn = (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.5);
             
-            const monthlyIncome = futureValue * (inputs.expectedReturn/100) / 12;
+            // Pension calculation with management fees
+            const pensionFutureValue = inputs.currentSavings * Math.pow(1 + netPensionReturn/100, yearsToRetirement) +
+                annualContribution * (Math.pow(1 + netPensionReturn/100, yearsToRetirement) - 1) / (netPensionReturn/100);
+            
+            // Training fund calculation with its own fees
+            const trainingAnnualContribution = (inputs.trainingFundContribution || 0) * 12;
+            const trainingFutureValue = (inputs.trainingFund || 0) * Math.pow(1 + netTrainingReturn/100, yearsToRetirement) +
+                trainingAnnualContribution * (Math.pow(1 + netTrainingReturn/100, yearsToRetirement) - 1) / (netTrainingReturn/100);
+            
+            const totalFutureValue = pensionFutureValue + trainingFutureValue;
+            const monthlyIncome = totalFutureValue * (netPensionReturn/100) / 12;
             
             setResults({
-                totalSavings: Math.round(futureValue),
+                totalSavings: Math.round(totalFutureValue),
+                pensionSavings: Math.round(pensionFutureValue),
+                trainingFundSavings: Math.round(trainingFutureValue),
                 monthlyIncome: Math.round(monthlyIncome),
-                achievesTarget: monthlyIncome > (inputs.currentMonthlySalary * 0.75)
+                achievesTarget: monthlyIncome > (inputs.currentMonthlySalary * 0.75),
+                netReturn: netPensionReturn,
+                managementFeeImpact: Math.round(totalFutureValue * (inputs.managementFees/100) * yearsToRetirement)
             });
         };
 
