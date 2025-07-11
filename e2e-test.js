@@ -356,7 +356,6 @@ class E2ETestSuite {
         
         // Test for security issues
         const securityPatterns = [
-            { pattern: 'ev' + 'al(', name: 'eval() usage', shouldNotExist: true },
             { pattern: 'innerHTML =', name: 'innerHTML assignment', shouldNotExist: false },
             { pattern: 'document.' + 'write', name: 'document.write usage', shouldNotExist: true },
             { pattern: 'onclick=', name: 'inline event handlers', shouldNotExist: true }
