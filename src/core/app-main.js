@@ -577,6 +577,7 @@
     window.BasicInputs = BasicInputs;
     window.BasicResults = BasicResults;
     window.SimpleChart = SimpleChart;
+    window.ErrorBoundary = ErrorBoundary;
     window.initializeRetirementPlannerCore = initializeRetirementPlannerCore;
 
     console.log('🚀 Retirement Planner Core loaded successfully');

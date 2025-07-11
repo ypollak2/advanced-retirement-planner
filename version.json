@@ -1,5 +1,5 @@
 {
-  "version": "3.0.1",
+  "version": "3.0.2",
   "releaseDate": "2025-07-11",
-  "description": "Security fix: removed eval() usage and inline event handlers"
+  "description": "Deploy fixes: ErrorBoundary export, security scan patterns, React CDN compatibility"
 }
