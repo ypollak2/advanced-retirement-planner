@@ -360,6 +360,131 @@
                     key: 'content',
                     className: "space-y-4" 
                 }, [
+                    // Planning Type Selection (Single/Couple)
+                    React.createElement('div', { 
+                        key: 'planning-type',
+                        className: "mb-6" 
+                    }, [
+                        React.createElement('label', { 
+                            className: "block text-sm font-medium text-gray-700 mb-3" 
+                        }, language === 'he' ? "סוג התכנון" : "Planning Type"),
+                        React.createElement('div', { 
+                            className: "grid grid-cols-2 gap-3" 
+                        }, [
+                            React.createElement('button', {
+                                type: 'button',
+                                onClick: () => setInputs({...inputs, planningType: 'single'}),
+                                className: `p-3 rounded-lg border-2 transition-all text-center ${
+                                    (inputs.planningType || 'single') === 'single' 
+                                        ? 'border-purple-500 bg-purple-50 text-purple-700' 
+                                        : 'border-gray-200 bg-white hover:border-purple-300'
+                                }`
+                            }, [
+                                React.createElement('div', { className: "font-medium" }, 
+                                    language === 'he' ? 'רווק/ה' : 'Single'),
+                                React.createElement('div', { className: "text-xs opacity-75" }, 
+                                    language === 'he' ? 'תכנון אישי' : 'Individual planning')
+                            ]),
+                            React.createElement('button', {
+                                type: 'button',
+                                onClick: () => setInputs({...inputs, planningType: 'couple'}),
+                                className: `p-3 rounded-lg border-2 transition-all text-center ${
+                                    inputs.planningType === 'couple' 
+                                        ? 'border-purple-500 bg-purple-50 text-purple-700' 
+                                        : 'border-gray-200 bg-white hover:border-purple-300'
+                                }`
+                            }, [
+                                React.createElement('div', { className: "font-medium" }, 
+                                    language === 'he' ? 'זוג' : 'Couple'),
+                                React.createElement('div', { className: "text-xs opacity-75" }, 
+                                    language === 'he' ? 'תכנון משותף' : 'Joint planning')
+                            ])
+                        ])
+                    ]),
+                    
+                    // Partner Information (if couple selected)
+                    inputs.planningType === 'couple' && React.createElement('div', { 
+                        key: 'partner-info',
+                        className: "bg-pink-50 rounded-lg p-4 border border-pink-200 mb-4" 
+                    }, [
+                        React.createElement('h3', { 
+                            className: "text-lg font-semibold text-pink-700 mb-4 flex items-center" 
+                        }, [
+                            React.createElement('span', { key: 'icon', className: "mr-2" }, '👫'),
+                            language === 'he' ? 'פרטי בני הזוג' : 'Partner Information'
+                        ]),
+                        React.createElement('div', { 
+                            className: "grid grid-cols-1 md:grid-cols-2 gap-6" 
+                        }, [
+                            // Partner 1
+                            React.createElement('div', { 
+                                key: 'partner1',
+                                className: "bg-white rounded-lg p-4 border border-pink-300" 
+                            }, [
+                                React.createElement('h4', { 
+                                    className: "font-medium text-pink-700 mb-3" 
+                                }, language === 'he' ? 'בן/בת זוג 1' : 'Partner 1'),
+                                React.createElement('div', { className: "space-y-3" }, [
+                                    React.createElement('div', {}, [
+                                        React.createElement('label', { 
+                                            className: "block text-sm font-medium text-gray-700 mb-1" 
+                                        }, language === 'he' ? 'גיל' : 'Age'),
+                                        React.createElement('input', {
+                                            type: 'number',
+                                            value: inputs.partner1Age || '',
+                                            onChange: (e) => setInputs({...inputs, partner1Age: parseInt(e.target.value) || 0}),
+                                            className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
+                                        })
+                                    ]),
+                                    React.createElement('div', {}, [
+                                        React.createElement('label', { 
+                                            className: "block text-sm font-medium text-gray-700 mb-1" 
+                                        }, language === 'he' ? 'משכורת חודשית' : 'Monthly Salary'),
+                                        React.createElement('input', {
+                                            type: 'number',
+                                            value: inputs.partner1Salary || '',
+                                            onChange: (e) => setInputs({...inputs, partner1Salary: parseInt(e.target.value) || 0}),
+                                            className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
+                                        })
+                                    ])
+                                ])
+                            ]),
+                            // Partner 2
+                            React.createElement('div', { 
+                                key: 'partner2',
+                                className: "bg-white rounded-lg p-4 border border-pink-300" 
+                            }, [
+                                React.createElement('h4', { 
+                                    className: "font-medium text-pink-700 mb-3" 
+                                }, language === 'he' ? 'בן/בת זוג 2' : 'Partner 2'),
+                                React.createElement('div', { className: "space-y-3" }, [
+                                    React.createElement('div', {}, [
+                                        React.createElement('label', { 
+                                            className: "block text-sm font-medium text-gray-700 mb-1" 
+                                        }, language === 'he' ? 'גיל' : 'Age'),
+                                        React.createElement('input', {
+                                            type: 'number',
+                                            value: inputs.partner2Age || '',
+                                            onChange: (e) => setInputs({...inputs, partner2Age: parseInt(e.target.value) || 0}),
+                                            className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
+                                        })
+                                    ]),
+                                    React.createElement('div', {}, [
+                                        React.createElement('label', { 
+                                            className: "block text-sm font-medium text-gray-700 mb-1" 
+                                        }, language === 'he' ? 'משכורת חודשית' : 'Monthly Salary'),
+                                        React.createElement('input', {
+                                            type: 'number',
+                                            value: inputs.partner2Salary || '',
+                                            onChange: (e) => setInputs({...inputs, partner2Salary: parseInt(e.target.value) || 0}),
+                                            className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
+                                        })
+                                    ])
+                                ])
+                            ])
+                        ])
+                    ]),
+
                     React.createElement('div', { 
                         key: 'row1',
                         className: "grid grid-cols-2 gap-4" 
@@ -1002,7 +1127,7 @@
         return React.createElement('div', { className: "space-y-4" }, [
             React.createElement('div', { 
                 key: 'results',
-                className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" 
+                className: "financial-card p-6 animate-slide-up" 
             }, [
                 React.createElement('h2', { 
                     key: 'title',
@@ -1017,11 +1142,11 @@
                 }, [
                     React.createElement('div', { 
                         key: 'total',
-                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                        className: "metric-card metric-positive p-4" 
                     }, [
                         React.createElement('div', { className: "text-sm text-green-700" }, [
                             React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה:" : "Total Expected Accumulation:"),
-                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1 wealth-amount" }, 
                                 `₪${Math.round(results.totalSavings || 0).toLocaleString()}`)
                         ])
                     ]),
@@ -1031,11 +1156,11 @@
                     }, [
                         React.createElement('div', { 
                             key: 'pension',
-                            className: "bg-blue-50 rounded-lg p-3 border border-blue-200" 
+                            className: "metric-card metric-neutral p-3" 
                         }, [
                             React.createElement('div', { className: "text-sm text-blue-700" }, [
                                 React.createElement('strong', null, language === 'he' ? "פנסיה:" : "Pension:"),
-                                React.createElement('div', { className: "text-lg font-bold text-blue-800 mt-1" }, 
+                                React.createElement('div', { className: "text-lg font-bold text-blue-800 mt-1 wealth-amount" }, 
                                     `₪${Math.round(results.pensionSavings || 0).toLocaleString()}`)
                             ])
                         ]),
@@ -1232,7 +1357,22 @@
         // Basic calculation function with separate contribution and accumulation fees
         const calculateBasic = () => {
             const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
-            const monthlyContribution = inputs.currentMonthlySalary * 0.186; // 18.6% pension contribution
+            
+            // Calculate contributions based on planning type
+            let totalMonthlySalary = inputs.currentMonthlySalary || 0;
+            let totalCurrentSavings = inputs.currentSavings || 0;
+            let totalTrainingFund = inputs.trainingFund || 0;
+            
+            if (inputs.planningType === 'couple') {
+                // Add partner salaries and savings
+                totalMonthlySalary += (inputs.partner1Salary || 0) + (inputs.partner2Salary || 0);
+                // Assume proportional current savings for partners (could be made configurable)
+                const salaryRatio1 = (inputs.partner1Salary || 0) / Math.max(1, totalMonthlySalary);
+                const salaryRatio2 = (inputs.partner2Salary || 0) / Math.max(1, totalMonthlySalary);
+                // For now, assume equal distribution - this could be enhanced later
+            }
+            
+            const monthlyContribution = totalMonthlySalary * 0.186; // 18.6% pension contribution
             const annualContribution = monthlyContribution * 12;
             
             // Calculate net returns after separate contribution and accumulation fees (ensure minimum 0.1% to avoid division by zero)
@@ -1244,11 +1384,11 @@
             const netTrainingAnnualContribution = (inputs.trainingFundContribution || 0) * 12 * (1 - (inputs.contributionFees || 1.0) / 100);
             
             // Pension calculation with separate contribution and accumulation fees
-            const pensionFutureValue = inputs.currentSavings * Math.pow(1 + netPensionReturn/100, yearsToRetirement) +
+            const pensionFutureValue = totalCurrentSavings * Math.pow(1 + netPensionReturn/100, yearsToRetirement) +
                 netAnnualContribution * (Math.pow(1 + netPensionReturn/100, yearsToRetirement) - 1) / (netPensionReturn/100);
             
             // Training fund calculation with its own fees
-            const trainingFutureValue = (inputs.trainingFund || 0) * Math.pow(1 + netTrainingReturn/100, yearsToRetirement) +
+            const trainingFutureValue = totalTrainingFund * Math.pow(1 + netTrainingReturn/100, yearsToRetirement) +
                 netTrainingAnnualContribution * (Math.pow(1 + netTrainingReturn/100, yearsToRetirement) - 1) / (netTrainingReturn/100);
             
             const totalFutureValue = pensionFutureValue + trainingFutureValue;
@@ -1263,9 +1403,11 @@
                 pensionSavings: Math.round(pensionFutureValue),
                 trainingFundSavings: Math.round(trainingFutureValue),
                 monthlyIncome: Math.round(monthlyIncome),
-                achievesTarget: monthlyIncome > (inputs.currentMonthlySalary * 0.75),
+                achievesTarget: monthlyIncome > (totalMonthlySalary * 0.75),
                 netReturn: netPensionReturn,
-                managementFeeImpact: Math.round(totalContributionFeesImpact + totalAccumulationFeesImpact)
+                managementFeeImpact: Math.round(totalContributionFeesImpact + totalAccumulationFeesImpact),
+                planningType: inputs.planningType || 'single',
+                totalMonthlySalary: Math.round(totalMonthlySalary)
             });
         };
 
@@ -1352,7 +1494,7 @@
         const currentT = t[language];
 
         return React.createElement('div', {
-            className: 'min-h-screen gradient-bg py-8 px-4',
+            className: 'min-h-screen py-6 px-4 dashboard-grid',
             dir: language === 'he' ? 'rtl' : 'ltr'
         }, [
             // Header
@@ -1387,17 +1529,15 @@
                     key: 'tabs',
                     className: 'flex justify-center mb-8 overflow-x-auto'
                 }, React.createElement('div', {
-                    className: 'glass-effect rounded-xl p-2 inline-flex space-x-2'
+                    className: 'financial-card p-2 inline-flex space-x-2'
                 }, [
                     ['basic', 'advanced', 'analysis', 'scenarios', 'fire', 'stress'].map(tab => 
                         React.createElement('button', {
                             key: tab,
                             onClick: () => handleTabClick(tab),
                             disabled: loadingTabs[tab],
-                            className: `px-4 py-2 rounded-lg font-semibold transition-all min-w-max ${
-                                activeTab === tab
-                                    ? 'bg-purple-600 text-white shadow-lg'
-                                    : 'text-purple-700 hover:bg-purple-100'
+                            className: `tab-modern ${
+                                activeTab === tab ? 'active' : ''
                             } ${loadingTabs[tab] ? 'opacity-50 cursor-not-allowed' : ''}`
                         }, loadingTabs[tab] ? '...' : currentT[tab])
                     )
@@ -1469,7 +1609,7 @@
                     // Results Column with Side Panel
                     React.createElement('div', {
                         key: 'results',
-                        className: 'lg:col-span-1 space-y-6'
+                        className: 'lg:col-span-1 space-y-6 sidebar-panel'
                     }, [
                         // Real-time Summary Panel
                         React.createElement(SavingsSummaryPanel, {

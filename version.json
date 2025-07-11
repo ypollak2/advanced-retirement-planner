@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0",
+  "version": "4.1.0",
   "releaseDate": "2025-07-11",
-  "description": "Automatic Calculation & Export Suite: Real-time calculations, PNG/AI exports, LLM analysis, graphical charts, enhanced UX with English interface, updated fee defaults (1%/0.1%/0.6%), monthly purchasing power display"
+  "description": "Modern Financial UI Design: Professional interface inspired by Personal Capital/Wealthfront, enhanced financial cards, metric indicators, wealth-focused typography, responsive dashboard, improved color palette, stress testing fixes, comprehensive e2e testing"
 }

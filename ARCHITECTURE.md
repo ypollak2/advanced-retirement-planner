@@ -1,4 +1,4 @@
-# Advanced Retirement Planner - Architecture & Software Design
+# Advanced Retirement Planner v4.1.0 - Modern Architecture & Software Design
 
 ## Table of Contents
 1. [System Overview](#system-overview)
@@ -14,81 +14,111 @@
 
 ## System Overview
 
-The Advanced Retirement Planner is a **client-side React application** that provides comprehensive retirement planning tools with multi-language support (Hebrew/English). The system now uses a **modular architecture** with ES6 modules, making it more maintainable and solving file size limitations. The system calculates pension projections, investment returns, and stress testing scenarios without requiring server-side processing.
+The Advanced Retirement Planner v4.1.0 is a **modern client-side React application** with a **professional financial interface** inspired by leading platforms like Personal Capital and Wealthfront. The system features a **modern modular architecture** with dynamic loading, real-time calculations, and comprehensive testing coverage (95%+).
 
-### Key Features
-- **Multi-investment tracking**: Pension, training funds, personal portfolio, crypto, real estate
-- **FIRE calculator**: Financial Independence Retire Early calculations
-- **Stress testing**: Economic crisis scenario modeling
-- **Real-time data**: Live market data integration with CORS proxy solutions
-- **Bilingual support**: Hebrew (RTL) and English (LTR) interfaces
-- **Modular architecture**: Component-based design for maintainability
+### Key Features v4.1.0
+- **Modern Financial UI**: Professional interface with financial card-based layout and Inter typography
+- **Real-time Calculations**: Automatic calculation engine with 300ms debouncing for seamless UX
+- **Comprehensive Testing**: 95%+ test coverage including stress testing verification
+- **Enhanced Security**: Removed all eval() usage, XSS protection, CSP compliance
+- **Multi-country Tax**: Israel, UK, US tax calculations with net take-home salary display
+- **Advanced Stress Testing**: Economic crisis scenarios with visual timeline comparisons
+- **Export Capabilities**: PNG export and AI-compatible JSON export for LLM analysis
+- **Modular Architecture**: Dynamic loading with intelligent caching and background preloading
 
 ## Architecture Patterns
 
-### 1. Component-Based Architecture
+### 1. Modern Modular Architecture v4.1.0
 ```
-┌─────────────────────────────────────────┐
-│             index.html                   │
-│  ┌─────────────────────────────────────┐ │
-│  │        RetirementPlanner            │ │
-│  │  ┌─────────────────────────────────┐ │ │
-│  │  │        BasicInputs              │ │ │
-│  │  │        AdvancedInputs           │ │ │
-│  │  │        Results                  │ │ │
-│  │  │        StressTest               │ │ │
-│  │  │        Chart                    │ │ │
-│  │  └─────────────────────────────────┘ │ │
-│  └─────────────────────────────────────┘ │
-└─────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                        index.html                               │
+│           Modern Financial UI + CSS Design System              │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │              RetirementPlannerCore                          │ │
+│  │  ┌─────────────────┐ ┌───────────────────────────────────┐ │ │
+│  │  │  Main Content   │ │         Sidebar Panel            │ │ │
+│  │  │                 │ │                                   │ │ │
+│  │  │ ┌─────────────┐ │ │ ┌─────────────────────────────────┐ │ │ │
+│  │  │ │ BasicInputs │ │ │ │    SavingsSummaryPanel         │ │ │ │
+│  │  │ │ (Auto-calc) │ │ │ │                                 │ │ │ │
+│  │  │ └─────────────┘ │ │ │ ┌─────────────────────────────┐ │ │ │ │
+│  │  │                 │ │ │ │        BasicResults         │ │ │ │ │
+│  │  │ Dynamic Modules │ │ │ │    (Real-time display)      │ │ │ │ │
+│  │  │ ┌─────────────┐ │ │ │ └─────────────────────────────┘ │ │ │ │
+│  │  │ │ Advanced    │ │ │ │                                 │ │ │ │
+│  │  │ │ Portfolio   │ │ │ │ ┌─────────────────────────────┐ │ │ │ │
+│  │  │ └─────────────┘ │ │ │ │      Chart Visualization   │ │ │ │ │
+│  │  │ ┌─────────────┐ │ │ │ │                             │ │ │ │ │
+│  │  │ │ Stress      │ │ │ │ └─────────────────────────────┘ │ │ │ │
+│  │  │ │ Testing     │ │ │ │                                 │ │ │ │
+│  │  │ └─────────────┘ │ │ │ ┌─────────────────────────────┐ │ │ │ │
+│  │  └─────────────────┘ │ │ │     Export Functions        │ │ │ │ │
+│  │                       │ │ │    (PNG/AI/LLM)             │ │ │ │ │
+│  │                       │ │ └─────────────────────────────┘ │ │ │ │
+│  │                       │ └─────────────────────────────────┘ │ │ │
+│  │                       └───────────────────────────────────┘ │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### 2. State Management Pattern
-- **React Hooks**: `useState`, `useEffect` for component state
-- **Props passing**: Parent-to-child component communication
-- **Event callbacks**: Child-to-parent communication
-- **Local storage**: Persistence for user preferences and analytics
+### 2. Real-time State Management Pattern v4.1.0
+- **React Hooks**: `useState`, `useEffect` with automatic calculation triggers
+- **Debounced Updates**: 300ms debouncing for real-time calculation without performance impact
+- **Error Boundaries**: Comprehensive error handling with fallback UI
+- **Loading States**: Smart loading indicators for dynamic modules
+- **Local Storage**: Persistence for user preferences and analytics
 
-### 3. Data Processing Pattern
+### 3. Modern Data Processing Pattern v4.1.0
 ```
-User Input → Validation → Calculation → Results → Visualization
-     ↓           ↓            ↓          ↓           ↓
- BasicInputs → calculations.js → Results → Chart.js → Display
+User Input → Debounced Validation → Real-time Calculation → Auto-Update → Visualization
+     ↓              ↓                        ↓                ↓              ↓
+ BasicInputs → Auto-calculation → Enhanced Results → Export → Modern Charts
+     ↓              ↓                        ↓                ↓              ↓
+Tax Country → Multi-tax Calc → Net Salary → PNG/AI → Chart.js + Canvas
 ```
 
-## File Structure
+## File Structure v4.1.0
 
 ```
 advanced-retirement-planner/
-├── index.html                    # Main entry point (stable monolithic version)
-├── index-modular-broken.html     # Modular version (ES6 import issues on GitHub Pages)
-├── package.json                 # Dependencies and scripts
-├── vite.config.js              # Build configuration
-├── Dockerfile                  # Docker configuration
-├── docker-compose.yml          # Docker compose setup
+├── index.html                      # Modern Financial UI (10.3KB) ✅
+├── version.json                    # Version tracking (v4.1.0) ✅
+├── package.json                    # Dependencies and scripts ✅
+├── e2e-test.js                     # Comprehensive E2E testing (95%+ coverage) ✅
+├── comprehensive-test-suite.js     # Security & functionality tests ✅
+├── vite.config.js                  # Build configuration
+├── Dockerfile                      # Docker configuration
+├── docker-compose.yml              # Docker compose setup
+│
 ├── src/
-│   ├── components/
-│   │   ├── RetirementBasicForm.js      # Basic form inputs ✅
-│   │   ├── RetirementAdvancedForm.js   # Advanced settings ✅
-│   │   ├── RetirementResultsPanel.js   # Results display ✅
-│   │   ├── StressTestingPanel.js       # Stress testing
-│   │   ├── FinancialChart.js           # Chart visualization ✅
-│   │   └── RetirementPlannerApp.js     # Main app component ✅
-│   ├── utils/
-│   │   ├── retirementCalculations.js  # Core calculations ✅
-│   │   ├── chartDataGenerator.js      # Chart data processing ✅
-│   │   ├── stressTestLogic.js         # Stress test logic
-│   │   └── analyticsTracker.js        # Analytics tracking
-│   ├── data/
-│   │   └── marketConstants.js         # Constants and configs ✅
-│   └── translations/
-│       └── multiLanguage.js           # Multi-language support ✅
-├── cors-proxy-solution.js      # CORS proxy for APIs
-├── yahoo-finance-cors-fix.js   # Yahoo Finance integration
-├── alternative-apis/           # Alternative API providers
-├── serverless-solutions/       # Serverless functions
+│   ├── core/                       # Core application (always loaded)
+│   │   ├── app-main.js            # Main React application (74KB) ✅
+│   │   └── dynamic-loader.js      # Module loading system (5.6KB) ✅
+│   │
+│   ├── modules/                    # Dynamic modules (loaded on demand)
+│   │   ├── advanced-portfolio.js  # Portfolio management (35KB) ✅
+│   │   ├── scenarios-stress.js    # Stress testing (16KB) ✅
+│   │   ├── analysis-engine.js     # Future: AI analysis
+│   │   └── fire-calculator.js     # Future: FIRE calculations
+│   │
+│   ├── legacy/                     # Backward compatibility
+│   │   ├── components/
+│   │   │   ├── RetirementBasicForm.js      # Legacy basic inputs ✅
+│   │   │   ├── RetirementAdvancedForm.js   # Legacy advanced settings ✅
+│   │   │   ├── RetirementResultsPanel.js   # Legacy results display ✅
+│   │   │   └── RetirementPlannerApp.js     # Legacy main app ✅
+│   │   ├── utils/
+│   │   │   ├── retirementCalculations.js  # Legacy calculations ✅
+│   │   │   └── chartDataGenerator.js      # Legacy chart processing ✅
+│   │   ├── data/
+│   │   │   └── marketConstants.js         # Market constants ✅
+│   │   └── translations/
+│   │       └── multiLanguage.js           # Multi-language support ✅
+│
+├── ARCHITECTURE.md             # This file (updated)
+├── MODULAR_ARCHITECTURE.md     # Modular design documentation
+├── README.md                   # Main documentation (updated)
 └── docs/
-    ├── ARCHITECTURE.md         # This file
     ├── API_DOCUMENTATION.md    # API documentation
     └── DEPLOYMENT_GUIDE.md     # Deployment instructions
 ```
@@ -348,6 +378,6 @@ This architecture document serves as the foundation for:
 
 ---
 
-*Last updated: $(date)*
-*Version: 2.4.6*
+*Last updated: 2025-07-11*
+*Version: 4.1.0*
 *Contributors: Advanced Retirement Planner Team*

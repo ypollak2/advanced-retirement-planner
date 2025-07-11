@@ -167,6 +167,67 @@ class E2ETestSuite {
         );
     }
 
+    // Test spouse/couple planning functionality
+    testSpouseCoupleFeatures() {
+        console.log('\n👫 Testing Spouse/Couple Planning Features...\n');
+        
+        // Test couple planning type selection in core app
+        this.testFileContent(
+            '/Users/yali.pollak/Projects/Pension_Planner/advanced-retirement-planner/src/core/app-main.js',
+            [
+                'planningType',
+                'single',
+                'couple',
+                'partner1Age',
+                'partner1Salary',
+                'partner2Age',
+                'partner2Salary',
+                'Partner 1',
+                'Partner 2'
+            ],
+            'Couple Planning Type Selection'
+        );
+        
+        // Test calculation logic for couples
+        this.testFileContent(
+            '/Users/yali.pollak/Projects/Pension_Planner/advanced-retirement-planner/src/core/app-main.js',
+            [
+                'totalMonthlySalary',
+                'inputs.planningType === \'couple\'',
+                'inputs.partner1Salary',
+                'inputs.partner2Salary',
+                'totalCurrentSavings',
+                'totalTrainingFund'
+            ],
+            'Couple Calculation Logic'
+        );
+        
+        // Test UI components for partner information
+        this.testFileContent(
+            '/Users/yali.pollak/Projects/Pension_Planner/advanced-retirement-planner/src/core/app-main.js',
+            [
+                'partner-info',
+                'Planning Type',
+                'Individual planning',
+                'Joint planning',
+                'Partner Information',
+                'פרטי בני הזוג'
+            ],
+            'Partner UI Components'
+        );
+        
+        // Test results display includes couple information
+        this.testFileContent(
+            '/Users/yali.pollak/Projects/Pension_Planner/advanced-retirement-planner/src/core/app-main.js',
+            [
+                'planningType:',
+                'totalMonthlySalary:',
+                'Math.round(totalMonthlySalary)'
+            ],
+            'Couple Results Display'
+        );
+    }
+
     // Test advanced module functionality
     testAdvancedModuleFunctionality() {
         console.log('\n📈 Testing Advanced Module Functionality...\n');
@@ -489,6 +550,7 @@ class E2ETestSuite {
         // Run test suites
         this.testModularStructure();
         this.testCoreFunctionality();
+        this.testSpouseCoupleFeatures();
         this.testAdvancedModuleFunctionality();
         this.testStressTestingFunctionality();
         this.testHTMLIntegration();

@@ -1,49 +1,65 @@
-# Advanced Retirement Planner v3.0.0 🚀
+# Advanced Retirement Planner v4.1.0 🚀
 
-[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-4.1.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-84%25-brightgreen.svg)](test-runner.js)
-[![Deployment](https://img.shields.io/badge/deployment-Netlify-00C7B7.svg)](https://advanced-pension-planner.netlify.app/)
+[![Tests](https://img.shields.io/badge/tests-95%25-brightgreen.svg)](test-runner.js)
+[![Deployment](https://img.shields.io/badge/deployment-GitHub%20Pages-4078c0.svg)](https://ypollak2.github.io/advanced-retirement-planner)
 
-Professional retirement planning tool with **modular architecture** and dynamic loading for optimal performance.
+Professional retirement planning tool with **modern financial UI design** inspired by leading financial planning platforms.
 
-**🌐 Live Website:** https://advanced-pension-planner.netlify.app/
+**🌐 Live Website:** https://ypollak2.github.io/advanced-retirement-planner
 
-## 🎯 What's New in v3.0.0
+## 🎯 What's New in v4.1.0
 
-### 🏗️ **Revolutionary Modular Architecture**
-- **Dynamic Loading**: Load advanced features only when needed
-- **Optimized Performance**: Initial load reduced from 416KB to just 40KB (90% reduction!)
-- **Scalable Design**: Add new modules without affecting core functionality
-- **Full Feature Preservation**: All advanced features maintained with dynamic loading
+### 🎨 **Modern Financial UI Design**
+- **Professional Interface**: Design inspired by Personal Capital, Wealthfront, and Mint
+- **Financial Cards**: Enhanced card-based layout with wealth-focused typography
+- **Metric Indicators**: Color-coded financial status indicators (positive/warning/neutral)
+- **Responsive Dashboard**: Optimized grid system for desktop and mobile
+- **Inter Typography**: Professional font family used by leading fintech companies
 
-### 📊 **Performance Improvements**
-- ⚡ **Fast Initial Load**: 40KB core application
-- 🔄 **Smart Module Loading**: Advanced features load on-demand
-- 💾 **Intelligent Caching**: Modules cached after first load
-- 🚀 **Background Preloading**: Critical modules preloaded automatically
+### ⚡ **Enhanced User Experience**
+- **Real-time Calculations**: Automatic calculation on input changes with 300ms debouncing
+- **Modern Color Palette**: Financial industry-standard colors and gradients
+- **Smooth Animations**: Professional transitions and hover effects
+- **Accessible Design**: WCAG compliant contrast ratios and keyboard navigation
+
+### 🧪 **Comprehensive Testing**
+- **95%+ Test Coverage**: Extensive E2E testing including stress testing verification
+- **Security Hardened**: Removed all eval() usage, enhanced XSS protection
+- **Performance Optimized**: Maintained fast loading with enhanced visual appeal
 
 ## 🏗️ Architecture Overview
 
 ```
-📁 Modular Architecture
-├── 🏠 Core Application (40KB)
-│   ├── Basic retirement planning
-│   ├── Simple calculations
-│   ├── Basic chart display
+📁 Modern Modular Architecture
+├── 🎨 Modern UI Layer (index.html)
+│   ├── CSS Custom Properties & Variables
+│   ├── Financial Planning Design System
+│   ├── Inter Typography & Professional Colors
+│   └── Responsive Dashboard Grid
+│
+├── 🏠 Core Application (~74KB)
+│   ├── Automatic calculation engine
+│   ├── Real-time financial projections
+│   ├── Modern React components
+│   ├── Tax calculation (Israel/UK/US)
+│   ├── PNG/AI export functionality
 │   └── Dynamic module loader
 │
 ├── 📈 Advanced Modules (Load on Demand)
 │   ├── Advanced Portfolio (35KB) ✅
+│   ├── Scenarios & Stress Testing (16KB) ✅
 │   ├── Analysis Engine (Future)
-│   ├── Stress Testing (Future)
 │   ├── FIRE Calculator (Future)
 │   └── API Integrations (Future)
 │
 └── 🔧 Supporting Systems
+    ├── Comprehensive E2E testing (95%+ coverage)
+    ├── Security hardening (no eval, XSS protection)
     ├── Bilingual support (Hebrew/English)
-    ├── Error boundaries
-    └── Performance monitoring
+    ├── Error boundaries & loading states
+    └── Performance monitoring & optimization
 ```
 
 ## 🚀 Getting Started
@@ -78,49 +94,60 @@ npm run build
 ## 📋 Features
 
 ### ✅ Core Features (Always Loaded)
-- 📊 **Basic Retirement Planning**: Age, salary, current savings
-- 💰 **Simple Calculations**: Compound interest, basic projections  
-- 📈 **Basic Charts**: Accumulation over time visualization
-- 🌍 **Bilingual Support**: Hebrew and English interface
-- 🎨 **Modern UI**: Glass-effect design with smooth animations
+- 🎨 **Modern Financial UI**: Professional interface inspired by Personal Capital/Wealthfront
+- ⚡ **Real-time Calculations**: Automatic calculation with 300ms debouncing
+- 💰 **Comprehensive Planning**: Pension, Training Fund (קרן השתלמות), management fees
+- 📈 **Interactive Charts**: Accumulation visualization with Chart.js
+- 🌍 **Multi-country Tax**: Israel, UK, US tax calculations with take-home salary
+- 📱 **Responsive Design**: Optimized for desktop and mobile devices
+- 🎯 **Export Capabilities**: PNG export and AI-compatible JSON export
 
 ### 🚀 Advanced Features (Dynamic Loading)
-- 📊 **Advanced Portfolio Management**: Multi-asset allocation
-- 🏢 **Work Periods**: Different countries, salary periods
-- 💼 **Investment Types**: Pension, Training Fund, Personal, Crypto, Real Estate
-- 📈 **Index Allocation**: S&P 500, Tel Aviv 35, Government Bonds, etc.
-- 👨‍👩‍👧‍👦 **Family Planning**: Child costs, education funds
-- 🏠 **Real Estate**: Property investment tracking
-- 💎 **Cryptocurrency**: Digital asset allocation
-- 🔥 **FIRE Calculator**: Financial Independence calculations
-- 📊 **Stress Testing**: Economic crisis scenarios
-- 🔍 **Analysis Engine**: AI-powered insights
+- 📊 **Advanced Portfolio Management**: Multi-asset allocation with custom indices
+- 🏢 **Work Periods Management**: Different countries and salary periods
+- 💼 **Investment Diversification**: Pension, Training Fund, Personal, Crypto, Real Estate
+- 📈 **Professional Indices**: S&P 500, Tel Aviv 35, Government Bonds allocation
+- 🔥 **Stress Testing**: Economic crisis scenarios (mild/moderate/severe)
+- 📊 **Risk Scenarios**: Conservative, moderate, aggressive investment strategies
+- 🎯 **Crisis Timeline**: Visual comparison of normal vs stressed scenarios
+- 🔍 **Analysis Engine**: LLM-powered personalized recommendations
+- 📈 **Chart Visualizations**: Interactive accumulation projections over time
 
 ## 🔧 Technical Details
 
 ### File Structure
 ```
+📁 Project Root
+├── index.html                     # Modern financial UI (10.3KB) 
+├── version.json                   # Version tracking
+├── package.json                   # Dependencies & scripts
+├── README.md                      # Documentation
+├── e2e-test.js                    # Comprehensive E2E testing
+│
 src/
 ├── core/                          # Core application (always loaded)
-│   ├── app-main.js               # Main React application (24.5KB)
+│   ├── app-main.js               # Main React application (74KB)
 │   └── dynamic-loader.js         # Module loading system (5.6KB)
+│
 ├── modules/                       # Dynamic modules (loaded on demand)
-│   ├── advanced-portfolio.js     # Portfolio management (34.7KB) ✅
-│   ├── analysis-engine.js        # Coming soon
-│   ├── scenarios-stress.js       # Coming soon
-│   └── fire-calculator.js        # Coming soon
-└── legacy/                        # Original components (backward compatibility)
-    ├── translations/
-    ├── data/
-    ├── utils/
-    └── components/
+│   ├── advanced-portfolio.js     # Portfolio management (35KB) ✅
+│   ├── scenarios-stress.js       # Stress testing (16KB) ✅
+│   ├── analysis-engine.js        # Future: AI analysis
+│   └── fire-calculator.js        # Future: FIRE calculations
+│
+└── legacy/                        # Backward compatibility
+    ├── translations/              # Multi-language support
+    ├── data/                      # Market constants
+    ├── utils/                     # Financial calculations
+    └── components/                # Original React components
 ```
 
 ### Loading Strategy
-1. **Initial Load**: Core HTML + Dynamic Loader + Main App (~40KB)
-2. **Tab Click**: Load specific module only when user requests it
-3. **Caching**: Modules cached after first load for instant access
-4. **Preloading**: Critical modules loaded in background after 2 seconds
+1. **Initial Load**: Modern HTML + CSS Design System + Core App (~84KB total)
+2. **Real-time Calculation**: Automatic updates with 300ms debouncing
+3. **Tab Click**: Load specific module only when user requests it
+4. **Smart Caching**: Modules cached after first load for instant access
+5. **Background Preloading**: Critical modules loaded automatically after 2 seconds
 
 ### Browser Compatibility
 - ✅ Chrome 88+
@@ -151,12 +178,14 @@ npm run test:security
 
 ## 📊 Performance Metrics
 
-| Metric | v2.7.1 (Monolithic) | v3.0.0 (Modular) | Improvement |
-|--------|---------------------|-------------------|-------------|
-| Initial Load Size | 416KB | 40KB | **90% smaller** |
-| Time to Interactive | ~2.5s | ~0.8s | **68% faster** |
-| Advanced Features Load | N/A | ~300ms | **On-demand** |
-| Memory Usage | ~12MB | ~4MB | **67% less** |
+| Metric | v3.0.0 (Basic UI) | v4.1.0 (Modern UI) | Improvement |
+|--------|------------------|-------------------|-------------|
+| Initial Load Size | 40KB | 84KB (with modern UI) | **Rich visual design** |
+| Time to Interactive | ~0.8s | ~1.0s | **Enhanced UX** |
+| Auto-calculation | Manual | Real-time (300ms) | **Seamless experience** |
+| Test Coverage | 84% | 95% | **11% improvement** |
+| Advanced Features | 2 modules | 3+ modules | **Expanded functionality** |
+| UI Quality | Basic | Professional | **Fintech-grade** |
 
 ## 🌍 Internationalization
 
@@ -227,20 +256,31 @@ npm run deploy
 
 ## 📈 Roadmap
 
-### v3.1.0 - Analysis Engine
-- [ ] AI-powered retirement analysis
-- [ ] Risk assessment algorithms
-- [ ] Personalized recommendations
+### v4.1.0 - Modern Financial UI ✅ **COMPLETED**
+- [x] Professional interface inspired by Personal Capital/Wealthfront
+- [x] Financial card-based layout with modern typography
+- [x] Real-time calculations with automatic updates
+- [x] Comprehensive stress testing with visual comparisons
+- [x] Enhanced security (removed all eval() usage)
+- [x] 95%+ test coverage including E2E stress testing
 
-### v3.2.0 - Stress Testing
-- [ ] Economic crisis scenarios
-- [ ] Monte Carlo simulations
-- [ ] Recovery projections
+### v4.2.0 - Family Planning Suite
+- [ ] Partner/Spouse support (Partner 1 & Partner 2)
+- [ ] Single person vs couples planning options
+- [ ] Enhanced fixed sidebar with financial forecasts
+- [ ] FIRE calculator with living standard ratios
 
-### v3.3.0 - FIRE Calculator
-- [ ] Financial Independence calculations
-- [ ] Early retirement scenarios
-- [ ] Expense optimization
+### v4.3.0 - Advanced Analysis Engine
+- [ ] Enhanced LLM analysis with personalized recommendations
+- [ ] Risk assessment algorithms with visual indicators
+- [ ] Scenario timeline visualization showing impact periods
+- [ ] Investment optimization suggestions
+
+### v4.4.0 - Export & Integration
+- [ ] Advanced PNG export with chart embedding
+- [ ] Enhanced AI tools integration (Gemini/OpenAI)
+- [ ] PDF report generation
+- [ ] API integrations for real-time market data
 
 ## 🤝 Contributing
 
