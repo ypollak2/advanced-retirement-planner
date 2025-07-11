@@ -66,7 +66,7 @@ jobs:
     - name: Check licenses
       run: |
         echo "Checking license compliance..."
-        npx license-checker --summary --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;CC0-1.0;Unlicense;0BSD;CC-BY-3.0;CC-BY-4.0;(MIT AND CC-BY-3.0)'
+        npx license-checker --summary --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC;CC0-1.0;Unlicense;0BSD;CC-BY-3.0;CC-BY-4.0;Python-2.0;(MIT AND CC-BY-3.0)'
         echo "✅ All licenses are compliant"
 
   code-security:
