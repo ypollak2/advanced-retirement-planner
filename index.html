@@ -649,9 +649,8 @@
                 await loadScript('./src/core/app-main.js?v=4.2.1');
                 console.log('✅ Core application loaded');
 
-                // Poll for the initialization function to be available
-                const startTime = Date.now();
-                const pollForInitialization = () => {
+                // Wait for the appReady event before initializing
+                document.addEventListener('appReady', () => {
                     if (window.initializeRetirementPlannerCore) {
                         console.log('🎉 Initializing core application with ErrorBoundary...');
                         window.initializeRetirementPlannerCore();
@@ -663,8 +662,8 @@
                                 window.moduleLoader.preloadCriticalModules();
                             }
                         }, 2000);
-                    } else if (Date.now() - startTime > 5000) { // 5-second timeout
-                        console.error('❌ Core application initialization function not found after timeout');
+                    } else {
+                        console.error('❌ Core application initialization function not found even after appReady event');
                         safeSetHTML(document.getElementById('root'), `
                             <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
                                 <div class="text-center max-w-md">
@@ -685,11 +684,8 @@
                                 refreshBtn.addEventListener('click', () => location.reload());
                             }
                         }, 100);
-                    } else {
-                        setTimeout(pollForInitialization, 100);
                     }
-                };
-                pollForInitialization();
+                });
 
             } catch (error) {
                 console.error('❌ Application initialization failed:', error);
