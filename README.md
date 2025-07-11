@@ -1,6 +1,6 @@
-# Advanced Retirement Planner v4.1.0 🚀
+# Advanced Retirement Planner v4.2.0 🚀
 
-[![Version](https://img.shields.io/badge/version-4.1.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-4.2.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-95%25-brightgreen.svg)](test-runner.js)
 [![Deployment](https://img.shields.io/badge/deployment-GitHub%20Pages-4078c0.svg)](https://ypollak2.github.io/advanced-retirement-planner)
@@ -9,7 +9,22 @@ Professional retirement planning tool with **modern financial UI design** inspir
 
 **🌐 Live Website:** https://ypollak2.github.io/advanced-retirement-planner
 
-## 🎯 What's New in v4.1.0
+## 🎯 What's New in v4.2.0
+
+### 🔧 **Enhanced UI Visibility & Export Fixes**
+- **Improved Headlines**: Enhanced CSS with better contrast and text shadows for maximum visibility
+- **Button Enhancement**: Strengthened button styling with bold fonts and improved shadows
+- **Fixed PNG Export**: Resolved export functionality with better error handling and data validation
+- **Fixed AI Export**: Enhanced AI-compatible JSON export with proper error messages
+- **Chart Display**: Improved Chart.js integration with better error handling and debugging
+
+### 🔍 **Enhanced Sidebar & Analysis**
+- **Bottom Line Summary**: New prominent key metrics display for easy viewing
+- **Dynamic LLM Recommendations**: Real-time AI analysis that updates with parameter changes
+- **Enhanced Financial Forecast**: Better visualization of retirement projections
+- **Improved Color Visibility**: High contrast design for better accessibility
+
+### 📊 **Previous Features (v4.1.0)**
 
 ### 🎨 **Modern Financial UI Design**
 - **Professional Interface**: Design inspired by Personal Capital, Wealthfront, and Mint

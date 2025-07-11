@@ -41,14 +41,15 @@
         const chartInstance = React.useRef(null);
         
         React.useEffect(() => {
-            if (chartRef.current && data && data.length > 0) {
+            if (chartRef.current && data && data.length > 0 && window.Chart) {
                 const ctx = chartRef.current.getContext('2d');
                 
-                if (chartInstance.current) {
-                    chartInstance.current.destroy();
-                }
-                
-                const isHebrew = language === 'he';
+                try {
+                    if (chartInstance.current) {
+                        chartInstance.current.destroy();
+                    }
+                    
+                    const isHebrew = language === 'he';
                 
                 const chartData = {
                     labels: data.map(d => isHebrew ? `גיל ${d.age}` : `Age ${d.age}`),
@@ -93,7 +94,13 @@
                     }
                 };
                 
-                chartInstance.current = new Chart(ctx, config);
+                    chartInstance.current = new Chart(ctx, config);
+                    console.log('✅ Chart rendered successfully');
+                } catch (error) {
+                    console.error('❌ Chart rendering error:', error);
+                }
+            } else if (!window.Chart) {
+                console.error('❌ Chart.js not loaded');
             }
             
             return () => {
@@ -364,6 +371,65 @@
                     ]),
                     React.createElement('div', { className: "text-xs text-gray-500 text-center" }, 
                         `${Math.round(((inputs.currentAge || 30) - 25) / ((inputs.retirementAge || 67) - 25) * 100)}% ${language === 'he' ? 'מהדרך' : 'complete'}`)
+                ])
+            ]),
+            
+            // Bottom Line Summary - Key metrics at a glance
+            React.createElement('div', {
+                key: 'bottom-line-summary',
+                className: "border-t border-gray-200 pt-4 mb-4"
+            }, [
+                React.createElement('div', { 
+                    key: 'summary-title',
+                    className: "header-primary text-sm font-bold text-gray-900 mb-3 flex items-center" 
+                }, [
+                    React.createElement('span', { key: 'icon', className: "mr-2" }, '📍'),
+                    language === 'he' ? 'השורה התחתונה' : 'Bottom Line'
+                ]),
+                
+                // Key Metrics Cards
+                React.createElement('div', { 
+                    key: 'key-metrics',
+                    className: "space-y-2" 
+                }, [
+                    // Monthly income in retirement
+                    React.createElement('div', {
+                        key: 'monthly-retirement',
+                        className: "metric-card p-4 border-2 border-indigo-300 bg-indigo-50"
+                    }, [
+                        React.createElement('div', { className: "text-xs font-semibold text-indigo-600 uppercase tracking-wide" }, 
+                            language === 'he' ? 'הכנסה חודשית בפרישה' : 'Monthly Retirement Income'),
+                        React.createElement('div', { className: "text-2xl font-bold text-indigo-800 wealth-amount mt-1" }, 
+                            formatCurrency(estimatedMonthlyIncome)),
+                        React.createElement('div', { className: "text-xs text-indigo-600 mt-1" }, 
+                            `${((estimatedMonthlyIncome / totalMonthlySalary) * 100).toFixed(0)}% ${language === 'he' ? 'מהמשכורת הנוכחית' : 'of current salary'}`)
+                    ]),
+                    
+                    // Years to retirement
+                    React.createElement('div', {
+                        key: 'years-countdown',
+                        className: "metric-card p-3 border-2 border-purple-300 bg-purple-50"
+                    }, [
+                        React.createElement('div', { className: "text-xs font-semibold text-purple-600 uppercase tracking-wide" }, 
+                            language === 'he' ? 'זמן לפרישה' : 'Time to Retirement'),
+                        React.createElement('div', { className: "text-xl font-bold text-purple-800" }, 
+                            `${yearsToRetirement} ${language === 'he' ? 'שנים' : 'years'}`),
+                        React.createElement('div', { className: "text-xs text-purple-600" }, 
+                            `${language === 'he' ? 'עד גיל' : 'Until age'} ${inputs.retirementAge || 67}`)
+                    ]),
+                    
+                    // Total projected savings
+                    React.createElement('div', {
+                        key: 'total-savings',
+                        className: "metric-card p-3 border-2 border-green-300 bg-green-50"
+                    }, [
+                        React.createElement('div', { className: "text-xs font-semibold text-green-600 uppercase tracking-wide" }, 
+                            language === 'he' ? 'צבירה כוללת צפויה' : 'Total Projected Savings'),
+                        React.createElement('div', { className: "text-xl font-bold text-green-800 wealth-amount" }, 
+                            formatCurrency(projectedWithGrowth)),
+                        React.createElement('div', { className: "text-xs text-green-600" }, 
+                            `${language === 'he' ? 'כוח קנייה:' : 'Buying power:'} ${formatCurrency(buyingPowerToday)}`)
+                    ])
                 ])
             ]),
             
@@ -893,14 +959,25 @@
     // Export Functions - PNG and AI-compatible exports
     const exportToPNG = async () => {
         try {
+            console.log('🖼️ Starting PNG export...');
+            
+            // Check if we have data to export
+            if (!results) {
+                alert(language === 'he' ? 'אין נתונים לייצוא. אנא בצע חישוב תחילה.' : 'No data to export. Please calculate first.');
+                return;
+            }
+            
             // Create a canvas element for export
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = 800;
             canvas.height = 1000;
             
-            // Set background
-            ctx.fillStyle = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            // Set background gradient (manual implementation since canvas doesn't support CSS gradients)
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             // Add white background for content
@@ -988,7 +1065,7 @@
             ctx.font = '12px Arial';
             ctx.fillStyle = '#6B7280';
             ctx.textAlign = 'center';
-            ctx.fillText(`Generated on ${new Date().toLocaleDateString()} | Advanced Retirement Planner v4.0.0`, 400, 920);
+            ctx.fillText(`Generated on ${new Date().toLocaleDateString()} | Advanced Retirement Planner v4.2.0`, 400, 920);
             
             // Convert to blob and download
             canvas.toBlob((blob) => {
@@ -1091,11 +1168,19 @@
     // AI Tools Export - Generate structured data for Gemini/OpenAI
     const exportForAI = () => {
         try {
+            console.log('🤖 Starting AI export...');
+            
+            // Check if we have data to export
+            if (!results) {
+                alert(language === 'he' ? 'אין נתונים לייצוא. אנא בצע חישוב תחילה.' : 'No data to export. Please calculate first.');
+                return;
+            }
+            
             const taxResult = calculateNetSalary(inputs.currentMonthlySalary || 15000, inputs.taxCountry || 'israel');
             const totalSavings = (inputs.currentSavings || 0) + (inputs.trainingFund || 0);
             
             const aiData = {
-                version: "4.0.0",
+                version: "4.2.0",
                 timestamp: new Date().toISOString(),
                 language: language,
                 personalInfo: {
@@ -1133,7 +1218,7 @@
                 } : null,
                 metadata: {
                     calculationDate: new Date().toISOString(),
-                    plannerVersion: "4.0.0",
+                    plannerVersion: "4.2.0",
                     autoCalculation: true,
                     exportFormat: "AI_COMPATIBLE"
                 }
@@ -1485,6 +1570,18 @@
                 totalMonthlySalary: Math.round(totalMonthlySalary)
             });
         };
+        
+        // Auto-generate LLM analysis when results change
+        React.useEffect(() => {
+            if (results && inputs.currentAge && inputs.retirementAge && inputs.currentMonthlySalary) {
+                // Automatically generate analysis when results are available
+                const timeoutId = setTimeout(() => {
+                    generateLLMAnalysis();
+                }, 1000); // 1 second delay to allow calculations to complete
+                
+                return () => clearTimeout(timeoutId);
+            }
+        }, [results, inputs.currentAge, inputs.retirementAge, inputs.currentMonthlySalary, inputs.expectedReturn, inputs.currentSavings, inputs.contributionFees, inputs.accumulationFees]);
 
         // Tab click handler with dynamic loading
         const handleTabClick = async (tabName) => {

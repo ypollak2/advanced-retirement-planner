@@ -1,5 +1,5 @@
 {
-  "version": "4.1.0",
+  "version": "4.2.0",
   "releaseDate": "2025-07-11",
-  "description": "Modern Financial UI Design: Professional interface inspired by Personal Capital/Wealthfront, enhanced financial cards, metric indicators, wealth-focused typography, responsive dashboard, improved color palette, stress testing fixes, comprehensive e2e testing"
+  "description": "Enhanced UI Visibility and Export Fixes: Improved headline and button visibility with enhanced CSS, fixed PNG and AI export functionality, enhanced chart display, added dynamic LLM recommendations, improved sidebar summary for bottom line viewing, comprehensive bug fixes"
 }

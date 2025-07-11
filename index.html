@@ -137,9 +137,10 @@
         }
         
         .section-header {
-            font-weight: 600;
-            color: var(--gray-800);
+            font-weight: 700;
+            color: var(--gray-900);
             letter-spacing: -0.025em;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
         
         .financial-input {
@@ -163,10 +164,11 @@
             border: none;
             border-radius: 8px;
             padding: 12px 24px;
-            font-weight: 600;
-            font-size: 14px;
+            font-weight: 700;
+            font-size: 15px;
             transition: all 0.2s ease-in-out;
-            box-shadow: var(--shadow-sm);
+            box-shadow: var(--shadow-md);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
         
         .btn-primary:hover {
@@ -298,6 +300,25 @@
         .status-good { color: var(--primary-blue); }
         .status-warning { color: var(--warning); }
         .status-poor { color: var(--error); }
+        
+        /* High contrast headers and buttons */
+        .header-primary {
+            color: var(--gray-900) !important;
+            font-weight: 800 !important;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        .header-secondary {
+            color: var(--gray-800) !important;
+            font-weight: 700 !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        .btn-enhanced {
+            font-weight: 700 !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+            box-shadow: var(--shadow-lg) !important;
+        }
         
         /* RTL support enhanced */
         [dir="rtl"] .ml-2 { margin-left: 0; margin-right: 0.5rem; }
