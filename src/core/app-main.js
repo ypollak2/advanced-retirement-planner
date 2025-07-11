@@ -4,6 +4,66 @@
 (function() {
     'use strict';
 
+    // Add at the top of the file, after the opening IIFE and 'use strict':
+
+    const style = document.createElement('style');
+    style.innerHTML = `
+      body {
+        background: #f4f6fa;
+        font-family: 'Segoe UI', 'Inter', 'Arial', sans-serif;
+        color: #222;
+      }
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 2.5rem;
+        align-items: flex-start;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+      }
+      .forms-column {
+        min-width: 0;
+        max-width: 700px;
+        width: 100%;
+      }
+      .results-column {
+        min-width: 320px;
+        max-width: 350px;
+        width: 100%;
+        position: sticky;
+        top: 2rem;
+        z-index: 10;
+      }
+      .sidebar-panel > * {
+        margin-bottom: 1.5rem;
+      }
+      .financial-card, .glass-effect, .metric-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
+        border: 1px solid #e5e7eb;
+        margin-bottom: 1.5rem;
+      }
+      .glass-effect {
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(8px);
+      }
+      .modal-overlay, .fixed {
+        z-index: 1000 !important;
+      }
+      @media (max-width: 1100px) {
+        .dashboard-grid {
+          grid-template-columns: 1fr;
+        }
+        .results-column {
+          position: static;
+          max-width: 100%;
+          margin-top: 2rem;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
     // Icon Components - Simple icon components
     const Calculator = ({ size = 16, className = "" }) => React.createElement('span', { 
         className: className + " inline-flex items-center justify-center", 
