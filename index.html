@@ -301,23 +301,127 @@
         .status-warning { color: var(--warning); }
         .status-poor { color: var(--error); }
         
-        /* High contrast headers and buttons */
+        /* High contrast headers and buttons - VERY SIGNIFICANT COLORS */
         .header-primary {
-            color: var(--gray-900) !important;
-            font-weight: 800 !important;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
+            color: var(--primary-blue) !important;
+            font-weight: 900 !important;
+            text-shadow: 0 2px 4px rgba(0, 102, 204, 0.3) !important;
+            text-decoration: none !important;
         }
         
         .header-secondary {
-            color: var(--gray-800) !important;
-            font-weight: 700 !important;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+            color: var(--primary-purple) !important;
+            font-weight: 800 !important;
+            text-shadow: 0 2px 3px rgba(108, 92, 231, 0.25) !important;
         }
         
+        /* Main page title - EXTRA prominent */
+        h1.header-primary {
+            color: var(--primary-blue) !important;
+            font-weight: 900 !important;
+            font-size: 2.5rem !important;
+            text-shadow: 0 3px 6px rgba(0, 102, 204, 0.4) !important;
+            letter-spacing: -0.02em !important;
+        }
+        
+        /* Section headers - Very prominent */
+        h2.header-primary {
+            color: var(--wealth-green) !important;
+            font-weight: 800 !important;
+            font-size: 1.75rem !important;
+            text-shadow: 0 2px 4px rgba(22, 163, 74, 0.3) !important;
+        }
+        
+        /* Component titles - Prominent */
+        h3.header-primary {
+            color: var(--primary-purple) !important;
+            font-weight: 800 !important;
+            font-size: 1.25rem !important;
+            text-shadow: 0 2px 3px rgba(108, 92, 231, 0.25) !important;
+        }
+        
+        /* VERY PROMINENT BUTTONS */
         .btn-enhanced {
-            font-weight: 700 !important;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
-            box-shadow: var(--shadow-lg) !important;
+            font-weight: 800 !important;
+            font-size: 16px !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+            box-shadow: var(--shadow-xl) !important;
+            border: 2px solid transparent !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--growth-blue)) !important;
+            color: white !important;
+            font-weight: 800 !important;
+            font-size: 16px !important;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+            box-shadow: 0 8px 20px rgba(0, 102, 204, 0.3) !important;
+            border: 3px solid rgba(255, 255, 255, 0.2) !important;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--growth-blue), var(--primary-blue)) !important;
+            box-shadow: 0 12px 25px rgba(0, 102, 204, 0.4) !important;
+            transform: translateY(-2px) !important;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--primary-purple), var(--accent-orange)) !important;
+            color: white !important;
+            font-weight: 800 !important;
+            font-size: 16px !important;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3) !important;
+            border: 3px solid rgba(255, 255, 255, 0.2) !important;
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, var(--accent-orange), var(--primary-purple)) !important;
+            box-shadow: 0 12px 25px rgba(108, 92, 231, 0.4) !important;
+            transform: translateY(-2px) !important;
+        }
+        
+        /* WEALTH AMOUNTS AND IMPORTANT VALUES - Very prominent */
+        .wealth-amount {
+            color: var(--wealth-green) !important;
+            font-weight: 900 !important;
+            font-size: 1.1em !important;
+            text-shadow: 0 2px 4px rgba(22, 163, 74, 0.25) !important;
+            letter-spacing: -0.01em !important;
+        }
+        
+        /* Key financial metrics */
+        .metric-card {
+            border: 2px solid rgba(0, 102, 204, 0.1) !important;
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.15) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .metric-card:hover {
+            border-color: rgba(0, 102, 204, 0.3) !important;
+            box-shadow: 0 8px 20px rgba(0, 102, 204, 0.25) !important;
+            transform: translateY(-2px) !important;
+        }
+        
+        /* Section headers - Make them VERY noticeable */
+        .section-header {
+            color: var(--primary-blue) !important;
+            font-weight: 800 !important;
+            font-size: 1.2em !important;
+            text-shadow: 0 2px 4px rgba(0, 102, 204, 0.2) !important;
+            border-bottom: 3px solid var(--primary-blue) !important;
+            padding-bottom: 8px !important;
+            margin-bottom: 16px !important;
+        }
+        
+        /* Tab buttons - Very prominent */
+        button[class*="tab"] {
+            font-weight: 800 !important;
+            font-size: 15px !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+            border: 2px solid transparent !important;
+            transition: all 0.3s ease !important;
         }
         
         /* RTL support enhanced */
