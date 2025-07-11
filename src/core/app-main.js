@@ -1683,8 +1683,7 @@ ${language === 'he' ?
                         className: 'results-column space-y-6 sidebar-panel'
                     }, [
                         // Real-time Summary Panel (with calculated values)
-                        (() => {
-                            // Calculate values needed for SavingsSummaryPanel and BottomLineSummary
+                        // Calculate values needed for SavingsSummaryPanel and BottomLineSummary
                             // IMPORTANT: ALL calculated values below must be passed as props to components
                             // If adding new calculated values, update component prop lists accordingly
                             const totalSavings = Math.max(0, (inputs.currentSavings || 0) + (inputs.trainingFund || 0));
@@ -1734,7 +1733,6 @@ ${language === 'he' ?
                             setShowChart,
                             generateLLMAnalysis
                         }),
-                        })(),
                         
                         // Basic Results
                         React.createElement(BasicResults, {
