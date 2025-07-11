@@ -1,5 +1,5 @@
 {
-  "version": "3.0.2",
+  "version": "3.0.3",
   "releaseDate": "2025-07-11",
-  "description": "Deploy fixes: ErrorBoundary export, security scan patterns, React CDN compatibility"
+  "description": "Critical fix: Proper React class-based ErrorBoundary for CDN compatibility"
 }

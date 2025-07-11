@@ -527,46 +527,68 @@
         ]);
     };
 
-    // Error Boundary
-    const ErrorBoundary = ({ children }) => {
-        const [hasError, setHasError] = React.useState(false);
-
-        React.useEffect(() => {
-            const handleError = (event) => {
-                console.error('Application error:', event.error);
-                setHasError(true);
-            };
-
-            window.addEventListener('error', handleError);
-            return () => window.removeEventListener('error', handleError);
-        }, []);
-
-        if (hasError) {
-            return React.createElement('div', {
-                className: 'flex items-center justify-center min-h-screen p-8'
-            }, React.createElement('div', {
-                className: 'glass-effect rounded-2xl p-8 max-w-md mx-auto text-center'
-            }, [
-                React.createElement('h2', {
-                    key: 'title',
-                    className: 'text-2xl font-bold text-red-600 mb-4'
-                }, '⚠️ Application Error'),
-                React.createElement('button', {
-                    key: 'refresh',
-                    className: 'px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors',
-                    onClick: () => window.location.reload()
-                }, 'Refresh Page')
-            ]));
+    // Error Boundary - Class component for proper React error boundary functionality
+    window.ErrorBoundary = class ErrorBoundary extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = { hasError: false, error: null, errorInfo: null };
         }
 
-        return children;
+        static getDerivedStateFromError(error) {
+            // Update state so the next render will show the fallback UI
+            return { hasError: true };
+        }
+
+        componentDidCatch(error, errorInfo) {
+            // Log the error for debugging
+            console.error('ErrorBoundary caught an error:', error, errorInfo);
+            this.setState({
+                error: error,
+                errorInfo: errorInfo
+            });
+        }
+
+        render() {
+            if (this.state.hasError) {
+                // Fallback UI
+                return React.createElement('div', {
+                    className: 'flex items-center justify-center min-h-screen p-8'
+                }, React.createElement('div', {
+                    className: 'glass-effect rounded-2xl p-8 max-w-md mx-auto text-center'
+                }, [
+                    React.createElement('h2', {
+                        key: 'title',
+                        className: 'text-2xl font-bold text-red-600 mb-4'
+                    }, '⚠️ Application Error'),
+                    React.createElement('p', {
+                        key: 'message',
+                        className: 'text-gray-600 mb-4'
+                    }, 'Something went wrong. Please refresh the page to try again.'),
+                    this.state.error && React.createElement('details', {
+                        key: 'details',
+                        className: 'text-left bg-red-50 p-3 rounded mb-4 text-sm'
+                    }, [
+                        React.createElement('summary', { key: 'summary', className: 'cursor-pointer text-red-700 font-medium' }, 'Error Details'),
+                        React.createElement('pre', { key: 'error', className: 'mt-2 text-red-600' }, this.state.error.toString()),
+                        this.state.errorInfo && React.createElement('pre', { key: 'info', className: 'mt-2 text-gray-500' }, this.state.errorInfo.componentStack)
+                    ]),
+                    React.createElement('button', {
+                        key: 'refresh',
+                        className: 'px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors',
+                        onClick: () => window.location.reload()
+                    }, 'Refresh Page')
+                ]));
+            }
+
+            return this.props.children;
+        }
     };
 
     // Initialize application
     function initializeRetirementPlannerCore() {
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(
-            React.createElement(ErrorBoundary, {}, 
+            React.createElement(window.ErrorBoundary, {}, 
                 React.createElement(RetirementPlannerCore)
             )
         );
@@ -577,7 +599,6 @@
     window.BasicInputs = BasicInputs;
     window.BasicResults = BasicResults;
     window.SimpleChart = SimpleChart;
-    window.ErrorBoundary = ErrorBoundary;
     window.initializeRetirementPlannerCore = initializeRetirementPlannerCore;
 
     console.log('🚀 Retirement Planner Core loaded successfully');
