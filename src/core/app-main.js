@@ -1199,4 +1199,4079 @@
                         React.createElement('div', { className: "text-sm text-orange-700" }, [
                             React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה:" : "Monthly Retirement Income:"),
                             React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
-                                `
+                                `₪${Math.round(results.monthlyRetirementIncome || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה:" : "Total Expected Accumulation:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1 wealth-amount" }, 
+                                `₪${Math.round(results.totalSavings || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה:" : "Pension Savings:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1 wealth-amount" }, 
+                                `₪${Math.round(results.pensionSavings || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה:" : "Training Fund Savings:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1 wealth-amount" }, 
+                                `₪${Math.round(results.trainingFundSavings || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה:" : "Monthly Retirement Income:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncome || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת:" : "Average Net Return:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturn || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום:" : "Today's Buying Power:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerToday || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה:" : "Years to Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי:" : "Total Current:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrent || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית:" : "Current Pension:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPension || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית:" : "Current Training Fund:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFund || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס:" : "Tax Rate:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRate || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר:" : "Net Salary:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalary || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר:" : "Gross Salary:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalary || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות:" : "Monthly Contributions:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributions || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות:" : "Total Contributions:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributions || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Projected Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.projectedSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות צפויה בגיל פרישה:" : "Training Fund Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.trainingFundSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-retirement-income-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הכנסה חודשית בפרישה צפויה:" : "Monthly Retirement Income at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyRetirementIncomeAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-return-at-retirement-breakdown',
+                        className: "bg-yellow-50 rounded-lg p-4 border border-yellow-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-yellow-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "תשואה נטו ממוצעת צפויה:" : "Average Net Return at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-yellow-800 mt-1" }, 
+                                `${(results.avgNetReturnAtRetirement || 0).toFixed(1)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'buying-power-today-at-retirement-breakdown',
+                        className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "כוח קנייה היום צפוי:" : "Buying Power Today at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-orange-800 mt-1" }, 
+                                `₪${Math.round(results.buyingPowerTodayAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'years-to-retirement-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "זמן לפרישה צפוי:" : "Years to Retirement at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `${(results.yearsToRetirementAtRetirement || 0).toFixed(0)}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סך הכל נוכחי צפוי:" : "Total Current at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.totalCurrentAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-current-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה נוכחית צפויה:" : "Current Pension at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.currentPensionAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-current-at-retirement-breakdown',
+                        className: "bg-purple-50 rounded-lg p-4 border border-purple-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "קרן השתלמות נוכחית צפויה:" : "Current Training Fund at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-800 mt-1" }, 
+                                `₪${Math.round(results.currentTrainingFundAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'tax-rate-at-retirement-breakdown',
+                        className: "bg-red-50 rounded-lg p-4 border border-red-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-red-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "שיעור מס צפוי:" : "Tax Rate at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-red-800 mt-1" }, 
+                                `${(results.taxRateAtRetirement || 0).toFixed(0)}%`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'net-salary-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "נטו שכר צפוי:" : "Net Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.netSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'gross-salary-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "ברוטו שכר צפוי:" : "Gross Salary at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.grossSalaryAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'monthly-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "הפקדות חודשיות צפויות:" : "Monthly Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.monthlyContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-contributions-at-retirement-breakdown',
+                        className: "bg-gray-50 rounded-lg p-4 border border-gray-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-gray-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "סה״כ הפקדות צפויות:" : "Total Contributions at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-gray-800 mt-1" }, 
+                                `₪${Math.round(results.totalContributionsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'total-savings-at-retirement-breakdown',
+                        className: "bg-green-50 rounded-lg p-4 border border-green-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה בגיל פרישה:" : "Total Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1" }, 
+                                `₪${Math.round(results.totalSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'pension-savings-at-retirement-breakdown',
+                        className: "bg-blue-50 rounded-lg p-4 border border-blue-200" 
+                    }, [
+                        React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('strong', null, language === 'he' ? "פנסיה צפויה בגיל פרישה:" : "Pension Savings at Retirement:"),
+                            React.createElement('div', { className: "text-2xl font-bold text-blue-800 mt-1" }, 
+                                `₪${Math.round(results.pensionSavingsAtRetirement || 0).toLocaleString()}`)
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'training-fund-savings-at-retirement-breakdown',
+                        className:
