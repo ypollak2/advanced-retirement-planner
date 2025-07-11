@@ -77,6 +77,29 @@ Professional retirement planning tool with **modern financial UI design** inspir
     └── Performance monitoring & optimization
 ```
 
+## Modern Adobe-Inspired UI
+
+This app now features a fine, modern UI inspired by Adobe's design language:
+- Large, soft cards with subtle shadows and rounded corners
+- Bold accent colors (indigo, purple, teal, orange)
+- Modern typography using the Inter font
+- Large, rounded buttons with gradients and strong contrast
+- Responsive, card-based layout for desktop and mobile
+- Clear section separation and generous spacing
+
+### Customizing the Design
+- All styles are managed via a global style block in the main JS file.
+- You can adjust accent colors, card radius, and spacing in the style block.
+- To use the Inter font, add this to your HTML `<head>`:
+  ```html
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  ```
+
+### Screenshots
+_Add screenshots of the new UI here._
+
+---
+
 ## 🚀 Getting Started
 
 ### Quick Start (Static HTML)
