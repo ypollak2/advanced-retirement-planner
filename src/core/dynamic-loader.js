@@ -165,5 +165,6 @@ window.hideModuleLoading = function() {
 
 // Export to global window
 window.DynamicModuleLoader = DynamicModuleLoader;
+window.moduleLoader = new DynamicModuleLoader();
 
 console.log('🚀 Dynamic Module Loader initialized');

@@ -434,32 +434,50 @@
                 if (window.moduleLoader) {
                     console.log('🚀 Auto-loading critical modules for rich feature set...');
                     try {
-                        // Load Advanced Portfolio first (most commonly used)
-                        if (!window.AdvancedPortfolio) {
-                            await window.moduleLoader.loadAdvancedTab();
-                            console.log('✅ Advanced Portfolio auto-loaded');
-                        }
+                        // Load modules with individual error handling
+                        const loadModule = async (loadFn, moduleName, windowProperty) => {
+                            try {
+                                if (!window[windowProperty]) {
+                                    await loadFn();
+                                    console.log(`✅ ${moduleName} auto-loaded`);
+                                }
+                            } catch (error) {
+                                console.warn(`⚠️ Failed to load ${moduleName}:`, error.message);
+                                // Don't fail the entire loading process
+                            }
+                        };
                         
-                        // Load Analysis Engine for insights
-                        if (!window.AnalysisEngine) {
-                            await window.moduleLoader.loadAnalysisTab();
-                            console.log('✅ Analysis Engine auto-loaded');
-                        }
+                        // Load modules individually with error isolation
+                        await loadModule(
+                            () => window.moduleLoader.loadAdvancedTab(),
+                            'Advanced Portfolio',
+                            'AdvancedPortfolio'
+                        );
                         
-                        // Load FIRE Calculator for early retirement planning
-                        if (!window.FireCalculator) {
-                            await window.moduleLoader.loadFireTab();
-                            console.log('✅ FIRE Calculator auto-loaded');
-                        }
+                        await loadModule(
+                            () => window.moduleLoader.loadAnalysisTab(),
+                            'Analysis Engine',
+                            'AnalysisEngine'
+                        );
+                        
+                        await loadModule(
+                            () => window.moduleLoader.loadFireTab(),
+                            'FIRE Calculator',
+                            'FireCalculator'
+                        );
                         
                         setLoadingTabs(prev => ({...prev, advanced: false, analysis: false, fire: false}));
-                        console.log('🎉 All critical modules auto-loaded successfully');
+                        console.log('🎉 Module auto-loading completed');
                     } catch (error) {
-                        console.warn('⚠️ Failed to auto-load some modules:', error);
+                        console.warn('⚠️ Module auto-loading encountered issues:', error);
                         setLoadingTabs(prev => ({...prev, advanced: false, analysis: false, fire: false}));
                     }
+                } else {
+                    console.warn('⚠️ Module loader not available for auto-loading');
+                    // Don't fail - just disable loading states
+                    setLoadingTabs(prev => ({...prev, advanced: false, analysis: false, fire: false}));
                 }
-            }, 1500); // Load after initial render is complete
+            }, 2000); // Increased delay to ensure moduleLoader is ready
         }, []);
 
         // Basic calculation function
