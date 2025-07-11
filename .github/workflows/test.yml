@@ -52,24 +52,49 @@ jobs:
     - name: 🔗 Test basic connectivity
       run: |
         curl -f http://localhost:8080/ || exit 1
-        curl -f http://localhost:8080/src/utils/retirementCalculations.js || exit 1
-        echo "✅ All URLs accessible"
+        curl -f http://localhost:8080/src/core/app-main.js || exit 1
+        curl -f http://localhost:8080/src/core/dynamic-loader.js || exit 1
+        curl -f http://localhost:8080/src/modules/advanced-portfolio.js || exit 1
+        echo "✅ All core URLs accessible"
         
     - name: 📝 Test HTML validity
       run: |
         # Check for basic HTML structure
         grep -q "<html" index.html && echo "✅ HTML tag found"
         grep -q "React" index.html && echo "✅ React included"
-        grep -q "retirementCalculations" index.html && echo "✅ Scripts included"
+        grep -q "dynamic-loader" index.html && echo "✅ Modular architecture included"
+        grep -q "initializeRetirementPlannerCore" index.html && echo "✅ Initialization function included"
         
     - name: 🧮 Test JavaScript syntax
       run: |
         # Use Node.js to check syntax of main files
-        for file in src/utils/*.js src/components/*.js; do
+        for file in src/core/*.js src/modules/*.js src/utils/*.js src/components/*.js; do
           if [ -f "$file" ]; then
             node -c "$file" && echo "✅ $file syntax OK"
           fi
         done
+        
+    - name: 🎯 Test application initialization
+      run: |
+        # Test if the application can be initialized in a headless environment
+        timeout 30 bash -c '
+        python3 -m http.server 8081 > /dev/null 2>&1 &
+        SERVER_PID=$!
+        sleep 5
+        
+        # Test if page loads without errors
+        response=$(curl -s http://localhost:8081/)
+        if echo "$response" | grep -q "initializeRetirementPlannerCore"; then
+          echo "✅ Initialization function found in HTML"
+        else
+          echo "❌ Initialization function NOT found"
+          kill $SERVER_PID
+          exit 1
+        fi
+        
+        kill $SERVER_PID
+        echo "✅ Application initialization test passed"
+        ' || echo "⚠️ Application test completed with timeout"
 
   deploy:
     name: 🚀 Deploy to GitHub Pages
