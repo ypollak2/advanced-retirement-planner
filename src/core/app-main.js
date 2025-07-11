@@ -1449,7 +1449,7 @@
                             inputs, setInputs, language, t: currentT
                         }),
 
-                        activeTab === 'stress' && window.StressTestEngine && React.createElement(window.StressTestEngine, {
+                        activeTab === 'stress' && window.ScenariosStress && React.createElement(window.ScenariosStress, {
                             key: 'stress-form',
                             inputs, setInputs, language, t: currentT
                         }),

@@ -202,6 +202,78 @@ class E2ETestSuite {
         );
     }
 
+    // Test stress testing functionality
+    testStressTestingFunctionality() {
+        console.log('\n🔥 Testing Stress Testing Functionality...\n');
+        
+        // Test stress testing module exists and has required components
+        this.testFileContent(
+            '/Users/yali.pollak/Projects/Pension_Planner/advanced-retirement-planner/src/modules/scenarios-stress.js',
+            [
+                'ScenariosStress',
+                'riskScenarios',
+                'crisisScenarios',
+                'calculateStressTest',
+                'calculateNormalScenario',
+                'generateCrisisChartData',
+                'window.ScenariosStress'
+            ],
+            'Stress Testing Core Functions'
+        );
+        
+        // Test stress scenarios configuration
+        this.testFileContent(
+            '/Users/yali.pollak/Projects/Pension_Planner/advanced-retirement-planner/src/modules/scenarios-stress.js',
+            [
+                'conservative',
+                'moderate',
+                'aggressive',
+                'mild',
+                'severe',
+                'returnReduction',
+                'duration'
+            ],
+            'Stress Scenarios Configuration'
+        );
+        
+        // Test dynamic loader has correct stress test loading
+        this.testFileContent(
+            '/Users/yali.pollak/Projects/Pension_Planner/advanced-retirement-planner/src/core/dynamic-loader.js',
+            [
+                'loadStressTestTab',
+                'ScenariosStress',
+                './src/modules/scenarios-stress.js'
+            ],
+            'Stress Test Dynamic Loading'
+        );
+        
+        // Test main app has correct stress test integration
+        this.testFileContent(
+            '/Users/yali.pollak/Projects/Pension_Planner/advanced-retirement-planner/src/core/app-main.js',
+            [
+                'stress',
+                'window.ScenariosStress',
+                'React.createElement(window.ScenariosStress',
+                'loadStressTestTab'
+            ],
+            'Stress Test Main App Integration'
+        );
+        
+        // Test chart integration in stress tests
+        this.testFileContent(
+            '/Users/yali.pollak/Projects/Pension_Planner/advanced-retirement-planner/src/modules/scenarios-stress.js',
+            [
+                'Chart',
+                'canvas',
+                'chartInstance',
+                'generateCrisisChartData',
+                'normalAccumulation',
+                'stressedAccumulation'
+            ],
+            'Stress Test Chart Integration'
+        );
+    }
+
     // Test HTML integration
     testHTMLIntegration() {
         console.log('\n🌐 Testing HTML Integration...\n');
@@ -418,6 +490,7 @@ class E2ETestSuite {
         this.testModularStructure();
         this.testCoreFunctionality();
         this.testAdvancedModuleFunctionality();
+        this.testStressTestingFunctionality();
         this.testHTMLIntegration();
         this.testBilingualSupport();
         this.testPerformanceCharacteristics();
