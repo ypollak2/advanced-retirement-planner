@@ -1,5 +1,5 @@
 {
   "version": "4.0.0",
   "releaseDate": "2025-07-11",
-  "description": "Tax Calculations & Fee Restructuring: Separate contribution/accumulation fees, multi-country tax calculations (Israel/UK/US), net salary display, decimal precision removal, enhanced financial accuracy"
+  "description": "Automatic Calculation & Export Suite: Real-time calculations, PNG/AI exports, LLM analysis, graphical charts, enhanced UX with English interface, updated fee defaults (1%/0.1%/0.6%), monthly purchasing power display"
 }
