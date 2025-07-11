@@ -28,14 +28,15 @@
       }
       .results-column {
         min-width: 320px;
-        max-width: 350px;
+        max-width: 400px;
         width: 100%;
         position: sticky;
         top: 2rem;
         z-index: 10;
+        overflow: visible !important;
       }
-      .sidebar-panel > * {
-        margin-bottom: 1.5rem;
+      .sidebar-panel {
+        overflow: visible !important;
       }
       .financial-card, .glass-effect, .metric-card {
         background: #fff;
@@ -60,6 +61,19 @@
           max-width: 100%;
           margin-top: 2rem;
         }
+      }
+      .btn-primary {
+        background: #6c63ff;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(108,99,255,0.08);
+        transition: background 0.2s;
+        outline: none;
+      }
+      .btn-primary:hover, .btn-primary:focus {
+        background: #5548c8;
       }
     `;
     document.head.appendChild(style);
