@@ -229,7 +229,25 @@
                     }, 2000);
                     
                 } else {
-                    throw new Error('Core application initialization function not found');
+                    console.error('❌ Core application initialization function not found');
+                    console.log('Available window functions:', Object.keys(window).filter(k => k.includes('initialize') || k.includes('Retirement')));
+                    
+                    // Show error without throwing
+                    document.getElementById('root').innerHTML = `
+                        <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
+                            <div class="text-center max-w-md">
+                                <div class="text-red-500 text-6xl mb-4">⚠️</div>
+                                <h2 class="text-2xl font-bold text-red-700 mb-4">Initialization Error</h2>
+                                <p class="text-gray-700 mb-4">
+                                    Core application initialization function not found. Please refresh the page.
+                                </p>
+                                <button onclick="location.reload()" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                                    Refresh Page
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    return; // Don't continue with initialization
                 }
 
             } catch (error) {
@@ -261,20 +279,59 @@
             }
         }
 
-        // Helper function to load scripts dynamically
-        function loadScript(src) {
+        // Helper function to load scripts dynamically with retry logic
+        function loadScript(src, retries = 2) {
             return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
                 script.src = src;
                 script.async = true;
+                
                 script.onload = () => {
                     console.log(`✅ Loaded: ${src}`);
                     resolve();
                 };
+                
                 script.onerror = () => {
                     console.error(`❌ Failed to load: ${src}`);
-                    reject(new Error(`Failed to load script: ${src}`));
+                    document.head.removeChild(script);
+                    
+                    if (retries > 0) {
+                        console.log(`🔄 Retrying to load: ${src} (${retries} attempts left)`);
+                        setTimeout(() => {
+                            loadScript(src, retries - 1).then(resolve).catch(reject);
+                        }, 1000);
+                    } else {
+                        // Show detailed error information
+                        const errorDetails = `
+                            <div class="bg-red-100 border border-red-300 rounded-lg p-3 mb-4">
+                                <h4 class="font-bold text-red-700">Failed to load script:</h4>
+                                <code class="text-red-600 text-sm break-all">${src}</code>
+                                <p class="text-red-600 text-sm mt-2">This might be due to network issues or missing files.</p>
+                            </div>
+                        `;
+                        
+                        document.getElementById('root').innerHTML = `
+                            <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
+                                <div class="text-center max-w-lg">
+                                    <div class="text-red-500 text-6xl mb-4">📡</div>
+                                    <h2 class="text-2xl font-bold text-red-700 mb-4">Loading Error</h2>
+                                    ${errorDetails}
+                                    <div class="space-y-2">
+                                        <button onclick="location.reload()" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors block w-full">
+                                            Retry Loading
+                                        </button>
+                                        <button onclick="window.open('./test-browser.html', '_blank')" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors block w-full">
+                                            Open Browser Test
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        reject(new Error(`Failed to load script after retries: ${src}`));
+                    }
                 };
+                
                 document.head.appendChild(script);
             });
         }
