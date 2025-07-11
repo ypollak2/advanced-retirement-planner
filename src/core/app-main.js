@@ -177,6 +177,10 @@
     };
 
     // Savings Summary Panel Component - Real-time savings overview with multi-currency support
+    // CRITICAL: All calculated values MUST be passed as props to prevent undefined errors
+    // Props: inputs, language, t, totalMonthlySalary, yearsToRetirement, estimatedMonthlyIncome, 
+    //        projectedWithGrowth, buyingPowerToday, monthlyTotal, avgNetReturn
+    // Each prop has a safe fallback calculation to ensure robust operation
     const SavingsSummaryPanel = ({ inputs, language, t, totalMonthlySalary, yearsToRetirement, estimatedMonthlyIncome, projectedWithGrowth, buyingPowerToday, monthlyTotal, avgNetReturn }) => {
         const [exchangeRates, setExchangeRates] = React.useState({
             USD: 3.6, EUR: 4.0, GBP: 4.7, BTC: 180000, ETH: 9000
@@ -1799,6 +1803,8 @@
                         // Real-time Summary Panel (with calculated values)
                         (() => {
                             // Calculate values needed for SavingsSummaryPanel and BottomLineSummary
+                            // IMPORTANT: ALL calculated values below must be passed as props to components
+                            // If adding new calculated values, update component prop lists accordingly
                             const totalSavings = Math.max(0, (inputs.currentSavings || 0) + (inputs.trainingFund || 0));
                             const yearsToRetirement = Math.max(0, (inputs.retirementAge || 67) - (inputs.currentAge || 30));
                             const totalMonthlySalary = inputs.planningType === 'couple' 
