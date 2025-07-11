@@ -21,31 +21,51 @@
         /* Modern Financial Planning UI - Inspired by Personal Capital, Wealthfront, Mint */
         
         :root {
-            /* 80s Neon Palette */
-            --neon-pink: #FF00FF;
-            --neon-blue: #00FFFF;
-            --neon-green: #00FF00;
-            --neon-purple: #8A2BE2;
-            --dark-bg: #1a1a2e;
-            --mid-dark-bg: #2e2e4a;
-            --light-gray: #b0b0b0;
-            --white: #ffffff;
+            /* Modern Financial Palette */
+            --primary-blue: #2196F3; /* A vibrant, trustworthy blue */
+            --primary-green: #4CAF50; /* A calming, positive green */
+            --primary-purple: #673AB7; /* A sophisticated purple */
+            --accent-orange: #FF9800; /* A warm accent orange */
 
-            /* 80s Typography */
-            --font-display: 'Press Start 2P', cursive;
-            --font-body: 'Share Tech Mono', monospace;
+            /* Neutral Colors */
+            --gray-50: #F8F9FA;   /* Lightest gray, for backgrounds */
+            --gray-100: #E9ECEF;  /* Lighter gray */
+            --gray-200: #DEE2E6;  /* Light gray for borders */
+            --gray-300: #CED4DA;  /* Medium light gray */
+            --gray-400: #ADB5BD;  /* Medium gray */
+            --gray-500: #6C757D;  /* Darker gray for text */
+            --gray-600: #495057;  /* Even darker gray */
+            --gray-700: #343A40;  /* Darkest gray for text/headers */
+            --gray-800: #212529;  /* Near black */
+            --white: #FFFFFF;
+
+            /* Semantic Colors */
+            --success: #28A745; /* Green for success */
+            --warning: #FFC107; /* Yellow for warnings */
+            --error: #DC3545;   /* Red for errors */
+            --info: #17A2B8;    /* Cyan for info */
+
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+            --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+            --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+
+            /* Typography */
+            --font-primary: 'Inter', sans-serif;
+            --font-mono: 'Roboto Mono', monospace;
         }
 
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap');
         
         body {
-            font-family: var(--font-body);
-            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--mid-dark-bg) 100%);
+            font-family: var(--font-primary);
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
             min-height: 100vh;
-            color: var(--neon-green);
+            color: var(--gray-700);
             line-height: 1.6;
             font-size: 16px;
-            text-shadow: 0 0 5px var(--neon-green);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         
         .modern-gradient-bg {
