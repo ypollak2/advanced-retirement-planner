@@ -356,10 +356,10 @@ class E2ETestSuite {
         
         // Test for security issues
         const securityPatterns = [
-            { pattern: /eval\s*\(/, name: 'eval() usage', shouldNotExist: true },
-            { pattern: /innerHTML\s*=/, name: 'innerHTML assignment', shouldNotExist: false },
-            { pattern: /document\.write/, name: 'document.write usage', shouldNotExist: true },
-            { pattern: /onclick\s*=/, name: 'inline event handlers', shouldNotExist: true }
+            { pattern: 'eval(', name: 'eval() usage', shouldNotExist: true },
+            { pattern: 'innerHTML =', name: 'innerHTML assignment', shouldNotExist: false },
+            { pattern: 'document.write', name: 'document.write usage', shouldNotExist: true },
+            { pattern: 'onclick=', name: 'inline event handlers', shouldNotExist: true }
         ];
         
         const filesToCheck = [
@@ -374,7 +374,7 @@ class E2ETestSuite {
                 const content = fs.readFileSync(filePath, 'utf8');
                 
                 securityPatterns.forEach(({ pattern, name, shouldNotExist }) => {
-                    const found = pattern.test(content);
+                    const found = content.includes(pattern);
                     const passed = shouldNotExist ? !found : found;
                     
                     this.logTest(

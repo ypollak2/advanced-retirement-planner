@@ -120,12 +120,19 @@
                             <p class="text-gray-700 mb-4">
                                 Missing dependencies: <strong>${missing.join(', ')}</strong>
                             </p>
-                            <button onclick="location.reload()" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                            <button id="retryBtn1" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
                                 Retry Loading
                             </button>
                         </div>
                     </div>
                 `;
+                // Add event listener for retry button
+                setTimeout(() => {
+                    const retryBtn = document.getElementById('retryBtn1');
+                    if (retryBtn) {
+                        retryBtn.addEventListener('click', () => location.reload());
+                    }
+                }, 100);
                 return false;
             }
             
@@ -164,9 +171,9 @@
                 await loadScript('./src/core/app-main.js?v=2.7.2');
                 console.log('✅ Core application loaded');
 
-                // Initialize the core application
+                // Initialize the core application with ErrorBoundary
                 if (window.initializeRetirementPlannerCore) {
-                    console.log('🎉 Initializing core application...');
+                    console.log('🎉 Initializing core application with ErrorBoundary...');
                     window.initializeRetirementPlannerCore();
                     
                     // Preload critical modules in background
@@ -194,12 +201,19 @@
                             <div class="bg-red-100 border border-red-300 rounded-lg p-3 mb-4">
                                 <code class="text-red-700 text-sm">${error.message}</code>
                             </div>
-                            <button onclick="location.reload()" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                            <button id="retryBtn2" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
                                 Reload Application
                             </button>
                         </div>
                     </div>
                 `;
+                // Add event listener for retry button
+                setTimeout(() => {
+                    const retryBtn = document.getElementById('retryBtn2');
+                    if (retryBtn) {
+                        retryBtn.addEventListener('click', () => location.reload());
+                    }
+                }, 100);
             }
         }
 

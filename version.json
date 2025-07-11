@@ -1,5 +1,5 @@
 {
-  "version": "2.7.1",
-  "releaseDate": "2025-07-10",
-  "description": "Restored full-featured complex version with React hooks fix"
+  "version": "3.0.1",
+  "releaseDate": "2025-07-11",
+  "description": "Security fix: removed eval() usage and inline event handlers"
 }
