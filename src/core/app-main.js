@@ -177,7 +177,7 @@
     };
 
     // Savings Summary Panel Component - Real-time savings overview with multi-currency support
-    const SavingsSummaryPanel = ({ inputs, language, t, totalMonthlySalary, yearsToRetirement, estimatedMonthlyIncome, projectedWithGrowth, buyingPowerToday }) => {
+    const SavingsSummaryPanel = ({ inputs, language, t, totalMonthlySalary, yearsToRetirement, estimatedMonthlyIncome, projectedWithGrowth, buyingPowerToday, monthlyTotal }) => {
         const [exchangeRates, setExchangeRates] = React.useState({
             USD: 3.6, EUR: 4.0, GBP: 4.7, BTC: 180000, ETH: 9000
         });
@@ -1838,7 +1838,8 @@
                                 yearsToRetirement,
                                 estimatedMonthlyIncome,
                                 projectedWithGrowth,
-                                buyingPowerToday
+                                buyingPowerToday,
+                                monthlyTotal
                             });
                         })(),
                         
