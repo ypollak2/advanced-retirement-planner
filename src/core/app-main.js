@@ -9,9 +9,72 @@
     const style = document.createElement('style');
     style.innerHTML = `
       body {
-        background: #f4f6fa;
-        font-family: 'Segoe UI', 'Inter', 'Arial', sans-serif;
+        background: linear-gradient(135deg, #f7f9fb 0%, #e9eaf3 100%);
+        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
         color: #222;
+      }
+      .header-primary {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #6c63ff;
+        letter-spacing: -1px;
+        margin-bottom: 0.5rem;
+      }
+      .financial-card, .glass-effect, .metric-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 4px 32px rgba(60,60,90,0.10);
+        border: 1.5px solid #e5e7eb;
+        padding: 2rem 1.5rem;
+        margin-bottom: 2rem;
+        transition: box-shadow 0.2s;
+      }
+      .financial-card:hover, .glass-effect:hover, .metric-card:hover {
+        box-shadow: 0 8px 40px rgba(60,60,90,0.16);
+      }
+      .btn-primary {
+        background: linear-gradient(90deg, #6c63ff 0%, #00bfae 100%);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 0.85rem 1.5rem;
+        box-shadow: 0 2px 8px rgba(108,99,255,0.08);
+        transition: background 0.2s, box-shadow 0.2s;
+        outline: none;
+      }
+      .btn-primary:hover, .btn-primary:focus {
+        background: linear-gradient(90deg, #5a54e8 0%, #009e8e 100%);
+        box-shadow: 0 4px 16px rgba(108,99,255,0.16);
+      }
+      input, select, textarea {
+        border-radius: 10px;
+        border: 1.5px solid #e0e3ea;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        background: #f7f9fb;
+        transition: border 0.2s, box-shadow 0.2s;
+      }
+      input:focus, select:focus, textarea:focus {
+        border-color: #6c63ff;
+        box-shadow: 0 0 0 2px #6c63ff33;
+        outline: none;
+      }
+      .tab-modern {
+        background: #f4f6fa;
+        border-radius: 999px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        color: #6c63ff;
+        margin: 0 0.25rem;
+        border: none;
+        transition: background 0.2s, color 0.2s;
+      }
+      .tab-modern.active {
+        background: linear-gradient(90deg, #6c63ff 0%, #00bfae 100%);
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(108,99,255,0.08);
       }
       .dashboard-grid {
         display: grid;
@@ -54,35 +117,19 @@
         min-width: 0;
         width: 100%;
       }
-      .financial-card, .glass-effect, .metric-card {
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
-        border: 1px solid #e5e7eb;
-        margin-bottom: 1.5rem;
+      ::-webkit-scrollbar {
+        width: 8px;
+        background: #e9eaf3;
       }
-      .glass-effect {
-        background: rgba(255,255,255,0.85);
-        backdrop-filter: blur(8px);
-      }
-      .modal-overlay, .fixed {
-        z-index: 1000 !important;
-      }
-      .btn-primary {
-        background: #6c63ff;
-        color: #fff;
-        border: none;
-        border-radius: 12px;
-        font-weight: 600;
-        box-shadow: 0 2px 8px rgba(108,99,255,0.08);
-        transition: background 0.2s;
-        outline: none;
-      }
-      .btn-primary:hover, .btn-primary:focus {
-        background: #5548c8;
+      ::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 8px;
       }
     `;
     document.head.appendChild(style);
+
+    // Add a comment to the user to add Inter font to their HTML head if not already present.
+    // <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 
     // Icon Components - Simple icon components
     const Calculator = ({ size = 16, className = "" }) => React.createElement('span', { 
