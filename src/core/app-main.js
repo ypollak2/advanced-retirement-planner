@@ -349,11 +349,7 @@
                     className: "grid grid-cols-2 gap-2 text-xs"
                 }, [
                     ['USD', '$'], ['EUR', '€'], ['GBP', '£'], ['BTC', '₿'], ['ETH', 'Ξ']
-                ].map(([currency, symbol]) => 
-                    React.createElement('div', {
-                        key: currency,
-                        className: "bg-gray-100 rounded px-2 py-1"
-                    }, [
+                ].map(([currency, symbol]) => React.createElement('div', { key: currency, className: "bg-gray-100 rounded px-2 py-1" }, [
                         React.createElement('div', { className: "font-medium" }, currency),
                         React.createElement('div', { className: "text-gray-600" }, 
                             currency === 'BTC' || currency === 'ETH' ? 
@@ -1633,16 +1629,54 @@ ${language === 'he' ?
                 }, React.createElement('div', {
                     className: 'financial-card p-2 inline-flex space-x-2'
                 }, [
-                    ['basic', 'advanced', 'analysis', 'scenarios', 'fire', 'stress'].map(tab => 
-                        React.createElement('button', {
-                            key: tab,
-                            onClick: () => handleTabClick(tab),
-                            disabled: loadingTabs[tab],
-                            className: `tab-modern ${
-                                activeTab === tab ? 'active' : ''
-                            } ${loadingTabs[tab] ? 'opacity-50 cursor-not-allowed' : ''}`
-                        }, loadingTabs[tab] ? '...' : currentT[tab])
-                    )
+                    React.createElement('button', {
+                        key: 'basic',
+                        onClick: () => handleTabClick('basic'),
+                        disabled: loadingTabs['basic'],
+                        className: `tab-modern ${
+                            activeTab === 'basic' ? 'active' : ''
+                        } ${loadingTabs['basic'] ? 'opacity-50 cursor-not-allowed' : ''}`
+                    }, loadingTabs['basic'] ? '...' : currentT.basic),
+                    React.createElement('button', {
+                        key: 'advanced',
+                        onClick: () => handleTabClick('advanced'),
+                        disabled: loadingTabs['advanced'],
+                        className: `tab-modern ${
+                            activeTab === 'advanced' ? 'active' : ''
+                        } ${loadingTabs['advanced'] ? 'opacity-50 cursor-not-allowed' : ''}`
+                    }, loadingTabs['advanced'] ? '...' : currentT.advanced),
+                    React.createElement('button', {
+                        key: 'analysis',
+                        onClick: () => handleTabClick('analysis'),
+                        disabled: loadingTabs['analysis'],
+                        className: `tab-modern ${
+                            activeTab === 'analysis' ? 'active' : ''
+                        } ${loadingTabs['analysis'] ? 'opacity-50 cursor-not-allowed' : ''}`
+                    }, loadingTabs['analysis'] ? '...' : currentT.analysis),
+                    React.createElement('button', {
+                        key: 'scenarios',
+                        onClick: () => handleTabClick('scenarios'),
+                        disabled: loadingTabs['scenarios'],
+                        className: `tab-modern ${
+                            activeTab === 'scenarios' ? 'active' : ''
+                        } ${loadingTabs['scenarios'] ? 'opacity-50 cursor-not-allowed' : ''}`
+                    }, loadingTabs['scenarios'] ? '...' : currentT.scenarios),
+                    React.createElement('button', {
+                        key: 'fire',
+                        onClick: () => handleTabClick('fire'),
+                        disabled: loadingTabs['fire'],
+                        className: `tab-modern ${
+                            activeTab === 'fire' ? 'active' : ''
+                        } ${loadingTabs['fire'] ? 'opacity-50 cursor-not-allowed' : ''}`
+                    }, loadingTabs['fire'] ? '...' : currentT.fire),
+                    React.createElement('button', {
+                        key: 'stress',
+                        onClick: () => handleTabClick('stress'),
+                        disabled: loadingTabs['stress'],
+                        className: `tab-modern ${
+                            activeTab === 'stress' ? 'active' : ''
+                        } ${loadingTabs['stress'] ? 'opacity-50 cursor-not-allowed' : ''}`
+                    }, loadingTabs['stress'] ? '...' : currentT.stress)
                 ])),
 
                 // Tab Content
