@@ -1672,7 +1672,9 @@ ${language === 'he' ?
                         }, [
                             React.createElement('span', { key: 'icon', className: 'text-green-400' }, '⚡'),
                             React.createElement('span', { key: 'text' }, currentT.autoCalcActive)
-                        ]))
+                        ])),
+
+                        
                     ]),
 
                     // Results Column with Side Panel
