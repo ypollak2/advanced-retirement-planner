@@ -88,7 +88,7 @@ class DynamicModuleLoader {
     }
 
     async loadStressTestTab() {
-        return this.loadModule('StressTestEngine', './src/modules/stress-test.js');
+        return this.loadModule('StressTestEngine', './src/modules/scenarios-stress.js');
     }
 
     // Load utility modules

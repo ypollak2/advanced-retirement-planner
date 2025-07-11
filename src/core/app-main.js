@@ -109,6 +109,138 @@
         });
     };
 
+    // Savings Summary Panel Component - Real-time savings overview with multi-currency support
+    const SavingsSummaryPanel = ({ inputs, language, t }) => {
+        const [exchangeRates, setExchangeRates] = React.useState({
+            USD: 3.6, EUR: 4.0, GBP: 4.7, BTC: 180000, ETH: 9000
+        });
+        
+        // Calculate real-time totals
+        const totalSavings = (inputs.currentSavings || 0) + (inputs.trainingFund || 0);
+        const yearsToRetirement = (inputs.retirementAge || 67) - (inputs.currentAge || 30);
+        const monthlyTotal = (inputs.currentMonthlySalary || 15000) * 0.18 + (inputs.trainingFundContribution || 0); // 18% pension contribution + training fund
+        const totalProjected = totalSavings + (monthlyTotal * 12 * yearsToRetirement);
+        
+        // Inflation calculations
+        const inflationRate = (inputs.inflationRate || 3) / 100;
+        const buyingPowerToday = totalProjected / Math.pow(1 + inflationRate, yearsToRetirement);
+        
+        const formatCurrency = (amount, symbol = '₪') => {
+            return `${symbol}${amount.toLocaleString()}`;
+        };
+        
+        return React.createElement('div', { 
+            className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in sticky top-4" 
+        }, [
+            React.createElement('h3', { 
+                key: 'title',
+                className: "text-xl font-bold text-purple-700 mb-4 flex items-center" 
+            }, [
+                React.createElement('span', { key: 'icon', className: "mr-2" }, '💰'),
+                language === 'he' ? 'סיכום חיסכון' : 'Savings Summary'
+            ]),
+            
+            // Current Totals
+            React.createElement('div', {
+                key: 'current',
+                className: "space-y-3 mb-6"
+            }, [
+                React.createElement('div', {
+                    key: 'pension',
+                    className: "bg-blue-50 rounded-lg p-3 border border-blue-200"
+                }, [
+                    React.createElement('div', { className: "text-sm text-blue-700 font-medium" }, 
+                        language === 'he' ? 'פנסיה נוכחית' : 'Current Pension'),
+                    React.createElement('div', { className: "text-lg font-bold text-blue-800" }, 
+                        formatCurrency(inputs.currentSavings || 0))
+                ]),
+                
+                React.createElement('div', {
+                    key: 'training',
+                    className: "bg-green-50 rounded-lg p-3 border border-green-200"
+                }, [
+                    React.createElement('div', { className: "text-sm text-green-700 font-medium" }, 
+                        language === 'he' ? 'קרן השתלמות' : 'Training Fund'),
+                    React.createElement('div', { className: "text-lg font-bold text-green-800" }, 
+                        formatCurrency(inputs.trainingFund || 0))
+                ]),
+                
+                React.createElement('div', {
+                    key: 'total',
+                    className: "bg-purple-50 rounded-lg p-3 border border-purple-200"
+                }, [
+                    React.createElement('div', { className: "text-sm text-purple-700 font-medium" }, 
+                        language === 'he' ? 'סך הכל נוכחי' : 'Total Current'),
+                    React.createElement('div', { className: "text-xl font-bold text-purple-800" }, 
+                        formatCurrency(totalSavings))
+                ])
+            ]),
+            
+            // Monthly Contributions
+            React.createElement('div', {
+                key: 'monthly',
+                className: "bg-gray-50 rounded-lg p-3 mb-4"
+            }, [
+                React.createElement('div', { className: "text-sm text-gray-700 font-medium mb-2" }, 
+                    language === 'he' ? 'הפקדות חודשיות' : 'Monthly Contributions'),
+                React.createElement('div', { className: "text-base font-bold text-gray-800" }, 
+                    formatCurrency(monthlyTotal))
+            ]),
+            
+            // Projected at Retirement
+            React.createElement('div', {
+                key: 'projected',
+                className: "bg-yellow-50 rounded-lg p-3 mb-4 border border-yellow-200"
+            }, [
+                React.createElement('div', { className: "text-sm text-yellow-700 font-medium" }, 
+                    language === 'he' ? 'צפי בפרישה' : 'Projected at Retirement'),
+                React.createElement('div', { className: "text-lg font-bold text-yellow-800" }, 
+                    formatCurrency(totalProjected))
+            ]),
+            
+            // Buying Power
+            React.createElement('div', {
+                key: 'buying-power',
+                className: "bg-orange-50 rounded-lg p-3 mb-4 border border-orange-200"
+            }, [
+                React.createElement('div', { className: "text-sm text-orange-700 font-medium" }, 
+                    language === 'he' ? 'כוח קנייה היום' : 'Today\'s Buying Power'),
+                React.createElement('div', { className: "text-lg font-bold text-orange-800" }, 
+                    formatCurrency(buyingPowerToday))
+            ]),
+            
+            // Multi-Currency Display
+            React.createElement('div', {
+                key: 'currencies',
+                className: "border-t border-gray-200 pt-4"
+            }, [
+                React.createElement('div', { 
+                    key: 'currency-title',
+                    className: "text-sm font-medium text-gray-700 mb-3" 
+                }, language === 'he' ? 'בערכי מטבעות' : 'In Other Currencies'),
+                
+                React.createElement('div', {
+                    key: 'currency-grid',
+                    className: "grid grid-cols-2 gap-2 text-xs"
+                }, [
+                    ['USD', '$'], ['EUR', '€'], ['GBP', '£'], ['BTC', '₿'], ['ETH', 'Ξ']
+                ].map(([currency, symbol]) => 
+                    React.createElement('div', {
+                        key: currency,
+                        className: "bg-gray-100 rounded px-2 py-1"
+                    }, [
+                        React.createElement('div', { className: "font-medium" }, currency),
+                        React.createElement('div', { className: "text-gray-600" }, 
+                            currency === 'BTC' || currency === 'ETH' ? 
+                                `${symbol}${(totalSavings / exchangeRates[currency]).toFixed(4)}` :
+                                `${symbol}${Math.round(totalSavings / exchangeRates[currency]).toLocaleString()}`
+                        )
+                    ])
+                ))
+            ])
+        ]);
+    };
+
     // Basic Inputs Component - Basic input form
     const BasicInputs = ({ inputs, setInputs, language, t }) => {
         return React.createElement('div', { className: "space-y-6" }, [
@@ -170,6 +302,22 @@
                                 className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                             })
                         ]),
+                        React.createElement('div', { key: 'training-fund' }, [
+                            React.createElement('label', { 
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, language === 'he' ? "קרן השתלמות נוכחית (₪)" : "Current Training Fund (₪)"),
+                            React.createElement('input', {
+                                type: 'number',
+                                value: inputs.trainingFund || 0,
+                                onChange: (e) => setInputs({...inputs, trainingFund: parseInt(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                            })
+                        ])
+                    ]),
+                    React.createElement('div', { 
+                        key: 'row3',
+                        className: "grid grid-cols-2 gap-4" 
+                    }, [
                         React.createElement('div', { key: 'salary' }, [
                             React.createElement('label', { 
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
@@ -178,6 +326,17 @@
                                 type: 'number',
                                 value: inputs.currentMonthlySalary || 15000,
                                 onChange: (e) => setInputs({...inputs, currentMonthlySalary: parseInt(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                            })
+                        ]),
+                        React.createElement('div', { key: 'training-contribution' }, [
+                            React.createElement('label', { 
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, language === 'he' ? "הפקדה חודשית לקרן השתלמות (₪)" : "Monthly Training Fund Contribution (₪)"),
+                            React.createElement('input', {
+                                type: 'number',
+                                value: inputs.trainingFundContribution || Math.round((inputs.currentMonthlySalary || 15000) * 0.075), // 7.5% default
+                                onChange: (e) => setInputs({...inputs, trainingFundContribution: parseInt(e.target.value) || 0}),
                                 className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                             })
                         ])
@@ -258,6 +417,8 @@
             retirementAge: 67,
             currentSavings: 50000,
             currentMonthlySalary: 15000,
+            trainingFund: 25000,
+            trainingFundContribution: 1125, // 7.5% of 15000
             inflationRate: 3,
             expectedReturn: 7
         });
@@ -513,15 +674,27 @@
                         }, currentT.calculate))
                     ]),
 
-                    // Results Column
+                    // Results Column with Side Panel
                     React.createElement('div', {
                         key: 'results',
-                        className: 'lg:col-span-1'
-                    }, React.createElement(BasicResults, {
-                        results,
-                        language,
-                        t: currentT
-                    }))
+                        className: 'lg:col-span-1 space-y-6'
+                    }, [
+                        // Real-time Summary Panel
+                        React.createElement(SavingsSummaryPanel, {
+                            key: 'summary-panel',
+                            inputs,
+                            language,
+                            t: currentT
+                        }),
+                        
+                        // Basic Results
+                        React.createElement(BasicResults, {
+                            key: 'basic-results',
+                            results,
+                            language,
+                            t: currentT
+                        })
+                    ])
                 ])
             ])
         ]);
