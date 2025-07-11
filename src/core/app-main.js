@@ -264,6 +264,43 @@
         const [results, setResults] = React.useState(null);
         const [loadingTabs, setLoadingTabs] = React.useState({});
 
+        // Auto-load advanced modules for better UX (like versions 2.3-2.4)
+        React.useEffect(() => {
+            console.log('🎯 RetirementPlannerCore component mounted');
+            
+            // Immediately preload critical modules for better UX (like versions 2.3-2.4)
+            setTimeout(async () => {
+                if (window.moduleLoader) {
+                    console.log('🚀 Auto-loading critical modules for rich feature set...');
+                    try {
+                        // Load Advanced Portfolio first (most commonly used)
+                        if (!window.AdvancedPortfolio) {
+                            await window.moduleLoader.loadAdvancedTab();
+                            console.log('✅ Advanced Portfolio auto-loaded');
+                        }
+                        
+                        // Load Analysis Engine for insights
+                        if (!window.AnalysisEngine) {
+                            await window.moduleLoader.loadAnalysisTab();
+                            console.log('✅ Analysis Engine auto-loaded');
+                        }
+                        
+                        // Load FIRE Calculator for early retirement planning
+                        if (!window.FireCalculator) {
+                            await window.moduleLoader.loadFireTab();
+                            console.log('✅ FIRE Calculator auto-loaded');
+                        }
+                        
+                        setLoadingTabs(prev => ({...prev, advanced: false, analysis: false, fire: false}));
+                        console.log('🎉 All critical modules auto-loaded successfully');
+                    } catch (error) {
+                        console.warn('⚠️ Failed to auto-load some modules:', error);
+                        setLoadingTabs(prev => ({...prev, advanced: false, analysis: false, fire: false}));
+                    }
+                }
+            }, 1500); // Load after initial render is complete
+        }, []);
+
         // Basic calculation function
         const calculateBasic = () => {
             const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
