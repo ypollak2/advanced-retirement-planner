@@ -11,8 +11,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- React & ReactDOM from CDN -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -98,39 +98,83 @@
         // Global utility functions
         const safeValue = (value) => isNaN(value) || !isFinite(value) ? 0 : Math.max(0, value);
 
-        // Dependency check function
+        // Enhanced dependency check function with detailed reporting
         function checkDependencies() {
-            console.log('Checking dependencies...');
-            console.log('React:', typeof React);
-            console.log('ReactDOM:', typeof ReactDOM);
-            console.log('Chart:', typeof Chart);
+            console.log('🔍 Checking dependencies...');
             
-            const missing = [];
-            if (typeof React === 'undefined') missing.push('React');
-            if (typeof ReactDOM === 'undefined') missing.push('ReactDOM');
-            if (typeof Chart === 'undefined') missing.push('Chart.js');
+            // Detailed dependency information
+            const deps = {
+                React: { 
+                    available: typeof React !== 'undefined',
+                    version: typeof React !== 'undefined' ? React.version : 'N/A',
+                    source: 'https://unpkg.com/react@18/umd/react.development.js'
+                },
+                ReactDOM: { 
+                    available: typeof ReactDOM !== 'undefined',
+                    version: typeof ReactDOM !== 'undefined' ? ReactDOM.version : 'N/A',
+                    source: 'https://unpkg.com/react-dom@18/umd/react-dom.development.js'
+                },
+                Chart: { 
+                    available: typeof Chart !== 'undefined',
+                    version: typeof Chart !== 'undefined' ? Chart.version : 'N/A',
+                    source: 'https://cdn.jsdelivr.net/npm/chart.js'
+                }
+            };
+            
+            // Log detailed information
+            Object.entries(deps).forEach(([name, info]) => {
+                console.log(`${name}:`, info.available ? `✅ v${info.version}` : '❌ Missing');
+            });
+            
+            const missing = Object.entries(deps)
+                .filter(([name, info]) => !info.available)
+                .map(([name, info]) => ({ name, source: info.source }));
             
             if (missing.length > 0) {
-                console.error('Missing dependencies:', missing);
+                console.error('❌ Missing dependencies:', missing.map(d => d.name));
+                
+                const missingDetails = missing.map(dep => 
+                    `<li><strong>${dep.name}</strong><br><small>${dep.source}</small></li>`
+                ).join('');
+                
                 document.getElementById('root').innerHTML = `
                     <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center p-4">
-                        <div class="text-center max-w-md">
+                        <div class="text-center max-w-lg">
                             <div class="text-red-500 text-6xl mb-4">⚠️</div>
-                            <h2 class="text-2xl font-bold text-red-700 mb-4">Loading Error</h2>
+                            <h2 class="text-2xl font-bold text-red-700 mb-4">Dependency Loading Error</h2>
                             <p class="text-gray-700 mb-4">
-                                Missing dependencies: <strong>${missing.join(', ')}</strong>
+                                The following required libraries failed to load:
                             </p>
-                            <button id="retryBtn1" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors">
-                                Retry Loading
-                            </button>
+                            <ul class="text-left bg-red-100 border border-red-300 rounded-lg p-4 mb-4">
+                                ${missingDetails}
+                            </ul>
+                            <p class="text-gray-600 text-sm mb-4">
+                                This might be due to network issues or CDN availability problems.
+                            </p>
+                            <div class="space-y-2">
+                                <button id="retryBtn1" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors block w-full">
+                                    Retry Loading
+                                </button>
+                                <button id="debugBtn" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors block w-full">
+                                    Open Browser Test Page
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
-                // Add event listener for retry button
+                
+                // Add event listeners
                 setTimeout(() => {
                     const retryBtn = document.getElementById('retryBtn1');
+                    const debugBtn = document.getElementById('debugBtn');
+                    
                     if (retryBtn) {
                         retryBtn.addEventListener('click', () => location.reload());
+                    }
+                    if (debugBtn) {
+                        debugBtn.addEventListener('click', () => {
+                            window.open('./test-browser.html', '_blank');
+                        });
                     }
                 }, 100);
                 return false;
@@ -159,7 +203,7 @@
                 }
 
                 // Load dynamic loader first
-                await loadScript('./src/core/dynamic-loader.js?v=3.0.3');
+                await loadScript('./src/core/dynamic-loader.js?v=3.0.5');
                 console.log('✅ Dynamic loader loaded');
 
                 // Update loading message
@@ -168,7 +212,7 @@
                 }
 
                 // Load core application
-                await loadScript('./src/core/app-main.js?v=3.0.3');
+                await loadScript('./src/core/app-main.js?v=3.0.5');
                 console.log('✅ Core application loaded');
 
                 // Initialize the core application with ErrorBoundary

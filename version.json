@@ -1,5 +1,5 @@
 {
-  "version": "3.0.4",
+  "version": "3.0.5",
   "releaseDate": "2025-07-11",
-  "description": "Final deployment fix: Updated HTML entry point and test suite for modular architecture"
+  "description": "Enhanced browser testing: Real dependency validation, development CDN versions, comprehensive browser test suite"
 }

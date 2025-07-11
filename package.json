@@ -1,6 +1,6 @@
 {
   "name": "advanced-retirement-planner",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "description": "Professional retirement planning tool with salary tracking, family planning, comprehensive investment tracking, FIRE calculator, stress testing, and dedicated data management",
   "main": "index.html",
   "homepage": "https://ypollak2.github.io/advanced-retirement-planner",
@@ -17,7 +17,9 @@
     "preview": "vite preview",
     "deploy": "npm run build && gh-pages -d dist",
     "test": "node test-runner.js",
-    "test:local": "python3 -m http.server 8080 --bind 127.0.0.1 & sleep 2 && open http://localhost:8080/test-local.html && echo 'Local testing server started'",
+    "test:local": "python3 -m http.server 8082 --bind 127.0.0.1 & sleep 2 && open http://localhost:8082/test-browser.html && echo 'Local browser testing server started on port 8082'",
+    "test:browser": "python3 -m http.server 8083 --bind 127.0.0.1 & sleep 2 && open http://localhost:8083/index.html && echo 'Main app testing server started on port 8083'",
+    "serve": "python3 -m http.server 8080 --bind 127.0.0.1",
     "lint": "echo \"No linting configured\" && exit 0",
     "audit": "npm audit --audit-level=moderate",
     "audit-fix": "npm audit fix",
