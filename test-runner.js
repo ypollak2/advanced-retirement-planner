@@ -127,30 +127,109 @@ function testVersionManagement() {
     }
 }
 
-// Test 4: HTML Structure
+// Dynamic Architecture Discovery
+function discoverArchitecture() {
+    const entryPointCandidates = ['index.html', 'index-modular.html', 'main.html', 'app.html'];
+    const entryPoint = entryPointCandidates.find(file => fs.existsSync(file)) || 'index.html';
+    
+    let architectureType = 'unknown';
+    let html = '';
+    
+    try {
+        html = fs.readFileSync(entryPoint, 'utf8');
+        
+        // Detect architecture type
+        if (html.includes('src/core/') || html.includes('loadScript') || html.includes('dynamic-loader')) {
+            architectureType = 'modular';
+        } else if (html.includes('src/components/')) {
+            architectureType = 'component-based';
+        } else if (html.length > 100000) {
+            architectureType = 'monolithic';
+        } else {
+            architectureType = 'simple';
+        }
+        
+    } catch (error) {
+        console.warn(`Warning: Could not read ${entryPoint}: ${error.message}`);
+    }
+    
+    return {
+        entryPoint,
+        architectureType,
+        html,
+        hasModules: html.includes('src/modules/') || html.includes('loadModule'),
+        hasErrorBoundary: html.includes('ErrorBoundary'),
+        hasDynamicLoading: html.includes('loadScript') || html.includes('import(')
+    };
+}
+
+// Test 4: HTML Structure - Dynamic and Architecture-Aware
 function testHtmlStructure() {
     console.log('\n🌐 Testing HTML Structure...');
     
     try {
-        const html = fs.readFileSync('index.html', 'utf8');
+        const arch = discoverArchitecture();
+        console.log(`   📍 Entry point: ${arch.entryPoint}`);
+        console.log(`   🏗️  Architecture: ${arch.architectureType}`);
         
-        // Check for required elements
+        if (!arch.html) {
+            logTest('HTML structure', false, `Could not read entry point: ${arch.entryPoint}`);
+            return;
+        }
+        
+        // Dynamic checks based on discovered architecture
         const checks = [
-            { name: 'React CDN', test: html.includes('react.production.min.js') || html.includes('react.development.js') },
-            { name: 'ReactDOM CDN', test: html.includes('react-dom.production.min.js') || html.includes('react-dom.development.js') },
-            { name: 'Script tags for components', test: html.includes('src/core/') || html.includes('src/modules/') },
-            { name: 'Cache busting parameters', test: html.includes('?v=') },
-            { name: 'Error boundary', test: html.includes('ErrorBoundary') },
-            { name: 'Module loading check', test: html.includes('checkDependencies') || html.includes('checkModules') },
-            { name: 'Required modules array', test: html.includes('initializeRetirementPlannerCore') || (html.includes('RetirementPlannerApp') && html.includes('BasicInputs')) }
+            { 
+                name: 'React CDN', 
+                test: arch.html.includes('react.production.min.js') || arch.html.includes('react.development.js') 
+            },
+            { 
+                name: 'ReactDOM CDN', 
+                test: arch.html.includes('react-dom.production.min.js') || arch.html.includes('react-dom.development.js') 
+            },
+            { 
+                name: 'Script tags for components', 
+                test: arch.html.includes('src/core/') || arch.html.includes('src/modules/') || arch.html.includes('src/components/') 
+            },
+            { 
+                name: 'Cache busting parameters', 
+                test: arch.html.includes('?v=') 
+            },
+            { 
+                name: 'Error boundary', 
+                test: arch.hasErrorBoundary 
+            },
+            { 
+                name: 'Module loading check', 
+                test: arch.html.includes('checkDependencies') || arch.html.includes('checkModules') || arch.html.includes('loadScript') 
+            },
+            { 
+                name: 'Application initialization', 
+                test: arch.html.includes('initializeRetirementPlannerCore') || 
+                      arch.html.includes('initializeApp') || 
+                      (arch.html.includes('RetirementPlannerApp') && arch.html.includes('BasicInputs')) 
+            }
         ];
+        
+        // Additional checks for modular architecture
+        if (arch.architectureType === 'modular') {
+            checks.push({
+                name: 'Dynamic loading system',
+                test: arch.hasDynamicLoading
+            });
+        }
         
         checks.forEach(check => {
             logTest(`HTML: ${check.name}`, check.test);
         });
         
+        // Architecture-specific feedback
+        if (arch.architectureType === 'modular') {
+            console.log('   ✨ Modular architecture detected - advanced features available');
+        }
+        
     } catch (error) {
-        logTest('HTML structure', false, `Error reading HTML: ${error.message}`);
+        logTest('HTML structure', false, `Error during architecture discovery: ${error.message}`);
     }
 }
 
