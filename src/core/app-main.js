@@ -15,28 +15,44 @@
       }
       .dashboard-grid {
         display: grid;
-        grid-template-columns: 1fr 350px;
+        grid-template-columns: 1fr 400px;
         gap: 2.5rem;
         align-items: flex-start;
-        margin-top: 2rem;
-        margin-bottom: 2rem;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      @media (max-width: 1024px) {
+        .dashboard-grid {
+          grid-template-columns: 1fr;
+        }
+        .results-column {
+          position: static;
+          width: 100%;
+          max-width: 100%;
+          margin-top: 2rem;
+        }
+      }
+      .results-column.sidebar-panel {
+        position: sticky;
+        top: 2rem;
+        width: 400px;
+        max-width: 100vw;
+        min-width: 320px;
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 4px 32px rgba(60,60,90,0.10);
+        border: 1.5px solid #e5e7eb;
+        padding: 2rem 1.5rem;
+        z-index: 5;
+        overflow-y: auto;
+        overflow-x: visible;
+        margin-left: auto;
+        margin-right: 0;
       }
       .forms-column {
         min-width: 0;
-        max-width: 700px;
         width: 100%;
-      }
-      .results-column {
-        min-width: 320px;
-        max-width: 400px;
-        width: 100%;
-        position: sticky;
-        top: 2rem;
-        z-index: 10;
-        overflow: visible !important;
-      }
-      .sidebar-panel {
-        overflow: visible !important;
       }
       .financial-card, .glass-effect, .metric-card {
         background: #fff;
@@ -51,16 +67,6 @@
       }
       .modal-overlay, .fixed {
         z-index: 1000 !important;
-      }
-      @media (max-width: 1100px) {
-        .dashboard-grid {
-          grid-template-columns: 1fr;
-        }
-        .results-column {
-          position: static;
-          max-width: 100%;
-          margin-top: 2rem;
-        }
       }
       .btn-primary {
         background: #6c63ff;

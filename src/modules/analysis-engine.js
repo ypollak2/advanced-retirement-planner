@@ -277,7 +277,7 @@
                     className: "space-y-3" 
                 }, analysis.insights.map((insight, index) =>
                     React.createElement('div', {
-                        key: index,
+                        key: insight.id || insight.title || index,
                         className: `p-4 rounded-lg border-l-4 ${
                             insight.type === 'success' ? 'bg-green-50 border-green-500' :
                             insight.type === 'warning' ? 'bg-yellow-50 border-yellow-500' :
@@ -417,7 +417,7 @@
                             React.createElement('ul', { className: "space-y-2" }, 
                                 riskAssessment.riskFactors.map((factor, index) =>
                                     React.createElement('li', {
-                                        key: index,
+                                        key: factor.id || factor.title || factor || index,
                                         className: "text-sm text-gray-600 flex items-center"
                                     }, [
                                         React.createElement(AlertCircle, { key: 'icon', className: "mr-2 text-orange-500" }),
@@ -452,7 +452,7 @@
                     className: "space-y-4" 
                 }, analysis.recommendations.map((rec, index) =>
                     React.createElement('div', {
-                        key: index,
+                        key: rec.id || rec.title || index,
                         className: "bg-indigo-50 border border-indigo-200 rounded-lg p-4"
                     }, [
                         React.createElement('h4', { 
