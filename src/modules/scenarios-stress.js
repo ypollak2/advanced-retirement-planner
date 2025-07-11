@@ -368,10 +368,162 @@
                 ])
             ]),
 
+            // Scenario Timeline Visualization
+            React.createElement('div', { 
+                key: 'scenario-timeline',
+                className: "financial-card p-6 animate-slide-up" 
+            }, [
+                React.createElement('h3', { 
+                    key: 'title',
+                    className: "text-xl font-bold text-indigo-700 mb-4 flex items-center" 
+                }, [
+                    React.createElement('span', { key: 'icon', className: "mr-2" }, '📅'),
+                    language === 'he' ? 'ציר זמן השפעת התרחיש' : 'Scenario Impact Timeline'
+                ]),
+                React.createElement('div', { 
+                    key: 'timeline-content',
+                    className: "space-y-4" 
+                }, [
+                    // Timeline visualization
+                    React.createElement('div', { 
+                        key: 'timeline',
+                        className: "relative" 
+                    }, [
+                        // Timeline track
+                        React.createElement('div', { 
+                            className: "absolute left-0 top-6 w-full h-2 bg-gray-200 rounded" 
+                        }),
+                        
+                        // Crisis period indicator
+                        React.createElement('div', { 
+                            className: "absolute left-0 top-6 h-2 bg-red-400 rounded",
+                            style: { 
+                                width: `${(currentCrisis.duration / ((inputs.retirementAge || 67) - (inputs.currentAge || 30))) * 100}%` 
+                            }
+                        }),
+                        
+                        // Timeline labels
+                        React.createElement('div', { 
+                            className: "flex justify-between items-start pt-10" 
+                        }, [
+                            React.createElement('div', { 
+                                key: 'start',
+                                className: "text-center" 
+                            }, [
+                                React.createElement('div', { 
+                                    className: "w-4 h-4 bg-blue-500 rounded-full mx-auto mb-1 relative -top-6" 
+                                }),
+                                React.createElement('div', { className: "text-sm font-medium" }, 
+                                    language === 'he' ? 'התחלה' : 'Start'),
+                                React.createElement('div', { className: "text-xs text-gray-500" }, 
+                                    `${language === 'he' ? 'גיל' : 'Age'} ${inputs.currentAge || 30}`)
+                            ]),
+                            
+                            React.createElement('div', { 
+                                key: 'crisis-end',
+                                className: "text-center",
+                                style: { 
+                                    marginLeft: `${(currentCrisis.duration / ((inputs.retirementAge || 67) - (inputs.currentAge || 30))) * 100 - 10}%` 
+                                }
+                            }, [
+                                React.createElement('div', { 
+                                    className: "w-4 h-4 bg-red-500 rounded-full mx-auto mb-1 relative -top-6" 
+                                }),
+                                React.createElement('div', { className: "text-sm font-medium text-red-600" }, 
+                                    language === 'he' ? 'סוף משבר' : 'Crisis Ends'),
+                                React.createElement('div', { className: "text-xs text-red-500" }, 
+                                    `${currentCrisis.duration} ${language === 'he' ? 'שנים' : 'years'}`)
+                            ]),
+                            
+                            React.createElement('div', { 
+                                key: 'retirement',
+                                className: "text-center" 
+                            }, [
+                                React.createElement('div', { 
+                                    className: "w-4 h-4 bg-green-500 rounded-full mx-auto mb-1 relative -top-6" 
+                                }),
+                                React.createElement('div', { className: "text-sm font-medium" }, 
+                                    language === 'he' ? 'פרישה' : 'Retirement'),
+                                React.createElement('div', { className: "text-xs text-gray-500" }, 
+                                    `${language === 'he' ? 'גיל' : 'Age'} ${inputs.retirementAge || 67}`)
+                            ])
+                        ])
+                    ]),
+                    
+                    // Impact phases explanation
+                    React.createElement('div', { 
+                        key: 'phases',
+                        className: "grid grid-cols-1 md:grid-cols-3 gap-4 mt-6" 
+                    }, [
+                        React.createElement('div', { 
+                            key: 'crisis-phase',
+                            className: "metric-card metric-warning p-4" 
+                        }, [
+                            React.createElement('h4', { 
+                                className: "font-semibold text-red-700 mb-2 flex items-center" 
+                            }, [
+                                React.createElement('span', { key: 'icon', className: "mr-2" }, '⚠️'),
+                                language === 'he' ? 'שלב המשבר' : 'Crisis Phase'
+                            ]),
+                            React.createElement('div', { className: "text-sm space-y-1" }, [
+                                React.createElement('div', {}, 
+                                    `${language === 'he' ? 'משך:' : 'Duration:'} ${currentCrisis.duration} ${language === 'he' ? 'שנים' : 'years'}`),
+                                React.createElement('div', {}, 
+                                    `${language === 'he' ? 'ירידה בתשואה:' : 'Return reduction:'} ${Math.round(currentCrisis.returnReduction * 100)}%`),
+                                React.createElement('div', { className: "text-red-600" }, 
+                                    language === 'he' ? 'השפעה שלילית על צבירה' : 'Negative impact on accumulation')
+                            ])
+                        ]),
+                        
+                        React.createElement('div', { 
+                            key: 'recovery-phase',
+                            className: "metric-card metric-neutral p-4" 
+                        }, [
+                            React.createElement('h4', { 
+                                className: "font-semibold text-blue-700 mb-2 flex items-center" 
+                            }, [
+                                React.createElement('span', { key: 'icon', className: "mr-2" }, '🔄'),
+                                language === 'he' ? 'שלב ההתאוששות' : 'Recovery Phase'
+                            ]),
+                            React.createElement('div', { className: "text-sm space-y-1" }, [
+                                React.createElement('div', {}, 
+                                    `${language === 'he' ? 'משך:' : 'Duration:'} ${((inputs.retirementAge || 67) - (inputs.currentAge || 30)) - currentCrisis.duration} ${language === 'he' ? 'שנים' : 'years'}`),
+                                React.createElement('div', {}, 
+                                    `${language === 'he' ? 'תשואה רגילה:' : 'Normal return:'} ${inputs.expectedReturn || 7}%`),
+                                React.createElement('div', { className: "text-blue-600" }, 
+                                    language === 'he' ? 'חזרה לתשואות רגילות' : 'Return to normal yields')
+                            ])
+                        ]),
+                        
+                        React.createElement('div', { 
+                            key: 'final-impact',
+                            className: "metric-card metric-positive p-4" 
+                        }, [
+                            React.createElement('h4', { 
+                                className: "font-semibold text-green-700 mb-2 flex items-center" 
+                            }, [
+                                React.createElement('span', { key: 'icon', className: "mr-2" }, '📊'),
+                                language === 'he' ? 'השפעה סופית' : 'Final Impact'
+                            ]),
+                            React.createElement('div', { className: "text-sm space-y-1" }, [
+                                React.createElement('div', {}, 
+                                    `${language === 'he' ? 'הפסד כולל:' : 'Total loss:'} ${Math.abs(stressResults.reductionPercent)}%`),
+                                React.createElement('div', {}, 
+                                    `${language === 'he' ? 'צבירה במשבר:' : 'Crisis accumulation:'} ${formatCurrency(stressResults.totalAccumulation)}`),
+                                React.createElement('div', { className: stressResults.reductionPercent < -10 ? "text-red-600" : "text-yellow-600" }, 
+                                    stressResults.reductionPercent < -10 ? 
+                                        (language === 'he' ? 'השפעה משמעותית' : 'Significant impact') :
+                                        (language === 'he' ? 'השפעה מתונה' : 'Moderate impact'))
+                            ])
+                        ])
+                    ])
+                ])
+            ]),
+
             // Crisis Timeline Chart
             showChart && React.createElement('div', { 
                 key: 'crisis-chart',
-                className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" 
+                className: "financial-card p-6 animate-slide-up" 
             }, [
                 React.createElement('h3', { 
                     key: 'title',

@@ -137,7 +137,7 @@
         };
         
         return React.createElement('div', { 
-            className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in sticky top-4" 
+            className: "financial-card p-6 animate-slide-up sticky top-4" 
         }, [
             React.createElement('h3', { 
                 key: 'title',
@@ -154,31 +154,31 @@
             }, [
                 React.createElement('div', {
                     key: 'pension',
-                    className: "bg-blue-50 rounded-lg p-3 border border-blue-200"
+                    className: "metric-card metric-neutral p-3"
                 }, [
                     React.createElement('div', { className: "text-sm text-blue-700 font-medium" }, 
                         language === 'he' ? 'פנסיה נוכחית' : 'Current Pension'),
-                    React.createElement('div', { className: "text-lg font-bold text-blue-800" }, 
+                    React.createElement('div', { className: "text-lg font-bold text-blue-800 wealth-amount" }, 
                         formatCurrency(inputs.currentSavings || 0))
                 ]),
                 
                 React.createElement('div', {
                     key: 'training',
-                    className: "bg-green-50 rounded-lg p-3 border border-green-200"
+                    className: "metric-card metric-positive p-3"
                 }, [
                     React.createElement('div', { className: "text-sm text-green-700 font-medium" }, 
                         language === 'he' ? 'קרן השתלמות' : 'Training Fund'),
-                    React.createElement('div', { className: "text-lg font-bold text-green-800" }, 
+                    React.createElement('div', { className: "text-lg font-bold text-green-800 wealth-amount" }, 
                         formatCurrency(inputs.trainingFund || 0))
                 ]),
                 
                 React.createElement('div', {
                     key: 'total',
-                    className: "bg-purple-50 rounded-lg p-3 border border-purple-200"
+                    className: "metric-card metric-positive p-3"
                 }, [
                     React.createElement('div', { className: "text-sm text-purple-700 font-medium" }, 
                         language === 'he' ? 'סך הכל נוכחי' : 'Total Current'),
-                    React.createElement('div', { className: "text-xl font-bold text-purple-800" }, 
+                    React.createElement('div', { className: "text-xl font-bold text-purple-800 wealth-amount" }, 
                         formatCurrency(totalSavings))
                 ])
             ]),
@@ -292,6 +292,81 @@
                 ))
             ]),
             
+            // Enhanced Financial Forecast
+            React.createElement('div', {
+                key: 'financial-forecast',
+                className: "border-t border-gray-200 pt-4 space-y-3"
+            }, [
+                React.createElement('div', { 
+                    key: 'forecast-title',
+                    className: "section-header text-sm font-medium text-gray-700 mb-3 flex items-center" 
+                }, [
+                    React.createElement('span', { key: 'icon', className: "mr-2" }, '🔮'),
+                    language === 'he' ? 'תחזית פיננסית' : 'Financial Forecast'
+                ]),
+                
+                // Retirement projections
+                React.createElement('div', { 
+                    key: 'projections',
+                    className: "space-y-2" 
+                }, [
+                    React.createElement('div', {
+                        key: 'projected-value',
+                        className: "metric-card metric-positive p-3"
+                    }, [
+                        React.createElement('div', { className: "text-xs text-gray-600" }, 
+                            language === 'he' ? 'צבירה צפויה בגיל פרישה' : 'Projected Retirement Value'),
+                        React.createElement('div', { className: "text-lg font-bold text-green-700 wealth-amount" }, 
+                            formatCurrency(projectedWithGrowth)),
+                        React.createElement('div', { className: "text-xs text-gray-500 mt-1" }, 
+                            `${language === 'he' ? 'בעוד' : 'In'} ${yearsToRetirement} ${language === 'he' ? 'שנים' : 'years'}`)
+                    ]),
+                    
+                    React.createElement('div', {
+                        key: 'buying-power',
+                        className: "metric-card metric-warning p-3"
+                    }, [
+                        React.createElement('div', { className: "text-xs text-gray-600" }, 
+                            language === 'he' ? 'כוח קנייה (נכון להיום)' : 'Buying Power (Today\'s Value)'),
+                        React.createElement('div', { className: "text-lg font-bold text-orange-700 wealth-amount" }, 
+                            formatCurrency(buyingPowerToday)),
+                        React.createElement('div', { className: "text-xs text-gray-500 mt-1" }, 
+                            `${language === 'he' ? 'לאחר אינפלציה של' : 'After'} ${(inputs.inflationRate || 3)}% ${language === 'he' ? '' : 'inflation'}`)
+                    ]),
+                    
+                    React.createElement('div', {
+                        key: 'monthly-income',
+                        className: "metric-card metric-neutral p-3"
+                    }, [
+                        React.createElement('div', { className: "text-xs text-gray-600" }, 
+                            language === 'he' ? 'הכנסה חודשית בפרישה' : 'Monthly Retirement Income'),
+                        React.createElement('div', { className: "text-lg font-bold text-blue-700 wealth-amount" }, 
+                            formatCurrency(projectedWithGrowth * (avgNetReturn/100) / 12)),
+                        React.createElement('div', { className: "text-xs text-gray-500 mt-1" }, 
+                            `${(avgNetReturn).toFixed(1)}% ${language === 'he' ? 'תשואה שנתית' : 'annual return'}`)
+                    ])
+                ]),
+                
+                // Progress indicators
+                React.createElement('div', { 
+                    key: 'progress',
+                    className: "space-y-2 mt-4" 
+                }, [
+                    React.createElement('div', { className: "text-xs text-gray-600 mb-1" }, 
+                        language === 'he' ? 'התקדמות לקראת פרישה' : 'Progress to Retirement'),
+                    React.createElement('div', { className: "progress-bar" }, [
+                        React.createElement('div', { 
+                            className: "progress-fill",
+                            style: { 
+                                width: `${Math.min(100, ((inputs.currentAge || 30) - 25) / ((inputs.retirementAge || 67) - 25) * 100)}%` 
+                            }
+                        })
+                    ]),
+                    React.createElement('div', { className: "text-xs text-gray-500 text-center" }, 
+                        `${Math.round(((inputs.currentAge || 30) - 25) / ((inputs.retirementAge || 67) - 25) * 100)}% ${language === 'he' ? 'מהדרך' : 'complete'}`)
+                ])
+            ]),
+            
             // Export Buttons
             React.createElement('div', {
                 key: 'export-buttons',
@@ -305,7 +380,7 @@
                 React.createElement('button', {
                     key: 'export-png',
                     onClick: exportToPNG,
-                    className: "w-full px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm flex items-center justify-center space-x-2"
+                    className: "btn-primary w-full text-sm flex items-center justify-center space-x-2"
                 }, [
                     React.createElement('span', { key: 'icon' }, '🖼️'),
                     React.createElement('span', { key: 'text' }, language === 'he' ? 'ייצא כתמונה' : 'Export as PNG')
@@ -314,7 +389,7 @@
                 React.createElement('button', {
                     key: 'export-ai',
                     onClick: exportForAI,
-                    className: "w-full px-3 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm flex items-center justify-center space-x-2"
+                    className: "btn-primary w-full text-sm flex items-center justify-center space-x-2"
                 }, [
                     React.createElement('span', { key: 'icon' }, '🤖'),
                     React.createElement('span', { key: 'text' }, language === 'he' ? 'ייצא לכלי AI' : 'Export for AI Tools')
@@ -323,7 +398,7 @@
                 React.createElement('button', {
                     key: 'show-chart',
                     onClick: () => setShowChart(true),
-                    className: "w-full px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm flex items-center justify-center space-x-2"
+                    className: "btn-primary w-full text-sm flex items-center justify-center space-x-2"
                 }, [
                     React.createElement('span', { key: 'icon' }, '📊'),
                     React.createElement('span', { key: 'text' }, language === 'he' ? 'ייצוג גרפי' : 'Graphical View')
@@ -332,7 +407,7 @@
                 React.createElement('button', {
                     key: 'llm-analysis',
                     onClick: generateLLMAnalysis,
-                    className: "w-full px-3 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors text-sm flex items-center justify-center space-x-2"
+                    className: "btn-primary w-full text-sm flex items-center justify-center space-x-2"
                 }, [
                     React.createElement('span', { key: 'icon' }, '🧠'),
                     React.createElement('span', { key: 'text' }, language === 'he' ? 'ניתוח AI' : 'LLM Analysis')
@@ -347,7 +422,7 @@
             // Basic Data Section
             React.createElement('div', { 
                 key: 'basic-data',
-                className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in" 
+                className: "financial-card p-6 animate-slide-up" 
             }, [
                 React.createElement('h2', { 
                     key: 'title',
@@ -497,7 +572,7 @@
                                 type: 'number',
                                 value: inputs.currentAge,
                                 onChange: (e) => setInputs({...inputs, currentAge: parseInt(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                className: "financial-input"
                             })
                         ]),
                         React.createElement('div', { key: 'retirement' }, [
@@ -508,7 +583,7 @@
                                 type: 'number',
                                 value: inputs.retirementAge,
                                 onChange: (e) => setInputs({...inputs, retirementAge: parseInt(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                className: "financial-input"
                             })
                         ])
                     ]),
@@ -524,7 +599,7 @@
                                 type: 'number',
                                 value: inputs.currentSavings,
                                 onChange: (e) => setInputs({...inputs, currentSavings: parseInt(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                className: "financial-input"
                             })
                         ]),
                         React.createElement('div', { key: 'training-fund' }, [
@@ -535,7 +610,7 @@
                                 type: 'number',
                                 value: inputs.trainingFund || 0,
                                 onChange: (e) => setInputs({...inputs, trainingFund: parseInt(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                className: "financial-input"
                             })
                         ])
                     ]),
@@ -551,7 +626,7 @@
                                 type: 'number',
                                 value: inputs.currentMonthlySalary || 15000,
                                 onChange: (e) => setInputs({...inputs, currentMonthlySalary: parseInt(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                className: "financial-input"
                             })
                         ]),
                         React.createElement('div', { key: 'training-contribution' }, [
@@ -562,7 +637,7 @@
                                 type: 'number',
                                 value: inputs.trainingFundContribution || Math.round((inputs.currentMonthlySalary || 15000) * 0.075), // 7.5% default
                                 onChange: (e) => setInputs({...inputs, trainingFundContribution: parseInt(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                className: "financial-input"
                             })
                         ])
                     ]),
@@ -579,7 +654,7 @@
                                 step: '0.1',
                                 value: inputs.contributionFees || 1.0,
                                 onChange: (e) => setInputs({...inputs, contributionFees: parseFloat(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                className: "financial-input"
                             })
                         ]),
                         React.createElement('div', { key: 'expected-yield' }, [
@@ -591,7 +666,7 @@
                                 step: '0.1',
                                 value: inputs.expectedReturn || 7,
                                 onChange: (e) => setInputs({...inputs, expectedReturn: parseFloat(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                className: "financial-input"
                             })
                         ])
                     ]),
@@ -608,7 +683,7 @@
                                 step: '0.1',
                                 value: inputs.accumulationFees || 0.1,
                                 onChange: (e) => setInputs({...inputs, accumulationFees: parseFloat(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                className: "financial-input"
                             })
                         ]),
                         React.createElement('div', { key: 'inflation' }, [
@@ -620,7 +695,7 @@
                                 step: '0.1',
                                 value: inputs.inflationRate || 3,
                                 onChange: (e) => setInputs({...inputs, inflationRate: parseFloat(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                className: "financial-input"
                             })
                         ])
                     ]),
@@ -637,7 +712,7 @@
                                 step: '0.1',
                                 value: inputs.trainingFundFees || 0.6,
                                 onChange: (e) => setInputs({...inputs, trainingFundFees: parseFloat(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                className: "financial-input"
                             })
                         ]),
                         React.createElement('div', { key: 'tax-country' }, [
@@ -647,7 +722,7 @@
                             React.createElement('select', {
                                 value: inputs.taxCountry || 'israel',
                                 onChange: (e) => setInputs({...inputs, taxCountry: e.target.value}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                className: "financial-input"
                             }, [
                                 React.createElement('option', { key: 'israel', value: 'israel' }, 
                                     language === 'he' ? 'ישראל' : 'Israel'),
@@ -1494,8 +1569,9 @@
         const currentT = t[language];
 
         return React.createElement('div', {
-            className: 'min-h-screen py-6 px-4 dashboard-grid',
-            dir: language === 'he' ? 'rtl' : 'ltr'
+            className: 'min-h-screen py-6 px-4',
+            dir: language === 'he' ? 'rtl' : 'ltr',
+            style: { background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)' }
         }, [
             // Header
             React.createElement('div', {
@@ -1546,7 +1622,7 @@
                 // Tab Content
                 React.createElement('div', {
                     key: 'tab-content',
-                    className: 'grid grid-cols-1 lg:grid-cols-3 gap-8'
+                    className: 'dashboard-grid'
                 }, [
                     // Forms Column
                     React.createElement('div', {
