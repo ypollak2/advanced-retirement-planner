@@ -111,12 +111,34 @@ jobs:
       run: |
         echo "Checking JavaScript security..."
         
-        # Check for eval usage
-        if grep -r "eval(" --include="*.html" --include="*.js" . | grep -v node_modules | grep -v ".git"; then
-          echo "⚠️ eval() usage found - security risk"
+        # CRITICAL: Check for eval usage (ZERO TOLERANCE)
+        echo "🔍 Scanning for eval() usage (FORBIDDEN)..."
+        if grep -r "eval(" --include="*.html" --include="*.js" . \
+          | grep -v node_modules \
+          | grep -v ".git" \
+          | grep -v "security-qa-analysis.js" \
+          | grep -v "SECURITY_RULES.md" \
+          | grep -v "README.md" \
+          | grep -v "documentation\|\.md$"; then
+          echo "🚨 CRITICAL SECURITY VIOLATION: eval() usage detected"
+          echo "❌ eval() is FORBIDDEN - see SECURITY_RULES.md"
+          echo "🔧 Use safe alternatives: JSON.parse(), parseInt(), switch statements"
           exit 1
         else
-          echo "✅ No eval() usage found"
+          echo "✅ No eval() usage found - SECURITY RULE COMPLIANT"
+        fi
+        
+        # Check for Function constructor
+        echo "🔍 Scanning for Function constructor usage..."
+        if grep -r "new Function\|Function(" --include="*.html" --include="*.js" . \
+          | grep -v node_modules \
+          | grep -v ".git" \
+          | grep -v "security-qa-analysis.js" \
+          | grep -v "SECURITY_RULES.md"; then
+          echo "⚠️ Function constructor usage found - security risk"
+          exit 1
+        else
+          echo "✅ No Function constructor usage found"
         fi
         
         # Check for document.write usage

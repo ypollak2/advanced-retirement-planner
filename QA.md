@@ -51,12 +51,29 @@ Use the **MANUAL_QA_CHECKLIST.md** for systematic UI validation:
 
 ## Test Execution Order
 
-1. Run `node quick-qa-test.js` - Must pass 100%
-2. Complete manual UI testing checklist
-3. Test in multiple browsers
-4. Validate performance metrics
-5. Document results
-6. Get sign-off before push
+1. **Security Rules Check**: `./security-check.sh` - Must pass with 0 violations
+2. **Logic Validation**: `node quick-qa-test.js` - Must pass 100%
+3. **Manual UI Testing**: Complete checklist validation
+4. **Browser Testing**: Chrome, Firefox, Safari minimum
+5. **Performance**: Validate load times and memory usage
+6. **Documentation**: Update and verify accuracy
+7. **Final Sign-off**: Get approval before push
+
+### CRITICAL: Security Rules Enforcement
+
+**MANDATORY FIRST STEP**: Every QA cycle MUST start with security rule validation:
+
+```bash
+./security-check.sh
+```
+
+**ZERO TOLERANCE POLICIES:**
+- ❌ **NO eval() usage** - Blocks deployment immediately
+- ❌ **NO Function constructor** - Security violation
+- ❌ **NO javascript: URLs** - XSS vulnerability
+- ❌ **NO sensitive data in localStorage** - Data exposure risk
+
+If security check fails, **STOP immediately** and fix violations before proceeding.
 
 ## Test Data
 
