@@ -6,7 +6,7 @@ These are **MANDATORY** security rules that must be followed at all times. Viola
 
 ### ❌ FORBIDDEN PRACTICES
 
-#### 1. **NO eval() USAGE - ZERO TOLERANCE**
+#### 1. **NO DANGEROUS eval() USAGE - ZERO TOLERANCE**
 ```javascript
 // ❌ NEVER DO THIS - SECURITY VIOLATION
 eval(userInput);
@@ -18,9 +18,16 @@ JSON.parse(jsonString);        // For JSON data
 parseInt(numberString);        // For numbers
 parseFloat(numberString);      // For decimals
 switch(action) { ... }         // For dynamic behavior
+
+// ✅ ALLOWED: Puppeteer DOM methods (NOT JavaScript eval)
+await page.$eval(selector, el => el.value);     // Safe DOM extraction
+await page.evaluate(() => document.title);     // Safe page evaluation
+await page.$$eval('div', divs => divs.length); // Safe element counting
 ```
 
-**Why forbidden**: `eval()` executes arbitrary code and is the #1 vector for code injection attacks.
+**Why JavaScript eval() is forbidden**: `eval()` executes arbitrary code and is the #1 vector for code injection attacks.
+
+**Why Puppeteer methods are safe**: `$eval` and `page.evaluate` run in isolated browser contexts and don't use JavaScript's `eval()` internally.
 
 #### 2. **NO Function Constructor**
 ```javascript

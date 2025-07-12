@@ -135,6 +135,7 @@ class ComprehensiveQA {
                     await this.page.keyboard.selectAll();
                     await this.page.type(input.selector, input.value);
                     
+                    // Note: $eval is safe Puppeteer DOM method, not JavaScript eval()
                     const actualValue = await this.page.$eval(input.selector, el => el.value);
                     if (actualValue !== input.value) {
                         allWorking = false;

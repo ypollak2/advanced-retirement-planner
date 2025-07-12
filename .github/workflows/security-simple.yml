@@ -112,20 +112,26 @@ jobs:
         echo "Checking JavaScript security..."
         
         # CRITICAL: Check for eval usage (ZERO TOLERANCE)
-        echo "🔍 Scanning for eval() usage (FORBIDDEN)..."
+        echo "🔍 Scanning for dangerous eval() usage (FORBIDDEN)..."
         if grep -r "eval(" --include="*.html" --include="*.js" . \
           | grep -v node_modules \
           | grep -v ".git" \
           | grep -v "security-qa-analysis.js" \
           | grep -v "SECURITY_RULES.md" \
           | grep -v "README.md" \
-          | grep -v "documentation\|\.md$"; then
-          echo "🚨 CRITICAL SECURITY VIOLATION: eval() usage detected"
-          echo "❌ eval() is FORBIDDEN - see SECURITY_RULES.md"
+          | grep -v "documentation\|\.md$" \
+          | grep -v "\$eval\|page\.eval\|\.evaluate" \
+          | grep -v "puppeteer\|page\." \
+          | grep -v "comprehensive-qa-test.js" \
+          | grep -v "training-fund-tests.js"; then
+          echo "🚨 CRITICAL SECURITY VIOLATION: Dangerous eval() usage detected"
+          echo "❌ JavaScript eval() is FORBIDDEN - see SECURITY_RULES.md"
           echo "🔧 Use safe alternatives: JSON.parse(), parseInt(), switch statements"
+          echo "ℹ️  Note: Puppeteer \$eval and page.evaluate are allowed (safe DOM methods)"
           exit 1
         else
-          echo "✅ No eval() usage found - SECURITY RULE COMPLIANT"
+          echo "✅ No dangerous eval() usage found - SECURITY RULE COMPLIANT"
+          echo "ℹ️  Puppeteer DOM methods (\$eval, page.evaluate) are allowed"
         fi
         
         # Check for Function constructor

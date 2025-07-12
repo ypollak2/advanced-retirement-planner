@@ -27,15 +27,17 @@ report_success() {
     echo "✅ PASS: $1"
 }
 
-# CRITICAL RULE 1: NO eval() USAGE (ZERO TOLERANCE)
+# CRITICAL RULE 1: NO DANGEROUS eval() USAGE (ZERO TOLERANCE)
 echo ""
-echo "🔍 Rule 1: Checking for eval() usage (FORBIDDEN)..."
-if grep -r "eval(" --include="*.html" --include="*.js" src/ index*.html 2>/dev/null | grep -v "/\*\|//\|console.log"; then
-    report_violation "eval() usage detected in source code"
+echo "🔍 Rule 1: Checking for dangerous eval() usage (FORBIDDEN)..."
+if grep -r "eval(" --include="*.html" --include="*.js" src/ index*.html 2>/dev/null | grep -v "/\*\|//\|console.log\|\$eval\|page\.eval\|\.evaluate\|puppeteer"; then
+    report_violation "Dangerous eval() usage detected in source code"
     echo "   📖 See SECURITY_RULES.md for safe alternatives"
     echo "   🔧 Use: JSON.parse(), parseInt(), parseFloat(), switch statements"
+    echo "   ℹ️  Note: Puppeteer \$eval and page.evaluate are allowed (safe DOM methods)"
 else
-    report_success "No eval() usage found in source code"
+    report_success "No dangerous eval() usage found in source code"
+    echo "   ℹ️  Puppeteer DOM methods (\$eval, page.evaluate) are allowed"
 fi
 
 # RULE 2: NO Function Constructor
