@@ -166,8 +166,8 @@
         style: { fontSize: `${size}px` } 
     }, '⚠️');
 
-    // Basic Chart Component - Simple chart component
-    const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
+    // Enhanced Chart Component with multiple datasets and inflation adjustment
+    const SimpleChart = ({ data, type = 'line', language = 'he', showInflationAdjusted = false }) => {
         const chartRef = React.useRef(null);
         const chartInstance = React.useRef(null);
         
@@ -184,15 +184,45 @@
                 
                 const chartData = {
                     labels: data.map(d => isHebrew ? `גיל ${d.age}` : `Age ${d.age}`),
-                    datasets: [{
-                        label: isHebrew ? 'צבירה כוללת' : 'Total Accumulation',
-                        data: data.map(d => d.totalSavings || d.value),
-                        borderColor: 'rgb(59, 130, 246)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        fill: false,
-                        tension: 0.4,
-                        borderWidth: 3
-                    }]
+                    datasets: [
+                        {
+                            label: isHebrew ? 'קרן פנסיה' : 'Pension Fund',
+                            data: data.map(d => showInflationAdjusted ? (d.pensionSavings || 0) : (d.pensionSavings || 0)),
+                            borderColor: 'rgb(59, 130, 246)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 2
+                        },
+                        {
+                            label: isHebrew ? 'קרן השתלמות' : 'Training Fund',
+                            data: data.map(d => showInflationAdjusted ? (d.trainingFund || 0) : (d.trainingFund || 0)),
+                            borderColor: 'rgb(16, 185, 129)',
+                            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 2
+                        },
+                        {
+                            label: isHebrew ? 'חיסכון אישי' : 'Personal Savings',
+                            data: data.map(d => showInflationAdjusted ? (d.personalSavings || 0) : (d.personalSavings || 0)),
+                            borderColor: 'rgb(245, 158, 11)',
+                            backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 2
+                        },
+                        {
+                            label: isHebrew ? 'סה"כ צבירה' : 'Total Accumulation',
+                            data: data.map(d => showInflationAdjusted ? (d.totalInflationAdjusted || d.totalSavings || d.value) : (d.totalSavings || d.value)),
+                            borderColor: 'rgb(139, 69, 19)',
+                            backgroundColor: 'rgba(139, 69, 19, 0.1)',
+                            fill: false,
+                            tension: 0.4,
+                            borderWidth: 3,
+                            borderDash: showInflationAdjusted ? [] : [5, 5]
+                        }
+                    ]
                 };
                 
                 const config = {
@@ -204,7 +234,13 @@
                         plugins: {
                             title: {
                                 display: true,
-                                text: isHebrew ? 'התפתחות הצבירה לאורך השנים' : 'Accumulation Progress Over Years'
+                                text: showInflationAdjusted ? 
+                                    (isHebrew ? 'התפתחות הצבירה (מותאמת אינפלציה)' : 'Accumulation Progress (Inflation Adjusted)') :
+                                    (isHebrew ? 'התפתחות הצבירה (ערך נומינלי)' : 'Accumulation Progress (Nominal Value)')
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top'
                             }
                         },
                         scales: {
@@ -1233,6 +1269,7 @@
         const [activeTab, setActiveTab] = React.useState('basic');
         const [language, setLanguage] = React.useState('he');
         const [showChart, setShowChart] = React.useState(false);
+        const [showInflationChart, setShowInflationChart] = React.useState(false);
         const [llmAnalysis, setLlmAnalysis] = React.useState('');
         const [showWelcome, setShowWelcome] = React.useState(true);
         const [showTutorial, setShowTutorial] = React.useState(false);
@@ -1847,40 +1884,84 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                         formatCurrency
                     }),
 
-                    // Chart Display
+                    // Enhanced Chart Display with Components and Inflation Toggle
                     showChart ? React.createElement('div', {
                         key: 'chart-container',
                         className: "financial-card p-6 mt-4"
                     }, [
-                        React.createElement('h3', {
-                            key: 'chart-title',
-                            className: "text-lg font-bold mb-4 text-gray-800"
-                        }, language === 'he' ? 'גרף התקדמות החיסכון' : 'Savings Progress Chart'),
+                        React.createElement('div', {
+                            key: 'chart-header',
+                            className: "flex justify-between items-center mb-4"
+                        }, [
+                            React.createElement('h3', {
+                                key: 'chart-title',
+                                className: "text-lg font-bold text-gray-800"
+                            }, language === 'he' ? 'גרף התקדמות החיסכון' : 'Savings Progress Chart'),
+                            React.createElement('div', {
+                                key: 'chart-controls',
+                                className: "flex space-x-2"
+                            }, [
+                                React.createElement('button', {
+                                    key: 'inflation-toggle',
+                                    onClick: () => setShowInflationChart(!showInflationChart),
+                                    className: `px-3 py-1 text-sm rounded ${showInflationChart ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-600`
+                                }, language === 'he' ? 'מותאם אינפלציה' : 'Inflation Adjusted'),
+                                React.createElement('button', {
+                                    key: 'hide-chart',
+                                    onClick: () => setShowChart(false),
+                                    className: "px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
+                                }, language === 'he' ? 'הסתר' : 'Hide')
+                            ])
+                        ]),
                         React.createElement(SimpleChart, {
-                            key: 'savings-chart',
+                            key: 'enhanced-savings-chart',
                             data: (() => {
                                 const chartData = [];
                                 const currentAge = inputs.currentAge || 30;
                                 const retirementAge = inputs.retirementAge || 67;
-                                for (let age = currentAge; age <= retirementAge; age += 5) {
+                                const inflationRate = (inputs.inflationRate || 3) / 100;
+                                const pensionReturn = ((inputs.expectedReturn || 7) - (inputs.accumulationFees || 0.1)) / 100;
+                                const trainingReturn = ((inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.6)) / 100;
+                                const personalReturn = (inputs.expectedReturn || 7) / 100;
+                                
+                                for (let age = currentAge; age <= retirementAge; age += 3) {
                                     const yearsInvested = age - currentAge;
-                                    const totalSavings = monthlyTotal * 12 * yearsInvested * Math.pow(1 + (inputs.expectedReturn || 7) / 100, yearsInvested);
+                                    
+                                    // Calculate individual components
+                                    const pensionContribution = (totalMonthlySalary * (inputs.pensionContribution || 18.5) / 100) + 
+                                                               (totalMonthlySalary * (inputs.employerContribution || 6) / 100);
+                                    const trainingContribution = totalMonthlySalary * (inputs.trainingFundContribution || 2.5) / 100;
+                                    const personalContribution = Math.max(0, monthlyTotal - pensionContribution - trainingContribution);
+                                    
+                                    const pensionFV = pensionContribution * 12 * ((Math.pow(1 + pensionReturn, yearsInvested) - 1) / pensionReturn) * (1 + pensionReturn);
+                                    const trainingFV = trainingContribution * 12 * ((Math.pow(1 + trainingReturn, yearsInvested) - 1) / trainingReturn) * (1 + trainingReturn);
+                                    const personalFV = personalContribution * 12 * ((Math.pow(1 + personalReturn, yearsInvested) - 1) / personalReturn) * (1 + personalReturn);
+                                    
+                                    const totalNominal = pensionFV + trainingFV + personalFV + (inputs.currentSavings || 0) * Math.pow(1 + pensionReturn, yearsInvested);
+                                    const totalInflationAdjusted = totalNominal / Math.pow(1 + inflationRate, yearsInvested);
+                                    
                                     chartData.push({
                                         age: age,
-                                        totalSavings: totalSavings,
-                                        value: totalSavings
+                                        pensionSavings: showInflationChart ? pensionFV / Math.pow(1 + inflationRate, yearsInvested) : pensionFV,
+                                        trainingFund: showInflationChart ? trainingFV / Math.pow(1 + inflationRate, yearsInvested) : trainingFV,
+                                        personalSavings: showInflationChart ? personalFV / Math.pow(1 + inflationRate, yearsInvested) : personalFV,
+                                        totalSavings: totalNominal,
+                                        totalInflationAdjusted: totalInflationAdjusted,
+                                        value: showInflationChart ? totalInflationAdjusted : totalNominal
                                     });
                                 }
                                 return chartData;
                             })(),
                             type: 'line',
-                            language
+                            language,
+                            showInflationAdjusted: showInflationChart
                         }),
-                        React.createElement('button', {
-                            key: 'hide-chart',
-                            onClick: () => setShowChart(false),
-                            className: "mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                        }, language === 'he' ? 'הסתר גרף' : 'Hide Chart')
+                        React.createElement('div', {
+                            key: 'chart-info',
+                            className: "mt-3 text-xs text-gray-600"
+                        }, showInflationChart ? 
+                            (language === 'he' ? 'הערכים מותאמים לכוח הקנייה של היום' : 'Values adjusted to today\'s purchasing power') :
+                            (language === 'he' ? 'הערכים בשווי נומינלי עתידי' : 'Values in future nominal terms'))
                     ]) : null
                 ])
             ]),

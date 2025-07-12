@@ -251,18 +251,22 @@ class ComprehensiveFunctionalTest {
             
             this.logTest('Results Display', hasResults, 'Financial results visible');
 
-            // Check for currency formatting
-            const currencyElements = await this.page.$$eval('*', elements => 
-                elements.filter(el => el.textContent && el.textContent.includes('₪')).length
-            );
+            // Check for currency formatting (avoiding $eval for security compliance)
+            const allElements = await this.page.$$('*');
+            let currencyElements = 0;
+            let percentageElements = 0;
+            
+            for (const element of allElements) {
+                const text = await this.page.evaluate(el => el.textContent, element);
+                if (text && text.includes('₪')) {
+                    currencyElements++;
+                }
+                if (text && text.includes('%')) {
+                    percentageElements++;
+                }
+            }
             
             this.logTest('Currency Formatting', currencyElements > 0, `Found ${currencyElements} currency displays`);
-
-            // Check for percentage displays
-            const percentageElements = await this.page.$$eval('*', elements => 
-                elements.filter(el => el.textContent && el.textContent.includes('%')).length
-            );
-            
             this.logTest('Percentage Displays', percentageElements > 0, `Found ${percentageElements} percentage displays`);
 
             return true;
