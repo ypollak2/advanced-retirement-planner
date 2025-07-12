@@ -2,8 +2,8 @@
 
 [![Version](https://img.shields.io/badge/version-4.6.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](quick-qa-test.js)
-[![QA](https://img.shields.io/badge/QA-comprehensive-success.svg)](QA.md)
+[![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
+[![QA](https://img.shields.io/badge/QA-comprehensive-success.svg)](docs/QA.md)
 [![Deployment](https://img.shields.io/badge/deployment-GitHub%20Pages-4078c0.svg)](https://ypollak2.github.io/advanced-retirement-planner)
 
 > **Professional retirement planning tool with modern, welcoming UI design and comprehensive financial planning capabilities**
@@ -13,6 +13,13 @@
 ![Advanced Retirement Planner](https://via.placeholder.com/800x400/1e40af/ffffff?text=Advanced+Retirement+Planner+v4.6.0)
 
 ## ✨ What's New in v4.6.0
+
+### 📁 **Project Organization & Performance** (Latest)
+- **File Structure**: Organized project files into logical directories (`docs/`, `tests/`, `config/`, `backups/`)
+- **Performance Optimization**: Enhanced tab switching speed with version-based caching instead of timestamp cache busting
+- **React Key Warnings**: Fixed React key warnings for clean console output
+- **Security Compliance**: Zero-tolerance eval() policy with proper Puppeteer testing support
+- **Performance Tests**: Comprehensive tab switching and module loading performance validation
 
 ### 🇮🇱 **Enhanced Israeli Training Fund Support**
 - **Accurate Calculations**: Proper 2.5% employee + 7.5% employer contribution rates (10% total)
@@ -139,6 +146,58 @@ npm run test:local
 # Build for production
 npm run build
 ```
+
+## 📁 Project Structure
+
+```
+advanced-retirement-planner/
+├── 📄 index.html                    # Main application entry point
+├── 📁 src/                          # Source code
+│   ├── 📁 core/                     # Core application logic
+│   │   ├── app-main.js              # Main application component
+│   │   └── dynamic-loader.js        # Dynamic module loading system
+│   ├── 📁 modules/                  # Feature modules (loaded dynamically)
+│   │   ├── advanced-portfolio.js    # Advanced portfolio features
+│   │   ├── analysis-engine.js       # Analysis and reporting tools
+│   │   ├── fire-calculator.js       # FIRE (Financial Independence) calculator
+│   │   └── scenarios-stress.js      # Stress testing scenarios
+│   ├── 📁 components/               # React components
+│   │   ├── FinancialChart.js        # Chart visualization component
+│   │   └── RetirementPlannerApp.js  # Main planner component
+│   ├── 📁 utils/                    # Utility functions
+│   │   ├── retirementCalculations.js # Core calculation logic
+│   │   └── chartDataGenerator.js    # Chart data processing
+│   ├── 📁 data/                     # Static data and constants
+│   │   └── marketConstants.js       # Market data and rates
+│   └── 📁 translations/             # Internationalization
+│       └── multiLanguage.js         # Hebrew/English translations
+├── 📁 tests/                        # Test suite
+│   ├── comprehensive-qa-test.js     # Full QA test suite
+│   ├── performance-tests.js         # Performance benchmarks
+│   ├── training-fund-tests.js       # Training fund specific tests
+│   └── [other test files]           # Additional test coverage
+├── 📁 docs/                         # Documentation
+│   ├── README.md                    # This file
+│   ├── QA.md                        # Quality assurance documentation
+│   ├── SECURITY_RULES.md            # Security policies and rules
+│   └── [other docs]                 # Additional documentation
+├── 📁 config/                       # Configuration files
+│   ├── package.json                 # Node.js dependencies
+│   ├── vite.config.js               # Build configuration
+│   ├── security-check.sh            # Security validation script
+│   └── [other config files]         # Docker, Netlify, etc.
+├── 📁 backups/                      # Backup files and old versions
+│   └── [backup HTML files]          # Historical versions
+└── 📁 alternative-apis/             # API integration examples
+    └── multi-provider-finance.js    # Financial data providers
+```
+
+### Key Design Principles
+- **📁 Separation of Concerns**: Clear separation between core app, modules, and utilities
+- **⚡ Performance**: Dynamic loading prevents initial bundle bloat
+- **🧪 Testability**: Comprehensive test coverage with organized test files
+- **📚 Documentation**: Clear documentation for maintainability
+- **🔒 Security**: Dedicated security rules and validation scripts
 
 ## 📋 Features
 

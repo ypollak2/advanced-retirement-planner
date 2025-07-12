@@ -57,7 +57,7 @@ class ComprehensiveQA {
             });
             
             // Navigate to the app
-            await this.page.goto('file://' + __dirname + '/index.html');
+            await this.page.goto('file://' + __dirname + '/../index.html');
             await this.page.waitForSelector('#root', { timeout: 10000 });
             
             this.logTest('Application Loading', true, 'App loaded successfully');
@@ -245,7 +245,7 @@ class ComprehensiveQA {
     async testPerformanceMetrics() {
         try {
             // Measure page load time
-            const navigationPromise = this.page.goto('file://' + __dirname + '/index.html');
+            const navigationPromise = this.page.goto('file://' + __dirname + '/../index.html');
             const startTime = Date.now();
             await navigationPromise;
             const loadTime = Date.now() - startTime;

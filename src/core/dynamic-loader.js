@@ -6,6 +6,36 @@ class DynamicModuleLoader {
         this.loadedModules = new Map();
         this.loadingPromises = new Map();
         this.cache = new Map();
+        this.preloadQueue = [];
+        this.initPreloading();
+    }
+
+    // Initialize preloading for common modules
+    initPreloading() {
+        // Preload commonly used modules after 2 seconds
+        setTimeout(() => {
+            this.preloadCommonModules();
+        }, 2000);
+    }
+
+    // Preload frequently accessed modules in the background
+    async preloadCommonModules() {
+        const commonModules = [
+            { name: 'AdvancedPortfolio', path: './src/modules/advanced-portfolio.js' },
+            { name: 'ScenariosStress', path: './src/modules/scenarios-stress.js' }
+        ];
+
+        for (const module of commonModules) {
+            try {
+                // Only preload if not already loaded/loading
+                if (!this.loadedModules.has(module.name) && !this.loadingPromises.has(module.name)) {
+                    console.log(`🚀 Preloading module: ${module.name}`);
+                    await this.loadModule(module.name, module.path);
+                }
+            } catch (error) {
+                console.log(`⚠️ Preload failed for ${module.name}:`, error);
+            }
+        }
     }
 
     // Load module with caching and error handling
@@ -40,9 +70,9 @@ class DynamicModuleLoader {
         try {
             console.log(`🔄 Loading module: ${moduleName} from ${modulePath}`);
             
-            // Load script dynamically
+            // Load script dynamically with version-based caching
             const script = document.createElement('script');
-            script.src = `${modulePath}?v=${Date.now()}`;
+            script.src = `${modulePath}?v=4.6.0`; // Use app version for cache control
             script.async = true;
             
             const loadPromise = new Promise((resolve, reject) => {
