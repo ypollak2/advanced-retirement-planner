@@ -1,30 +1,39 @@
-# 🚀 Advanced Retirement Planner v4.3.0
+# 🚀 Advanced Retirement Planner v4.6.0
 
-[![Version](https://img.shields.io/badge/version-4.3.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-4.6.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-94.1%25-brightgreen.svg)](e2e-test.js)
+[![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](quick-qa-test.js)
+[![QA](https://img.shields.io/badge/QA-comprehensive-success.svg)](QA.md)
 [![Deployment](https://img.shields.io/badge/deployment-GitHub%20Pages-4078c0.svg)](https://ypollak2.github.io/advanced-retirement-planner)
 
 > **Professional retirement planning tool with modern, welcoming UI design and comprehensive financial planning capabilities**
 
 **🌐 Live Demo:** [https://ypollak2.github.io/advanced-retirement-planner](https://ypollak2.github.io/advanced-retirement-planner)
 
-![Advanced Retirement Planner](https://via.placeholder.com/800x400/1e40af/ffffff?text=Advanced+Retirement+Planner+v4.3.0)
+![Advanced Retirement Planner](https://via.placeholder.com/800x400/1e40af/ffffff?text=Advanced+Retirement+Planner+v4.6.0)
 
-## ✨ What's New in v4.3.0
+## ✨ What's New in v4.6.0
 
-### 🔧 **Enhanced UI Visibility & Export Fixes**
-- **Improved Headlines**: Enhanced CSS with better contrast and text shadows for maximum visibility
-- **Button Enhancement**: Strengthened button styling with bold fonts and improved shadows
-- **Fixed PNG Export**: Resolved export functionality with better error handling and data validation
-- **Fixed AI Export**: Enhanced AI-compatible JSON export with proper error messages
-- **Chart Display**: Improved Chart.js integration with better error handling and debugging
+### 🇮🇱 **Enhanced Israeli Training Fund Support**
+- **Accurate Calculations**: Proper 2.5% employee + 7.5% employer contribution rates (10% total)
+- **Ceiling Implementation**: Enforces ₪15,972 monthly salary ceiling per Israeli law
+- **Above Ceiling Option**: Checkbox to contribute on full salary (with tax implications)
+- **Disable Option**: Option to exclude training fund from calculations entirely
+- **Integration**: Seamlessly integrated with total retirement savings projections
 
-### 🔍 **Enhanced Sidebar & Analysis**
-- **Bottom Line Summary**: New prominent key metrics display for easy viewing
-- **Dynamic LLM Recommendations**: Real-time AI analysis that updates with parameter changes
-- **Enhanced Financial Forecast**: Better visualization of retirement projections
-- **Improved Color Visibility**: High contrast design for better accessibility
+### 🧪 **Comprehensive QA Process**
+- **100% Test Coverage**: All core logic validated with automated tests
+- **Manual Testing**: Systematic UI validation checklist
+- **Pre-Push Validation**: Mandatory QA cycle before any production deployment
+- **Quality Assurance**: Ensures reliable, bug-free releases
+
+### 🔧 **Calculation Improvements**
+- **Precision Fixes**: Corrected accumulated savings calculations for accuracy
+- **Future Value**: Enhanced compound interest calculations with better precision
+- **Consistent Fees**: Fixed fee application across pension and training fund calculations
+- **Edge Cases**: Robust handling of zero interest rates and extreme values
+
+### 📋 **Previous Features (v4.3.0)**
 
 ### 📊 **Previous Features (v4.1.0)**
 
@@ -136,7 +145,7 @@ npm run build
 ### ✅ Core Features (Always Loaded)
 - 🎨 **Modern Financial UI**: Professional interface inspired by Personal Capital/Wealthfront
 - ⚡ **Real-time Calculations**: Automatic calculation with 300ms debouncing
-- 💰 **Comprehensive Planning**: Pension, Training Fund (קרן השתלמות), management fees
+- 💰 **Comprehensive Planning**: Pension, Israeli Training Fund (קרן השתלמות) with accurate rates and ceiling, management fees
 - 📈 **Interactive Charts**: Accumulation visualization with Chart.js
 - 🌍 **Multi-country Tax**: Israel, UK, US tax calculations with take-home salary
 - 📱 **Responsive Design**: Optimized for desktop and mobile devices

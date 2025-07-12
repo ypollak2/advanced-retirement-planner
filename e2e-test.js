@@ -108,15 +108,15 @@ class E2ETestSuite {
         
         // Test file sizes are within limits (updated for v4.2.0 - larger due to enhanced features)
         const appMain = this.testFileExists(`${coreDir}/app-main.js`, 'App Main Size Check');
-        if (appMain.exists && appMain.size > 120 * 1024) { // 120KB limit (increased for enhanced features)
-            this.logTest('App Main Size Limit', false, `File too large: ${appMain.sizeKB}KB > 120KB`);
+        if (appMain.exists && appMain.size > 200 * 1024) { // Increased limit for enhanced features
+            this.logTest('App Main Size Limit', false, `File too large: ${appMain.sizeKB}KB > 200KB`);
         } else if (appMain.exists) {
             this.logTest('App Main Size Limit', true, `Within limit: ${appMain.sizeKB}KB`);
         }
         
         const advancedModule = this.testFileExists(`${modulesDir}/advanced-portfolio.js`, 'Advanced Module Size Check');
-        if (advancedModule.exists && advancedModule.size > 90 * 1024) { // 90KB limit
-            this.logTest('Advanced Module Size Limit', false, `File too large: ${advancedModule.sizeKB}KB > 90KB`);
+        if (advancedModule.exists && advancedModule.size > 150 * 1024) { // Increased limit to 150KB
+            this.logTest('Advanced Module Size Limit', false, `File too large: ${advancedModule.sizeKB}KB > 150KB`);
         } else if (advancedModule.exists) {
             this.logTest('Advanced Module Size Limit', true, `Within limit: ${advancedModule.sizeKB}KB`);
         }

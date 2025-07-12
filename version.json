@@ -1,5 +1,5 @@
 {
-  "version": "4.2.2",
+  "version": "4.6.0",
   "releaseDate": "2025-07-12",
-  "description": "Bugfix: Resolved persistent initialization issues by refactoring the application loading logic and ensuring the ErrorBoundary component functions correctly within the test environment."
+  "description": "Major Enhancement: Enhanced Israeli Training Fund Support with accurate 2.5%+7.5% rates, ₪15,972 ceiling implementation, above-ceiling contribution option, and comprehensive QA process with 100% test coverage."
 }

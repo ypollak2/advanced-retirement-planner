@@ -68,8 +68,7 @@
                 salary: inputs.currentMonthlySalary || 15000,
                 pensionReturn: 7.0,
                 pensionDepositFee: 0.5,
-                pensionAnnualFee: 0.8,
-                monthlyTrainingFund: 500
+                pensionAnnualFee: 0.8
             }
         ]);
 
@@ -113,8 +112,7 @@
                 salary: 15000,
                 pensionReturn: 7.0,
                 pensionDepositFee: 0.5,
-                pensionAnnualFee: 0.8,
-                monthlyTrainingFund: 500
+                pensionAnnualFee: 0.8
             };
             setWorkPeriods([...workPeriods, newPeriod]);
         };

@@ -94,7 +94,7 @@ class RuntimeTestSuite {
             });
             
             // Wait for app to initialize
-            await this.page.waitForTimeout(3000);
+            await this.page.waitForSelector('#root');
             
             // Check for React app initialization
             const reactLoaded = await this.page.evaluate(() => {
@@ -270,7 +270,109 @@ class RuntimeTestSuite {
         }
     }
 
-    // Test responsive design
+    async testScenariosStressModule() {
+        try {
+            // Click on the "Stress Test" tab
+            await this.page.click('#stress-tab');
+
+            // Check if the stress testing module is displayed
+            const stressTestingModule = await this.page.$('#stress-testing');
+            const isVisible = await stressTestingModule.isIntersectingViewport();
+            this.logTest('Scenarios & Stress Testing Module', isVisible, isVisible ? 'Scenarios & Stress Testing module is displayed' : 'Scenarios & Stress Testing module is not displayed');
+            return isVisible;
+        } catch (error) {
+            this.logTest('Scenarios & Stress Testing Module', false, `Test failed: ${error.message}`);
+            return false;
+        }
+    }
+        try {
+            // Click on the "FIRE" tab
+            await this.page.click('#fire-tab');
+
+            // Check if the FIRE calculator is displayed
+            const fireCalculator = await this.page.$('#fire-calculator');
+            const isVisible = await fireCalculator.isIntersectingViewport();
+            this.logTest('FIRE Calculator', isVisible, isVisible ? 'FIRE calculator is displayed' : 'FIRE calculator is not displayed');
+            return isVisible;
+        } catch (error) {
+            this.logTest('FIRE Calculator', false, `Test failed: ${error.message}`);
+            return false;
+        }
+    }
+        try {
+            // Click on the "Analysis" tab
+            await this.page.click('#analysis-tab');
+
+            // Check if the analysis engine is displayed
+            const analysisEngine = await this.page.$('#analysis-engine');
+            const isVisible = await analysisEngine.isIntersectingViewport();
+            this.logTest('Analysis Engine', isVisible, isVisible ? 'Analysis engine is displayed' : 'Analysis engine is not displayed');
+            return isVisible;
+        } catch (error) {
+            this.logTest('Analysis Engine', false, `Test failed: ${error.message}`);
+            return false;
+        }
+    }
+        try {
+            // Click on the "Advanced" tab
+            await this.page.click('#advanced-tab');
+
+            // Check if the advanced portfolio is displayed
+            const advancedPortfolio = await this.page.$('#advanced-portfolio');
+            const isVisible = await advancedPortfolio.isIntersectingViewport();
+            this.logTest('Advanced Portfolio', isVisible, isVisible ? 'Advanced portfolio is displayed' : 'Advanced portfolio is not displayed');
+            return isVisible;
+        } catch (error) {
+            this.logTest('Advanced Portfolio', false, `Test failed: ${error.message}`);
+            return false;
+        }
+    }
+        try {
+            // Fill in the form
+            await this.page.type('#current-age', '30');
+            await this.page.type('#retirement-age', '67');
+            await this.page.type('#current-savings', '50000');
+            await this.page.type('#monthly-contribution', '1000');
+            await this.page.type('#interest-rate', '5');
+
+            // Click on the "Calculate" button
+            await this.page.click('#calculate-button');
+
+            // Check if the progress bar is displayed
+            const progressBarContainer = await this.page.$('#progress-bar-container');
+            const isVisible = await progressBarContainer.isIntersectingViewport();
+            this.logTest('Progress Bar', isVisible, isVisible ? 'Progress bar is displayed' : 'Progress bar is not displayed');
+            return isVisible;
+        } catch (error) {
+            this.logTest('Progress Bar', false, `Test failed: ${error.message}`);
+            return false;
+        }
+    }
+        try {
+            // Click on the "Take a Tour" button
+            await this.page.click('#take-tour-button');
+
+            // Check if the tutorial is displayed
+            const tutorialOverlay = await this.page.$('#tutorial-overlay');
+            const isVisible = await tutorialOverlay.isIntersectingViewport();
+            this.logTest('Tutorial', isVisible, isVisible ? 'Tutorial is displayed' : 'Tutorial is not displayed');
+            return isVisible;
+        } catch (error) {
+            this.logTest('Tutorial', false, `Test failed: ${error.message}`);
+            return false;
+        }
+    }
+        try {
+            // Check if the welcome message is displayed
+            const welcomeBanner = await this.page.$('#welcome-banner');
+            const isVisible = await welcomeBanner.isIntersectingViewport();
+            this.logTest('Welcome Message', isVisible, isVisible ? 'Welcome message is displayed' : 'Welcome message is not displayed');
+            return isVisible;
+        } catch (error) {
+            this.logTest('Welcome Message', false, `Test failed: ${error.message}`);
+            return false;
+        }
+    }
     async testResponsiveDesign() {
         try {
             // Test mobile viewport
@@ -327,6 +429,13 @@ class RuntimeTestSuite {
             await this.testChartRendering();
             await this.testStressTestingModule();
             await this.testResponsiveDesign();
+            await this.testWelcomeMessage();
+            await this.testTutorial();
+            await this.testProgressBar();
+            await this.testAdvancedPortfolio();
+            await this.testAnalysisEngine();
+            await this.testFireCalculator();
+            await this.testScenariosStressModule();
             
         } catch (error) {
             console.error('🚨 Runtime testing failed:', error);

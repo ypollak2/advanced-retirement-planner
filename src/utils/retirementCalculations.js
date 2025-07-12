@@ -57,6 +57,7 @@ window.calculateRetirement = (
     pensionIndexAllocation, 
     trainingFundIndexAllocation,
     historicalReturns,
+    monthlyTrainingFundContribution,
     partnerWorkPeriods = []
 ) => {
     const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
@@ -128,7 +129,7 @@ window.calculateRetirement = (
         if (periodYears > 0) {
             const monthlyReturn = trainingFundNetReturn / 100 / 12;
             const periodMonths = periodYears * 12;
-            const contributionsValue = period.monthlyTrainingFund * (Math.pow(1 + monthlyReturn, periodMonths) - 1) / monthlyReturn;
+            const contributionsValue = monthlyTrainingFundContribution * (Math.pow(1 + monthlyReturn, periodMonths) - 1) / monthlyReturn;
             totalTrainingFund += contributionsValue;
         }
     }

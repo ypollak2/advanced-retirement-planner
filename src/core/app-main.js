@@ -433,9 +433,9 @@
                                    inputs.taxCountry === 'us' ? (language === 'he' ? 'ארה״ב' : 'US') : '';
                 
                 return [
-                    React.createElement('div', { className: "text-sm text-blue-700 font-medium mb-2" }, 
+                    React.createElement('div', { key: 'salary-title', className: "text-sm text-blue-700 font-medium mb-2" }, 
                         language === 'he' ? `משכורת חודשית (${countryName})` : `Monthly Salary (${countryName})`),
-                    React.createElement('div', { className: "grid grid-cols-2 gap-2 text-xs" }, [
+                    React.createElement('div', { key: 'salary-values', className: "grid grid-cols-2 gap-2 text-xs" }, [
                         React.createElement('div', { key: 'gross' }, [
                             React.createElement('div', { className: "text-blue-600" }, 
                                 language === 'he' ? 'ברוטו:' : 'Gross:'),
@@ -449,7 +449,7 @@
                                 formatCurrency(taxResult.netSalary))
                         ])
                     ]),
-                    React.createElement('div', { className: "text-xs text-blue-600 mt-1" }, 
+                    React.createElement('div', { key: 'tax-rate-info', className: "text-xs text-blue-600 mt-1" }, 
                         language === 'he' ? `שיעור מס: ${taxResult.taxRate}%` : `Tax Rate: ${taxResult.taxRate}%`)
                 ];
             })()),
@@ -667,7 +667,7 @@
     };
 
     // Basic Inputs Component - Basic input form
-    const BasicInputs = ({ inputs, setInputs, language, t }) => {
+        const BasicInputs = ({ inputs, setInputs, language, t, monthlyTrainingFundContribution }) => {
         return React.createElement('div', { className: "space-y-6" }, [
             // Basic Data Section
             React.createElement('div', { 
@@ -885,10 +885,41 @@
                             }, language === 'he' ? "הפקדה חודשית לקרן השתלמות (₪)" : "Monthly Training Fund Contribution (₪)"),
                             React.createElement('input', {
                                 type: 'number',
-                                value: inputs.trainingFundContribution || Math.round((inputs.currentMonthlySalary || 15000) * 0.075), // 7.5% default
-                                onChange: (e) => setInputs({...inputs, trainingFundContribution: parseInt(e.target.value) || 0}),
-                                className: "financial-input"
+                                value: Math.round(monthlyTrainingFundContribution),
+                                readOnly: true,
+                                className: "financial-input bg-gray-100"
                             })
+                        ]),
+                        React.createElement('div', { key: 'training-fund-options' }, [
+                            React.createElement('label', {
+                                className: "block text-sm font-medium text-gray-700 mb-1"
+                            }, language === 'he' ? "אפשרויות קרן השתלמות" : "Training Fund Options"),
+                            React.createElement('div', { className: 'flex items-center' }, [
+                                React.createElement('input', {
+                                    type: 'checkbox',
+                                    id: 'has-training-fund',
+                                    checked: inputs.hasTrainingFund,
+                                    onChange: (e) => setInputs({ ...inputs, hasTrainingFund: e.target.checked }),
+                                    className: 'h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded'
+                                }),
+                                React.createElement('label', {
+                                    htmlFor: 'has-training-fund',
+                                    className: 'ml-2 block text-sm text-gray-900'
+                                }, language === 'he' ? "כולל קרן השתלמות" : "Include Training Fund")
+                            ]),
+                            React.createElement('div', { className: 'flex items-center' }, [
+                                React.createElement('input', {
+                                    type: 'checkbox',
+                                    id: 'contribute-above-ceiling',
+                                    checked: inputs.trainingFundContributeAboveCeiling,
+                                    onChange: (e) => setInputs({ ...inputs, trainingFundContributeAboveCeiling: e.target.checked }),
+                                    className: 'h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded'
+                                }),
+                                React.createElement('label', {
+                                    htmlFor: 'contribute-above-ceiling',
+                                    className: 'ml-2 block text-sm text-gray-900'
+                                }, language === 'he' ? "הפרשה מעל התקרה" : "Contribute Above Ceiling")
+                            ])
                         ])
                     ]),
                     React.createElement('div', { 
@@ -1254,7 +1285,12 @@
             contributionFees: 1.0,
             accumulationFees: 1.0,
             currentPensionSavings: 0,
-            trainingFundContribution: 7.5,
+            // Training Fund (קרן השתלמות) Settings
+            hasTrainingFund: true,
+            trainingFundContributeAboveCeiling: false,
+            trainingFundEmployeeRate: 2.5,
+            trainingFundEmployerRate: 7.5,
+            trainingFundCeiling: 15972,
             trainingFundFees: 0.6,
             currentTrainingFundSavings: 0,
             inflationRate: 3.0,
@@ -1272,7 +1308,19 @@
         const [showInflationChart, setShowInflationChart] = React.useState(false);
         const [llmAnalysis, setLlmAnalysis] = React.useState('');
         const [showWelcome, setShowWelcome] = React.useState(true);
+
+        React.useEffect(() => {
+            if (results) {
+                setShowProgressBar(true);
+            }
+        }, [results]);
         const [showTutorial, setShowTutorial] = React.useState(false);
+        const [showProgressBar, setShowProgressBar] = React.useState(false);
+
+        const handleTakeTour = () => {
+            setShowWelcome(false);
+            setShowTutorial(true);
+        };
 
         // Financial calculations
         const yearsToRetirement = Math.max(0, (inputs.retirementAge || 67) - (inputs.currentAge || 30));
@@ -1281,7 +1329,27 @@
             : (inputs.currentMonthlySalary || 0);
 
         const monthlyPensionContribution = totalMonthlySalary * (inputs.pensionContribution || 18.5) / 100;
-        const monthlyTrainingFundContribution = totalMonthlySalary * (inputs.trainingFundContribution || 7.5) / 100;
+        
+        // קרן השתלמות - חישוב נכון לפי החוק הישראלי
+        const calculateTrainingFundContribution = () => {
+            if (!inputs.hasTrainingFund) return 0;
+            
+            const employeeRate = inputs.trainingFundEmployeeRate || 2.5;
+            const employerRate = inputs.trainingFundEmployerRate || 7.5;
+            const totalRate = employeeRate + employerRate; // 10% בסך הכל
+            const ceiling = inputs.trainingFundCeiling || 15972;
+            
+            if (inputs.trainingFundContributeAboveCeiling) {
+                // הפרשה על כל הסכום (עם מס על החלק מעל התקרה)
+                return totalMonthlySalary * totalRate / 100;
+            } else {
+                // הפרשה רק עד התקרה
+                const salaryForTrainingFund = Math.min(totalMonthlySalary, ceiling);
+                return salaryForTrainingFund * totalRate / 100;
+            }
+        };
+        
+        const monthlyTrainingFundContribution = calculateTrainingFundContribution();
         const monthlyTotal = monthlyPensionContribution + monthlyTrainingFundContribution;
 
         const netPensionReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.accumulationFees || 1.0));
@@ -1312,7 +1380,11 @@
         const calculateFutureValue = (monthlyPayment, annualRate, years, presentValue = 0) => {
             const monthlyRate = annualRate / 100 / 12;
             const numPayments = years * 12;
-            
+
+            if (monthlyRate === 0) {
+                return presentValue + monthlyPayment * numPayments;
+            }
+
             const futureValuePV = presentValue * Math.pow(1 + monthlyRate, numPayments);
             const futureValueAnnuity = monthlyPayment * (Math.pow(1 + monthlyRate, numPayments) - 1) / monthlyRate;
             
@@ -1807,7 +1879,8 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                         inputs,
                         setInputs,
                         language,
-                        t
+                        t,
+                        monthlyTrainingFundContribution
                     }) : null,
                     
                     activeTab === 'advanced' && window.AdvancedPortfolio ? 
