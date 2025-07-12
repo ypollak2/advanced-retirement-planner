@@ -1,15 +1,17 @@
-# Advanced Retirement Planner v4.2.0 🚀
+# 🚀 Advanced Retirement Planner v4.3.0
 
-[![Version](https://img.shields.io/badge/version-4.2.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-4.3.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-95%25-brightgreen.svg)](test-runner.js)
+[![Tests](https://img.shields.io/badge/tests-94.1%25-brightgreen.svg)](e2e-test.js)
 [![Deployment](https://img.shields.io/badge/deployment-GitHub%20Pages-4078c0.svg)](https://ypollak2.github.io/advanced-retirement-planner)
 
-Professional retirement planning tool with **modern financial UI design** inspired by leading financial planning platforms.
+> **Professional retirement planning tool with modern, welcoming UI design and comprehensive financial planning capabilities**
 
-**🌐 Live Website:** https://ypollak2.github.io/advanced-retirement-planner
+**🌐 Live Demo:** [https://ypollak2.github.io/advanced-retirement-planner](https://ypollak2.github.io/advanced-retirement-planner)
 
-## 🎯 What's New in v4.2.0
+![Advanced Retirement Planner](https://via.placeholder.com/800x400/1e40af/ffffff?text=Advanced+Retirement+Planner+v4.3.0)
+
+## ✨ What's New in v4.3.0
 
 ### 🔧 **Enhanced UI Visibility & Export Fixes**
 - **Improved Headlines**: Enhanced CSS with better contrast and text shadows for maximum visibility

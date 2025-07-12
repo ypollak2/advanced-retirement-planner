@@ -21,51 +21,164 @@
         /* Modern Financial Planning UI - Inspired by Personal Capital, Wealthfront, Mint */
         
         :root {
-            /* Modern Financial Palette */
-            --primary-blue: #2196F3; /* A vibrant, trustworthy blue */
-            --primary-green: #4CAF50; /* A calming, positive green */
-            --primary-purple: #673AB7; /* A sophisticated purple */
-            --accent-orange: #FF9800; /* A warm accent orange */
+            /* Modern Financial Palette - Enhanced */
+            --primary-blue: #1e40af; /* Professional trustworthy blue */
+            --primary-green: #059669; /* Success green */
+            --primary-purple: #7c3aed; /* Premium purple */
+            --accent-orange: #f59e0b; /* Attention orange */
+            --accent-pink: #ec4899; /* Highlight pink */
+            
+            /* Enhanced Color System */
+            --gradient-primary: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #06b6d4 100%);
+            --gradient-success: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+            --gradient-warm: linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #ec4899 100%);
+            
+            /* Neutral Colors - Refined */
+            --gray-50: #f8fafc;   /* Ultra light background */
+            --gray-100: #f1f5f9;  /* Light background */
+            --gray-200: #e2e8f0;  /* Border light */
+            --gray-300: #cbd5e1;  /* Border medium */
+            --gray-400: #94a3b8;  /* Text muted */
+            --gray-500: #64748b;  /* Text secondary */
+            --gray-600: #475569;  /* Text primary */
+            --gray-700: #334155;  /* Text dark */
+            --gray-800: #1e293b;  /* Near black */
+            --white: #ffffff;
 
-            /* Neutral Colors */
-            --gray-50: #F8F9FA;   /* Lightest gray, for backgrounds */
-            --gray-100: #E9ECEF;  /* Lighter gray */
-            --gray-200: #DEE2E6;  /* Light gray for borders */
-            --gray-300: #CED4DA;  /* Medium light gray */
-            --gray-400: #ADB5BD;  /* Medium gray */
-            --gray-500: #6C757D;  /* Darker gray for text */
-            --gray-600: #495057;  /* Even darker gray */
-            --gray-700: #343A40;  /* Darkest gray for text/headers */
-            --gray-800: #212529;  /* Near black */
-            --white: #FFFFFF;
+            /* Semantic Colors - Enhanced */
+            --success: #10b981; 
+            --success-light: #d1fae5;
+            --warning: #f59e0b; 
+            --warning-light: #fef3c7;
+            --error: #ef4444;   
+            --error-light: #fee2e2;
+            --info: #06b6d4;    
+            --info-light: #cffafe;
 
-            /* Semantic Colors */
-            --success: #28A745; /* Green for success */
-            --warning: #FFC107; /* Yellow for warnings */
-            --error: #DC3545;   /* Red for errors */
-            --info: #17A2B8;    /* Cyan for info */
-
-            /* Shadows */
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-            --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-            --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+            /* Enhanced Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
 
             /* Typography */
-            --font-primary: 'Inter', sans-serif;
-            --font-mono: 'Roboto Mono', monospace;
+            --font-primary: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            
+            /* Spacing Scale */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
         }
 
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap');
         
         body {
             font-family: var(--font-primary);
-            background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--info-light) 20%, var(--gray-100) 100%);
             min-height: 100vh;
             color: var(--gray-700);
             line-height: 1.6;
             font-size: 16px;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        /* Welcome Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200px 0;
+            }
+            100% {
+                background-position: calc(200px + 100%) 0;
+            }
+        }
+
+        /* Animation Classes */
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .animate-slide-in-right {
+            animation: slideInRight 0.6s ease-out;
+        }
+
+        .animate-bounce {
+            animation: bounce 2s infinite;
+        }
+
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .animate-delay-100 {
+            animation-delay: 0.1s;
+        }
+
+        .animate-delay-200 {
+            animation-delay: 0.2s;
+        }
+
+        .animate-delay-300 {
+            animation-delay: 0.3s;
         }
         
         .modern-gradient-bg {
@@ -75,17 +188,37 @@
                 var(--primary-purple) 100%);
         }
         
+        /* Enhanced Financial Cards */
         .financial-card {
-            background: linear-gradient(145deg, var(--mid-dark-bg) 0%, #3a005d 100%);
-            border-radius: 10px;
-            box-shadow: 0 0 15px var(--neon-purple), 0 0 5px var(--neon-pink) inset;
-            border: 2px solid var(--neon-purple);
-            transition: all 0.3s ease-in-out;
+            background: var(--white);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .financial-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
         
         .financial-card:hover {
-            box-shadow: 0 0 25px var(--neon-pink), 0 0 10px var(--neon-blue) inset;
-            transform: translateY(-2px) scale(1.01);
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-2px);
+            border-color: var(--primary-blue);
+        }
+        
+        .financial-card:hover::before {
+            opacity: 1;
         }
         
         .financial-card-header {
@@ -94,122 +227,264 @@
             border-radius: 12px 12px 0 0;
         }
         
+        /* Enhanced Metric Cards */
         .metric-card {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
-            border: 1px solid var(--neon-blue);
-            transition: all 0.2s ease-in-out;
-            color: var(--neon-green);
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--gray-700);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 49%, rgba(255,255,255,0.1) 50%, transparent 51%);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
         }
         
         .metric-card:hover {
-            box-shadow: 0 0 15px var(--neon-blue);
-            border-color: var(--neon-pink);
-        }
-        
-        .metric-positive {
-            color: var(--neon-green);
-            background: rgba(0, 255, 0, 0.1);
-            border-color: var(--neon-green);
-        }
-        
-        .metric-neutral {
-            color: var(--light-gray);
-            background: rgba(128, 128, 128, 0.1);
-            border-color: var(--light-gray);
-        }
-        
-        .metric-warning {
-            color: var(--neon-pink);
-            background: rgba(255, 0, 255, 0.1);
-            border-color: var(--neon-pink);
-        }
-        
-        .wealth-amount {
-            font-family: var(--font-display);
-            font-weight: 400;
-            letter-spacing: 0.05em;
-            color: var(--neon-blue);
-            text-shadow: 0 0 8px var(--neon-blue);
-        }
-        
-        .section-header {
-            font-family: var(--font-display);
-            font-weight: 400;
-            color: var(--neon-pink);
-            letter-spacing: 0.05em;
-            text-shadow: 0 0 10px var(--neon-pink);
-        }
-        
-        .financial-input {
-            border: 2px solid var(--neon-blue);
-            border-radius: 5px;
-            padding: 10px 15px;
-            font-size: 15px;
-            background: rgba(0, 0, 0, 0.5);
-            color: var(--neon-green);
-            box-shadow: 0 0 5px var(--neon-blue);
-            transition: all 0.3s ease;
-        }
-        
-        .financial-input:focus {
-            border-color: var(--neon-pink);
-            box-shadow: 0 0 10px var(--neon-pink);
-            outline: none;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));
-            color: var(--white);
-            border: none;
-            border-radius: 5px;
-            padding: 12px 20px;
-            font-weight: bold;
-            font-family: var(--font-display);
-            font-size: 14px;
-            text-shadow: 0 0 8px var(--neon-blue);
-            box-shadow: 0 0 10px var(--neon-purple);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
-            box-shadow: 0 0 15px var(--neon-blue);
+            box-shadow: var(--shadow-lg);
             transform: translateY(-1px);
         }
         
+        .metric-card:hover::after {
+            transform: translateX(100%);
+        }
+        
+        .metric-positive {
+            background: linear-gradient(135deg, var(--success-light) 0%, var(--white) 100%);
+            border-color: var(--success);
+            color: var(--gray-800);
+        }
+        
+        .metric-positive .metric-value {
+            color: var(--success);
+        }
+        
+        .metric-neutral {
+            background: linear-gradient(135deg, var(--info-light) 0%, var(--white) 100%);
+            border-color: var(--info);
+            color: var(--gray-800);
+        }
+        
+        .metric-neutral .metric-value {
+            color: var(--info);
+        }
+        
+        .metric-warning {
+            background: linear-gradient(135deg, var(--warning-light) 0%, var(--white) 100%);
+            border-color: var(--warning);
+            color: var(--gray-800);
+        }
+        
+        .metric-warning .metric-value {
+            color: var(--warning);
+        }
+        
+        /* Enhanced Typography */
+        .wealth-amount {
+            font-family: var(--font-primary);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: var(--primary-green);
+            font-size: 1.5em;
+        }
+        
+        .section-header {
+            font-family: var(--font-primary);
+            font-weight: 600;
+            color: var(--primary-blue);
+            letter-spacing: -0.025em;
+            margin-bottom: var(--space-lg);
+        }
+        
+        /* Enhanced Form Inputs */
+        .financial-input {
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg) var(--space-lg);
+            font-size: 16px;
+            background: var(--white);
+            color: var(--gray-700);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+        }
+        
+        .financial-input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1), var(--shadow-md);
+            outline: none;
+            background: var(--gray-50);
+        }
+        
+        .financial-input:hover {
+            border-color: var(--gray-400);
+        }
+        
+        /* Enhanced Buttons */
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg) var(--space-xl);
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* Secondary Button */
         .btn-secondary {
-            background: var(--mid-dark-bg);
-            color: var(--neon-green);
-            border: 2px solid var(--neon-green);
-            border-radius: 5px;
-            padding: 10px 18px;
-            font-weight: bold;
-            font-family: var(--font-body);
-            transition: all 0.3s ease;
-            box-shadow: 0 0 5px var(--neon-green);
+            background: var(--white);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg) var(--space-xl);
+            font-weight: 600;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
         }
         
         .btn-secondary:hover {
-            border-color: var(--neon-pink);
-            color: var(--neon-pink);
-            box-shadow: 0 0 10px var(--neon-pink);
+            background: var(--primary-blue);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
         
+        /* Progress Components */
         .progress-bar {
-            background: rgba(0, 255, 255, 0.2);
-            border-radius: 8px;
+            background: var(--gray-200);
+            border-radius: var(--radius-xl);
             overflow: hidden;
-            height: 10px;
-            box-shadow: 0 0 5px var(--neon-blue);
+            height: 12px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         
         .progress-fill {
-            background: linear-gradient(90deg, var(--neon-green), var(--neon-blue));
+            background: var(--gradient-success);
             height: 100%;
-            border-radius: 8px;
-            transition: width 0.5s ease-in-out;
+            border-radius: var(--radius-xl);
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(45deg, 
+                transparent 30%, 
+                rgba(255,255,255,0.3) 50%, 
+                transparent 70%);
+            animation: shimmer 2s infinite;
+        }
+        
+        /* Welcome Banner */
+        .welcome-banner {
+            background: var(--gradient-primary);
+            color: var(--white);
+            padding: var(--space-2xl);
+            border-radius: var(--radius-2xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 20%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        /* Feature Highlights */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-2xl);
+        }
+        
+        .feature-card {
+            background: var(--white);
+            padding: var(--space-xl);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--gray-200);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary-blue);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: var(--space-md);
+            display: block;
+        }
+        
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .feature-description {
+            color: var(--gray-600);
+            line-height: 1.6;
         }
         
         .dashboard-grid {
@@ -850,7 +1125,7 @@
                 }
 
                 // Load dynamic loader first
-                await loadScript('./src/core/dynamic-loader.js?v=4.2.2');
+                await loadScript('./src/core/dynamic-loader.js?v=4.3.0');
                 console.log('✅ Dynamic loader loaded');
 
                 // Update loading message
@@ -859,7 +1134,7 @@
                 }
 
                 // Load core application
-                await loadScript('./src/core/app-main.js?v=4.2.2');
+                await loadScript('./src/core/app-main.js?v=4.3.0');
                 console.log('✅ Core application loaded');
 
                 // Initialize the core application
