@@ -643,7 +643,7 @@
                     className: "text-2xl font-bold text-purple-700 mb-6 flex items-center" 
                 }, [
                     React.createElement(Calculator, { key: 'icon', className: "mr-2" }),
-                    t.basic || 'Basic Information'
+                    React.createElement('span', { key: 'text' }, t.basic || 'Basic Information')
                 ]),
                 React.createElement('div', { 
                     key: 'content',
@@ -1107,7 +1107,7 @@
     
 
     // Basic Results Component - Basic results display
-    const BasicResults = ({ results, inputs, language, t }) => {
+    const BasicResults = ({ results, inputs, language, t, formatCurrency }) => {
         // Check if we have minimum required inputs
         const hasRequiredInputs = inputs.currentAge && inputs.retirementAge && 
                                  inputs.currentMonthlySalary && inputs.expectedReturn && 
@@ -1709,6 +1709,7 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                         key: 'savings-summary',
                         inputs,
                         language,
+                        t,
                         totalMonthlySalary,
                         yearsToRetirement,
                         estimatedMonthlyIncome,
