@@ -293,7 +293,7 @@
                 className: "header-primary text-sm font-bold text-gray-900 mb-3 flex items-center" 
             }, [
                 React.createElement('span', { key: 'icon', className: "mr-2" }, '📍'),
-                language === 'he' ? 'השורה התחתונה' : 'Bottom Line'
+                React.createElement('span', { key: 'title-text' }, language === 'he' ? 'השורה התחתונה' : 'Bottom Line')
             ]),
             
             // Key Metrics Cards
@@ -437,15 +437,15 @@
                         language === 'he' ? `משכורת חודשית (${countryName})` : `Monthly Salary (${countryName})`),
                     React.createElement('div', { key: 'salary-values', className: "grid grid-cols-2 gap-2 text-xs" }, [
                         React.createElement('div', { key: 'gross' }, [
-                            React.createElement('div', { className: "text-blue-600" }, 
+                            React.createElement('div', { key: 'gross-label', className: "text-blue-600" }, 
                                 language === 'he' ? 'ברוטו:' : 'Gross:'),
-                            React.createElement('div', { className: "font-bold" }, 
+                            React.createElement('div', { key: 'gross-amount', className: "font-bold" }, 
                                 formatCurrency(inputs.currentMonthlySalary || 15000))
                         ]),
                         React.createElement('div', { key: 'net' }, [
-                            React.createElement('div', { className: "text-blue-600" }, 
+                            React.createElement('div', { key: 'net-label', className: "text-blue-600" }, 
                                 language === 'he' ? 'נטו:' : 'Net:'),
-                            React.createElement('div', { className: "font-bold text-blue-800" }, 
+                            React.createElement('div', { key: 'net-amount', className: "font-bold text-blue-800" }, 
                                 formatCurrency(taxResult.netSalary))
                         ])
                     ]),
@@ -697,6 +697,7 @@
                             className: "grid grid-cols-2 gap-3" 
                         }, [
                             React.createElement('button', {
+                                key: 'single-planning',
                                 type: 'button',
                                 onClick: () => setInputs({...inputs, planningType: 'single'}),
                                 className: `p-3 rounded-lg border-2 transition-all text-center ${
@@ -711,6 +712,7 @@
                                     language === 'he' ? 'תכנון אישי' : 'Individual planning')
                             ]),
                             React.createElement('button', {
+                                key: 'couple-planning',
                                 type: 'button',
                                 onClick: () => setInputs({...inputs, planningType: 'couple'}),
                                 className: `p-3 rounded-lg border-2 transition-all text-center ${
@@ -1229,8 +1231,8 @@
                         className: "metric-card metric-positive p-4" 
                     }, [
                         React.createElement('div', { className: "text-sm text-green-700" }, [
-                            React.createElement('strong', null, language === 'he' ? "צבירה כוללת צפויה:" : "Total Expected Accumulation:"),
-                            React.createElement('div', { className: "text-2xl font-bold text-green-800 mt-1 wealth-amount" }, 
+                            React.createElement('strong', { key: 'total-label' }, language === 'he' ? "צבירה כוללת צפויה:" : "Total Expected Accumulation:"),
+                            React.createElement('div', { key: 'total-amount', className: "text-2xl font-bold text-green-800 mt-1 wealth-amount" }, 
                                 `₪${Math.round(results.totalSavings || 0).toLocaleString()}`)
                         ])
                     ]),
@@ -1944,18 +1946,6 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                         exportForAI,
                         setShowChart,
                         generateLLMAnalysis
-                    }),
-
-                    React.createElement(BottomLineSummary, {
-                        key: 'bottom-line',
-                        inputs,
-                        language,
-                        totalMonthlySalary,
-                        yearsToRetirement,
-                        estimatedMonthlyIncome,
-                        projectedWithGrowth,
-                        buyingPowerToday,
-                        formatCurrency
                     }),
 
                     // Enhanced Chart Display with Components and Inflation Toggle
