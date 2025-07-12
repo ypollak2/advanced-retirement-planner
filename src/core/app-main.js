@@ -832,6 +832,7 @@
                     }, [
                         React.createElement('div', { key: 'age' }, [
                             React.createElement('label', { 
+                                key: 'age-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, t.currentAge || 'Current Age'),
                             React.createElement('input', {
@@ -843,6 +844,7 @@
                         ]),
                         React.createElement('div', { key: 'retirement' }, [
                             React.createElement('label', { 
+                                key: 'retirement-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, t.retirementAge || 'Retirement Age'),
                             React.createElement('input', {
@@ -859,6 +861,7 @@
                     }, [
                         React.createElement('div', { key: 'savings' }, [
                             React.createElement('label', { 
+                                key: 'savings-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "חיסכון נוכחי בפנסיה (₪)" : "Current Pension Savings (₪)"),
                             React.createElement('input', {
@@ -870,6 +873,7 @@
                         ]),
                         React.createElement('div', { key: 'training-fund' }, [
                             React.createElement('label', { 
+                                key: 'training-fund-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "קרן השתלמות נוכחית (₪)" : "Current Training Fund (₪)"),
                             React.createElement('input', {
@@ -886,6 +890,7 @@
                     }, [
                         React.createElement('div', { key: 'salary' }, [
                             React.createElement('label', { 
+                                key: 'salary-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "משכורת חודשית (₪)" : "Monthly Salary (₪)"),
                             React.createElement('input', {
@@ -897,6 +902,7 @@
                         ]),
                         React.createElement('div', { key: 'training-contribution' }, [
                             React.createElement('label', { 
+                                key: 'training-contribution-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "הפקדה חודשית לקרן השתלמות (₪)" : "Monthly Training Fund Contribution (₪)"),
                             React.createElement('input', {
@@ -949,6 +955,7 @@
                     }, [
                         React.createElement('div', { key: 'contribution-fees' }, [
                             React.createElement('label', { 
+                                key: 'contribution-fees-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "דמי ניהול מהפקדות (%)" : "Management Fees on Contributions (%)"),
                             React.createElement('input', {
@@ -961,6 +968,7 @@
                         ]),
                         React.createElement('div', { key: 'expected-yield' }, [
                             React.createElement('label', { 
+                                key: 'expected-yield-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "תשואה שנתית צפויה (%)" : "Expected Annual Yield (%)"),
                             React.createElement('input', {
@@ -978,6 +986,7 @@
                     }, [
                         React.createElement('div', { key: 'accumulation-fees' }, [
                             React.createElement('label', { 
+                                key: 'accumulation-fees-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "דמי ניהול מצבירה (%)" : "Management Fees on Accumulation (%)"),
                             React.createElement('input', {
@@ -990,6 +999,7 @@
                         ]),
                         React.createElement('div', { key: 'inflation' }, [
                             React.createElement('label', { 
+                                key: 'inflation-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "שיעור אינפלציה שנתי (%)" : "Annual Inflation Rate (%)"),
                             React.createElement('input', {
@@ -1007,6 +1017,7 @@
                     }, [
                         React.createElement('div', { key: 'training-fund-fees' }, [
                             React.createElement('label', { 
+                                key: 'training-fund-fees-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "דמי ניהול קרן השתלמות (%)" : "Training Fund Management Fees (%)"),
                             React.createElement('input', {
@@ -1019,6 +1030,7 @@
                         ]),
                         React.createElement('div', { key: 'tax-country' }, [
                             React.createElement('label', { 
+                                key: 'tax-country-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "מדינה למס הכנסה" : "Tax Country"),
                             React.createElement('select', {
