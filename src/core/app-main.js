@@ -1292,6 +1292,13 @@
             return `₪${Math.round(amount).toLocaleString()}`;
         };
 
+        // Translations object
+        const t = {
+            basic: language === 'he' ? 'מידע בסיסי' : 'Basic Information',
+            advanced: language === 'he' ? 'הגדרות מתקדמות' : 'Advanced Settings',
+            results: language === 'he' ? 'תוצאות' : 'Results'
+        };
+
         // Export Functions
         const exportToPNG = async () => {
             try {
@@ -1650,7 +1657,8 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                         key: 'basic-inputs',
                         inputs,
                         setInputs,
-                        language
+                        language,
+                        t
                     }) : null,
                     
                     activeTab === 'advanced' && window.AdvancedPortfolio ? 
@@ -1692,7 +1700,9 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                         key: 'basic-results',
                         results,
                         inputs,
-                        language
+                        language,
+                        t,
+                        formatCurrency
                     }) : null,
 
                     React.createElement(SavingsSummaryPanel, {
@@ -1758,9 +1768,16 @@ Recommendations: Continue regular contributions and review portfolio allocation 
     // Global initialization
     window.initializeRetirementPlannerCore = () => {
         console.log('🎯 Initializing Retirement Planner Core...');
-        const root = document.getElementById('root');
-        if (root) {
-            ReactDOM.render(React.createElement(RetirementPlannerCore), root);
+        const rootElement = document.getElementById('root');
+        if (rootElement) {
+            // Use React 18 createRoot API
+            if (typeof ReactDOM.createRoot === 'function') {
+                const root = ReactDOM.createRoot(rootElement);
+                root.render(React.createElement(RetirementPlannerCore));
+            } else {
+                // Fallback for older React versions
+                ReactDOM.render(React.createElement(RetirementPlannerCore), rootElement);
+            }
             console.log('✅ Retirement Planner Core initialized successfully');
         } else {
             console.error('❌ Root element not found');
