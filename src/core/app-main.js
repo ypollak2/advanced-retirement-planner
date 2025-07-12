@@ -1150,7 +1150,7 @@
                     key: 'title',
                     className: "text-2xl font-bold text-green-700 mb-6 flex items-center" 
                 }, [
-                    React.createElement(Target, { key: 'icon', className: "mr-2" }),
+                    React.createElement('span', { key: 'icon', className: "mr-2" }, '🎯'),
                     language === 'he' ? 'תוצאות חישוב' : 'Calculation Results'
                 ]),
                 React.createElement('div', { 
@@ -1202,15 +1202,9 @@
                                 formatCurrency(results?.monthlyIncomeAtRetirement || 0))
                         ])
                     ])
-                ]);
-            }
-            
-            return React.createElement('div', {
-                className: "text-center text-gray-500 py-8"
-            }, language === 'he' ? 'אין תוצאות לתצוגה' : 'No results to display');
-        }
-        
-        return React.createElement('div', { className: "space-y-4" }, resultElements);
+                ])
+            ])
+        ]);
     };
 
     // Main Retirement Planner Core Component
@@ -1240,6 +1234,8 @@
         const [language, setLanguage] = React.useState('he');
         const [showChart, setShowChart] = React.useState(false);
         const [llmAnalysis, setLlmAnalysis] = React.useState('');
+        const [showWelcome, setShowWelcome] = React.useState(true);
+        const [showTutorial, setShowTutorial] = React.useState(false);
 
         // Financial calculations
         const yearsToRetirement = Math.max(0, (inputs.retirementAge || 67) - (inputs.currentAge || 30));
@@ -1405,6 +1401,213 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                     }, 'English')
                 ])
             ]),
+
+            // Welcome Banner
+            showWelcome ? React.createElement('div', {
+                key: 'welcome-banner',
+                className: "welcome-banner mx-4 animate-fade-in-up"
+            }, [
+                React.createElement('div', {
+                    key: 'welcome-content',
+                    className: "relative z-10"
+                }, [
+                    React.createElement('h2', {
+                        key: 'welcome-title',
+                        className: "text-3xl font-bold mb-4"
+                    }, language === 'he' ? '👋 ברוכים הבאים למתכנן הפרישה המתקדם!' : '👋 Welcome to Advanced Retirement Planner!'),
+                    
+                    React.createElement('p', {
+                        key: 'welcome-description',
+                        className: "text-lg mb-6 opacity-90"
+                    }, language === 'he' ? 
+                        'תכננו את עתידכם הכלכלי בביטחון עם כלי התכנון המתקדם ביותר לפרישה בישראל' :
+                        'Plan your financial future with confidence using the most advanced retirement planning tool for Israeli standards'),
+                    
+                    React.createElement('div', {
+                        key: 'welcome-features',
+                        className: "feature-grid mb-6"
+                    }, [
+                        React.createElement('div', {
+                            key: 'feature-1',
+                            className: "feature-card animate-delay-100"
+                        }, [
+                            React.createElement('span', {
+                                key: 'icon-1',
+                                className: "feature-icon"
+                            }, '📊'),
+                            React.createElement('h3', {
+                                key: 'title-1',
+                                className: "feature-title"
+                            }, language === 'he' ? 'תחזיות מדויקות' : 'Accurate Projections'),
+                            React.createElement('p', {
+                                key: 'desc-1',
+                                className: "feature-description"
+                            }, language === 'he' ? 'חישובי פנסיה וקרן השתלמות מדויקים לפי התקינה הישראלית' : 'Precise pension and training fund calculations per Israeli standards')
+                        ]),
+                        
+                        React.createElement('div', {
+                            key: 'feature-2',
+                            className: "feature-card animate-delay-200"
+                        }, [
+                            React.createElement('span', {
+                                key: 'icon-2',
+                                className: "feature-icon"
+                            }, '👥'),
+                            React.createElement('h3', {
+                                key: 'title-2',
+                                className: "feature-title"
+                            }, language === 'he' ? 'תכנון זוגי' : 'Couple Planning'),
+                            React.createElement('p', {
+                                key: 'desc-2',
+                                className: "feature-description"
+                            }, language === 'he' ? 'תמיכה מלאה בתכנון פרישה משותף לזוגות' : 'Full support for joint retirement planning for couples')
+                        ]),
+                        
+                        React.createElement('div', {
+                            key: 'feature-3',
+                            className: "feature-card animate-delay-300"
+                        }, [
+                            React.createElement('span', {
+                                key: 'icon-3',
+                                className: "feature-icon"
+                            }, '🌍'),
+                            React.createElement('h3', {
+                                key: 'title-3',
+                                className: "feature-title"
+                            }, language === 'he' ? 'תמיכה בינלאומית' : 'Multi-Country Support'),
+                            React.createElement('p', {
+                                key: 'desc-3',
+                                className: "feature-description"
+                            }, language === 'he' ? 'חישובי מס לישראל, בריטניה וארה״ב' : 'Tax calculations for Israel, UK, and US')
+                        ])
+                    ]),
+                    
+                    React.createElement('div', {
+                        key: 'welcome-actions',
+                        className: "flex flex-col sm:flex-row gap-4 justify-center"
+                    }, [
+                        React.createElement('button', {
+                            key: 'start-planning',
+                            onClick: () => {
+                                setShowWelcome(false);
+                                document.querySelector('.financial-input')?.focus();
+                            },
+                            className: "btn-primary"
+                        }, language === 'he' ? '🚀 התחילו לתכנן עכשיו' : '🚀 Start Planning Now'),
+                        
+                        React.createElement('button', {
+                            key: 'take-tour',
+                            onClick: () => {
+                                setShowWelcome(false);
+                                setShowTutorial(true);
+                            },
+                            className: "btn-secondary"
+                        }, language === 'he' ? '🎯 סיור מודרך' : '🎯 Take a Tour'),
+                        
+                        React.createElement('button', {
+                            key: 'skip-welcome',
+                            onClick: () => setShowWelcome(false),
+                            className: "text-white hover:text-gray-200 transition-colors text-sm"
+                        }, language === 'he' ? 'דלג' : 'Skip')
+                    ])
+                ])
+            ]) : null,
+
+            // Interactive Tutorial
+            showTutorial ? React.createElement('div', {
+                key: 'tutorial-overlay',
+                className: "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            }, [
+                React.createElement('div', {
+                    key: 'tutorial-content',
+                    className: "bg-white rounded-xl p-6 max-w-2xl max-h-96 overflow-auto",
+                    onClick: (e) => e.stopPropagation()
+                }, [
+                    React.createElement('h3', {
+                        key: 'tutorial-title',
+                        className: "text-2xl font-bold mb-4 text-center"
+                    }, language === 'he' ? '🎓 מדריך מהיר לשימוש' : '🎓 Quick Start Guide'),
+                    
+                    React.createElement('div', {
+                        key: 'tutorial-steps',
+                        className: "space-y-4"
+                    }, [
+                        React.createElement('div', {
+                            key: 'step-1',
+                            className: "flex items-start space-x-3"
+                        }, [
+                            React.createElement('span', {
+                                key: 'step-num-1',
+                                className: "flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold"
+                            }, '1'),
+                            React.createElement('div', {}, [
+                                React.createElement('h4', {
+                                    className: "font-semibold"
+                                }, language === 'he' ? 'הכנסת פרטים בסיסיים' : 'Enter Basic Information'),
+                                React.createElement('p', {
+                                    className: "text-gray-600 text-sm"
+                                }, language === 'he' ? 'הזינו את הגיל, המשכורת והתשואה הצפויה' : 'Enter your age, salary, and expected returns')
+                            ])
+                        ]),
+                        
+                        React.createElement('div', {
+                            key: 'step-2',
+                            className: "flex items-start space-x-3"
+                        }, [
+                            React.createElement('span', {
+                                key: 'step-num-2',
+                                className: "flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold"
+                            }, '2'),
+                            React.createElement('div', {}, [
+                                React.createElement('h4', {
+                                    className: "font-semibold"
+                                }, language === 'he' ? 'צפייה בתוצאות' : 'View Results'),
+                                React.createElement('p', {
+                                    className: "text-gray-600 text-sm"
+                                }, language === 'he' ? 'התוצאות מתעדכנות באופן אוטומטי בעמודה הימנית' : 'Results update automatically in the right column')
+                            ])
+                        ]),
+                        
+                        React.createElement('div', {
+                            key: 'step-3',
+                            className: "flex items-start space-x-3"
+                        }, [
+                            React.createElement('span', {
+                                key: 'step-num-3',
+                                className: "flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold"
+                            }, '3'),
+                            React.createElement('div', {}, [
+                                React.createElement('h4', {
+                                    className: "font-semibold"
+                                }, language === 'he' ? 'תכונות מתקדמות' : 'Advanced Features'),
+                                React.createElement('p', {
+                                    className: "text-gray-600 text-sm"
+                                }, language === 'he' ? 'השתמשו בלשוניות "מתקדם" ו"בדיקות עמידות" לניתוח מעמיק' : 'Use "Advanced" and "Stress Test" tabs for deeper analysis')
+                            ])
+                        ])
+                    ]),
+                    
+                    React.createElement('div', {
+                        key: 'tutorial-actions',
+                        className: "flex justify-center space-x-4 mt-6"
+                    }, [
+                        React.createElement('button', {
+                            key: 'start-now',
+                            onClick: () => setShowTutorial(false),
+                            className: "btn-primary"
+                        }, language === 'he' ? 'התחל עכשיו' : 'Start Now'),
+                        
+                        React.createElement('button', {
+                            key: 'back-welcome',
+                            onClick: () => {
+                                setShowTutorial(false);
+                                setShowWelcome(true);
+                            },
+                            className: "btn-secondary"
+                        }, language === 'he' ? 'חזור' : 'Back')
+                    ])
+                ])
+            ]) : null,
 
             // Tab Navigation
             React.createElement('div', { 
