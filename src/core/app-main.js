@@ -1303,7 +1303,63 @@
         const exportToPNG = async () => {
             try {
                 console.log('🖼️ Exporting to PNG...');
-                alert(language === 'he' ? 'ייצוא PNG זמין בקרוב' : 'PNG export coming soon');
+                
+                // Create a canvas for the export
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Set canvas size
+                canvas.width = 800;
+                canvas.height = 1000;
+                
+                // Fill background
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Add title
+                ctx.fillStyle = '#1e40af';
+                ctx.font = 'bold 28px Inter, Arial, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(language === 'he' ? 'מתכנן הפרישה המתקדם' : 'Advanced Retirement Planner', 400, 50);
+                
+                // Add key metrics
+                ctx.font = '18px Inter, Arial, sans-serif';
+                ctx.fillStyle = '#374151';
+                ctx.textAlign = 'left';
+                
+                let y = 120;
+                const lineHeight = 35;
+                
+                // Add user data
+                ctx.fillText(`${language === 'he' ? 'גיל נוכחי:' : 'Current Age:'} ${inputs.currentAge || 30}`, 50, y);
+                y += lineHeight;
+                ctx.fillText(`${language === 'he' ? 'גיל פרישה:' : 'Retirement Age:'} ${inputs.retirementAge || 67}`, 50, y);
+                y += lineHeight;
+                ctx.fillText(`${language === 'he' ? 'משכורת חודשית:' : 'Monthly Salary:'} ${formatCurrency(totalMonthlySalary)}`, 50, y);
+                y += lineHeight;
+                ctx.fillText(`${language === 'he' ? 'סך חיסכון חודשי:' : 'Total Monthly Savings:'} ${formatCurrency(monthlyTotal)}`, 50, y);
+                y += lineHeight;
+                ctx.fillText(`${language === 'he' ? 'צפי חיסכון כולל:' : 'Projected Total Savings:'} ${formatCurrency(projectedWithGrowth)}`, 50, y);
+                y += lineHeight;
+                ctx.fillText(`${language === 'he' ? 'הכנסה חודשית בפרישה:' : 'Monthly Retirement Income:'} ${formatCurrency(estimatedMonthlyIncome)}`, 50, y);
+                
+                // Add footer
+                y = canvas.height - 50;
+                ctx.font = '14px Inter, Arial, sans-serif';
+                ctx.fillStyle = '#6b7280';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${language === 'he' ? 'נוצר ב-' : 'Generated on'} ${new Date().toLocaleDateString()}`, 400, y);
+                
+                // Download the image
+                const link = document.createElement('a');
+                link.download = `retirement-plan-${new Date().toISOString().split('T')[0]}.png`;
+                link.href = canvas.toDataURL();
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                console.log('✅ PNG export completed successfully');
+                
             } catch (error) {
                 console.error('Error exporting PNG:', error);
                 alert(language === 'he' ? 'שגיאה בייצוא PNG' : 'Error exporting PNG');
@@ -1312,23 +1368,79 @@
 
         const exportForAI = () => {
             try {
+                // Create comprehensive AI-ready export data
                 const exportData = {
-                    calculationResults: results,
-                    userInputs: inputs,
-                    projections: {
-                        totalMonthlySalary,
-                        yearsToRetirement,
-                        monthlyTotal,
-                        avgNetReturn,
-                        projectedWithGrowth,
-                        buyingPowerToday,
-                        estimatedMonthlyIncome
+                    metadata: {
+                        exportDate: new Date().toISOString(),
+                        version: "4.3.3",
+                        language: language,
+                        planningType: inputs.planningType
                     },
-                    exportDate: new Date().toISOString()
+                    userProfile: {
+                        currentAge: inputs.currentAge,
+                        retirementAge: inputs.retirementAge,
+                        yearsToRetirement: yearsToRetirement,
+                        country: inputs.country || 'Israel',
+                        planningType: inputs.planningType
+                    },
+                    financialInputs: {
+                        monthlyIncome: {
+                            gross: totalMonthlySalary,
+                            currency: "ILS"
+                        },
+                        currentSavings: {
+                            pension: inputs.currentSavings || 0,
+                            trainingFund: inputs.trainingFund || 0,
+                            total: (inputs.currentSavings || 0) + (inputs.trainingFund || 0)
+                        },
+                        monthlyContributions: {
+                            pensionContribution: inputs.pensionContribution || 18.5,
+                            employerContribution: inputs.employerContribution || 6,
+                            trainingFundContribution: inputs.trainingFundContribution || 2.5,
+                            totalMonthly: monthlyTotal
+                        },
+                        fees: {
+                            contributionFees: inputs.contributionFees || 1.0,
+                            accumulationFees: inputs.accumulationFees || 0.1,
+                            trainingFundFees: inputs.trainingFundFees || 0.6
+                        },
+                        expectedReturn: inputs.expectedReturn || 7,
+                        inflationRate: inputs.inflationRate || 3
+                    },
+                    projections: {
+                        totalSavingsAtRetirement: {
+                            nominal: projectedWithGrowth,
+                            realValue: buyingPowerToday,
+                            currency: "ILS"
+                        },
+                        monthlyRetirementIncome: {
+                            nominal: estimatedMonthlyIncome,
+                            currency: "ILS"
+                        },
+                        averageNetReturn: avgNetReturn
+                    },
+                    aiPromptSuggestion: language === 'he' ? 
+                        "אנא נתח את נתוני התכנון הפנסיוני הבאים וספק המלצות לשיפור האסטרטגיה הפיננסית:" :
+                        "Please analyze the following retirement planning data and provide recommendations for improving the financial strategy:"
                 };
                 
+                // Create downloadable JSON file
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `retirement-analysis-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                // Also copy to clipboard for convenience
                 navigator.clipboard.writeText(JSON.stringify(exportData, null, 2));
-                alert(language === 'he' ? 'נתונים הועתקו ללוח' : 'Data copied to clipboard');
+                
+                console.log('✅ AI export completed successfully');
+                alert(language === 'he' ? 'נתוני AI הורדו בהצלחה ונועתקו ללוח' : 'AI data downloaded successfully and copied to clipboard');
+                
             } catch (error) {
                 console.error('Error exporting for AI:', error);
                 alert(language === 'he' ? 'שגיאה בייצוא נתונים' : 'Error exporting data');
@@ -1733,7 +1845,43 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                         projectedWithGrowth,
                         buyingPowerToday,
                         formatCurrency
-                    })
+                    }),
+
+                    // Chart Display
+                    showChart ? React.createElement('div', {
+                        key: 'chart-container',
+                        className: "financial-card p-6 mt-4"
+                    }, [
+                        React.createElement('h3', {
+                            key: 'chart-title',
+                            className: "text-lg font-bold mb-4 text-gray-800"
+                        }, language === 'he' ? 'גרף התקדמות החיסכון' : 'Savings Progress Chart'),
+                        React.createElement(SimpleChart, {
+                            key: 'savings-chart',
+                            data: (() => {
+                                const chartData = [];
+                                const currentAge = inputs.currentAge || 30;
+                                const retirementAge = inputs.retirementAge || 67;
+                                for (let age = currentAge; age <= retirementAge; age += 5) {
+                                    const yearsInvested = age - currentAge;
+                                    const totalSavings = monthlyTotal * 12 * yearsInvested * Math.pow(1 + (inputs.expectedReturn || 7) / 100, yearsInvested);
+                                    chartData.push({
+                                        age: age,
+                                        totalSavings: totalSavings,
+                                        value: totalSavings
+                                    });
+                                }
+                                return chartData;
+                            })(),
+                            type: 'line',
+                            language
+                        }),
+                        React.createElement('button', {
+                            key: 'hide-chart',
+                            onClick: () => setShowChart(false),
+                            className: "mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                        }, language === 'he' ? 'הסתר גרף' : 'Hide Chart')
+                    ]) : null
                 ])
             ]),
 
