@@ -129,6 +129,8 @@ class SecurityQAAnalysis {
                 const content = fs.readFileSync(filePath, 'utf8');
 
                 // Check for sensitive data logging
+                // NOTE: These patterns are used for DETECTION, not actual storage
+                // Security workflow excludes this file to prevent false positives
                 const sensitivePatterns = [
                     'console.log.*password',
                     'console.log.*token',

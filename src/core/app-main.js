@@ -1308,12 +1308,6 @@
         const [showInflationChart, setShowInflationChart] = React.useState(false);
         const [llmAnalysis, setLlmAnalysis] = React.useState('');
         const [showWelcome, setShowWelcome] = React.useState(true);
-
-        React.useEffect(() => {
-            if (results) {
-                setShowProgressBar(true);
-            }
-        }, [results]);
         const [showTutorial, setShowTutorial] = React.useState(false);
         const [showProgressBar, setShowProgressBar] = React.useState(false);
 
@@ -1400,6 +1394,13 @@
         const formatCurrency = (amount) => {
             return `₪${Math.round(amount).toLocaleString()}`;
         };
+
+        // Progress bar effect (after results are calculated)
+        React.useEffect(() => {
+            if (results) {
+                setShowProgressBar(true);
+            }
+        }, [results]);
 
         // Translations object
         const t = {

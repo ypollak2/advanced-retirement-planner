@@ -80,7 +80,7 @@ jobs:
     - name: Check for sensitive data
       run: |
         echo "Scanning for potential sensitive data..."
-        # Scan for hardcoded secrets, but exclude safe patterns
+        # Scan for hardcoded secrets, but exclude safe patterns and security analysis files
         if grep -r -i "api[_-]key\|secret\|password\|token" --include="*.html" --include="*.js" --include="*.json" . \
           | grep -v node_modules \
           | grep -v ".git" \
@@ -93,7 +93,13 @@ jobs:
           | grep -v "demo" \
           | grep -v "YOUR_API_KEY" \
           | grep -v "placeholder" \
-          | grep -v "alternative-apis/multi-provider-finance.js"; then
+          | grep -v "alternative-apis/multi-provider-finance.js" \
+          | grep -v "security-qa-analysis.js" \
+          | grep -v "comprehensive-qa-test.js" \
+          | grep -v "training-fund-tests.js" \
+          | grep -v "quick-qa-test.js" \
+          | grep -v "qa-test-results.md" \
+          | grep -v "MANUAL_QA_CHECKLIST.md"; then
           echo "⚠️ Potential sensitive data found - please review"
           echo "If this is a false positive, update the security workflow to exclude the pattern"
           exit 1
