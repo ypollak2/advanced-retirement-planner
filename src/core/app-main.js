@@ -100,15 +100,21 @@
     // ... other functions
 
     // Render the main component
-    const container = document.getElementById('retirement-planner-app');
-    if (container) {
-        ReactDOM.render(
-            React.createElement(ErrorBoundary, null, 
-                React.createElement(RetirementPlannerCore)
-            ),
-            container
-        );
-    } else {
-        console.error('Target container not found');
-    }
+    window.initializeRetirementPlannerCore = () => {
+        const container = document.getElementById('retirement-planner-app');
+        if (container) {
+            ReactDOM.render(
+                React.createElement(ErrorBoundary, null, 
+                    React.createElement(RetirementPlannerCore)
+                ),
+                container
+            );
+        } else {
+            console.error('Target container not found');
+        }
+    };
+
+    // Ensure React and ReactDOM are globally available for other modules
+    window.React = React;
+    window.ReactDOM = ReactDOM;
 })();

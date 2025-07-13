@@ -10,7 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     
     <!-- Main Application Styles -->
-    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/main.css?v=5.0.1">
     
     <style>
         /* Version indicator - repositioned for better UX */
@@ -54,16 +54,20 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Application Scripts -->
-    <script type="module" src="src/utils/currencyExchange.js"></script>
-    <script type="module" src="src/utils/pensionCalculations.js"></script>
-    <script type="module" src="src/utils/rsuCalculations.js"></script>
-    <script type="module" src="src/utils/TaxCalculators.js"></script>
-    <script type="module" src="src/core/dynamic-loader.js"></script>
-    <script type="module" src="src/components/EnhancedRSUCompanySelector.js"></script>
-    <script type="module" src="src/components/BottomLineSummary.js"></script>
-    <script type="module" src="src/components/SavingsSummaryPanel.js"></script>
-    <script type="module" src="src/components/BasicInputs.js"></script>
-    <script type="module" src="src/core/app-main.js"></script>
+    <script type="module" src="src/utils/currencyExchange.js?v=5.0.1"></script>
+    <script type="module" src="src/utils/pensionCalculations.js?v=5.0.1"></script>
+    <script type="module" src="src/utils/rsuCalculations.js?v=5.0.1"></script>
+    <script type="module" src="src/utils/TaxCalculators.js?v=5.0.1"></script>
+    <script type="module" src="src/core/dynamic-loader.js?v=5.0.1"></script>
+    <script type="module" src="src/components/EnhancedRSUCompanySelector.js?v=5.0.1"></script>
+    <script type="module" src="src/components/BottomLineSummary.js?v=5.0.1"></script>
+    <script type="module" src="src/components/SavingsSummaryPanel.js?v=5.0.1"></script>
+    <script type="module" src="src/components/BasicInputs.js?v=5.0.1"></script>
+    <script type="module" src="src/core/app-main.js?v=5.0.1"></script>
+
+    <script>
+        window.initializeRetirementPlannerCore();
+    </script>
 
 </body>
 </html>
