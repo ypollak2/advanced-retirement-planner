@@ -4,152 +4,7 @@
 (function() {
     'use strict';
 
-    // Add at the top of the file, after the opening IIFE and 'use strict':
-
-    const style = document.createElement('style');
-    style.innerHTML = `
-      body {
-        background: linear-gradient(135deg, #f7f9fb 0%, #e9eaf3 100%);
-        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-        color: #222;
-      }
-      .header-primary {
-        font-size: 3rem;
-        font-weight: 900;
-        background: linear-gradient(135deg, #6c63ff 0%, #00bfae 50%, #ff6b6b 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: -2px;
-        margin-bottom: 0.5rem;
-        text-shadow: 0 4px 8px rgba(108,99,255,0.1);
-      }
-      .financial-card, .glass-effect, .metric-card {
-        background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-        border-radius: 18px;
-        box-shadow: 0 8px 32px rgba(60,60,90,0.12);
-        border: 1.5px solid rgba(99, 102, 241, 0.1);
-        padding: 2rem 1.5rem;
-        margin-bottom: 2rem;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
-      }
-      .financial-card:hover, .glass-effect:hover, .metric-card:hover {
-        box-shadow: 0 12px 48px rgba(60,60,90,0.18);
-        border-color: rgba(99, 102, 241, 0.2);
-        transform: translateY(-2px);
-      }
-      .metric-card.metric-neutral {
-        background: linear-gradient(145deg, #dbeafe 0%, #e0e7ff 100%);
-        border-color: #93c5fd;
-      }
-      .metric-card.metric-positive {
-        background: linear-gradient(145deg, #dcfce7 0%, #bbf7d0 100%);
-        border-color: #86efac;
-      }
-      .metric-card.metric-warning {
-        background: linear-gradient(145deg, #fef3c7 0%, #fde68a 100%);
-        border-color: #fbbf24;
-      }
-      .btn-primary {
-        background: linear-gradient(90deg, #6c63ff 0%, #00bfae 100%);
-        color: #fff;
-        border: none;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 1.1rem;
-        padding: 0.85rem 1.5rem;
-        box-shadow: 0 2px 8px rgba(108,99,255,0.08);
-        transition: background 0.2s, box-shadow 0.2s;
-        outline: none;
-      }
-      .btn-primary:hover, .btn-primary:focus {
-        background: linear-gradient(90deg, #5a54e8 0%, #009e8e 100%);
-        box-shadow: 0 4px 16px rgba(108,99,255,0.16);
-      }
-      input, select, textarea {
-        border-radius: 10px;
-        border: 1.5px solid #e0e3ea;
-        padding: 0.75rem 1rem;
-        font-size: 1rem;
-        background: #f7f9fb;
-        transition: border 0.2s, box-shadow 0.2s;
-      }
-      input:focus, select:focus, textarea:focus {
-        border-color: #6c63ff;
-        box-shadow: 0 0 0 2px #6c63ff33;
-        outline: none;
-      }
-      .tab-modern {
-        background: #f4f6fa;
-        border-radius: 999px;
-        padding: 0.5rem 1.5rem;
-        font-weight: 600;
-        color: #6c63ff;
-        margin: 0 0.25rem;
-        border: none;
-        transition: background 0.2s, color 0.2s;
-      }
-      .tab-modern.active {
-        background: linear-gradient(90deg, #6c63ff 0%, #00bfae 100%);
-        color: #fff;
-        box-shadow: 0 2px 8px rgba(108,99,255,0.08);
-      }
-      .dashboard-grid {
-        display: grid;
-        grid-template-columns: 1fr 480px;
-        gap: 3rem;
-        align-items: flex-start;
-        width: 100%;
-        max-width: 1400px;
-        margin: 0 auto;
-      }
-      @media (max-width: 1200px) {
-        .dashboard-grid {
-          grid-template-columns: 1fr;
-        }
-        .results-column {
-          position: static;
-          width: 100%;
-          max-width: 100%;
-          margin-top: 2rem;
-        }
-      }
-      .results-column.sidebar-panel {
-        position: sticky;
-        top: 2rem;
-        width: 480px;
-        min-width: 440px;
-        max-width: 520px;
-        background: linear-gradient(120deg, #fff 80%, #f3eaff 100%);
-        border-radius: 22px;
-        box-shadow: 0 8px 48px rgba(60,60,90,0.13);
-        border-left: 6px solid #a084f3;
-        border-top: 1.5px solid #e5e7eb;
-        border-bottom: 1.5px solid #e5e7eb;
-        border-right: 1.5px solid #e5e7eb;
-        padding: 2.5rem 2rem;
-        z-index: 5;
-        overflow-y: auto;
-        overflow-x: visible;
-        margin-left: auto;
-        margin-right: 0;
-        transition: box-shadow 0.2s, border 0.2s;
-      }
-      .forms-column {
-        min-width: 0;
-        width: 100%;
-      }
-      ::-webkit-scrollbar {
-        width: 8px;
-        background: #e9eaf3;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #d1d5db;
-        border-radius: 8px;
-      }
-    `;
-    document.head.appendChild(style);
+    // CSS styles now loaded from external file: src/styles/main.css
 
     // Add a comment to the user to add Inter font to their HTML head if not already present.
     // <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
@@ -379,8 +234,30 @@
         setShowChart, generateLLMAnalysis
     }) => {
         const [exchangeRates, setExchangeRates] = React.useState({
-            USD: 3.6, EUR: 4.0, GBP: 4.7, BTC: 180000, ETH: 9000
+            USD: 0.27, EUR: 0.25, GBP: 0.21, BTC: 0.000025, ETH: 0.0003
         });
+        const [currencyLoading, setCurrencyLoading] = React.useState(false);
+        const [currencyError, setCurrencyError] = React.useState(null);
+        
+        // Load exchange rates when component mounts
+        React.useEffect(() => {
+            if (window.CurrencyExchangeAPI) {
+                setCurrencyLoading(true);
+                const currencyAPI = new window.CurrencyExchangeAPI();
+                currencyAPI.getAllRates()
+                    .then(rates => {
+                        setExchangeRates(rates);
+                        setCurrencyError(null);
+                    })
+                    .catch(error => {
+                        console.error('Failed to load currency rates:', error);
+                        setCurrencyError('Failed to load rates');
+                    })
+                    .finally(() => {
+                        setCurrencyLoading(false);
+                    });
+            }
+        }, []);
         
         // Use passed-in calculated values (or defaults if not provided)
         const safeYearsToRetirement = yearsToRetirement || Math.max(0, (inputs.retirementAge || 67) - (inputs.currentAge || 30));
@@ -557,18 +434,31 @@
                 
                 React.createElement('div', {
                     key: 'currency-grid',
-                    className: "grid grid-cols-2 gap-2 text-xs"
+                    className: "currency-grid"
                 }, [
                     ['USD', '$'], ['EUR', '€'], ['GBP', '£'], ['BTC', '₿'], ['ETH', 'Ξ']
-                ].map(([currency, symbol]) => React.createElement('div', { key: currency, className: "bg-gray-100 rounded px-2 py-1" }, [
-                        React.createElement('div', { key: `${currency}-name`, className: "font-medium" }, currency),
-                        React.createElement('div', { key: `${currency}-value`, className: "text-gray-600" }, 
-                            currency === 'BTC' || currency === 'ETH' ? 
-                                `${symbol}${(totalSavings / exchangeRates[currency]).toFixed(4)}` :
-                                `${symbol}${Math.round(totalSavings / exchangeRates[currency]).toLocaleString()}`
-                        )
-                    ])
-                ))
+                ].map(([currency, symbol]) => React.createElement('div', { 
+                    key: currency, 
+                    className: "currency-card" 
+                }, [
+                    React.createElement('div', { 
+                        key: `${currency}-symbol`, 
+                        className: "currency-symbol" 
+                    }, currency),
+                    React.createElement('div', { 
+                        key: `${currency}-value`, 
+                        className: currencyLoading ? "currency-loading" : 
+                                 currencyError ? "currency-error" : "currency-rate"
+                    }, 
+                        currencyLoading ? "Loading..." :
+                        currencyError ? "Error" :
+                        exchangeRates[currency] ? 
+                            (currency === 'BTC' || currency === 'ETH' ? 
+                                `${symbol}${(totalSavings * exchangeRates[currency]).toFixed(6)}` :
+                                `${symbol}${Math.round(totalSavings * exchangeRates[currency]).toLocaleString()}`) :
+                            "N/A"
+                    )
+                ])))
             ]),
             
             // Enhanced Financial Forecast
