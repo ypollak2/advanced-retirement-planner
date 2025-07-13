@@ -1841,6 +1841,54 @@
         ]);
     };
 
+    // Generate Chart Data Function
+    const generateChartData = (inputs, chartView, showInflationChart) => {
+        const chartData = [];
+        const currentAge = inputs.currentAge || 30;
+        const retirementAge = inputs.retirementAge || 67;
+        const inflationRate = (inputs.inflationRate || 3) / 100;
+        const pensionReturn = ((inputs.expectedReturn || 7) - (inputs.accumulationFees || 1.0)) / 100;
+        const trainingReturn = ((inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.6)) / 100;
+        const personalReturn = (inputs.expectedReturn || 7) / 100;
+
+        for (let age = currentAge; age <= retirementAge; age += 3) {
+            const yearsInvested = age - currentAge;
+            
+            let pensionFV = 0, trainingFV = 0, personalFV = 0, currentSavingsGrowth = 0;
+            
+            // Simple calculation for demonstration
+            const totalMonthlySalary = inputs.planningType === 'couple' 
+                ? (inputs.partner1Salary || 15000) + (inputs.partner2Salary || 12000)
+                : (inputs.currentMonthlySalary || 15000);
+                
+            const pensionContribution = totalMonthlySalary * 0.185; // 18.5%
+            const trainingContribution = totalMonthlySalary * 0.075; // 7.5%
+            const personalContribution = Math.max(0, totalMonthlySalary * 0.05); // 5%
+            
+            if (yearsInvested > 0) {
+                pensionFV = pensionContribution * 12 * ((Math.pow(1 + pensionReturn, yearsInvested) - 1) / pensionReturn) * (1 + pensionReturn);
+                trainingFV = trainingContribution * 12 * ((Math.pow(1 + trainingReturn, yearsInvested) - 1) / trainingReturn) * (1 + trainingReturn);
+                personalFV = personalContribution * 12 * ((Math.pow(1 + personalReturn, yearsInvested) - 1) / personalReturn) * (1 + personalReturn);
+                currentSavingsGrowth = (inputs.currentSavings || 50000) * Math.pow(1 + pensionReturn, yearsInvested);
+            }
+            
+            const totalNominal = pensionFV + trainingFV + personalFV + currentSavingsGrowth;
+            const totalInflationAdjusted = totalNominal / Math.pow(1 + inflationRate, yearsInvested);
+            
+            chartData.push({
+                age: age,
+                pensionSavings: showInflationChart ? pensionFV / Math.pow(1 + inflationRate, yearsInvested) : pensionFV,
+                trainingFund: showInflationChart ? trainingFV / Math.pow(1 + inflationRate, yearsInvested) : trainingFV,
+                personalSavings: showInflationChart ? personalFV / Math.pow(1 + inflationRate, yearsInvested) : personalFV,
+                totalSavings: totalNominal,
+                totalInflationAdjusted: totalInflationAdjusted,
+                value: showInflationChart ? totalInflationAdjusted : totalNominal
+            });
+        }
+        
+        return chartData;
+    };
+
     // Main Retirement Planner Core Component
     const RetirementPlannerCore = () => {
         const [inputs, setInputs] = React.useState({
@@ -2750,7 +2798,7 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                     }, [
                         React.createElement(SimpleChart, {
                             key: 'main-chart',
-                            data: generateChartData(),
+                            data: generateChartData(inputs, chartView, showInflationChart),
                             language,
                             showInflationAdjusted: showInflationChart
                         })
@@ -2802,7 +2850,7 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                         key: 'creator-info',
                         className: "text-gray-500"
                     }, language === 'he' ? 
-                        'פותח על ידי יעלי פולק • בשיתוף Claude AI' : 
+                        'פותח על ידי יהלי פולק • בשיתוף Claude AI' : 
                         'Created by Yali Pollak • In collaboration with Claude AI'
                     ),
                     React.createElement('div', {
