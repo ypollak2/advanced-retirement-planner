@@ -1,25 +1,28 @@
-# NUCLEAR CACHE-BUSTING HEADERS
-# Nuclear ID: nuclear-1752430534646
-# Generated: 2025-07-13T18:15:34.653Z
+# EMERGENCY CACHE-BUSTING HEADERS
+# Emergency ID: emergency-1752430896054
+# Generated: 2025-07-13T18:21:36.055Z
 
 /*
   Cache-Control: no-cache, no-store, must-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0
-  ETag: "nuclear-1752430534646"
-  X-Nuclear-Deployment: "nuclear-1752430534646"
-  X-Force-Refresh: "true"
+  ETag: "emergency-1752430896054"
+  X-Emergency-Fix: "emergency-1752430896054"
 
-/build/v4.10.5/*
+/src/core/*.js
   Cache-Control: no-cache, no-store, must-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0
-  ETag: "nuclear-1752430534646-build"
-  X-Nuclear-Files: "true"
+  ETag: "emergency-1752430896054-core"
 
-/index-nuclear.html
+/src/utils/*.js
   Cache-Control: no-cache, no-store, must-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0
-  ETag: "nuclear-1752430534646-html"
-  X-Nuclear-HTML: "true"
+  ETag: "emergency-1752430896054-utils"
+
+/version.js
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+  Pragma: no-cache
+  Expires: 0
+  ETag: "emergency-1752430896054-version"

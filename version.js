@@ -4,8 +4,8 @@
 
 const APP_VERSION = {
     major: 4,
-    minor: 10,
-    patch: 5,
+    minor: 11,
+    patch: 0,
     
     // Build information
     buildDate: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
