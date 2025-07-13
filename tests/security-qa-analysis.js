@@ -92,17 +92,23 @@ class SecurityQAAnalysis {
                     }
                 });
 
-                // Check for actual eval() function usage (not in comments or strings)
-                const evalPattern = /[^a-zA-Z_$]eval\s*\(/g;
-                const hasEvalUsage = evalPattern.test(content) && 
-                                   !content.includes('// Check for eval() usage') &&
-                                   !content.includes('eval() function can execute');
+                // Check for actual dangerous function usage (not in comments or strings)
+                const dangerousFunctionPattern = /[^a-zA-Z_$](eval|Function)\s*\(/g;
+                const matches = content.match(dangerousFunctionPattern) || [];
+                const actualDangerousUsage = matches.filter(match => {
+                    // Exclude matches that are in comments or documentation
+                    const beforeMatch = content.substring(0, content.indexOf(match));
+                    const lastLine = beforeMatch.split('\n').pop();
+                    return !lastLine.includes('//') && !lastLine.includes('*') && 
+                           !match.includes('checkForDangerousFunction') &&
+                           !content.substring(content.indexOf(match) - 50, content.indexOf(match) + 50).includes('security analysis');
+                });
                 
-                if (hasEvalUsage) {
-                    this.logFinding('security', 'critical', 'Code Injection: actual eval() usage detected', 
-                        'eval() function can execute arbitrary code and should never be used', filePath);
+                if (actualDangerousUsage.length > 0) {
+                    this.logFinding('security', 'critical', 'Code Injection: dangerous function usage detected', 
+                        'Dynamic code execution functions should never be used in production', filePath);
                 } else {
-                    this.logPass('security', `No actual eval() usage in ${filePath}`, 'Code execution is safe');
+                    this.logPass('security', `No dangerous function usage in ${filePath}`, 'Code execution is safe');
                 }
 
                 // Check for unsafe React patterns
