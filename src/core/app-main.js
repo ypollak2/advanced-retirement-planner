@@ -272,16 +272,17 @@
         const safeAvgNetReturn = avgNetReturn || Math.max(0.1, (pensionNetReturn + trainingNetReturn) / 2);
         
         // Enhanced safe defaults for current savings with more realistic values
-        // If user has entered 0 or very low values, use age-based estimates for better UX
-        const rawPensionSavings = inputs.currentSavings || 0;
-        const rawTrainingFundSavings = inputs.currentTrainingFundSavings || 0;
+        // Always show meaningful values instead of zeros for better UX
+        const rawPensionSavings = inputs.currentSavings;
+        const rawTrainingFundSavings = inputs.currentTrainingFundSavings;
         const userAge = inputs.currentAge || 30;
         
-        const safeCurrentPensionSavings = rawPensionSavings > 1000 ? rawPensionSavings : 
-            (userAge > 25 ? Math.max((userAge - 22) * 12000, 50000) : 50000);
-        const safeCurrentTrainingFundSavings = rawTrainingFundSavings > 500 ? rawTrainingFundSavings : 
-            (userAge > 25 ? Math.max((userAge - 22) * 8000, 25000) : 25000);
-        const totalSavings = Math.max(75000, safeCurrentPensionSavings + safeCurrentTrainingFundSavings);
+        // Use realistic age-based estimates when values are undefined, null, or very low
+        const safeCurrentPensionSavings = (rawPensionSavings && rawPensionSavings > 1000) ? rawPensionSavings : 
+            Math.max((userAge - 22) * 12000, 50000);
+        const safeCurrentTrainingFundSavings = (rawTrainingFundSavings && rawTrainingFundSavings > 500) ? rawTrainingFundSavings : 
+            Math.max((userAge - 22) * 8000, 25000);
+        const totalSavings = safeCurrentPensionSavings + safeCurrentTrainingFundSavings;
         
         const formatCurrency = (amount, symbol = '₪') => {
             // Safety check for invalid numbers
