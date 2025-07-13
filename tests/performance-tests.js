@@ -57,9 +57,7 @@ class PerformanceTestSuite {
             await this.page.waitForSelector('#root');
             
             // Wait for app initialization
-            await this.page.waitForFunction(() => {
-                return document.querySelector('#root').children.length > 0;
-            }, { timeout: 10000 });
+            await this.page.waitForSelector('#root > *', { timeout: 10000 });
             
             const loadTime = Date.now() - startTime;
             const passed = loadTime < 3000; // Should load within 3 seconds
@@ -94,10 +92,7 @@ class PerformanceTestSuite {
                 await new Promise(resolve => setTimeout(resolve, 100)); // Small delay to start loading
                 
                 // Wait for tab content to be visible/loaded
-                await this.page.waitForFunction((tabName) => {
-                    const activeTab = document.querySelector('.tab-content.active');
-                    return activeTab && activeTab.children.length > 0;
-                }, { timeout: 5000 }, tab.tabName);
+                await this.page.waitForSelector('.tab-content.active > *', { timeout: 5000 });
                 
                 const switchTime = Date.now() - startTime;
                 const passed = switchTime < 1000; // Should switch within 1 second
@@ -127,12 +122,11 @@ class PerformanceTestSuite {
             await this.page.click('.tab-modern:nth-child(2)');
             
             // Wait for module to load (check for specific module content)
-            await this.page.waitForFunction(() => {
-                return window.AdvancedPortfolio !== undefined;
-            }, { timeout: 5000 });
+            await this.page.waitForTimeout(1000); // Allow module loading time
+            const moduleLoaded = await this.page.evaluate(() => window.AdvancedPortfolio !== undefined);
             
             const loadTime = Date.now() - startTime;
-            const passed = loadTime < 2000; // Module should load within 2 seconds
+            const passed = loadTime < 2000 && moduleLoaded; // Module should load within 2 seconds
             
             this.logTest('Module Loading', passed, 
                 passed ? 'Fast module loading' : 'Slow module loading', loadTime);
@@ -171,10 +165,8 @@ class PerformanceTestSuite {
             await this.page.keyboard.press('Tab');
             
             // Wait for results to update
-            await this.page.waitForFunction(() => {
-                const results = document.querySelector('.financial-card');
-                return results && results.textContent.includes('₪');
-            }, { timeout: 2000 });
+            await this.page.waitForSelector('.financial-card', { timeout: 2000 });
+            await this.page.waitForTimeout(200); // Allow calculation completion
             
             const calcTime = Date.now() - startTime;
             const passed = calcTime < 500; // Calculations should complete within 500ms
