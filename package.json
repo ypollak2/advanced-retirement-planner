@@ -18,6 +18,8 @@
     "deploy": "npm run build && gh-pages -d dist",
     "test": "node tests/test-runner.js",
     "test:security": "node tests/test-runner.js | grep -E '(Security|PASS|FAIL)'",
+    "qa:pre-commit": "bash scripts/pre-commit-qa.sh",
+    "qa:full": "npm test && node tests/security-qa-analysis.js",
     "test:local": "python3 -m http.server 8082 --bind 127.0.0.1 & sleep 2 && open http://localhost:8082/test-browser.html && echo 'Local browser testing server started on port 8082'",
     "test:browser": "python3 -m http.server 8083 --bind 127.0.0.1 & sleep 2 && open http://localhost:8083/index.html && echo 'Main app testing server started on port 8083'",
     "serve": "python3 -m http.server 8080 --bind 127.0.0.1",

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Retirement Planner v4.11.0 - emergency-1752430896054</title>
+    <title>Advanced Retirement Planner v4.11.0 - netlify-fix-1752431602323</title>
     <meta name="description" content="Advanced retirement planning tool with comprehensive investment tracking">
     
     <!-- Tailwind CSS via CDN -->
@@ -47,8 +47,8 @@
 <body>
     <!-- Emergency deployment indicator -->
     <div class="emergency-indicator">
-        ✅ FIXED v4.11.0<br>
-        emergency-1752430896054
+        🔧 NETLIFY FIX v4.11.0<br>
+        netlify-fix-1752431602323
     </div>
     
     <div id="root" class="min-h-screen"></div>
@@ -56,47 +56,46 @@
     
     <script>
         // Emergency deployment loader - uses existing file structure
-        console.log('✅ EMERGENCY DEPLOYMENT STARTING:', 'emergency-1752430896054');
+        console.log('✅ NETLIFY FIX STARTING:', 'netlify-fix-1752431602323');
         
-        const EMERGENCY_TIMESTAMP = 1752430896054;
+        const NETLIFY_FIX_TIMESTAMP = 1752430896054;
         
         async function emergencyLoader() {
             try {
-                console.log('🚑 Loading EMERGENCY fixed files...');
+                console.log('🚑 Loading NETLIFY_FIX fixed files...');
                 
                 // Load files from existing locations with cache-busting
-                await loadScript(`version.js?v=4.11.0&emergency=${EMERGENCY_TIMESTAMP}`);
-                console.log('✅ EMERGENCY version loaded');
+                await loadScript(`version.js?v=4.11.0&emergency=${NETLIFY_FIX_TIMESTAMP}`);
+                console.log('✅ NETLIFY_FIX version loaded');
                 
-                await loadScript(`src/utils/currencyExchange.js?v=4.11.0&emergency=${EMERGENCY_TIMESTAMP}`);
-                console.log('✅ EMERGENCY currency exchange loaded');
+                await loadScript(`src/utils/currencyExchange.js?v=4.11.0&emergency=${NETLIFY_FIX_TIMESTAMP}`);
+                console.log('✅ NETLIFY_FIX currency exchange loaded');
                 
-                await loadScript(`src/utils/pensionCalculations.js?v=4.11.0&emergency=${EMERGENCY_TIMESTAMP}`);
-                console.log('✅ EMERGENCY pension calculations loaded');
+                await loadScript(`src/utils/pensionCalculations.js?v=4.11.0&emergency=${NETLIFY_FIX_TIMESTAMP}`);
+                console.log('✅ NETLIFY_FIX pension calculations loaded');
                 
-                await loadScript(`src/utils/rsuCalculations.js?v=4.11.0&emergency=${EMERGENCY_TIMESTAMP}`);
-                console.log('✅ EMERGENCY RSU calculations loaded');
+                await loadScript(`src/utils/rsuCalculations.js?v=4.11.0&emergency=${NETLIFY_FIX_TIMESTAMP}`);
+                console.log('✅ NETLIFY_FIX RSU calculations loaded');
                 
-                await loadScript(`src/core/dynamic-loader.js?v=4.11.0&emergency=${EMERGENCY_TIMESTAMP}`);
-                console.log('✅ EMERGENCY dynamic loader loaded');
+                await loadScript(`src/core/dynamic-loader.js?v=4.11.0&emergency=${NETLIFY_FIX_TIMESTAMP}`);
+                console.log('✅ NETLIFY_FIX dynamic loader loaded');
                 
-                await loadScript(`src/core/app-main.js?v=4.11.0&emergency=${EMERGENCY_TIMESTAMP}`);
-                console.log('✅ EMERGENCY core application loaded');
+                await loadScript(`src/core/app-main.js?v=4.11.0&emergency=${NETLIFY_FIX_TIMESTAMP}`);
+                console.log('✅ NETLIFY_FIX core application loaded');
                 
                 // Initialize the application
                 window.initializeRetirementPlannerCore();
-                console.log('🎯 EMERGENCY DEPLOYMENT COMPLETE!');
+                console.log('🎯 NETLIFY_FIX DEPLOYMENT COMPLETE!');
                 
             } catch (error) {
-                console.error('🚨 EMERGENCY DEPLOYMENT FAILED:', error);
+                console.error('🚨 NETLIFY_FIX DEPLOYMENT FAILED:', error);
                 document.getElementById('root').innerHTML = `
                     <div style="padding: 40px; text-align: center; background: #fee2e2; min-height: 100vh;">
                         <h1 style="color: #dc2626; font-size: 24px; margin-bottom: 20px;">
-                            🚨 EMERGENCY DEPLOYMENT FAILED
+                            🚨 NETLIFY_FIX DEPLOYMENT FAILED
                         </h1>
                         <p style="color: #991b1b; font-size: 16px; margin-bottom: 10px;">
-                            Emergency ID: emergency-1752430896054
-                        </p>
+                            Fix ID: netlify-fix-1752431602323</p>
                         <p style="color: #7f1d1d; font-size: 14px;">
                             Error: ${error.message}
                         </p>
@@ -125,11 +124,11 @@
                 script.src = src;
                 script.async = true;
                 script.onload = () => {
-                    console.log(`✅ EMERGENCY LOADED: ${src}`);
+                    console.log(`✅ NETLIFY_FIX LOADED: ${src}`);
                     resolve();
                 };
                 script.onerror = () => {
-                    console.error(`🚨 EMERGENCY FAILED: ${src}`);
+                    console.error(`🚨 NETLIFY_FIX FAILED: ${src}`);
                     reject(new Error(`Failed to load: ${src}`));
                 };
                 document.head.appendChild(script);

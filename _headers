@@ -1,28 +1,35 @@
-# EMERGENCY CACHE-BUSTING HEADERS
-# Emergency ID: emergency-1752430896054
-# Generated: 2025-07-13T18:21:36.055Z
+# NETLIFY FIX HEADERS
+# Fix ID: netlify-fix-1752431602323
+# Generated: 2025-07-13T18:33:22.328Z
 
 /*
   Cache-Control: no-cache, no-store, must-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0
-  ETag: "emergency-1752430896054"
-  X-Emergency-Fix: "emergency-1752430896054"
+  ETag: "netlify-fix-1752431602323"
+  X-Netlify-Fix: "netlify-fix-1752431602323"
+  X-Force-Refresh: "true"
+
+/index.html
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+  Pragma: no-cache
+  Expires: 0
+  ETag: "netlify-fix-1752431602323-html"
 
 /src/core/*.js
   Cache-Control: no-cache, no-store, must-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0
-  ETag: "emergency-1752430896054-core"
+  ETag: "netlify-fix-1752431602323-core"
 
 /src/utils/*.js
   Cache-Control: no-cache, no-store, must-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0
-  ETag: "emergency-1752430896054-utils"
+  ETag: "netlify-fix-1752431602323-utils"
 
 /version.js
   Cache-Control: no-cache, no-store, must-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0
-  ETag: "emergency-1752430896054-version"
+  ETag: "netlify-fix-1752431602323-version"

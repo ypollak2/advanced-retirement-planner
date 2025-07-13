@@ -40,6 +40,254 @@
         style: { fontSize: `${size}px` } 
     }, '⚠️');
 
+    // Enhanced RSU Company Selector with Search and Extended Company List
+    const EnhancedRSUCompanySelector = ({ inputs, setInputs, language, fetchStockPrice }) => {
+        const [searchQuery, setSearchQuery] = React.useState('');
+        const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+        const [isLoading, setIsLoading] = React.useState(false);
+        
+        // Comprehensive list of tech companies with RSUs
+        const companies = [
+            // FAANG + Major Tech
+            { symbol: 'AAPL', name: 'Apple Inc.', category: 'Big Tech' },
+            { symbol: 'GOOGL', name: 'Alphabet (Google)', category: 'Big Tech' },
+            { symbol: 'MSFT', name: 'Microsoft Corporation', category: 'Big Tech' },
+            { symbol: 'AMZN', name: 'Amazon.com Inc.', category: 'Big Tech' },
+            { symbol: 'META', name: 'Meta Platforms (Facebook)', category: 'Big Tech' },
+            { symbol: 'NFLX', name: 'Netflix Inc.', category: 'Big Tech' },
+            
+            // Top Tech Companies
+            { symbol: 'TSLA', name: 'Tesla Inc.', category: 'Electric Vehicles' },
+            { symbol: 'NVDA', name: 'NVIDIA Corporation', category: 'Semiconductors' },
+            { symbol: 'AMD', name: 'Advanced Micro Devices', category: 'Semiconductors' },
+            { symbol: 'INTC', name: 'Intel Corporation', category: 'Semiconductors' },
+            { symbol: 'CRM', name: 'Salesforce Inc.', category: 'Cloud Software' },
+            { symbol: 'ORCL', name: 'Oracle Corporation', category: 'Enterprise Software' },
+            { symbol: 'ADBE', name: 'Adobe Inc.', category: 'Creative Software' },
+            { symbol: 'NOW', name: 'ServiceNow Inc.', category: 'Cloud Software' },
+            
+            // Growth Tech
+            { symbol: 'SHOP', name: 'Shopify Inc.', category: 'E-commerce' },
+            { symbol: 'SPOT', name: 'Spotify Technology', category: 'Media Streaming' },
+            { symbol: 'ZM', name: 'Zoom Video Communications', category: 'Communication' },
+            { symbol: 'UBER', name: 'Uber Technologies', category: 'Rideshare' },
+            { symbol: 'ABNB', name: 'Airbnb Inc.', category: 'Travel' },
+            { symbol: 'COIN', name: 'Coinbase Global', category: 'Cryptocurrency' },
+            { symbol: 'PLTR', name: 'Palantir Technologies', category: 'Data Analytics' },
+            { symbol: 'SNOW', name: 'Snowflake Inc.', category: 'Cloud Data' },
+            { symbol: 'DDOG', name: 'Datadog Inc.', category: 'Monitoring' },
+            
+            // Enterprise & Cloud
+            { symbol: 'CRWD', name: 'CrowdStrike Holdings', category: 'Cybersecurity' },
+            { symbol: 'OKTA', name: 'Okta Inc.', category: 'Identity Management' },
+            { symbol: 'TWLO', name: 'Twilio Inc.', category: 'Communication APIs' },
+            { symbol: 'WORK', name: 'Slack Technologies', category: 'Collaboration' },
+            { symbol: 'TEAM', name: 'Atlassian Corporation', category: 'Developer Tools' },
+            { symbol: 'MDB', name: 'MongoDB Inc.', category: 'Database' },
+            { symbol: 'ESTC', name: 'Elastic N.V.', category: 'Search & Analytics' },
+            
+            // Israeli Tech Companies
+            { symbol: 'WDAY', name: 'Workday Inc.', category: 'HR Software' },
+            { symbol: 'NICE', name: 'NICE Ltd.', category: 'Analytics' },
+            { symbol: 'CYBR', name: 'CyberArk Software', category: 'Cybersecurity' },
+            { symbol: 'MNDY', name: 'monday.com Ltd.', category: 'Collaboration' },
+            { symbol: 'S', name: 'SentinelOne Inc.', category: 'Cybersecurity' },
+            { symbol: 'FROG', name: 'JFrog Ltd.', category: 'DevOps' },
+            
+            // Other Notable Tech
+            { symbol: 'LYFT', name: 'Lyft Inc.', category: 'Rideshare' },
+            { symbol: 'PINS', name: 'Pinterest Inc.', category: 'Social Media' },
+            { symbol: 'SNAP', name: 'Snap Inc.', category: 'Social Media' },
+            { symbol: 'TWTR', name: 'Twitter Inc.', category: 'Social Media' },
+            { symbol: 'SQ', name: 'Block Inc. (Square)', category: 'Fintech' },
+            { symbol: 'PYPL', name: 'PayPal Holdings', category: 'Fintech' },
+            { symbol: 'ROKU', name: 'Roku Inc.', category: 'Streaming' },
+            { symbol: 'ZS', name: 'Zscaler Inc.', category: 'Cybersecurity' }
+        ];
+        
+        // Filter companies based on search query
+        const filteredCompanies = companies.filter(company =>
+            company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            company.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            company.category.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        
+        const handleCompanySelect = async (symbol) => {
+            setInputs({...inputs, rsuCompany: symbol});
+            setIsDropdownOpen(false);
+            setSearchQuery('');
+            
+            if (symbol && symbol !== 'OTHER' && symbol !== '') {
+                setIsLoading(true);
+                try {
+                    const price = await fetchStockPrice(symbol);
+                    if (price) {
+                        setInputs(prev => ({...prev, rsuCurrentPrice: price}));
+                    }
+                } catch (error) {
+                    console.log('Stock price fetch failed, using manual input');
+                } finally {
+                    setIsLoading(false);
+                }
+            }
+        };
+        
+        const selectedCompany = companies.find(c => c.symbol === inputs.rsuCompany);
+        
+        return React.createElement('div', { key: 'enhanced-rsu-company' }, [
+            React.createElement('label', {
+                key: 'enhanced-rsu-label',
+                className: "block text-sm font-medium text-gray-700 mb-2"
+            }, [
+                React.createElement('span', { key: 'label-text' }, 
+                    language === 'he' ? 'חברה (40+ אפשרויות)' : 'Company (40+ Options)'),
+                React.createElement('span', { 
+                    key: 'label-badge',
+                    className: "ml-2 px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-semibold"
+                }, language === 'he' ? 'חיפוש חכם' : 'Smart Search')
+            ]),
+            
+            // Search Input with Dropdown
+            React.createElement('div', {
+                key: 'search-container',
+                className: "relative"
+            }, [
+                React.createElement('div', {
+                    key: 'input-wrapper',
+                    className: "relative"
+                }, [
+                    React.createElement('input', {
+                        key: 'search-input',
+                        type: 'text',
+                        value: selectedCompany ? `${selectedCompany.name} (${selectedCompany.symbol})` : searchQuery,
+                        onChange: (e) => {
+                            setSearchQuery(e.target.value);
+                            setIsDropdownOpen(true);
+                            if (selectedCompany) {
+                                setInputs({...inputs, rsuCompany: ''});
+                            }
+                        },
+                        onFocus: () => setIsDropdownOpen(true),
+                        placeholder: language === 'he' ? 'חפש חברה או סמל מניה...' : 'Search company or stock symbol...',
+                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm pr-10"
+                    }),
+                    React.createElement('div', {
+                        key: 'search-icon',
+                        className: "absolute right-3 top-1/2 transform -translate-y-1/2"
+                    }, isLoading ? 
+                        React.createElement('div', { 
+                            className: "animate-spin w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full" 
+                        }) :
+                        React.createElement('span', { className: "text-gray-400 text-sm" }, '🔍')
+                    )
+                ]),
+                
+                // Dropdown List
+                isDropdownOpen && filteredCompanies.length > 0 ? React.createElement('div', {
+                    key: 'dropdown',
+                    className: "absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto"
+                }, [
+                    React.createElement('div', {
+                        key: 'dropdown-header',
+                        className: "px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-600"
+                    }, `${filteredCompanies.length} ${language === 'he' ? 'תוצאות' : 'companies found'}`),
+                    
+                    ...filteredCompanies.map((company, index) => 
+                        React.createElement('div', {
+                            key: `company-${company.symbol}`,
+                            onClick: () => handleCompanySelect(company.symbol),
+                            className: "px-3 py-3 hover:bg-indigo-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors"
+                        }, [
+                            React.createElement('div', {
+                                key: 'company-main',
+                                className: "flex items-center justify-between"
+                            }, [
+                                React.createElement('div', { key: 'company-info' }, [
+                                    React.createElement('div', {
+                                        key: 'company-name',
+                                        className: "font-semibold text-gray-800 text-sm"
+                                    }, company.name),
+                                    React.createElement('div', {
+                                        key: 'company-symbol',
+                                        className: "text-xs text-gray-500"
+                                    }, `${company.symbol} • ${company.category}`)
+                                ]),
+                                React.createElement('div', {
+                                    key: 'select-arrow',
+                                    className: "text-indigo-500 font-bold"
+                                }, '→')
+                            ])
+                        ])
+                    ),
+                    
+                    // Custom option
+                    React.createElement('div', {
+                        key: 'custom-option',
+                        onClick: () => handleCompanySelect('OTHER'),
+                        className: "px-3 py-3 hover:bg-yellow-50 cursor-pointer border-t-2 border-yellow-200 bg-yellow-25"
+                    }, [
+                        React.createElement('div', {
+                            key: 'custom-content',
+                            className: "flex items-center justify-between"
+                        }, [
+                            React.createElement('div', { key: 'custom-info' }, [
+                                React.createElement('div', {
+                                    key: 'custom-name',
+                                    className: "font-semibold text-yellow-800 text-sm"
+                                }, language === 'he' ? '🏢 חברה אחרת' : '🏢 Other Company'),
+                                React.createElement('div', {
+                                    key: 'custom-desc',
+                                    className: "text-xs text-yellow-600"
+                                }, language === 'he' ? 'הזן פרטים ידנית' : 'Enter details manually')
+                            ]),
+                            React.createElement('div', {
+                                key: 'custom-arrow',
+                                className: "text-yellow-600 font-bold"
+                            }, '→')
+                        ])
+                    ])
+                ]) : null
+            ]),
+            
+            // Click outside to close dropdown
+            isDropdownOpen ? React.createElement('div', {
+                key: 'backdrop',
+                className: "fixed inset-0 z-40",
+                onClick: () => setIsDropdownOpen(false)
+            }) : null,
+            
+            // Selected company display
+            selectedCompany ? React.createElement('div', {
+                key: 'selected-display',
+                className: "mt-2 p-3 bg-indigo-50 border border-indigo-200 rounded-lg"
+            }, [
+                React.createElement('div', {
+                    key: 'selected-info',
+                    className: "flex items-center justify-between"
+                }, [
+                    React.createElement('div', { key: 'selected-details' }, [
+                        React.createElement('div', {
+                            key: 'selected-name',
+                            className: "font-semibold text-indigo-800 text-sm"
+                        }, `✅ ${selectedCompany.name}`),
+                        React.createElement('div', {
+                            key: 'selected-meta',
+                            className: "text-xs text-indigo-600"
+                        }, `${selectedCompany.symbol} • ${selectedCompany.category}`)
+                    ]),
+                    React.createElement('button', {
+                        key: 'clear-selection',
+                        onClick: () => {
+                            setInputs({...inputs, rsuCompany: ''});
+                            setSearchQuery('');
+                        },
+                        className: "text-indigo-600 hover:text-indigo-800 text-xs font-semibold px-2 py-1 hover:bg-indigo-100 rounded"
+                    }, language === 'he' ? 'נקה' : 'Clear')
+                ])
+            ]) : null
+        ]);
+    };
+
     // Enhanced Chart Component with multiple datasets, inflation adjustment, and partner names
     const SimpleChart = ({ data, type = 'line', language = 'he', showInflationAdjusted = false, partnerNames = null, chartTitle = null }) => {
         const chartRef = React.useRef(null);
@@ -215,61 +463,229 @@
         ]);
     };
 
-    // Bottom Line Summary Component - Key metrics display
+    // Enhanced Bottom Line Summary Component - Professional dashboard-style key metrics
     const BottomLineSummary = ({ inputs, language, totalMonthlySalary, yearsToRetirement, estimatedMonthlyIncome, projectedWithGrowth, buyingPowerToday, formatCurrency }) => {
+        
+        // Calculate additional insights
+        const replacementRatio = totalMonthlySalary > 0 ? ((estimatedMonthlyIncome / totalMonthlySalary) * 100) : 0;
+        const isRetirementReady = replacementRatio >= 70; // 70% replacement ratio is considered good
+        const savingsProgress = projectedWithGrowth / (estimatedMonthlyIncome * 12 * 25); // 25x annual expenses rule
+        
         return React.createElement('div', {
-            className: "border-t border-gray-200 pt-4 mb-4"
+            className: "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 rounded-2xl shadow-xl border border-slate-200 p-6 mb-6"
         }, [
+            // Enhanced Header with Status Indicator
             React.createElement('div', { 
-                key: 'summary-title',
-                className: "header-primary text-sm font-bold text-gray-900 mb-3 flex items-center" 
+                key: 'enhanced-header',
+                className: "flex items-center justify-between mb-6" 
             }, [
-                React.createElement('span', { key: 'icon', className: "mr-2" }, '📍'),
-                React.createElement('span', { key: 'title-text' }, language === 'he' ? 'השורה התחתונה' : 'Bottom Line')
+                React.createElement('div', {
+                    key: 'title-section',
+                    className: "flex items-center"
+                }, [
+                    React.createElement('div', {
+                        key: 'icon-container',
+                        className: "w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mr-4"
+                    }, React.createElement('span', { 
+                        key: 'icon',
+                        className: "text-white text-xl font-bold" 
+                    }, '📊')),
+                    React.createElement('div', {
+                        key: 'title-text-container'
+                    }, [
+                        React.createElement('h3', { 
+                            key: 'main-title',
+                            className: "text-xl font-bold text-slate-800 leading-tight" 
+                        }, language === 'he' ? 'תחזית פרישה מקצועית' : 'Professional Retirement Forecast'),
+                        React.createElement('p', {
+                            key: 'subtitle', 
+                            className: "text-sm text-slate-600 mt-1"
+                        }, language === 'he' ? 'נתונים מרכזיים ומדדי הצלחה' : 'Key Metrics & Success Indicators')
+                    ])
+                ]),
+                React.createElement('div', {
+                    key: 'status-badge',
+                    className: `px-3 py-1 rounded-full text-xs font-semibold ${
+                        isRetirementReady 
+                            ? 'bg-green-100 text-green-700 border border-green-200' 
+                            : 'bg-yellow-100 text-yellow-700 border border-yellow-200'
+                    }`
+                }, isRetirementReady 
+                    ? (language === 'he' ? '✅ מוכן לפרישה' : '✅ Retirement Ready')
+                    : (language === 'he' ? '⚠️ דורש שיפור' : '⚠️ Needs Improvement')
+                )
             ]),
             
-            // Key Metrics Cards
+            // Enhanced Metrics Grid with Better Visual Hierarchy
             React.createElement('div', { 
-                key: 'key-metrics',
-                className: "space-y-2" 
+                key: 'enhanced-metrics-grid',
+                className: "grid grid-cols-1 md:grid-cols-3 gap-4" 
             }, [
-                // Monthly income in retirement
+                // Primary Metric: Monthly Retirement Income
                 React.createElement('div', {
-                    key: 'monthly-retirement',
-                    className: "metric-card p-4 border-2 border-indigo-300 bg-indigo-50"
+                    key: 'primary-income-metric',
+                    className: "relative bg-white rounded-xl p-5 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-200"
                 }, [
-                    React.createElement('div', { className: "text-xs font-semibold text-indigo-600 uppercase tracking-wide" }, 
-                        language === 'he' ? 'הכנסה חודשית בפרישה' : 'Monthly Retirement Income'),
-                    React.createElement('div', { className: "text-2xl font-bold text-indigo-800 wealth-amount mt-1" }, 
-                        formatCurrency(estimatedMonthlyIncome || 0)),
-                    React.createElement('div', { className: "text-xs text-indigo-600 mt-1" }, 
-                        `${totalMonthlySalary > 0 ? ((estimatedMonthlyIncome / totalMonthlySalary) * 100).toFixed(0) : 0}% ${language === 'he' ? 'מהמשכורת הנוכחית' : 'of current salary'}`)
+                    React.createElement('div', {
+                        key: 'income-header',
+                        className: "flex items-center justify-between mb-3"
+                    }, [
+                        React.createElement('div', {
+                            key: 'income-icon',
+                            className: "w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center"
+                        }, React.createElement('span', { 
+                            key: 'income-emoji',
+                            className: "text-white text-lg" 
+                        }, '💰')),
+                        React.createElement('div', {
+                            key: 'replacement-ratio',
+                            className: `text-xs font-semibold px-2 py-1 rounded-full ${
+                                replacementRatio >= 70 ? 'bg-green-100 text-green-700' : 
+                                replacementRatio >= 50 ? 'bg-yellow-100 text-yellow-700' : 
+                                'bg-red-100 text-red-700'
+                            }`
+                        }, `${replacementRatio.toFixed(0)}%`)
+                    ]),
+                    React.createElement('div', { 
+                        key: 'income-label',
+                        className: "text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2" 
+                    }, language === 'he' ? 'הכנסה חודשית בפרישה' : 'Monthly Retirement Income'),
+                    React.createElement('div', { 
+                        key: 'income-amount',
+                        className: "text-2xl font-bold text-slate-800 mb-2" 
+                    }, formatCurrency(estimatedMonthlyIncome || 0)),
+                    React.createElement('div', { 
+                        key: 'income-comparison',
+                        className: "text-xs text-slate-500" 
+                    }, `${language === 'he' ? 'מהמשכורת הנוכחית' : 'of current salary'} (${formatCurrency(totalMonthlySalary)})`)
                 ]),
                 
-                // Years to retirement
+                // Secondary Metric: Time to Retirement with Progress
                 React.createElement('div', {
-                    key: 'years-countdown',
-                    className: "metric-card p-3 border-2 border-purple-300 bg-purple-50"
+                    key: 'time-metric',
+                    className: "relative bg-white rounded-xl p-5 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-200"
                 }, [
-                    React.createElement('div', { className: "text-xs font-semibold text-purple-600 uppercase tracking-wide" }, 
-                        language === 'he' ? 'זמן לפרישה' : 'Time to Retirement'),
-                    React.createElement('div', { className: "text-xl font-bold text-purple-800" }, 
-                        `${yearsToRetirement || 0} ${language === 'he' ? 'שנים' : 'years'}`),
-                    React.createElement('div', { className: "text-xs text-purple-600" }, 
-                        `${language === 'he' ? 'עד גיל' : 'Until age'} ${inputs.retirementAge || 67}`)
+                    React.createElement('div', {
+                        key: 'time-header',
+                        className: "flex items-center justify-between mb-3"
+                    }, [
+                        React.createElement('div', {
+                            key: 'time-icon',
+                            className: "w-10 h-10 bg-gradient-to-br from-purple-500 to-violet-600 rounded-lg flex items-center justify-center"
+                        }, React.createElement('span', { 
+                            key: 'time-emoji',
+                            className: "text-white text-lg" 
+                        }, '⏰')),
+                        React.createElement('div', {
+                            key: 'urgency-indicator',
+                            className: `text-xs font-semibold px-2 py-1 rounded-full ${
+                                yearsToRetirement > 20 ? 'bg-blue-100 text-blue-700' : 
+                                yearsToRetirement > 10 ? 'bg-yellow-100 text-yellow-700' : 
+                                'bg-red-100 text-red-700'
+                            }`
+                        }, yearsToRetirement > 20 ? (language === 'he' ? 'זמן רב' : 'Long Term') :
+                           yearsToRetirement > 10 ? (language === 'he' ? 'זמן בינוני' : 'Mid Term') :
+                           (language === 'he' ? 'זמן קצר' : 'Short Term'))
+                    ]),
+                    React.createElement('div', { 
+                        key: 'time-label',
+                        className: "text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2" 
+                    }, language === 'he' ? 'זמן לפרישה' : 'Time to Retirement'),
+                    React.createElement('div', { 
+                        key: 'years-display',
+                        className: "text-2xl font-bold text-slate-800 mb-2" 
+                    }, `${yearsToRetirement || 0} ${language === 'he' ? 'שנים' : 'years'}`),
+                    React.createElement('div', { 
+                        key: 'retirement-age',
+                        className: "text-xs text-slate-500" 
+                    }, `${language === 'he' ? 'פרישה בגיל' : 'Retiring at age'} ${inputs.retirementAge || 67}`)
                 ]),
                 
-                // Total projected savings
+                // Tertiary Metric: Total Savings with Buying Power
                 React.createElement('div', {
-                    key: 'total-savings',
-                    className: "metric-card p-3 border-2 border-green-300 bg-green-50"
+                    key: 'savings-metric',
+                    className: "relative bg-white rounded-xl p-5 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-200"
                 }, [
-                    React.createElement('div', { className: "text-xs font-semibold text-green-600 uppercase tracking-wide" }, 
-                        language === 'he' ? 'צבירה כוללת צפויה' : 'Total Projected Savings'),
-                    React.createElement('div', { className: "text-xl font-bold text-green-800 wealth-amount" }, 
-                        formatCurrency(projectedWithGrowth || 0)),
-                    React.createElement('div', { className: "text-xs text-green-600" }, 
-                        `${language === 'he' ? 'כוח קנייה:' : 'Buying power:'} ${formatCurrency(buyingPowerToday || 0)}`)
+                    React.createElement('div', {
+                        key: 'savings-header',
+                        className: "flex items-center justify-between mb-3"
+                    }, [
+                        React.createElement('div', {
+                            key: 'savings-icon',
+                            className: "w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center"
+                        }, React.createElement('span', { 
+                            key: 'savings-emoji',
+                            className: "text-white text-lg" 
+                        }, '🏦')),
+                        React.createElement('div', {
+                            key: 'savings-multiplier',
+                            className: "text-xs font-semibold px-2 py-1 rounded-full bg-blue-100 text-blue-700"
+                        }, `${(projectedWithGrowth / Math.max(totalMonthlySalary * 12, 1)).toFixed(1)}x`)
+                    ]),
+                    React.createElement('div', { 
+                        key: 'savings-label',
+                        className: "text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2" 
+                    }, language === 'he' ? 'סה"כ צבירה צפויה' : 'Total Projected Savings'),
+                    React.createElement('div', { 
+                        key: 'savings-amount',
+                        className: "text-2xl font-bold text-slate-800 mb-2" 
+                    }, formatCurrency(projectedWithGrowth || 0)),
+                    React.createElement('div', { 
+                        key: 'buying-power',
+                        className: "text-xs text-slate-500" 
+                    }, `${language === 'he' ? 'כוח קנייה היום:' : 'Today\'s buying power:'} ${formatCurrency(buyingPowerToday || 0)}`)
+                ])
+            ]),
+            
+            // Enhanced Footer with Key Insights
+            React.createElement('div', {
+                key: 'insights-footer',
+                className: "mt-6 pt-4 border-t border-slate-200"
+            }, [
+                React.createElement('div', {
+                    key: 'insights-grid',
+                    className: "grid grid-cols-2 md:grid-cols-4 gap-4 text-center"
+                }, [
+                    React.createElement('div', { key: 'insight-1' }, [
+                        React.createElement('div', { 
+                            key: 'insight-1-value',
+                            className: "text-lg font-semibold text-slate-700" 
+                        }, `${replacementRatio.toFixed(0)}%`),
+                        React.createElement('div', { 
+                            key: 'insight-1-label',
+                            className: "text-xs text-slate-500" 
+                        }, language === 'he' ? 'יחס החלפה' : 'Replacement Ratio')
+                    ]),
+                    React.createElement('div', { key: 'insight-2' }, [
+                        React.createElement('div', { 
+                            key: 'insight-2-value',
+                            className: "text-lg font-semibold text-slate-700" 
+                        }, `${((projectedWithGrowth / Math.max(estimatedMonthlyIncome * 12, 1)) / 25 * 100).toFixed(0)}%`),
+                        React.createElement('div', { 
+                            key: 'insight-2-label',
+                            className: "text-xs text-slate-500" 
+                        }, language === 'he' ? 'יעד 25x' : '25x Rule Progress')
+                    ]),
+                    React.createElement('div', { key: 'insight-3' }, [
+                        React.createElement('div', { 
+                            key: 'insight-3-value',
+                            className: "text-lg font-semibold text-slate-700" 
+                        }, `${Math.round((projectedWithGrowth / Math.max(estimatedMonthlyIncome, 1)) / 12)}y`),
+                        React.createElement('div', { 
+                            key: 'insight-3-label',
+                            className: "text-xs text-slate-500" 
+                        }, language === 'he' ? 'שנות פרישה' : 'Retirement Years')
+                    ]),
+                    React.createElement('div', { key: 'insight-4' }, [
+                        React.createElement('div', { 
+                            key: 'insight-4-value',
+                            className: "text-lg font-semibold text-slate-700" 
+                        }, inputs.currentAge ? `${67 - inputs.currentAge}y` : '37y'),
+                        React.createElement('div', { 
+                            key: 'insight-4-label',
+                            className: "text-xs text-slate-500" 
+                        }, language === 'he' ? 'זמן לגמלאות' : 'Time to Pension')
+                    ])
                 ])
             ])
         ]);
@@ -1389,45 +1805,14 @@
                             key: 'rsu-grid',
                             className: "grid grid-cols-1 md:grid-cols-2 gap-4"
                         }, [
-                            React.createElement('div', { key: 'rsu-company' }, [
-                                React.createElement('label', {
-                                    key: 'rsu-company-label',
-                                    className: "block text-sm font-medium text-gray-700 mb-1"
-                                }, language === 'he' ? 'חברה' : 'Company'),
-                                React.createElement('select', {
-                                    key: 'rsu-company-select',
-                                    value: inputs.rsuCompany || '',
-                                    onChange: async (e) => {
-                                        const symbol = e.target.value;
-                                        setInputs({...inputs, rsuCompany: symbol});
-                                        
-                                        // Auto-fetch stock price when company is selected
-                                        if (symbol && symbol !== 'OTHER' && symbol !== '') {
-                                            try {
-                                                const price = await fetchStockPrice(symbol);
-                                                if (price) {
-                                                    setInputs(prev => ({...prev, rsuCurrentPrice: price}));
-                                                }
-                                            } catch (error) {
-                                                console.log('Stock price fetch failed, using manual input');
-                                            }
-                                        }
-                                    },
-                                    className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 text-sm"
-                                }, [
-                                    React.createElement('option', { key: 'rsu-none', value: '' }, 
-                                        language === 'he' ? 'בחר חברה' : 'Select Company'),
-                                    React.createElement('option', { key: 'rsu-aapl', value: 'AAPL' }, 'Apple (AAPL)'),
-                                    React.createElement('option', { key: 'rsu-googl', value: 'GOOGL' }, 'Google (GOOGL)'),
-                                    React.createElement('option', { key: 'rsu-msft', value: 'MSFT' }, 'Microsoft (MSFT)'),
-                                    React.createElement('option', { key: 'rsu-amzn', value: 'AMZN' }, 'Amazon (AMZN)'),
-                                    React.createElement('option', { key: 'rsu-meta', value: 'META' }, 'Meta (META)'),
-                                    React.createElement('option', { key: 'rsu-tsla', value: 'TSLA' }, 'Tesla (TSLA)'),
-                                    React.createElement('option', { key: 'rsu-nvda', value: 'NVDA' }, 'NVIDIA (NVDA)'),
-                                    React.createElement('option', { key: 'rsu-other', value: 'OTHER' }, 
-                                        language === 'he' ? 'אחר' : 'Other')
-                                ])
-                            ]),
+                            // Enhanced RSU Company Selection with Search
+                            React.createElement(EnhancedRSUCompanySelector, {
+                                key: 'rsu-company-enhanced',
+                                inputs,
+                                setInputs,
+                                language,
+                                fetchStockPrice
+                            }),
 
                             React.createElement('div', { key: 'rsu-units' }, [
                                 React.createElement('label', {
