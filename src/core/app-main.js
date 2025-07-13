@@ -759,8 +759,22 @@
                                 React.createElement('h4', { 
                                     key: 'partner1-title',
                                     className: "font-medium text-pink-700 mb-3" 
-                                }, language === 'he' ? 'בן/בת זוג 1' : 'Partner 1'),
+                                }, inputs.partner1Name || (language === 'he' ? 'בן/בת זוג 1' : 'Partner 1')),
                                 React.createElement('div', { key: 'partner1-fields', className: "space-y-3" }, [
+                                    React.createElement('div', { key: 'partner1-name' }, [
+                                        React.createElement('label', { 
+                                            key: 'partner1-name-label',
+                                            className: "block text-sm font-medium text-gray-700 mb-1" 
+                                        }, language === 'he' ? 'שם' : 'Name'),
+                                        React.createElement('input', {
+                                            key: 'partner1-name-input',
+                                            type: 'text',
+                                            value: inputs.partner1Name || '',
+                                            onChange: (e) => setInputs({...inputs, partner1Name: e.target.value}),
+                                            placeholder: language === 'he' ? 'הזן שם' : 'Enter name',
+                                            className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
+                                        })
+                                    ]),
                                     React.createElement('div', { key: 'partner1-age' }, [
                                         React.createElement('label', { 
                                             key: 'partner1-age-label',
@@ -797,8 +811,22 @@
                                 React.createElement('h4', { 
                                     key: 'partner2-title',
                                     className: "font-medium text-pink-700 mb-3" 
-                                }, language === 'he' ? 'בן/בת זוג 2' : 'Partner 2'),
+                                }, inputs.partner2Name || (language === 'he' ? 'בן/בת זוג 2' : 'Partner 2')),
                                 React.createElement('div', { key: 'partner2-fields', className: "space-y-3" }, [
+                                    React.createElement('div', { key: 'partner2-name' }, [
+                                        React.createElement('label', { 
+                                            key: 'partner2-name-label',
+                                            className: "block text-sm font-medium text-gray-700 mb-1" 
+                                        }, language === 'he' ? 'שם' : 'Name'),
+                                        React.createElement('input', {
+                                            key: 'partner2-name-input',
+                                            type: 'text',
+                                            value: inputs.partner2Name || '',
+                                            onChange: (e) => setInputs({...inputs, partner2Name: e.target.value}),
+                                            placeholder: language === 'he' ? 'הזן שם' : 'Enter name',
+                                            className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
+                                        })
+                                    ]),
                                     React.createElement('div', { key: 'partner2-age' }, [
                                         React.createElement('label', { 
                                             key: 'partner2-age-label',
@@ -896,7 +924,7 @@
                         key: 'row3',
                         className: "grid grid-cols-2 gap-4" 
                     }, [
-                        React.createElement('div', { key: 'salary' }, [
+                        inputs.planningType !== 'couple' && React.createElement('div', { key: 'salary' }, [
                             React.createElement('label', { 
                                 key: 'salary-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
@@ -1693,14 +1721,14 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                     React.createElement('h2', {
                         key: 'welcome-title',
                         className: "text-3xl font-bold mb-4"
-                    }, language === 'he' ? '🌟 ברוכים הבאים למתכנן הפרישה החכם ביותר!' : '🌟 Welcome to the Smartest Retirement Planner!'),
+                    }, language === 'he' ? '📊 מתכנן פרישה מקצועי' : '📊 Professional Retirement Planner'),
                     
                     React.createElement('p', {
                         key: 'welcome-description',
                         className: "text-lg mb-6 opacity-90"
                     }, language === 'he' ? 
-                        '💰 גלו כמה מיליונים תחסכו! כלי AI מתקדם המחשב את הפרישה המושלמת שלכם עם תחזיות מדויקות לעשרות שנים קדימה' :
-                        '💰 Discover how many millions you\'ll save! Advanced AI tool that calculates your perfect retirement with precise forecasts decades ahead'),
+                        'כלי מקצועי לתכנון פרישה הכולל חישובי פנסיה, קרן השתלמות, וניתוח תרחישים שונים על פי החוק הישראלי' :
+                        'Professional retirement planning tool with pension calculations, training fund management, and scenario analysis based on Israeli regulations'),
                     
                     React.createElement('div', {
                         key: 'welcome-features',
@@ -1717,11 +1745,11 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                             React.createElement('h3', {
                                 key: 'title-1',
                                 className: "feature-title"
-                            }, language === 'he' ? '🚀 תחזיות מיליונים' : '🚀 Million-Dollar Forecasts'),
+                            }, language === 'he' ? '📊 חישובי פנסיה' : '📊 Pension Calculations'),
                             React.createElement('p', {
                                 key: 'desc-1',
                                 className: "feature-description"
-                            }, language === 'he' ? 'גלו כמה תחסכו בגיל 67 - חישובים מדויקים עד למיליון האחרון!' : 'See exactly how much you\'ll have at 67 - calculations accurate to the last million!')
+                            }, language === 'he' ? 'חישוב חיסכון פנסיוני, דמי ניהול, ותחזיות לפי גיל פרישה' : 'Calculate pension savings, management fees, and projections by retirement age')
                         ]),
                         
                         React.createElement('div', {
@@ -1735,11 +1763,11 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                             React.createElement('h3', {
                                 key: 'title-2',
                                 className: "feature-title"
-                            }, language === 'he' ? '💑 תכנון זוגי חכם' : '💑 Smart Couple Power'),
+                            }, language === 'he' ? '👥 תכנון זוגי' : '👥 Couple Planning'),
                             React.createElement('p', {
                                 key: 'desc-2',
                                 className: "feature-description"
-                            }, language === 'he' ? 'תכננו יחד ותחסכו יותר! אלגוריתם חכם לאופטימיזציה זוגית' : 'Plan together and save more! Smart algorithm for couple optimization')
+                            }, language === 'he' ? 'תכנון פרישה משותף הכולל חישובים נפרדים ומשולבים לזוג' : 'Joint retirement planning with separate and combined calculations for couples')
                         ]),
                         
                         React.createElement('div', {
@@ -1753,66 +1781,55 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                             React.createElement('h3', {
                                 key: 'title-3',
                                 className: "feature-title"
-                            }, language === 'he' ? '🌟 יכולות AI מתקדמות' : '🌟 Advanced AI Power'),
+                            }, language === 'he' ? '🇮🇱 התאמה לחוק הישראלי' : '🇮🇱 Israeli Tax Compliance'),
                             React.createElement('p', {
                                 key: 'desc-3',
                                 className: "feature-description"
-                            }, language === 'he' ? 'ניתוח חכם, תחזיות אינפלציה, ובדיקות עמידות אוטומטיות' : 'Smart analysis, inflation forecasts, and automatic stress testing')
+                            }, language === 'he' ? 'חישובים לפי חוקי המס הישראליים, קרן השתלמות, ותקרות שכר' : 'Calculations based on Israeli tax laws, training funds, and salary ceilings')
                         ])
                     ]),
                     
-                    // Add impressive stats section
+                    // Application capabilities section
                     React.createElement('div', {
-                        key: 'stats-section',
+                        key: 'capabilities-section',
                         className: "bg-white bg-opacity-20 rounded-xl p-6 mb-6 backdrop-blur-sm"
                     }, [
                         React.createElement('h3', {
-                            key: 'stats-title',
+                            key: 'capabilities-title',
                             className: "text-xl font-bold mb-4 text-center"
-                        }, language === 'he' ? '📊 נתונים מרשימים' : '📊 Impressive Results'),
+                        }, language === 'he' ? '🛠️ יכולות המערכת' : '🛠️ System Capabilities'),
                         
                         React.createElement('div', {
-                            key: 'stats-grid',
-                            className: "grid grid-cols-3 gap-4 text-center"
+                            key: 'capabilities-list',
+                            className: "text-sm space-y-2"
                         }, [
                             React.createElement('div', {
-                                key: 'stat-1',
-                                className: "bg-white bg-opacity-30 rounded-lg p-3"
+                                key: 'cap-1',
+                                className: "flex items-center gap-2"
                             }, [
-                                React.createElement('div', {
-                                    key: 'stat-1-number',
-                                    className: "text-2xl font-bold text-white"
-                                }, '₪8.2M'),
-                                React.createElement('div', {
-                                    key: 'stat-1-label',
-                                    className: "text-sm opacity-90"
-                                }, language === 'he' ? 'חיסכון ממוצע' : 'Avg. Savings')
+                                React.createElement('span', { key: 'icon-1' }, '✓'),
+                                React.createElement('span', { key: 'text-1' }, language === 'he' ? 'חישוב קרן השתלמות לפי תקרה חודשית ₪15,972' : 'Training fund calculation with ₪15,972 monthly ceiling')
                             ]),
                             React.createElement('div', {
-                                key: 'stat-2',
-                                className: "bg-white bg-opacity-30 rounded-lg p-3"
+                                key: 'cap-2',
+                                className: "flex items-center gap-2"
                             }, [
-                                React.createElement('div', {
-                                    key: 'stat-2-number',
-                                    className: "text-2xl font-bold text-white"
-                                }, '99.8%'),
-                                React.createElement('div', {
-                                    key: 'stat-2-label',
-                                    className: "text-sm opacity-90"
-                                }, language === 'he' ? 'דיוק חישובים' : 'Accuracy')
+                                React.createElement('span', { key: 'icon-2' }, '✓'),
+                                React.createElement('span', { key: 'text-2' }, language === 'he' ? 'תמיכה בתכנון יחיד וזוגי עם חישובים נפרדים' : 'Single and couple planning with separate calculations')
                             ]),
                             React.createElement('div', {
-                                key: 'stat-3',
-                                className: "bg-white bg-opacity-30 rounded-lg p-3"
+                                key: 'cap-3',
+                                className: "flex items-center gap-2"
                             }, [
-                                React.createElement('div', {
-                                    key: 'stat-3-number',
-                                    className: "text-2xl font-bold text-white"
-                                }, '50k+'),
-                                React.createElement('div', {
-                                    key: 'stat-3-label',
-                                    className: "text-sm opacity-90"
-                                }, language === 'he' ? 'משתמשים' : 'Users')
+                                React.createElement('span', { key: 'icon-3' }, '✓'),
+                                React.createElement('span', { key: 'text-3' }, language === 'he' ? 'תמיכה דו-לשונית עברית ואנגלית' : 'Bilingual support in Hebrew and English')
+                            ]),
+                            React.createElement('div', {
+                                key: 'cap-4',
+                                className: "flex items-center gap-2"
+                            }, [
+                                React.createElement('span', { key: 'icon-4' }, '✓'),
+                                React.createElement('span', { key: 'text-4' }, language === 'he' ? 'ניתוח אינפלציה ותחזיות לטווח ארוך' : 'Inflation analysis and long-term projections')
                             ])
                         ])
                     ]),
@@ -1828,7 +1845,7 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                                 document.querySelector('.financial-input')?.focus();
                             },
                             className: "btn-primary"
-                        }, language === 'he' ? '💰 גלו כמה מיליונים תחסכו!' : '💰 See Your Millions Now!'),
+                        }, language === 'he' ? '📊 התחל תכנון פרישה' : '📊 Start Planning'),
                         
                         React.createElement('button', {
                             key: 'take-tour',

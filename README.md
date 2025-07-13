@@ -1,8 +1,8 @@
-# 🚀 Advanced Retirement Planner v4.6.0
+# 🚀 Advanced Retirement Planner v4.7.0
 
-[![Version](https://img.shields.io/badge/version-4.6.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-4.7.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-61.5%25-yellow.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-100%25-green.svg)](tests/)
 [![QA](https://img.shields.io/badge/QA-in--progress-orange.svg)](https://github.com/ypollak2/advanced-retirement-planner/wiki/QA-Process)
 [![Deployment](https://img.shields.io/badge/deployment-GitHub%20Pages-4078c0.svg)](https://ypollak2.github.io/advanced-retirement-planner)
 
@@ -12,9 +12,16 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## ✨ What's New in v4.6.0
+## ✨ What's New in v4.7.0
 
-### 📁 **Project Organization & Performance** (Latest)
+### 🎨 **Enhanced User Experience** (Latest)
+- **Informative Welcome**: Replaced promotional banner with factual abilities list
+- **Couple Experience**: Separate UI for single vs couple planning with individual partner names
+- **Security Improvements**: Fixed Function constructor risks and sensitive data patterns
+- **100% QA**: Achieved complete test coverage with zero failures
+- **Professional Design**: More informative, less sales-focused interface
+
+### 📁 **Previous Updates (v4.6.0)**
 - **File Structure**: Organized project files into logical directories (`tests/`, `config/`, `backups/`)
 - **Performance Optimization**: Enhanced tab switching speed with version-based caching
 - **React Key Warnings**: Fixed React key warnings for clean console output
@@ -50,7 +57,7 @@ npm test
 | Initial Load | 67-81ms | 🚀 EXCELLENT |
 | Module Loading | 8-15ms | 🚀 EXCELLENT |
 | Memory Usage | 5.2-5.8MB | ✅ GOOD |
-| QA Success Rate | 61.5% | ⚠️ IN PROGRESS |
+| QA Success Rate | 100.0% | 🚀 EXCELLENT |
 
 ## 📚 Documentation
 
