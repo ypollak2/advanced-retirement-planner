@@ -101,7 +101,7 @@
 
     // Render the main component
     window.initializeRetirementPlannerCore = () => {
-        const container = document.getElementById('retirement-planner-app');
+        const container = document.getElementById('root');
         if (container) {
             ReactDOM.render(
                 React.createElement(ErrorBoundary, null, 
