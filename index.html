@@ -52,6 +52,7 @@
     </div>
     
     <div id="root" class="min-h-screen"></div>
+    <!-- ErrorBoundary component is defined in app-main.js and used for error handling -->
     
     <script>
         // Emergency deployment loader - uses existing file structure
@@ -64,22 +65,22 @@
                 console.log('🚑 Loading EMERGENCY fixed files...');
                 
                 // Load files from existing locations with cache-busting
-                await loadScript(`version.js?emergency=${EMERGENCY_TIMESTAMP}`);
+                await loadScript(`version.js?v=4.11.0&emergency=${EMERGENCY_TIMESTAMP}`);
                 console.log('✅ EMERGENCY version loaded');
                 
-                await loadScript(`src/utils/currencyExchange.js?emergency=${EMERGENCY_TIMESTAMP}`);
+                await loadScript(`src/utils/currencyExchange.js?v=4.11.0&emergency=${EMERGENCY_TIMESTAMP}`);
                 console.log('✅ EMERGENCY currency exchange loaded');
                 
-                await loadScript(`src/utils/pensionCalculations.js?emergency=${EMERGENCY_TIMESTAMP}`);
+                await loadScript(`src/utils/pensionCalculations.js?v=4.11.0&emergency=${EMERGENCY_TIMESTAMP}`);
                 console.log('✅ EMERGENCY pension calculations loaded');
                 
-                await loadScript(`src/utils/rsuCalculations.js?emergency=${EMERGENCY_TIMESTAMP}`);
+                await loadScript(`src/utils/rsuCalculations.js?v=4.11.0&emergency=${EMERGENCY_TIMESTAMP}`);
                 console.log('✅ EMERGENCY RSU calculations loaded');
                 
-                await loadScript(`src/core/dynamic-loader.js?emergency=${EMERGENCY_TIMESTAMP}`);
+                await loadScript(`src/core/dynamic-loader.js?v=4.11.0&emergency=${EMERGENCY_TIMESTAMP}`);
                 console.log('✅ EMERGENCY dynamic loader loaded');
                 
-                await loadScript(`src/core/app-main.js?emergency=${EMERGENCY_TIMESTAMP}`);
+                await loadScript(`src/core/app-main.js?v=4.11.0&emergency=${EMERGENCY_TIMESTAMP}`);
                 console.log('✅ EMERGENCY core application loaded');
                 
                 // Initialize the application
@@ -99,7 +100,7 @@
                         <p style="color: #7f1d1d; font-size: 14px;">
                             Error: ${error.message}
                         </p>
-                        <button onclick="location.reload()" style="
+                        <button id="retry-emergency-btn" style="
                             background: #dc2626; color: white; padding: 12px 24px; 
                             border: none; border-radius: 6px; font-size: 16px; 
                             margin-top: 20px; cursor: pointer;
@@ -108,6 +109,13 @@
                         </button>
                     </div>
                 `;
+                // Add event listener for retry button
+                setTimeout(() => {
+                    const retryBtn = document.getElementById('retry-emergency-btn');
+                    if (retryBtn) {
+                        retryBtn.addEventListener('click', () => location.reload());
+                    }
+                }, 100);
             }
         }
         
