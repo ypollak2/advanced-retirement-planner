@@ -489,7 +489,7 @@
             }, [
                 React.createElement('div', { className: "text-sm text-orange-700 font-medium mb-2" }, 
                     language === 'he' ? 'כוח קנייה היום' : 'Today\'s Buying Power'),
-                React.createElement('div', { className: "grid grid-cols-2 gap-2" }, [
+                React.createElement('div', { key: 'buying-power-grid', className: "grid grid-cols-2 gap-2" }, [
                     React.createElement('div', { key: 'total' }, [
                         React.createElement('div', { className: "text-xs text-orange-600" }, 
                             language === 'he' ? 'סה״כ:' : 'Total:'),
@@ -767,6 +767,7 @@
                                             className: "block text-sm font-medium text-gray-700 mb-1" 
                                         }, language === 'he' ? 'גיל' : 'Age'),
                                         React.createElement('input', {
+                                            key: 'partner1-age-input',
                                             type: 'number',
                                             value: inputs.partner1Age || '',
                                             onChange: (e) => setInputs({...inputs, partner1Age: parseInt(e.target.value) || 0}),
@@ -779,6 +780,7 @@
                                             className: "block text-sm font-medium text-gray-700 mb-1" 
                                         }, language === 'he' ? 'משכורת חודשית' : 'Monthly Salary'),
                                         React.createElement('input', {
+                                            key: 'partner1-salary-input',
                                             type: 'number',
                                             value: inputs.partner1Salary || '',
                                             onChange: (e) => setInputs({...inputs, partner1Salary: parseInt(e.target.value) || 0}),
@@ -803,6 +805,7 @@
                                             className: "block text-sm font-medium text-gray-700 mb-1" 
                                         }, language === 'he' ? 'גיל' : 'Age'),
                                         React.createElement('input', {
+                                            key: 'partner2-age-input',
                                             type: 'number',
                                             value: inputs.partner2Age || '',
                                             onChange: (e) => setInputs({...inputs, partner2Age: parseInt(e.target.value) || 0}),
@@ -815,6 +818,7 @@
                                             className: "block text-sm font-medium text-gray-700 mb-1" 
                                         }, language === 'he' ? 'משכורת חודשית' : 'Monthly Salary'),
                                         React.createElement('input', {
+                                            key: 'partner2-salary-input',
                                             type: 'number',
                                             value: inputs.partner2Salary || '',
                                             onChange: (e) => setInputs({...inputs, partner2Salary: parseInt(e.target.value) || 0}),
@@ -836,6 +840,7 @@
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, t.currentAge || 'Current Age'),
                             React.createElement('input', {
+                                key: 'current-age-input',
                                 type: 'number',
                                 value: inputs.currentAge,
                                 onChange: (e) => setInputs({...inputs, currentAge: parseInt(e.target.value) || 0}),
@@ -848,6 +853,7 @@
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, t.retirementAge || 'Retirement Age'),
                             React.createElement('input', {
+                                key: 'retirement-age-input',
                                 type: 'number',
                                 value: inputs.retirementAge,
                                 onChange: (e) => setInputs({...inputs, retirementAge: parseInt(e.target.value) || 0}),
@@ -865,6 +871,7 @@
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "חיסכון נוכחי בפנסיה (₪)" : "Current Pension Savings (₪)"),
                             React.createElement('input', {
+                                key: 'current-savings-input',
                                 type: 'number',
                                 value: inputs.currentSavings,
                                 onChange: (e) => setInputs({...inputs, currentSavings: parseInt(e.target.value) || 0}),
@@ -877,6 +884,7 @@
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "קרן השתלמות נוכחית (₪)" : "Current Training Fund (₪)"),
                             React.createElement('input', {
+                                key: 'training-fund-input',
                                 type: 'number',
                                 value: inputs.trainingFund || 0,
                                 onChange: (e) => setInputs({...inputs, trainingFund: parseInt(e.target.value) || 0}),
@@ -894,6 +902,7 @@
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "משכורת חודשית (₪)" : "Monthly Salary (₪)"),
                             React.createElement('input', {
+                                key: 'monthly-salary-input',
                                 type: 'number',
                                 value: inputs.currentMonthlySalary || 15000,
                                 onChange: (e) => setInputs({...inputs, currentMonthlySalary: parseInt(e.target.value) || 0}),
@@ -906,6 +915,7 @@
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "הפקדה חודשית לקרן השתלמות (₪)" : "Monthly Training Fund Contribution (₪)"),
                             React.createElement('input', {
+                                key: 'training-contribution-display',
                                 type: 'number',
                                 value: Math.round(monthlyTrainingFundContribution),
                                 readOnly: true,
@@ -959,6 +969,7 @@
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "דמי ניהול מהפקדות (%)" : "Management Fees on Contributions (%)"),
                             React.createElement('input', {
+                                key: 'contribution-fees-input',
                                 type: 'number',
                                 step: '0.1',
                                 value: inputs.contributionFees || 1.0,
@@ -972,6 +983,7 @@
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "תשואה שנתית צפויה (%)" : "Expected Annual Yield (%)"),
                             React.createElement('input', {
+                                key: 'expected-return-input',
                                 type: 'number',
                                 step: '0.1',
                                 value: inputs.expectedReturn || 7,
@@ -990,6 +1002,7 @@
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "דמי ניהול מצבירה (%)" : "Management Fees on Accumulation (%)"),
                             React.createElement('input', {
+                                key: 'accumulation-fees-input',
                                 type: 'number',
                                 step: '0.1',
                                 value: inputs.accumulationFees || 0.1,
@@ -1003,6 +1016,7 @@
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "שיעור אינפלציה שנתי (%)" : "Annual Inflation Rate (%)"),
                             React.createElement('input', {
+                                key: 'inflation-rate-input',
                                 type: 'number',
                                 step: '0.1',
                                 value: inputs.inflationRate || 3,
@@ -1021,6 +1035,7 @@
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "דמי ניהול קרן השתלמות (%)" : "Training Fund Management Fees (%)"),
                             React.createElement('input', {
+                                key: 'training-fund-fees-input',
                                 type: 'number',
                                 step: '0.1',
                                 value: inputs.trainingFundFees || 0.6,
@@ -1228,11 +1243,13 @@
                     key: 'placeholder',
                     className: "text-center py-8"
                 }, [
-                    React.createElement('div', { className: "text-6xl mb-4" }, '💡'),
+                    React.createElement('div', { key: 'placeholder-icon', className: "text-6xl mb-4" }, '💡'),
                     React.createElement('p', { 
+                        key: 'placeholder-text1',
                         className: "text-gray-600 text-lg mb-2" 
                     }, language === 'he' ? 'יש להזין פרטים בסיסיים לחישוב' : 'Enter basic information to start calculations'),
                     React.createElement('p', { 
+                        key: 'placeholder-text2',
                         className: "text-gray-500 text-sm" 
                     }, language === 'he' ? 'הזן גיל, משכורת ותשואה צפויה' : 'Enter age, salary, and expected return')
                 ])
@@ -1261,7 +1278,7 @@
                         key: 'total',
                         className: "metric-card metric-positive p-4" 
                     }, [
-                        React.createElement('div', { className: "text-sm text-green-700" }, [
+                        React.createElement('div', { key: 'total-container', className: "text-sm text-green-700" }, [
                             React.createElement('strong', { key: 'total-label' }, language === 'he' ? "צבירה כוללת צפויה:" : "Total Expected Accumulation:"),
                             React.createElement('div', { key: 'total-amount', className: "text-2xl font-bold text-green-800 mt-1 wealth-amount" }, 
                                 `₪${Math.round(results.totalSavings || 0).toLocaleString()}`)
@@ -1275,7 +1292,7 @@
                             key: 'pension',
                             className: "metric-card metric-neutral p-3" 
                         }, [
-                            React.createElement('div', { className: "text-sm text-blue-700" }, [
+                            React.createElement('div', { key: 'pension-container', className: "text-sm text-blue-700" }, [
                                 React.createElement('strong', { key: 'pension-label' }, language === 'he' ? "פנסיה:" : "Pension:"),
                                 React.createElement('div', { key: 'pension-amount', className: "text-lg font-bold text-blue-800 mt-1 wealth-amount" }, 
                                     `₪${Math.round(results.pensionSavings || 0).toLocaleString()}`)
@@ -1285,7 +1302,7 @@
                             key: 'training',
                             className: "bg-purple-50 rounded-lg p-3 border border-purple-200" 
                         }, [
-                            React.createElement('div', { className: "text-sm text-purple-700" }, [
+                            React.createElement('div', { key: 'training-fund-text', className: "text-sm text-purple-700" }, [
                                 React.createElement('strong', { key: 'training-label' }, language === 'he' ? "קרן השתלמות:" : "Training Fund:"),
                                 React.createElement('div', { key: 'training-amount', className: "text-lg font-bold text-purple-800 mt-1" }, 
                                     `₪${Math.round(results.trainingFundSavings || 0).toLocaleString()}`)
@@ -1296,7 +1313,7 @@
                         key: 'monthly',
                         className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 
                     }, [
-                        React.createElement('div', { className: "text-sm text-orange-700" }, [
+                        React.createElement('div', { key: 'monthly-income-text', className: "text-sm text-orange-700" }, [
                             React.createElement('strong', { key: 'monthly-label' }, language === 'he' ? "הכנסה חודשית בפרישה:" : "Monthly Retirement Income:"),
                             React.createElement('div', { key: 'monthly-amount', className: "text-2xl font-bold text-orange-800 mt-1" }, 
                                 formatCurrency(results?.monthlyIncomeAtRetirement || 0))
