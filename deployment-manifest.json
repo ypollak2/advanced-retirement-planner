@@ -1,0 +1,15 @@
+{
+  "deploymentId": "deploy-1752415469639",
+  "buildTimestamp": "2025-07-13T14:04:29.639Z",
+  "version": "4.10.5",
+  "cacheVersion": "deploy-1752415469639",
+  "files": {
+    "version.js": "version.js?v=4.10.5&cache=deploy-1752415469639",
+    "app-main.js": "src/core/app-main.js?v=4.10.5&cache=deploy-1752415469639",
+    "dynamic-loader.js": "src/core/dynamic-loader.js?v=4.10.5&cache=deploy-1752415469639",
+    "currencyExchange.js": "src/utils/currencyExchange.js?v=4.10.5&cache=deploy-1752415469639",
+    "pensionCalculations.js": "src/utils/pensionCalculations.js?v=4.10.5&cache=deploy-1752415469639",
+    "rsuCalculations.js": "src/utils/rsuCalculations.js?v=4.10.5&cache=deploy-1752415469639",
+    "main.css": "src/styles/main.css?v=4.10.5&cache=deploy-1752415469639"
+  }
+}

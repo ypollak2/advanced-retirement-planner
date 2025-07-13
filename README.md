@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v4.10.4
+# 🚀 Advanced Retirement Planner v4.10.5
 
-[![Version](https://img.shields.io/badge/version-4.10.4-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-4.10.5-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-green.svg)](tests/)
 [![QA](https://img.shields.io/badge/QA-94.6%25-brightgreen.svg)](https://github.com/ypollak2/advanced-retirement-planner/wiki/QA-Process)
@@ -13,7 +13,7 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v4.10.4 - Complete UI Overhaul & Architecture Refactor
+## 🎨 What's New in v4.10.5 - Complete UI Overhaul & Architecture Refactor
 
 ### **🔧 Critical Fixes & Major Improvements** (Latest)
 

@@ -1136,22 +1136,26 @@
                     `);
                 }
 
+                // Generate unique cache-busting timestamp for this deployment
+                const deploymentTimestamp = Date.now();
+                const buildId = `v4.10.5-build-${deploymentTimestamp}`;
+                
                 // Load version configuration first
-                await loadScript(`./version.js?v=4.10.4&t=${Date.now()}`);
+                await loadScript(`./version.js?v=4.10.5&t=${deploymentTimestamp}&build=${buildId}`);
                 console.log('✅ Version configuration loaded');
                 
                 // Load utility modules
-                await loadScript(`./src/utils/currencyExchange.js?v=4.10.1&t=${Date.now()}`);
+                await loadScript(`./src/utils/currencyExchange.js?v=4.10.5&t=${deploymentTimestamp}&build=${buildId}`);
                 console.log('✅ Currency exchange utility loaded');
                 
-                await loadScript(`./src/utils/pensionCalculations.js?v=4.10.1&t=${Date.now()}`);
+                await loadScript(`./src/utils/pensionCalculations.js?v=4.10.5&t=${deploymentTimestamp}&build=${buildId}`);
                 console.log('✅ Pension calculations utility loaded');
                 
-                await loadScript(`./src/utils/rsuCalculations.js?v=4.10.1&t=${Date.now()}`);
+                await loadScript(`./src/utils/rsuCalculations.js?v=4.10.5&t=${deploymentTimestamp}&build=${buildId}`);
                 console.log('✅ RSU calculations utility loaded');
                 
                 // Load dynamic loader
-                await loadScript(`./src/core/dynamic-loader.js?v=4.10.4&t=${Date.now()}`);
+                await loadScript(`./src/core/dynamic-loader.js?v=4.10.5&t=${deploymentTimestamp}&build=${buildId}`);
                 console.log('✅ Dynamic loader loaded');
 
                 // Update loading message
@@ -1160,7 +1164,7 @@
                 }
 
                 // Load core application
-                await loadScript(`./src/core/app-main.js?v=4.10.4&t=${Date.now()}`);
+                await loadScript(`./src/core/app-main.js?v=4.10.5&t=${deploymentTimestamp}&build=${buildId}`);
                 console.log('✅ Core application loaded');
 
                 // Initialize the core application

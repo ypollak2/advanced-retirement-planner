@@ -1,43 +1,39 @@
-# Netlify Headers File - Force Cache Invalidation for JavaScript and CSS
+# Force no-cache headers for v4.10.5 deployment deploy-1752415469639
+# Generated on: 2025-07-13T14:04:29.639Z
 
 /*
-  X-Frame-Options: DENY
-  X-Content-Type-Options: nosniff
-  X-XSS-Protection: 1; mode=block
-  Referrer-Policy: strict-origin-when-cross-origin
-
-# Cache busting for JS and CSS files
-/src/core/*.js
-  Cache-Control: no-cache, no-store, must-revalidate
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0
+  ETag: "deploy-1752415469639"
+  Last-Modified: Sun, 13 Jul 2025 14:04:29 GMT
+
+/src/core/*.js
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+  Pragma: no-cache
+  Expires: 0
+  ETag: "deploy-1752415469639-core"
 
 /src/utils/*.js
-  Cache-Control: no-cache, no-store, must-revalidate
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0
-
-/src/modules/*.js
-  Cache-Control: no-cache, no-store, must-revalidate
-  Pragma: no-cache
-  Expires: 0
+  ETag: "deploy-1752415469639-utils"
 
 /src/styles/*.css
-  Cache-Control: no-cache, no-store, must-revalidate
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0
+  ETag: "deploy-1752415469639-styles"
 
 /version.js
-  Cache-Control: no-cache, no-store, must-revalidate
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0
+  ETag: "deploy-1752415469639-version"
 
-# Cache static assets for a short time
-/assets/*
-  Cache-Control: public, max-age=300
-
-# Force HTML to not cache
-/*.html
-  Cache-Control: no-cache, no-store, must-revalidate
+/index.html
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
   Pragma: no-cache
   Expires: 0
+  ETag: "deploy-1752415469639-html"

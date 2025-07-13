@@ -35,14 +35,15 @@ cp wiki-content/*.md advanced-retirement-planner.wiki/
 # Commit and push
 cd advanced-retirement-planner.wiki
 git add .
-git commit -m "Update wiki for v4.10.4 release"
+git commit -m "Update wiki for v4.10.5 release"
 git push origin master
 ```
 
-## 🎯 Key Updates for v4.10.4:
-- Updated version numbers from 4.10.0 to 4.10.4
-- Added critical bug fixes documentation (zero values, chart positioning)
-- Enhanced architecture refactor information (CSS extraction, code modularity)
-- Updated QA metrics (94.6% success rate) and security compliance
-- Added currency API fixes and couple mode improvements
-- Updated technical performance improvements (14KB file size reduction)
+## 🎯 Key Updates for v4.10.5:
+- Updated version numbers from 4.10.4 to 4.10.5
+- Added comprehensive GitHub Wiki documentation update
+- Added Netlify deployment cache-busting solution
+- Fixed missing generateChartData function and chart rendering
+- Updated Hebrew creator name (יהלי פולק)
+- Added complete deployment guide and troubleshooting documentation
+- Enhanced cache-busting strategy with headers and netlify.toml configuration
