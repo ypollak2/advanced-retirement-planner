@@ -3,21 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Retirement Planner v5.0.0 - Enhanced UI & Partner Data Fix</title>
+    <title>Advanced Retirement Planner v5.0.1 - Enhanced UI & Partner Data Fix</title>
     <meta name="description" content="Advanced retirement planning tool with comprehensive investment tracking">
     
     <!-- Tailwind CSS via CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     
     <!-- Main Application Styles -->
-    <link rel="stylesheet" href="src/styles/main.css?emergency=1752430896054">
-    
-    <!-- React & ReactDOM from CDN -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js" integrity="sha384-xI/lf9pE2p9O/2bA0i9/43Jj3v7F/W6f6iR/K0f2f/c2X/J/4+i/tD/" crossorigin="anonymous"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" integrity="sha384-gY/1C/i+P9xR/i/6E/0i/wD/i/p/t/c/x/z/g/y/i/v/E/2/b/A/0/i/9/4/3/J/j/3/v/7/F/W/6/f/6/i/R/K/0/f/2/f/c/2/X/J/4+i/tD/" crossorigin="anonymous"></script>
-    
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" integrity="sha384-zVEB8t2dGfTsM1s/9wO/3eI/CR/f/qj2/c/p/s/l/i/b/e/r/t/y/g/h/t/d/f/g/h/j/k/l/z/x/c/v/b/n/m/q/w/e/r/t/y/u/i/o/p/a/s/d/f/g/h/j/k/l/z/x/c/v/b/n/m/" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="src/styles/main.css">
     
     <style>
         /* Version indicator - repositioned for better UX */
@@ -48,95 +41,29 @@
 <body>
     <!-- Version indicator -->
     <div class="version-indicator">
-        ✨ v5.0.0
+        ✨ v5.0.1
     </div>
     
     <div id="root" class="min-h-screen" role="main" aria-label="Retirement Planner Application"></div>
-    <!-- ErrorBoundary component is defined in app-main.js and used for error handling -->
     
-    <script>
-        // Emergency deployment loader - uses existing file structure
-        console.log('✅ NETLIFY FIX STARTING:', 'netlify-fix-1752431602323');
-        
-        const NETLIFY_FIX_TIMESTAMP = 1752430896054;
-        
-        async function emergencyLoader() {
-            try {
-                console.log('🚑 Loading NETLIFY_FIX fixed files...');
-                
-                // Load files from existing locations with cache-busting
-                await loadScript(`version.js?v=4.11.0&emergency=${NETLIFY_FIX_TIMESTAMP}`);
-                console.log('✅ NETLIFY_FIX version loaded');
-                
-                await loadScript(`src/utils/currencyExchange.js?v=4.11.0&emergency=${NETLIFY_FIX_TIMESTAMP}`);
-                console.log('✅ NETLIFY_FIX currency exchange loaded');
-                
-                await loadScript(`src/utils/pensionCalculations.js?v=4.11.0&emergency=${NETLIFY_FIX_TIMESTAMP}`);
-                console.log('✅ NETLIFY_FIX pension calculations loaded');
-                
-                await loadScript(`src/utils/rsuCalculations.js?v=4.11.0&emergency=${NETLIFY_FIX_TIMESTAMP}`);
-                console.log('✅ NETLIFY_FIX RSU calculations loaded');
-                
-                await loadScript(`src/core/dynamic-loader.js?v=4.11.0&emergency=${NETLIFY_FIX_TIMESTAMP}`);
-                console.log('✅ NETLIFY_FIX dynamic loader loaded');
-                
-                await loadScript(`src/core/app-main.js?v=4.11.0&emergency=${NETLIFY_FIX_TIMESTAMP}`);
-                console.log('✅ NETLIFY_FIX core application loaded');
-                
-                // Initialize the application
-                window.initializeRetirementPlannerCore();
-                console.log('🎯 NETLIFY_FIX DEPLOYMENT COMPLETE!');
-                
-            } catch (error) {
-                console.error('🚨 NETLIFY_FIX DEPLOYMENT FAILED:', error);
-                document.getElementById('root').innerHTML = `
-                    <div style="padding: 40px; text-align: center; background: #fee2e2; min-height: 100vh;">
-                        <h1 style="color: #dc2626; font-size: 24px; margin-bottom: 20px;">
-                            🚨 NETLIFY_FIX DEPLOYMENT FAILED
-                        </h1>
-                        <p style="color: #991b1b; font-size: 16px; margin-bottom: 10px;">
-                            Fix ID: netlify-fix-1752431602323</p>
-                        <p style="color: #7f1d1d; font-size: 14px;">
-                            Error: ${error.message}
-                        </p>
-                        <button id="retry-emergency-btn" style="
-                            background: #dc2626; color: white; padding: 12px 24px; 
-                            border: none; border-radius: 6px; font-size: 16px; 
-                            margin-top: 20px; cursor: pointer;
-                        ">
-                            🔄 Retry Emergency Load
-                        </button>
-                    </div>
-                `;
-                // Add event listener for retry button
-                setTimeout(() => {
-                    const retryBtn = document.getElementById('retry-emergency-btn');
-                    if (retryBtn) {
-                        retryBtn.addEventListener('click', () => location.reload());
-                    }
-                }, 100);
-            }
-        }
-        
-        function loadScript(src) {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = src;
-                script.async = true;
-                script.onload = () => {
-                    console.log(`✅ NETLIFY_FIX LOADED: ${src}`);
-                    resolve();
-                };
-                script.onerror = () => {
-                    console.error(`🚨 NETLIFY_FIX FAILED: ${src}`);
-                    reject(new Error(`Failed to load: ${src}`));
-                };
-                document.head.appendChild(script);
-            });
-        }
-        
-        // Start emergency deployment immediately
-        document.addEventListener('DOMContentLoaded', emergencyLoader);
-    </script>
+    <!-- React & ReactDOM from CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Application Scripts -->
+    <script type="module" src="src/utils/currencyExchange.js"></script>
+    <script type="module" src="src/utils/pensionCalculations.js"></script>
+    <script type="module" src="src/utils/rsuCalculations.js"></script>
+    <script type="module" src="src/utils/TaxCalculators.js"></script>
+    <script type="module" src="src/core/dynamic-loader.js"></script>
+    <script type="module" src="src/components/EnhancedRSUCompanySelector.js"></script>
+    <script type="module" src="src/components/BottomLineSummary.js"></script>
+    <script type="module" src="src/components/SavingsSummaryPanel.js"></script>
+    <script type="module" src="src/components/BasicInputs.js"></script>
+    <script type="module" src="src/core/app-main.js"></script>
+
 </body>
 </html>

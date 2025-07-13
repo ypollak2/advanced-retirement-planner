@@ -188,8 +188,7 @@ input:focus, select:focus, textarea:focus {
     max-width: 1280px;
   }
 }
-  box-shadow: 0 2px 8px rgba(108,99,255,0.08);
-}
+  
 
 .dashboard-grid {
   display: grid;
