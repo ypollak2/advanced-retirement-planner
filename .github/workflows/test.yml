@@ -82,7 +82,7 @@ jobs:
             args: ["--no-sandbox", "--disable-setuid-sandbox"],
           });
           const page = await browser.newPage();
-          await page.goto("http://localhost:8080");
+          await page.goto("http://localhost:8080/index.html");
           await page.waitForSelector("#root", { timeout: 5000 });
           const appElement = await page.$("#root");
           if (appElement) {
