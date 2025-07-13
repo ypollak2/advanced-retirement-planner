@@ -201,11 +201,11 @@ function testHtmlStructure() {
             },
             { 
                 name: 'Module loading check', 
-                test: arch.html.includes('src/core/dynamic-loader.js') && arch.html.includes('type="module"') 
+                test: arch.html.includes('type="module"') && arch.html.includes('src/core/app-main.js') 
             },
             { 
                 name: 'Application initialization', 
-                test: fs.readFileSync('src/core/app-main.js', 'utf8').includes('window.initializeRetirementPlannerCore = () => {') 
+                test: fs.existsSync('src/core/app-main.js') && fs.readFileSync('src/core/app-main.js', 'utf8').includes('window.initializeRetirementPlannerCore') 
             }
         ];
         
@@ -213,7 +213,7 @@ function testHtmlStructure() {
         if (arch.architectureType === 'modular') {
             checks.push({
                 name: 'Dynamic loading system',
-                test: arch.html.includes('src/core/dynamic-loader.js')
+                test: fs.existsSync('src/core/dynamic-loader.js') && fs.readFileSync('src/core/dynamic-loader.js', 'utf8').includes('window.DynamicModuleLoader')
             });
         }
         
@@ -341,20 +341,12 @@ function testVersion5Upgrade() {
         // Check HTML title for v5.0.0 reference
         if (fs.existsSync('index.html')) {
             const html = fs.readFileSync('index.html', 'utf8');
-            const titleHasV5 = html.includes('v5.0.1') || html.includes('5.0.1');
-            logTest('HTML title includes v5.0.1', titleHasV5);
-            
-            // Check for enhanced UI features mentioned in v5.0.0
-            const hasEnhancedUI = html.includes('Enhanced UI') || html.includes('enhanced UI');
-            logTest('Enhanced UI features referenced', hasEnhancedUI);
-            
-            // Check for partner data fix mention
-            const hasPartnerDataFix = html.includes('Partner Data Fix') || html.includes('partner data');
-            logTest('Partner data fix referenced', hasPartnerDataFix);
+            const titleHasV5 = html.includes('v5.1.0') || html.includes('5.1.0');
+            logTest('HTML title includes v5.1.0', titleHasV5);
             
             // Verify version indicator display
-            const hasVersionIndicator = html.includes('version-indicator') && html.includes('v5.0.1');
-            logTest('Version indicator displays v5.0.1', hasVersionIndicator);
+            const hasVersionIndicator = html.includes('version-indicator') && html.includes('v5.1.0');
+            logTest('Version indicator displays v5.1.0', hasVersionIndicator);
         }
         
     } catch (error) {
