@@ -205,7 +205,7 @@ function testHtmlStructure() {
             },
             { 
                 name: 'Application initialization', 
-                test: arch.html.includes('window.initializeRetirementPlannerCore()') 
+                test: fs.readFileSync('src/core/app-main.js', 'utf8').includes('window.initializeRetirementPlannerCore = () => {') 
             }
         ];
         
