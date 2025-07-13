@@ -1,0 +1,81 @@
+# Netlify Configuration File
+
+[build]
+  # Build command (none needed for static site)
+  command = "echo 'Building Advanced Retirement Planner v4.10.4'"
+  
+  # Publish directory 
+  publish = "."
+  
+  # Functions directory (if needed in future)
+  functions = "netlify/functions"
+
+[build.environment]
+  # Force fresh builds
+  NODE_VERSION = "18"
+  FORCE_BUILD = "true"
+
+# Header rules
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Cache busting for JavaScript files
+[[headers]]
+  for = "/src/core/*.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/src/utils/*.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/src/modules/*.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/version.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+# Redirects and rewrites
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Build plugins
+[[plugins]]
+  package = "@netlify/plugin-sitemap"
+
+# Deploy contexts
+[context.production]
+  environment = { NODE_ENV = "production" }
+  
+[context.deploy-preview]
+  environment = { NODE_ENV = "preview" }
+
+[context.branch-deploy]
+  environment = { NODE_ENV = "development" }

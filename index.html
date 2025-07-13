@@ -1137,21 +1137,21 @@
                 }
 
                 // Load version configuration first
-                await loadScript('./version.js?v=4.10.4');
+                await loadScript(`./version.js?v=4.10.4&t=${Date.now()}`);
                 console.log('✅ Version configuration loaded');
                 
                 // Load utility modules
-                await loadScript('./src/utils/currencyExchange.js?v=4.10.1');
+                await loadScript(`./src/utils/currencyExchange.js?v=4.10.1&t=${Date.now()}`);
                 console.log('✅ Currency exchange utility loaded');
                 
-                await loadScript('./src/utils/pensionCalculations.js?v=4.10.1');
+                await loadScript(`./src/utils/pensionCalculations.js?v=4.10.1&t=${Date.now()}`);
                 console.log('✅ Pension calculations utility loaded');
                 
-                await loadScript('./src/utils/rsuCalculations.js?v=4.10.1');
+                await loadScript(`./src/utils/rsuCalculations.js?v=4.10.1&t=${Date.now()}`);
                 console.log('✅ RSU calculations utility loaded');
                 
                 // Load dynamic loader
-                await loadScript('./src/core/dynamic-loader.js?v=4.10.4');
+                await loadScript(`./src/core/dynamic-loader.js?v=4.10.4&t=${Date.now()}`);
                 console.log('✅ Dynamic loader loaded');
 
                 // Update loading message
