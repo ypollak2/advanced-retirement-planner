@@ -1200,7 +1200,22 @@
                                 React.createElement('select', {
                                     key: 'rsu-company-select',
                                     value: inputs.rsuCompany || '',
-                                    onChange: (e) => setInputs({...inputs, rsuCompany: e.target.value}),
+                                    onChange: async (e) => {
+                                        const symbol = e.target.value;
+                                        setInputs({...inputs, rsuCompany: symbol});
+                                        
+                                        // Auto-fetch stock price when company is selected
+                                        if (symbol && symbol !== 'OTHER' && symbol !== '') {
+                                            try {
+                                                const price = await fetchStockPrice(symbol);
+                                                if (price) {
+                                                    setInputs(prev => ({...prev, rsuCurrentPrice: price}));
+                                                }
+                                            } catch (error) {
+                                                console.log('Stock price fetch failed, using manual input');
+                                            }
+                                        }
+                                    },
                                     className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 text-sm"
                                 }, [
                                     React.createElement('option', { key: 'rsu-none', value: '' }, 
@@ -1643,6 +1658,87 @@
                             ])
                         ])
                     ] : []),
+
+                    // RSU Results Section
+                    ...(inputs.rsuCompany && inputs.rsuUnits && inputs.rsuCurrentPrice ? [
+                        React.createElement('div', {
+                            key: 'rsu-results',
+                            className: "bg-indigo-50 rounded-lg p-4 border border-indigo-200 mt-4"
+                        }, [
+                            React.createElement('h4', {
+                                key: 'rsu-results-title',
+                                className: "text-lg font-semibold text-indigo-700 mb-3 flex items-center"
+                            }, [
+                                React.createElement('span', { key: 'rsu-results-icon', className: "mr-2" }, '📈'),
+                                language === 'he' ? 'תחזית RSU' : 'RSU Projections'
+                            ]),
+                            
+                            React.createElement('div', {
+                                key: 'rsu-calculations',
+                                className: "grid grid-cols-2 gap-4"
+                            }, (() => {
+                                const rsuProjections = calculateRSUProjections();
+                                if (!rsuProjections) return [];
+                                
+                                return [
+                                    React.createElement('div', {
+                                        key: 'rsu-gross-value',
+                                        className: "bg-white rounded p-3 border border-indigo-300"
+                                    }, [
+                                        React.createElement('div', { key: 'rsu-gross-label', className: "text-sm text-indigo-600" }, 
+                                            language === 'he' ? 'ערך כולל' : 'Gross Value'),
+                                        React.createElement('div', { key: 'rsu-gross-amount', className: "text-lg font-bold text-indigo-800" }, 
+                                            `$${Math.round(rsuProjections.totalValue).toLocaleString()}`)
+                                    ]),
+                                    
+                                    React.createElement('div', {
+                                        key: 'rsu-net-value',
+                                        className: "bg-white rounded p-3 border border-indigo-300"
+                                    }, [
+                                        React.createElement('div', { key: 'rsu-net-label', className: "text-sm text-indigo-600" }, 
+                                            language === 'he' ? 'ערך נטו' : 'Net Value'),
+                                        React.createElement('div', { key: 'rsu-net-amount', className: "text-lg font-bold text-indigo-800" }, 
+                                            `$${Math.round(rsuProjections.netValue).toLocaleString()}`)
+                                    ]),
+                                    
+                                    React.createElement('div', {
+                                        key: 'rsu-taxes',
+                                        className: "bg-white rounded p-3 border border-indigo-300"
+                                    }, [
+                                        React.createElement('div', { key: 'rsu-taxes-label', className: "text-sm text-indigo-600" }, 
+                                            language === 'he' ? 'מסים' : 'Taxes'),
+                                        React.createElement('div', { key: 'rsu-taxes-amount', className: "text-lg font-bold text-red-600" }, 
+                                            `$${Math.round(rsuProjections.totalTaxes).toLocaleString()}`)
+                                    ]),
+                                    
+                                    React.createElement('div', {
+                                        key: 'rsu-units',
+                                        className: "bg-white rounded p-3 border border-indigo-300"
+                                    }, [
+                                        React.createElement('div', { key: 'rsu-units-label', className: "text-sm text-indigo-600" }, 
+                                            language === 'he' ? 'יחידות כולל' : 'Total Units'),
+                                        React.createElement('div', { key: 'rsu-units-amount', className: "text-lg font-bold text-indigo-800" }, 
+                                            `${rsuProjections.totalUnits.toLocaleString()}`)
+                                    ])
+                                ];
+                            })()),
+                            
+                            React.createElement('div', {
+                                key: 'rsu-info-tax',
+                                className: "mt-3 p-3 bg-indigo-100 rounded text-sm text-indigo-700"
+                            }, (() => {
+                                const rsuProjections = calculateRSUProjections();
+                                const taxCountryText = inputs.rsuTaxCountry === 'israel' ? 
+                                    (language === 'he' ? 'ישראל' : 'Israel') : 
+                                    (language === 'he' ? 'ארה״ב' : 'USA');
+                                const effectiveRate = rsuProjections ? rsuProjections.effectiveRate.toFixed(1) : '0';
+                                
+                                return language === 'he' ? 
+                                    `💰 חישוב מס לפי חוקי ${taxCountryText} | שיעור מס אפקטיבי: ${effectiveRate}%` :
+                                    `💰 Tax calculation based on ${taxCountryText} laws | Effective tax rate: ${effectiveRate}%`;
+                            })())
+                        ])
+                    ] : []),
                     
                     React.createElement('div', { 
                         key: 'monthly',
@@ -1689,6 +1785,126 @@
 
         const [activeTab, setActiveTab] = React.useState('basic');
         const [language, setLanguage] = React.useState('he');
+
+        // Stock Price API Integration for RSUs
+        const fetchStockPrice = async (symbol) => {
+            try {
+                // Free stock API alternatives (Yahoo Finance proxy or Alpha Vantage demo)
+                const response = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`);
+                const data = await response.json();
+                
+                if (data?.chart?.result?.[0]?.meta?.regularMarketPrice) {
+                    return parseFloat(data.chart.result[0].meta.regularMarketPrice).toFixed(2);
+                }
+                
+                // Fallback to static prices if API fails
+                const fallbackPrices = {
+                    'AAPL': 190.50,
+                    'GOOGL': 140.25,
+                    'MSFT': 415.80,
+                    'AMZN': 145.30,
+                    'META': 485.60,
+                    'TSLA': 248.75,
+                    'NVDA': 875.90
+                };
+                
+                return fallbackPrices[symbol] || null;
+            } catch (error) {
+                console.log(`Failed to fetch ${symbol} price:`, error.message);
+                
+                // Return static fallback prices
+                const fallbackPrices = {
+                    'AAPL': 190.50,
+                    'GOOGL': 140.25,
+                    'MSFT': 415.80,
+                    'AMZN': 145.30,
+                    'META': 485.60,
+                    'TSLA': 248.75,
+                    'NVDA': 875.90
+                };
+                
+                return fallbackPrices[symbol] || null;
+            }
+        };
+
+        // RSU Taxation and Calculation Logic
+        const calculateRSUTaxes = (rsuValue, taxCountry, income) => {
+            const taxes = {};
+            
+            if (taxCountry === 'israel') {
+                // Israeli RSU taxation (simplified)
+                // RSUs are taxed as employment income at grant and capital gains on appreciation
+                const marginalRate = income > 640000 ? 0.50 : income > 220000 ? 0.35 : income > 75000 ? 0.31 : 0.10;
+                
+                taxes.incomeTax = rsuValue * marginalRate;
+                taxes.nationalInsurance = Math.min(rsuValue * 0.07, 2400); // Simplified NI
+                taxes.healthTax = rsuValue * 0.031;
+                taxes.totalTax = taxes.incomeTax + taxes.nationalInsurance + taxes.healthTax;
+                taxes.netValue = rsuValue - taxes.totalTax;
+                taxes.effectiveRate = (taxes.totalTax / rsuValue) * 100;
+            } else if (taxCountry === 'us') {
+                // US RSU taxation (simplified)
+                // RSUs are taxed as ordinary income at vesting
+                const federalRate = income > 418850 ? 0.37 : income > 329850 ? 0.35 : income > 209425 ? 0.32 : income > 87850 ? 0.24 : 0.22;
+                const stateRate = 0.05; // Average state rate
+                const socialSecurity = income < 160200 ? rsuValue * 0.062 : 0;
+                const medicare = rsuValue * 0.0145;
+                
+                taxes.federalTax = rsuValue * federalRate;
+                taxes.stateTax = rsuValue * stateRate;
+                taxes.socialSecurity = socialSecurity;
+                taxes.medicare = medicare;
+                taxes.totalTax = taxes.federalTax + taxes.stateTax + taxes.socialSecurity + taxes.medicare;
+                taxes.netValue = rsuValue - taxes.totalTax;
+                taxes.effectiveRate = (taxes.totalTax / rsuValue) * 100;
+            }
+            
+            return taxes;
+        };
+
+        const calculateRSUProjections = () => {
+            if (!inputs.rsuCompany || !inputs.rsuUnits || !inputs.rsuCurrentPrice) {
+                return null;
+            }
+
+            const years = inputs.retirementAge - inputs.currentAge;
+            const vestingYears = Math.min(inputs.rsuVestingYears || 4, years);
+            const annualGrowthRate = (inputs.rsuExpectedGrowth || 10) / 100;
+            const currentStockPrice = inputs.rsuCurrentPrice;
+            const annualUnits = inputs.rsuUnits;
+            
+            let totalUnits = 0;
+            let totalValue = 0;
+            let totalTaxes = 0;
+            
+            // Calculate vesting over the years
+            for (let year = 1; year <= years; year++) {
+                const unitsThisYear = year <= vestingYears ? annualUnits : 0;
+                const priceAtVesting = currentStockPrice * Math.pow(1 + annualGrowthRate, year);
+                const valueThisYear = unitsThisYear * priceAtVesting;
+                
+                if (valueThisYear > 0) {
+                    const annualSalary = (inputs.planningType === 'couple' ? 
+                        (inputs.partner1Salary || 0) + (inputs.partner2Salary || 0) : 
+                        inputs.currentMonthlySalary) * 12;
+                    
+                    const taxInfo = calculateRSUTaxes(valueThisYear, inputs.rsuTaxCountry, annualSalary);
+                    
+                    totalUnits += unitsThisYear;
+                    totalValue += valueThisYear;
+                    totalTaxes += taxInfo.totalTax;
+                }
+            }
+            
+            return {
+                totalUnits,
+                totalValue,
+                totalTaxes,
+                netValue: totalValue - totalTaxes,
+                effectiveRate: totalValue > 0 ? (totalTaxes / totalValue) * 100 : 0
+            };
+        };
+
         const [showChart, setShowChart] = React.useState(false);
         const [showInflationChart, setShowInflationChart] = React.useState(false);
         const [chartView, setChartView] = React.useState('combined'); // 'combined', 'partner1', 'partner2'

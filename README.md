@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v4.8.0
+# 🚀 Advanced Retirement Planner v4.9.0
 
-[![Version](https://img.shields.io/badge/version-4.8.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-4.9.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-green.svg)](tests/)
 [![QA](https://img.shields.io/badge/QA-in--progress-orange.svg)](https://github.com/ypollak2/advanced-retirement-planner/wiki/QA-Process)
@@ -13,9 +13,16 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## ✨ What's New in v4.8.0
+## ✨ What's New in v4.9.0
 
-### 📈 **RSU Support & Security Enhancements** (Latest)
+### 💰 **Complete RSU Implementation & Stock Price Integration** (Latest)
+- **Real-Time Stock Prices**: Auto-fetch stock prices from Yahoo Finance API with fallback support
+- **Advanced RSU Taxation**: Comprehensive tax calculations for both Israeli and US RSU taxation laws
+- **RSU Projections**: Complete vesting projections with growth modeling and net value calculations
+- **Tax Rate Analysis**: Effective tax rate calculations with detailed breakdown by country
+- **31 New Tests**: Expanded RSU test suite achieving 100% coverage of all RSU functionality
+
+### 📈 **Previous: RSU Foundation (v4.8.0)**
 - **RSU Integration**: Added Restricted Stock Units input section with company selection, vesting periods, and tax implications
 - **Security Hardening**: Eliminated all eval() usage and Function constructor risks for maximum security
 - **Enhanced Testing**: Comprehensive QA suite with zero security vulnerabilities

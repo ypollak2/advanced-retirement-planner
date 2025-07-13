@@ -228,6 +228,113 @@ class RSUFeatureTests {
         }
     }
 
+    // Test 7: Stock Price API Integration
+    testStockPriceAPI() {
+        console.log('\\n📊 Testing Stock Price API Integration...\\n');
+        
+        const appMainPath = 'src/core/app-main.js';
+        if (fs.existsSync(appMainPath)) {
+            const content = fs.readFileSync(appMainPath, 'utf8');
+            
+            // Check for fetchStockPrice function
+            const hasFetchFunction = content.includes('fetchStockPrice') && 
+                                   content.includes('async (symbol)');
+            this.logTest('Stock price fetch function', hasFetchFunction,
+                hasFetchFunction ? 'Stock price API function implemented' : 'Stock price API function missing');
+
+            // Check for Yahoo Finance API integration
+            const hasYahooAPI = content.includes('query1.finance.yahoo.com');
+            this.logTest('Yahoo Finance API integration', hasYahooAPI,
+                hasYahooAPI ? 'Yahoo Finance API integrated' : 'Yahoo Finance API missing');
+
+            // Check for fallback prices
+            const hasFallbackPrices = content.includes('fallbackPrices') && 
+                                    content.includes('AAPL') && 
+                                    content.includes('190.50');
+            this.logTest('Fallback stock prices', hasFallbackPrices,
+                hasFallbackPrices ? 'Fallback prices available for offline mode' : 'Fallback prices missing');
+
+            // Check for auto-fetch on company selection
+            const hasAutoFetch = content.includes('onChange: async (e)') && 
+                               content.includes('await fetchStockPrice');
+            this.logTest('Auto-fetch on company selection', hasAutoFetch,
+                hasAutoFetch ? 'Stock prices auto-fetch when company selected' : 'Auto-fetch functionality missing');
+        }
+    }
+
+    // Test 8: RSU Taxation Logic
+    testRSUTaxationLogic() {
+        console.log('\\n💰 Testing RSU Taxation Logic...\\n');
+        
+        const appMainPath = 'src/core/app-main.js';
+        if (fs.existsSync(appMainPath)) {
+            const content = fs.readFileSync(appMainPath, 'utf8');
+            
+            // Check for taxation function
+            const hasTaxFunction = content.includes('calculateRSUTaxes') && 
+                                 content.includes('(rsuValue, taxCountry, income)');
+            this.logTest('RSU taxation function', hasTaxFunction,
+                hasTaxFunction ? 'RSU taxation calculation function exists' : 'RSU taxation function missing');
+
+            // Check for Israeli tax logic
+            const hasIsraeliTax = content.includes("taxCountry === 'israel'") && 
+                                content.includes('marginalRate') &&
+                                content.includes('nationalInsurance');
+            this.logTest('Israeli RSU taxation', hasIsraeliTax,
+                hasIsraeliTax ? 'Israeli RSU tax logic implemented' : 'Israeli RSU tax logic missing');
+
+            // Check for US tax logic
+            const hasUSTax = content.includes("taxCountry === 'us'") && 
+                           content.includes('federalRate') &&
+                           content.includes('socialSecurity');
+            this.logTest('US RSU taxation', hasUSTax,
+                hasUSTax ? 'US RSU tax logic implemented' : 'US RSU tax logic missing');
+
+            // Check for RSU projections
+            const hasProjections = content.includes('calculateRSUProjections') && 
+                                  content.includes('vestingYears') &&
+                                  content.includes('annualGrowthRate');
+            this.logTest('RSU projections calculation', hasProjections,
+                hasProjections ? 'RSU projection calculations implemented' : 'RSU projections missing');
+        }
+    }
+
+    // Test 9: RSU Results Display
+    testRSUResultsDisplay() {
+        console.log('\\n📈 Testing RSU Results Display...\\n');
+        
+        const appMainPath = 'src/core/app-main.js';
+        if (fs.existsSync(appMainPath)) {
+            const content = fs.readFileSync(appMainPath, 'utf8');
+            
+            // Check for RSU results section
+            const hasResultsSection = content.includes('rsu-results') && 
+                                    content.includes('RSU Projections') &&
+                                    content.includes('תחזית RSU');
+            this.logTest('RSU results section', hasResultsSection,
+                hasResultsSection ? 'RSU results display section implemented' : 'RSU results section missing');
+
+            // Check for all result metrics
+            const hasAllMetrics = content.includes('Gross Value') && 
+                                content.includes('Net Value') &&
+                                content.includes('Taxes') &&
+                                content.includes('Total Units');
+            this.logTest('RSU result metrics', hasAllMetrics,
+                hasAllMetrics ? 'All RSU metrics displayed (gross, net, taxes, units)' : 'Some RSU metrics missing');
+
+            // Check for tax information
+            const hasTaxInfo = content.includes('Tax calculation based on') && 
+                             content.includes('Effective tax rate');
+            this.logTest('RSU tax information', hasTaxInfo,
+                hasTaxInfo ? 'Tax calculation information displayed' : 'Tax information missing');
+
+            // Check for conditional display
+            const hasConditionalDisplay = content.includes('inputs.rsuCompany && inputs.rsuUnits && inputs.rsuCurrentPrice');
+            this.logTest('RSU conditional display', hasConditionalDisplay,
+                hasConditionalDisplay ? 'RSU results show only when inputs provided' : 'RSU conditional display missing');
+        }
+    }
+
     // Run all RSU feature tests
     async runRSUFeatureTests() {
         console.log('📈 RSU Feature Test Suite');
@@ -240,6 +347,9 @@ class RSUFeatureTests {
         this.testRSUTaxCountrySupport();
         this.testRSUUIDesign();
         this.testRSUFormIntegration();
+        this.testStockPriceAPI();
+        this.testRSUTaxationLogic();
+        this.testRSUResultsDisplay();
 
         return this.generateReport();
     }
