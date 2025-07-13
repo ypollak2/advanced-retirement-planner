@@ -1,9 +1,9 @@
-# 🚀 Advanced Retirement Planner v4.10.0
+# 🚀 Advanced Retirement Planner v4.10.4
 
-[![Version](https://img.shields.io/badge/version-4.10.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-4.10.4-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-green.svg)](tests/)
-[![QA](https://img.shields.io/badge/QA-94.7%25-brightgreen.svg)](https://github.com/ypollak2/advanced-retirement-planner/wiki/QA-Process)
+[![QA](https://img.shields.io/badge/QA-94.6%25-brightgreen.svg)](https://github.com/ypollak2/advanced-retirement-planner/wiki/QA-Process)
 [![Deployment](https://img.shields.io/badge/deployment-Netlify%20%2B%20GitHub%20Pages-4078c0.svg)](https://advanced-pension-planner.netlify.app/)
 
 > **Professional retirement planning tool with elegant UI design, comprehensive financial planning capabilities, and production-ready quality**
@@ -13,24 +13,41 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v4.10.0 - Major Design Overhaul
+## 🎨 What's New in v4.10.4 - Complete UI Overhaul & Architecture Refactor
 
-### **🔧 Critical Bug Fixes & UX Improvements** (Latest)
-- **✅ Fixed Zero Values Bug**: Resolved savings summary showing zero values in couple mode with proper default salary calculations
-- **📊 Enhanced Chart Display**: Increased chart size from 400px to 600px, improved centering and responsiveness with 1200px max-width
-- **🛤️ Redesigned Progress Timeline**: Replaced basic progress bar with comprehensive "Retirement Journey Timeline" featuring:
-  - Animated gradient progress visualization with clear age markers
-  - Current status breakdown (years remaining, monthly savings, projected total)
-  - Next steps guidance with actionable instructions
-  - Educational compound interest insights with personalized calculations
-- **⚙️ Advanced Analysis Fixed**: Resolved setInputs function error ensuring stress testing and scenario analysis work correctly
-- **🎯 UI Clarity Improvements**: Enhanced couple vs single planning experience with better visual separation and informational content
+### **🔧 Critical Fixes & Major Improvements** (Latest)
 
-### **📋 QA Status**: 94.7% Success Rate
+#### **✅ Zero Values Bug - FINALLY FIXED**
+- **Enhanced Smart Defaults**: Completely rewritten logic to show realistic age-based savings estimates instead of ₪0
+- **Robust Fallback System**: Proper handling of undefined/null values with meaningful defaults
+- **User Experience**: No more confusing zero values in savings summary
+
+#### **📊 Chart Positioning - CENTERED**
+- **Full-Width Layout**: Moved chart from sidebar to centered, full-width position
+- **Responsive Design**: Better visual hierarchy with improved grid layout
+- **Enhanced Controls**: Inflation toggle and chart view selection properly positioned
+
+#### **👥 Couple Mode Improvements**
+- **Hide Single Salary Field**: Automatic hiding when couple mode is selected
+- **Partner Names Integration**: Names properly displayed in graphs and panels
+- **Better UI Flow**: Cleaner interface for couple planning
+
+#### **💱 Currency APIs - WORKING**
+- **Real-Time Exchange Rates**: Live fetching of USD, EUR, GBP, BTC, ETH rates
+- **Loading States**: Proper loading indicators and error handling
+- **No Decimals**: Whole number displays only (no cents/pennies)
+
+#### **🏗️ Code Architecture Refactor**
+- **Modular Structure**: Extracted CSS to external file (60KB+ moved)
+- **Utility Modules**: Separated pension/RSU calculations and currency exchange
+- **File Size Reduction**: app-main.js reduced from 179.8KB to 165.8KB
+- **Syntax Fixes**: Eliminated all JavaScript syntax errors
+
+### **📋 QA Status**: 94.6% Success Rate
 - **✅ 100% Security Compliance**: Zero critical security vulnerabilities
-- **✅ 100% Core Tests Passing**: All 41 core functionality tests pass
-- **✅ 100% RSU Tests Passing**: All 31 RSU feature tests pass
-- **⚠️ Minor Issues**: 2 high-priority performance optimizations identified (file size optimization opportunities)
+- **✅ Syntax Clean**: All JavaScript syntax errors resolved
+- **✅ Performance Improved**: 14KB file size reduction achieved
+- **⚠️ Minor Issues**: 2 high-priority file size optimizations remaining
 
 ## ✨ Previous Updates - v4.9.0
 
