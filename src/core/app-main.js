@@ -414,7 +414,7 @@
                     React.createElement('div', { className: "text-sm text-green-700 font-medium" }, 
                         language === 'he' ? 'קרן השתלמות' : 'Training Fund'),
                     React.createElement('div', { className: "text-lg font-bold text-green-800 wealth-amount" }, 
-                        formatCurrency(inputs.trainingFund || 0))
+                        formatCurrency(inputs.currentTrainingFundSavings || 0))
                 ]),
                 
                 React.createElement('div', {
@@ -794,12 +794,53 @@
                                         React.createElement('label', { 
                                             key: 'partner1-salary-label',
                                             className: "block text-sm font-medium text-gray-700 mb-1" 
-                                        }, language === 'he' ? 'משכורת חודשית' : 'Monthly Salary'),
+                                        }, language === 'he' ? 'משכורת חודשית (₪)' : 'Monthly Salary (₪)'),
                                         React.createElement('input', {
                                             key: 'partner1-salary-input',
                                             type: 'number',
                                             value: inputs.partner1Salary || '',
                                             onChange: (e) => setInputs({...inputs, partner1Salary: parseInt(e.target.value) || 0}),
+                                            className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
+                                        })
+                                    ]),
+                                    React.createElement('div', { key: 'partner1-training-fund' }, [
+                                        React.createElement('label', { 
+                                            key: 'partner1-training-fund-label',
+                                            className: "block text-sm font-medium text-gray-700 mb-1" 
+                                        }, language === 'he' ? 'קרן השתלמות (%)' : 'Training Fund (%)'),
+                                        React.createElement('input', {
+                                            key: 'partner1-training-fund-input',
+                                            type: 'number',
+                                            step: '0.1',
+                                            value: inputs.partner1TrainingFundRate || 10.0,
+                                            onChange: (e) => setInputs({...inputs, partner1TrainingFundRate: parseFloat(e.target.value) || 0}),
+                                            className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
+                                        })
+                                    ]),
+                                    React.createElement('div', { key: 'partner1-management-fees' }, [
+                                        React.createElement('label', { 
+                                            key: 'partner1-management-fees-label',
+                                            className: "block text-sm font-medium text-gray-700 mb-1" 
+                                        }, language === 'he' ? 'דמי ניהול (%)' : 'Management Fees (%)'),
+                                        React.createElement('input', {
+                                            key: 'partner1-management-fees-input',
+                                            type: 'number',
+                                            step: '0.1',
+                                            value: inputs.partner1ManagementFees || 1.0,
+                                            onChange: (e) => setInputs({...inputs, partner1ManagementFees: parseFloat(e.target.value) || 0}),
+                                            className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
+                                        })
+                                    ]),
+                                    React.createElement('div', { key: 'partner1-current-savings' }, [
+                                        React.createElement('label', { 
+                                            key: 'partner1-current-savings-label',
+                                            className: "block text-sm font-medium text-gray-700 mb-1" 
+                                        }, language === 'he' ? 'חיסכון קיים (₪)' : 'Current Savings (₪)'),
+                                        React.createElement('input', {
+                                            key: 'partner1-current-savings-input',
+                                            type: 'number',
+                                            value: inputs.partner1CurrentSavings || '',
+                                            onChange: (e) => setInputs({...inputs, partner1CurrentSavings: parseInt(e.target.value) || 0}),
                                             className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
                                         })
                                     ])
@@ -846,12 +887,53 @@
                                         React.createElement('label', { 
                                             key: 'partner2-salary-label',
                                             className: "block text-sm font-medium text-gray-700 mb-1" 
-                                        }, language === 'he' ? 'משכורת חודשית' : 'Monthly Salary'),
+                                        }, language === 'he' ? 'משכורת חודשית (₪)' : 'Monthly Salary (₪)'),
                                         React.createElement('input', {
                                             key: 'partner2-salary-input',
                                             type: 'number',
                                             value: inputs.partner2Salary || '',
                                             onChange: (e) => setInputs({...inputs, partner2Salary: parseInt(e.target.value) || 0}),
+                                            className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
+                                        })
+                                    ]),
+                                    React.createElement('div', { key: 'partner2-training-fund' }, [
+                                        React.createElement('label', { 
+                                            key: 'partner2-training-fund-label',
+                                            className: "block text-sm font-medium text-gray-700 mb-1" 
+                                        }, language === 'he' ? 'קרן השתלמות (%)' : 'Training Fund (%)'),
+                                        React.createElement('input', {
+                                            key: 'partner2-training-fund-input',
+                                            type: 'number',
+                                            step: '0.1',
+                                            value: inputs.partner2TrainingFundRate || 10.0,
+                                            onChange: (e) => setInputs({...inputs, partner2TrainingFundRate: parseFloat(e.target.value) || 0}),
+                                            className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
+                                        })
+                                    ]),
+                                    React.createElement('div', { key: 'partner2-management-fees' }, [
+                                        React.createElement('label', { 
+                                            key: 'partner2-management-fees-label',
+                                            className: "block text-sm font-medium text-gray-700 mb-1" 
+                                        }, language === 'he' ? 'דמי ניהול (%)' : 'Management Fees (%)'),
+                                        React.createElement('input', {
+                                            key: 'partner2-management-fees-input',
+                                            type: 'number',
+                                            step: '0.1',
+                                            value: inputs.partner2ManagementFees || 1.0,
+                                            onChange: (e) => setInputs({...inputs, partner2ManagementFees: parseFloat(e.target.value) || 0}),
+                                            className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
+                                        })
+                                    ]),
+                                    React.createElement('div', { key: 'partner2-current-savings' }, [
+                                        React.createElement('label', { 
+                                            key: 'partner2-current-savings-label',
+                                            className: "block text-sm font-medium text-gray-700 mb-1" 
+                                        }, language === 'he' ? 'חיסכון קיים (₪)' : 'Current Savings (₪)'),
+                                        React.createElement('input', {
+                                            key: 'partner2-current-savings-input',
+                                            type: 'number',
+                                            value: inputs.partner2CurrentSavings || '',
+                                            onChange: (e) => setInputs({...inputs, partner2CurrentSavings: parseInt(e.target.value) || 0}),
                                             className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
                                         })
                                     ])
@@ -916,7 +998,7 @@
                             React.createElement('input', {
                                 key: 'training-fund-input',
                                 type: 'number',
-                                value: inputs.trainingFund || 0,
+                                value: inputs.currentTrainingFundSavings || 0,
                                 onChange: (e) => setInputs({...inputs, trainingFund: parseInt(e.target.value) || 0}),
                                 className: "financial-input"
                             })
@@ -1580,8 +1662,8 @@
                         },
                         currentSavings: {
                             pension: inputs.currentSavings || 0,
-                            trainingFund: inputs.trainingFund || 0,
-                            total: (inputs.currentSavings || 0) + (inputs.trainingFund || 0)
+                            trainingFund: inputs.currentTrainingFundSavings || 0,
+                            total: (inputs.currentSavings || 0) + (inputs.currentTrainingFundSavings || 0)
                         },
                         monthlyContributions: {
                             pensionContribution: inputs.pensionContribution || 18.5,
