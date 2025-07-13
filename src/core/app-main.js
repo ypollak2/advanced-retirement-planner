@@ -205,11 +205,11 @@
                                 React.createElement('div', { key: 'company-info' }, [
                                     React.createElement('div', {
                                         key: 'company-name',
-                                        className: "font-semibold text-gray-800 text-sm"
+                                        className: "font-semibold text-gray-800 text-sm truncate"
                                     }, company.name),
                                     React.createElement('div', {
                                         key: 'company-symbol',
-                                        className: "text-xs text-gray-500"
+                                        className: "text-xs text-gray-500 truncate"
                                     }, `${company.symbol} • ${company.category}`)
                                 ]),
                                 React.createElement('div', {
@@ -495,7 +495,7 @@
                     }, [
                         React.createElement('h3', { 
                             key: 'main-title',
-                            className: "text-xl font-bold text-slate-800 leading-tight" 
+                            className: "text-xl font-bold text-slate-800 leading-normal break-words" 
                         }, language === 'he' ? 'תחזית פרישה מקצועית' : 'Professional Retirement Forecast'),
                         React.createElement('p', {
                             key: 'subtitle', 
@@ -2337,45 +2337,102 @@
         ]);
     };
 
-    // Generate Chart Data Function
+    // Enhanced Chart Data Function v5.0.0 - Proper Partner Data Handling
     const generateChartData = (inputs, chartView, showInflationChart) => {
         const chartData = [];
-        const currentAge = inputs.currentAge || 30;
-        const retirementAge = inputs.retirementAge || 67;
         const inflationRate = (inputs.inflationRate || 3) / 100;
         const pensionReturn = ((inputs.expectedReturn || 7) - (inputs.accumulationFees || 1.0)) / 100;
         const trainingReturn = ((inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.6)) / 100;
         const personalReturn = (inputs.expectedReturn || 7) / 100;
 
-        for (let age = currentAge; age <= retirementAge; age += 3) {
-            const yearsInvested = age - currentAge;
-            
-            let pensionFV = 0, trainingFV = 0, personalFV = 0, currentSavingsGrowth = 0;
-            
-            // Simple calculation for demonstration
-            const totalMonthlySalary = inputs.planningType === 'couple' 
-                ? (inputs.partner1Salary || 15000) + (inputs.partner2Salary || 12000)
-                : (inputs.currentMonthlySalary || 15000);
-                
-            const pensionContribution = totalMonthlySalary * 0.185; // 18.5%
-            const trainingContribution = totalMonthlySalary * 0.075; // 7.5%
-            const personalContribution = Math.max(0, totalMonthlySalary * 0.05); // 5%
-            
-            if (yearsInvested > 0) {
-                pensionFV = pensionContribution * 12 * ((Math.pow(1 + pensionReturn, yearsInvested) - 1) / pensionReturn) * (1 + pensionReturn);
-                trainingFV = trainingContribution * 12 * ((Math.pow(1 + trainingReturn, yearsInvested) - 1) / trainingReturn) * (1 + trainingReturn);
-                personalFV = personalContribution * 12 * ((Math.pow(1 + personalReturn, yearsInvested) - 1) / personalReturn) * (1 + personalReturn);
-                currentSavingsGrowth = (inputs.currentSavings || 50000) * Math.pow(1 + pensionReturn, yearsInvested);
+        // Determine which data to calculate based on chartView
+        let dataToCalculate = [];
+        
+        if (inputs.planningType === 'couple') {
+            if (chartView === 'partner1') {
+                dataToCalculate = [{
+                    type: 'partner1',
+                    salary: inputs.partner1Salary || 15000,
+                    age: inputs.partner1Age || 30,
+                    currentSavings: inputs.partner1CurrentSavings || 25000,
+                    retirementAge: inputs.retirementAge || 67
+                }];
+            } else if (chartView === 'partner2') {
+                dataToCalculate = [{
+                    type: 'partner2', 
+                    salary: inputs.partner2Salary || 12000,
+                    age: inputs.partner2Age || 28,
+                    currentSavings: inputs.partner2CurrentSavings || 25000,
+                    retirementAge: inputs.retirementAge || 67
+                }];
+            } else {
+                // Combined view
+                dataToCalculate = [
+                    {
+                        type: 'partner1',
+                        salary: inputs.partner1Salary || 15000,
+                        age: inputs.partner1Age || 30,
+                        currentSavings: inputs.partner1CurrentSavings || 25000,
+                        retirementAge: inputs.retirementAge || 67
+                    },
+                    {
+                        type: 'partner2',
+                        salary: inputs.partner2Salary || 12000,
+                        age: inputs.partner2Age || 28,
+                        currentSavings: inputs.partner2CurrentSavings || 25000,
+                        retirementAge: inputs.retirementAge || 67
+                    }
+                ];
             }
+        } else {
+            // Single planning
+            dataToCalculate = [{
+                type: 'single',
+                salary: inputs.currentMonthlySalary || 15000,
+                age: inputs.currentAge || 30,
+                currentSavings: inputs.currentSavings || 50000,
+                retirementAge: inputs.retirementAge || 67
+            }];
+        }
+
+        // Calculate age range for chart
+        const minAge = Math.min(...dataToCalculate.map(d => d.age));
+        const maxAge = Math.max(...dataToCalculate.map(d => d.retirementAge));
+
+        for (let age = minAge; age <= maxAge; age += 3) {
+            let totalPensionFV = 0, totalTrainingFV = 0, totalPersonalFV = 0, totalCurrentSavingsGrowth = 0;
             
-            const totalNominal = pensionFV + trainingFV + personalFV + currentSavingsGrowth;
-            const totalInflationAdjusted = totalNominal / Math.pow(1 + inflationRate, yearsInvested);
+            dataToCalculate.forEach(partner => {
+                if (age >= partner.age && age <= partner.retirementAge) {
+                    const yearsInvested = age - partner.age;
+                    
+                    const pensionContribution = partner.salary * 0.185; // 18.5%
+                    const trainingContribution = partner.salary * 0.075; // 7.5%
+                    const personalContribution = Math.max(0, partner.salary * 0.05); // 5%
+                    
+                    if (yearsInvested > 0) {
+                        const pensionFV = pensionContribution * 12 * ((Math.pow(1 + pensionReturn, yearsInvested) - 1) / pensionReturn) * (1 + pensionReturn);
+                        const trainingFV = trainingContribution * 12 * ((Math.pow(1 + trainingReturn, yearsInvested) - 1) / trainingReturn) * (1 + trainingReturn);
+                        const personalFV = personalContribution * 12 * ((Math.pow(1 + personalReturn, yearsInvested) - 1) / personalReturn) * (1 + personalReturn);
+                        const currentSavingsGrowth = partner.currentSavings * Math.pow(1 + pensionReturn, yearsInvested);
+                        
+                        totalPensionFV += pensionFV;
+                        totalTrainingFV += trainingFV;
+                        totalPersonalFV += personalFV;
+                        totalCurrentSavingsGrowth += currentSavingsGrowth;
+                    }
+                }
+            });
+            
+            const totalNominal = totalPensionFV + totalTrainingFV + totalPersonalFV + totalCurrentSavingsGrowth;
+            const yearsFromNow = age - minAge;
+            const totalInflationAdjusted = totalNominal / Math.pow(1 + inflationRate, yearsFromNow);
             
             chartData.push({
                 age: age,
-                pensionSavings: showInflationChart ? pensionFV / Math.pow(1 + inflationRate, yearsInvested) : pensionFV,
-                trainingFund: showInflationChart ? trainingFV / Math.pow(1 + inflationRate, yearsInvested) : trainingFV,
-                personalSavings: showInflationChart ? personalFV / Math.pow(1 + inflationRate, yearsInvested) : personalFV,
+                pensionSavings: showInflationChart ? totalPensionFV / Math.pow(1 + inflationRate, yearsFromNow) : totalPensionFV,
+                trainingFund: showInflationChart ? totalTrainingFV / Math.pow(1 + inflationRate, yearsFromNow) : totalTrainingFV,
+                personalSavings: showInflationChart ? totalPersonalFV / Math.pow(1 + inflationRate, yearsFromNow) : totalPersonalFV,
                 totalSavings: totalNominal,
                 totalInflationAdjusted: totalInflationAdjusted,
                 value: showInflationChart ? totalInflationAdjusted : totalNominal
@@ -3142,7 +3199,7 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                 }, language === 'he' ? 'ניתוח מתקדם' : 'Analysis')
             ]),
 
-            // Main Content - New Layout Structure
+            // Main Content - Enhanced Layout Structure v5.0.0
             React.createElement('div', { 
                 key: 'main-content',
                 className: "px-4 pb-8 max-w-7xl mx-auto" 
@@ -3192,10 +3249,10 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                             language === 'he' ? 'טוען כלי ניתוח...' : 'Loading analysis tools...') : null
                 ]),
 
-                // Results Section (Centered)
+                // Results Section (Optimized Layout v5.0.0)
                 React.createElement('div', { 
                     key: 'results-section',
-                    className: "grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8" 
+                    className: "grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6 mt-8" 
                 }, [
                     // Basic Results
                     activeTab === 'basic' ? React.createElement(BasicResults, {

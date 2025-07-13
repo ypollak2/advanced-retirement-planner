@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Retirement Planner v4.11.0 - netlify-fix-1752431602323</title>
+    <title>Advanced Retirement Planner v5.0.0 - Enhanced UI & Partner Data Fix</title>
     <meta name="description" content="Advanced retirement planning tool with comprehensive investment tracking">
     
     <!-- Tailwind CSS via CDN -->
@@ -20,19 +20,20 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        /* Emergency deployment indicator */
-        .emergency-indicator {
+        /* Version indicator - repositioned for better UX */
+        .version-indicator {
             position: fixed;
             top: 10px;
-            right: 10px;
-            background: #059669;
+            left: 10px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             color: white;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
-            z-index: 9999;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         body {
@@ -45,10 +46,9 @@
     </style>
 </head>
 <body>
-    <!-- Emergency deployment indicator -->
-    <div class="emergency-indicator">
-        🔧 NETLIFY FIX v4.11.0<br>
-        netlify-fix-1752431602323
+    <!-- Version indicator -->
+    <div class="version-indicator">
+        ✨ v5.0.0
     </div>
     
     <div id="root" class="min-h-screen"></div>

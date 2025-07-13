@@ -1,6 +1,6 @@
 {
-  "version": "4.7.0",
-  "build": "2025-01-13",
-  "commit": "latest",
-  "description": "Enhanced user experience with informative UI, couple planning improvements, and 100% QA coverage"
+  "version": "5.0.0",
+  "build": "2025-07-13",
+  "commit": "v5-ui-partner-fixes",
+  "description": "Major UI/UX overhaul with fixed partner data visualization, enhanced layout responsiveness, improved chart logic, and professional design consistency"
 }

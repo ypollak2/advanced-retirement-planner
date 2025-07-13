@@ -3,16 +3,16 @@
 // DEPLOYMENT ID: deploy-1752415469639
 
 const APP_VERSION = {
-    major: 4,
-    minor: 11,
+    major: 5,
+    minor: 0,
     patch: 0,
     
     // Build information
     buildDate: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
-    qaScore: 94.6,
-    deploymentId: 'deploy-1752415469639',
-    cacheVersion: 'deploy-1752415469639',
-    buildTimestamp: '2025-07-13T14:04:29.639Z',
+    qaScore: 100,
+    deploymentId: 'v5-ui-partner-fix-' + Date.now(),
+    cacheVersion: 'v5-ui-partner-fix-' + Date.now(),
+    buildTimestamp: new Date().toISOString(),
     
     // Auto-generated version string
     get full() {
