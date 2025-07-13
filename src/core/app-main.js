@@ -2797,7 +2797,7 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                     React.createElement('div', {
                         key: 'app-version',
                         className: "font-semibold text-blue-700"
-                    }, `Advanced Retirement Planner v4.10.4`),
+                    }, window.APP_VERSION ? window.APP_VERSION.display : 'Advanced Retirement Planner v4.10.4'),
                     React.createElement('div', {
                         key: 'creator-info',
                         className: "text-gray-500"
@@ -2808,7 +2808,7 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                     React.createElement('div', {
                         key: 'build-info',
                         className: "text-xs text-gray-400"
-                    }, `Built: ${new Date().toLocaleDateString()} • Production Ready • 94.6% QA Score`)
+                    }, window.APP_VERSION ? window.APP_VERSION.buildInfo : `Built: ${new Date().toLocaleDateString()} • Production Ready • 94.6% QA Score`)
                 ])
             ])
         ]);

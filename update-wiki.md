@@ -35,7 +35,7 @@ cp wiki-content/*.md advanced-retirement-planner.wiki/
 # Commit and push
 cd advanced-retirement-planner.wiki
 git add .
-git commit -m "Update wiki for v4.10.0 release"
+git commit -m "Update wiki for v4.10.4 release"
 git push origin master
 ```
 

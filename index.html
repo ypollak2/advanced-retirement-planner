@@ -1136,7 +1136,11 @@
                     `);
                 }
 
-                // Load utility modules first
+                // Load version configuration first
+                await loadScript('./version.js?v=4.10.4');
+                console.log('✅ Version configuration loaded');
+                
+                // Load utility modules
                 await loadScript('./src/utils/currencyExchange.js?v=4.10.1');
                 console.log('✅ Currency exchange utility loaded');
                 
