@@ -44,9 +44,15 @@ jobs:
     - name: 📥 Checkout code
       uses: actions/checkout@v4
       
+    - name: 📥 Install dependencies
+      run: npm ci --omit=dev || npm install --production
+      
+    - name: 📦 Build project
+      run: npm run build
+
     - name: 🐳 Start web server
       run: |
-        python3 -m http.server 8080 &
+        python3 -m http.server 8080 --directory dist/ &
         
     - name: 🔗 Test basic connectivity
       run: |
