@@ -1151,7 +1151,7 @@
                 console.log('✅ RSU calculations utility loaded');
                 
                 // Load dynamic loader
-                await loadScript('./src/core/dynamic-loader.js?v=4.5.0');
+                await loadScript('./src/core/dynamic-loader.js?v=4.10.4');
                 console.log('✅ Dynamic loader loaded');
 
                 // Update loading message
@@ -1160,7 +1160,7 @@
                 }
 
                 // Load core application
-                await loadScript('./src/core/app-main.js?v=4.5.0');
+                await loadScript(`./src/core/app-main.js?v=4.10.4&t=${Date.now()}`);
                 console.log('✅ Core application loaded');
 
                 // Initialize the core application
