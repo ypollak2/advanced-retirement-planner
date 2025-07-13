@@ -117,4 +117,7 @@
     // Ensure React and ReactDOM are globally available for other modules
     window.React = React;
     window.ReactDOM = ReactDOM;
+
+    // Initialize the application
+    window.initializeRetirementPlannerCore();
 })();
