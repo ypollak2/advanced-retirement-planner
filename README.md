@@ -8,7 +8,8 @@
 
 > **Professional retirement planning tool with modern, engaging UI design and comprehensive financial planning capabilities**
 
-**🌐 Live Demo:** [https://ypollak2.github.io/advanced-retirement-planner](https://ypollak2.github.io/advanced-retirement-planner)
+**🌐 Live Demo:** [https://advanced-pension-planner.netlify.app/](https://advanced-pension-planner.netlify.app/)  
+**🔗 Alternative Demo:** [https://ypollak2.github.io/advanced-retirement-planner](https://ypollak2.github.io/advanced-retirement-planner)
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 

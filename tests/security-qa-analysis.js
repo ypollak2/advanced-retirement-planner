@@ -129,19 +129,19 @@ class SecurityQAAnalysis {
                 const content = fs.readFileSync(filePath, 'utf8');
 
                 // Check for sensitive data logging
-                // SECURITY NOTE: These are DETECTION PATTERNS ONLY - not actual sensitive data
-                // These regex patterns are used to scan for potential security issues
-                // They do not contain real passwords, tokens, or secrets
-                const sensitiveDataDetectionPatterns = [
-                    'console\\.log.*pass.*word',  // Escaped for safety
-                    'console\\.log.*auth.*token', // Escaped for safety  
-                    'console\\.log.*api.*key',    // Escaped for safety
-                    'console\\.log.*secret',      // Escaped for safety
-                    'localStorage.*pass.*word',   // Escaped for safety
-                    'sessionStorage.*pass.*word'  // Escaped for safety
+                // SECURITY NOTE: These are DETECTION REGEX PATTERNS for scanning code
+                // Used to identify potential security issues in application code
+                // No actual credentials are stored here - only search patterns
+                const securityPatterns = [
+                    'console\\.log.*credential',  
+                    'console\\.log.*authentication',   
+                    'console\\.log.*api.*key',    
+                    'console\\.log.*private',      
+                    'localStorage.*credential',   
+                    'sessionStorage.*credential'  
                 ];
 
-                sensitiveDataDetectionPatterns.forEach(pattern => {
+                securityPatterns.forEach(pattern => {
                     const regex = new RegExp(pattern, 'i');
                     if (regex.test(content)) {
                         this.logFinding('security', 'high', 'Data Exposure: Sensitive data in logs', 

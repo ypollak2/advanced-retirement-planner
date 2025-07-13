@@ -368,8 +368,10 @@
         const safeEstimatedMonthlyIncome = estimatedMonthlyIncome || 0;
         const safeProjectedWithGrowth = projectedWithGrowth || 0;
         const safeBuyingPowerToday = buyingPowerToday || 0;
-        const safeAvgNetReturn = avgNetReturn || Math.max(0.1, ((inputs.expectedReturn || 7) - (inputs.accumulationFees || 1.0) + (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.6)) / 2);
-        const totalSavings = Math.max(0, (inputs.currentSavings || 0) + (inputs.trainingFund || 0));
+        const pensionNetReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.accumulationFees || 1.0));
+        const trainingNetReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.6));
+        const safeAvgNetReturn = avgNetReturn || Math.max(0.1, (pensionNetReturn + trainingNetReturn) / 2);
+        const totalSavings = Math.max(0, (inputs.currentSavings || 0) + (inputs.currentTrainingFundSavings || 0));
         
         const formatCurrency = (amount, symbol = '₪') => {
             // Safety check for invalid numbers
@@ -2115,7 +2117,15 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                                     // Calculate individual components
                                     const pensionContribution = (totalMonthlySalary * (inputs.pensionContribution || 18.5) / 100) + 
                                                                (totalMonthlySalary * (inputs.employerContribution || 6) / 100);
-                                    const trainingContribution = totalMonthlySalary * (inputs.trainingFundContribution || 2.5) / 100;
+                                    // Use proper training fund ceiling calculation
+                                    const trainingEmployeeRate = inputs.trainingFundEmployeeRate || 2.5;
+                                    const trainingEmployerRate = inputs.trainingFundEmployerRate || 7.5;
+                                    const trainingTotalRate = trainingEmployeeRate + trainingEmployerRate;
+                                    const trainingCeiling = inputs.trainingFundCeiling || 15972;
+                                    const salaryForTraining = inputs.trainingFundContributeAboveCeiling ? 
+                                        totalMonthlySalary : Math.min(totalMonthlySalary, trainingCeiling);
+                                    const trainingContribution = inputs.hasTrainingFund ? 
+                                        (salaryForTraining * trainingTotalRate / 100) : 0;
                                     const personalContribution = Math.max(0, monthlyTotal - pensionContribution - trainingContribution);
                                     
                                     const pensionFV = pensionContribution * 12 * ((Math.pow(1 + pensionReturn, yearsInvested) - 1) / pensionReturn) * (1 + pensionReturn);
