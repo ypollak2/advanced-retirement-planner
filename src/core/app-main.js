@@ -118,6 +118,8 @@
     window.React = React;
     window.ReactDOM = ReactDOM;
 
-    // Initialize the application
-    window.initializeRetirementPlannerCore();
+    // Initialize the application after the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        window.initializeRetirementPlannerCore();
+    });
 })();
