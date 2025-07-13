@@ -28,7 +28,7 @@ const AdvancedInputs = ({
         }, [
             React.createElement('h2', { 
                 key: 'title',
-                className: "text-2xl font-bold text-orange-700 mb-6 flex items-center"
+                className: "text-2xl font-bold text-orange-700 mb-6 flex items-center truncate"
             }, [
                 React.createElement(Settings, { key: 'icon', className: "mr-2" }),
                 language === 'he' ? "הגדרות מתקדמות" : "Advanced Settings"

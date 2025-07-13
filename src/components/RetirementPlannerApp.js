@@ -1,4 +1,10 @@
-// Main Retirement Planner Component
+// Main Retirement Planner Component with enhanced truncation support
+
+// Helper function for title truncation
+const truncateTitle = (title, maxLength = 50) => {
+    if (!title || typeof title !== 'string') return '';
+    return title.length > maxLength ? title.substring(0, maxLength) + '...' : title;
+};
 
 const RetirementPlanner = () => {
     const [language, setLanguage] = React.useState('he');
@@ -121,33 +127,11 @@ const RetirementPlanner = () => {
         { index: 'Tel Aviv 35', percentage: 100, customReturn: null }
     ]);
 
-    return { 
-        language, setLanguage,
-        activeTab, setActiveTab,
-        results, setResults,
-        chartData, setChartData,
-        showChart, setShowChart,
-        showSalaryInput, setShowSalaryInput,
-        showFamilyPlanning, setShowFamilyPlanning,
-        familyPlanningEnabled, setFamilyPlanningEnabled,
-        children, setChildren,
-        stressTestResults, setStressTestResults,
-        showStressTest, setShowStressTest,
-        selectedScenario, setSelectedScenario,
-        selectedTimeHorizon, setSelectedTimeHorizon,
-        historicalReturns, setHistoricalReturns,
-        exchangeRatesLoading, setExchangeRatesLoading,
-        exchangeRatesLastUpdated, setExchangeRatesLastUpdated,
-        cryptoPrices, setCryptoPrices,
-        cryptoPricesLoading, setCryptoPricesLoading,
-        cryptoPricesLastUpdated, setCryptoPricesLastUpdated,
-        indexDataLoading, setIndexDataLoading,
-        lastUpdated, setLastUpdated,
-        inputs, setInputs,
-        workPeriods, setWorkPeriods,
-        partnerWorkPeriods, setPartnerWorkPeriods,
-        pensionIndexAllocation, setPensionIndexAllocation,
-        trainingFundIndexAllocation, setTrainingFundIndexAllocation
+    const AppTitle = () => {
+        const titleText = language === 'he' ? 'מחשבון פרישה מתקדם' : 'Advanced Retirement Planner';
+        return React.createElement('h1', { 
+            className: 'text-4xl font-bold text-gray-800 mb-4 truncate-multiline truncate-2-lines'
+        }, titleText);
     };
 };
 

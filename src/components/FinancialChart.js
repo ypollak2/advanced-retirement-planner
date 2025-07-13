@@ -1,10 +1,49 @@
-// FinancialChart.js - Chart component using Chart.js
+// FinancialChart.js - Chart component using Chart.js with partner data support
 
-const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
+const SimpleChart = ({ data, type = 'line', language = 'he', partnerData = null, chartView = 'combined' }) => {
     const chartRef = React.useRef(null);
     const chartInstance = React.useRef(null);
     
+    // Data validation helper
+    const validateChartData = (chartData, view) => {
+        if (!chartData || !Array.isArray(chartData) || chartData.length === 0) {
+            console.warn('FinancialChart: Chart data is invalid or empty.');
+            return false;
+        }
+
+        if ((view === 'partner1' || view === 'partner2') && !partnerData) {
+            console.warn(`FinancialChart: chartView is '${view}' but no partnerData is provided.`)
+            return false;
+        }
+
+        const requiredProps = ['age', 'totalSavings', 'inflationAdjusted'];
+        for (const prop of requiredProps) {
+            if (!(prop in chartData[0])) {
+                console.warn(`FinancialChart: Missing required property '${prop}' in chart data.`);
+                return false;
+            }
+        }
+        return true;
+    };
+
+    const safeRenderChart = () => {
+        try {
+            const effectiveData = (chartView === 'partner1' || chartView === 'partner2') ? partnerData : data;
+            if (!validateChartData(effectiveData, chartView)) {
+                console.error('FinancialChart: Data validation failed. Cannot render chart.');
+                return;
+            }
+            renderChart();
+        } catch (error) {
+            console.error('FinancialChart: An unexpected error occurred during chart rendering:', error);
+        }
+    };
+    
     React.useEffect(() => {
+        safeRenderChart();
+    }, [data, partnerData, chartView, language]);
+    
+    const renderChart = () => {
         if (chartRef.current && data && data.length > 0 && window.Chart) {
             const ctx = chartRef.current.getContext('2d');
             
@@ -18,15 +57,19 @@ const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
             // Use language prop instead of global variable
             const isHebrew = language === 'he';
             
+            // Partner data handling - check if we have partner-specific data
+            const hasPartnerData = partnerData && (chartView === 'partner1' || chartView === 'partner2');
+            const effectiveData = hasPartnerData ? partnerData : data;
+            
             // Check if this is accumulation chart (has pensionSavings property) or index chart
-            if (data[0] && data[0].pensionSavings !== undefined) {
+            if (effectiveData[0] && effectiveData[0].pensionSavings !== undefined) {
                 // Accumulation chart with multiple lines
                 chartData = {
-                    labels: data.map(d => isHebrew ? `גיל ${d.age}` : `Age ${d.age}`),
+                    labels: effectiveData.map(d => isHebrew ? `גיל ${d.age}` : `Age ${d.age}`),
                     datasets: [
                         {
                             label: isHebrew ? 'פנסיה (נומינלי)' : 'Pension (Nominal)',
-                            data: data.map(d => d.pensionSavings),
+                            data: effectiveData.map(d => d.pensionSavings || 0),
                             borderColor: '#3B82F6',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
                             fill: false,
@@ -34,7 +77,7 @@ const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
                         },
                         {
                             label: isHebrew ? 'קרן השתלמות (נומינלי)' : 'Training Fund (Nominal)',
-                            data: data.map(d => d.trainingFund),
+                            data: effectiveData.map(d => d.trainingFund || 0),
                             borderColor: '#10B981',
                             backgroundColor: 'rgba(16, 185, 129, 0.1)',
                             fill: false,
@@ -42,7 +85,7 @@ const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
                         },
                         {
                             label: isHebrew ? 'תיק אישי (נומינלי)' : 'Personal Portfolio (Nominal)',
-                            data: data.map(d => d.personalPortfolio || 0),
+                            data: effectiveData.map(d => d.personalPortfolio || d.personalSavings || 0),
                             borderColor: '#8B5CF6',
                             backgroundColor: 'rgba(139, 92, 246, 0.1)',
                             fill: false,
@@ -50,7 +93,7 @@ const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
                         },
                         {
                             label: isHebrew ? 'קריפטו (נומינלי)' : 'Crypto (Nominal)',
-                            data: data.map(d => d.crypto || 0),
+                            data: effectiveData.map(d => d.crypto || 0),
                             borderColor: '#F97316',
                             backgroundColor: 'rgba(249, 115, 22, 0.1)',
                             fill: false,
@@ -58,7 +101,7 @@ const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
                         },
                         {
                             label: isHebrew ? 'נדל״ן (נומינלי)' : 'Real Estate (Nominal)',
-                            data: data.map(d => d.realEstate || 0),
+                            data: effectiveData.map(d => d.realEstate || 0),
                             borderColor: '#059669',
                             backgroundColor: 'rgba(5, 150, 105, 0.1)',
                             fill: false,
@@ -66,7 +109,7 @@ const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
                         },
                         {
                             label: isHebrew ? 'סה"כ צבירה (נומינלי)' : 'Total Accumulation (Nominal)',
-                            data: data.map(d => d.totalSavings),
+                            data: effectiveData.map(d => d.totalSavings),
                             borderColor: '#DC2626',
                             backgroundColor: 'rgba(220, 38, 38, 0.1)',
                             fill: false,
@@ -75,7 +118,7 @@ const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
                         },
                         {
                             label: isHebrew ? 'ערך אמיתי (מותאם אינפלציה)' : 'Real Value (Inflation Adjusted)',
-                            data: data.map(d => d.inflationAdjusted),
+                            data: effectiveData.map(d => d.inflationAdjusted),
                             borderColor: '#F59E0B',
                             backgroundColor: 'rgba(245, 158, 11, 0.1)',
                             fill: false,

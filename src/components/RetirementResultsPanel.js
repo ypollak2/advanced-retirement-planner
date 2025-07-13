@@ -1,4 +1,4 @@
-// ResultsDisplay Component - Displays calculated retirement projections and financial summaries
+// ResultsDisplay Component - Displays calculated retirement projections and financial summaries with partner data support
 
 const ResultsDisplay = ({ 
     results, 
@@ -14,6 +14,8 @@ const ResultsDisplay = ({
     claudeInsights,
     exportRetirementSummary,
     exportAsImage,
+    partnerResults = null,
+    chartView = 'combined',
     // Icon components
     PiggyBank,
     Calculator,
@@ -23,8 +25,63 @@ const ResultsDisplay = ({
     TrendingUp,
     SimpleChart
 }) => {
-    // Don't render anything if no results
-    if (!results) return null;
+    // Data validation for results
+    const validateResults = (resultData) => {
+        if (!resultData) {
+            console.warn('RetirementResultsPanel: No results data provided');
+            return false;
+        }
+        
+        if (typeof resultData !== 'object') {
+            console.warn('RetirementResultsPanel: Results data must be an object');
+            return false;
+        }
+        
+        return true;
+    };
+    
+    // Error handling wrapper
+    const safeFormatValue = (value, formatter = null) => {
+        try {
+            if (value == null || isNaN(value)) return '₪0';
+            
+            if (formatter && typeof formatter === 'function') {
+                return formatter(value);
+            }
+            
+            return `₪${value.toLocaleString()}`;
+        } catch (error) {
+            console.error('RetirementResultsPanel: Error formatting value:', error);
+            return '₪0';
+        }
+    };
+    
+    // Handle partner-specific data
+    const getEffectiveResults = () => {
+        if (inputs?.planningType === 'couple' && partnerResults) {
+            if (chartView === 'partner1' && partnerResults.partner1) {
+                return partnerResults.partner1;
+            } else if (chartView === 'partner2' && partnerResults.partner2) {
+                return partnerResults.partner2;
+            }
+        }
+        return results;
+    };
+
+    const effectiveResults = getEffectiveResults();
+
+    const validateResults = (data) => {
+        if (!data || typeof data !== 'object') {
+            console.warn('RetirementResultsPanel: Invalid or missing results data.');
+            return false;
+        }
+        const requiredKeys = ['totalSavings', 'monthlyIncome'];
+        return requiredKeys.every(key => key in data && typeof data[key] === 'number');
+    };
+
+    if (!validateResults(effectiveResults)) {
+        return React.createElement('div', { className: 'text-red-500' }, 'Invalid data provided to results panel.');
+    }
 
     return React.createElement('div', { className: "space-y-6" }, [
         React.createElement('div', { 
@@ -33,7 +90,7 @@ const ResultsDisplay = ({
         }, [
             React.createElement('h2', { 
                 key: 'title',
-                className: "text-2xl font-bold text-green-700 mb-6 flex items-center"
+                className: "text-2xl font-bold text-green-700 mb-6 flex items-center truncate-multiline truncate-2-lines"
             }, [
                 React.createElement(Calculator, { key: 'icon', className: "mr-2" }),
                 language === 'he' ? "תוצאות החישוב" : "Calculation Results"
@@ -48,7 +105,7 @@ const ResultsDisplay = ({
                         React.createElement('div', { 
                             key: 'value',
                             className: "text-2xl font-bold text-green-600"
-                        }, formatCurrency ? formatCurrency(results.totalSavings || 0) : `₪${(results.totalSavings || 0).toLocaleString()}`)
+                        }, safeFormatValue(effectiveResults.totalSavings, formatCurrency))
                     ]),
                     React.createElement('div', { key: 'monthly' }, [
                         React.createElement('div', { 
@@ -58,12 +115,24 @@ const ResultsDisplay = ({
                         React.createElement('div', { 
                             key: 'value',
                             className: "text-2xl font-bold text-blue-600"
-                        }, formatCurrency ? formatCurrency(results.monthlyIncome || 0) : `₪${(results.monthlyIncome || 0).toLocaleString()}`)
+                        }, safeFormatValue(effectiveResults.monthlyIncome, formatCurrency))
                     ])
                 ])
             ])
         ])
     ]);
+
+    const safeFormatValue = (value, formatter) => {
+        if (typeof value !== 'number' || isNaN(value)) {
+            return 'N/A';
+        }
+        try {
+            return formatter ? formatter(value) : `₪${value.toLocaleString()}`;
+        } catch (error) {
+            console.error('Error formatting value:', error);
+            return 'Error';
+        }
+    };
 };
 
 // Export to window for global access

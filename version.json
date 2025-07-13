@@ -1,5 +1,5 @@
 {
-  "version": "5.0.0",
+  "version": "5.0.1",
   "build": "2025-07-13",
   "commit": "v5-ui-partner-fixes",
   "description": "Major UI/UX overhaul with fixed partner data visualization, enhanced layout responsiveness, improved chart logic, and professional design consistency"
