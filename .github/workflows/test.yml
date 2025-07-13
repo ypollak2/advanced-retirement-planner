@@ -1,0 +1,163 @@
+name: 🧪 Test & Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: 🔍 Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 📦 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: 📥 Install dependencies
+      run: npm ci --omit=dev || npm install --production
+      
+    - name: 🧪 Run automated tests
+      run: npm test
+      
+    - name: 🔒 Run security audit
+      run: npm audit --audit-level=moderate
+      continue-on-error: true
+      
+    - name: 📋 Test report
+      if: always()
+      run: echo "Tests completed. Check logs above for details."
+
+  browser-test:
+    name: 🌐 Browser Tests
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🐳 Start web server
+      run: |
+        python3 -m http.server 8080 &
+        
+    - name: 🔗 Test basic connectivity
+      run: |
+        curl -f http://localhost:8080/ || exit 1
+        curl -f http://localhost:8080/src/core/app-main.js || exit 1
+        curl -f http://localhost:8080/src/core/dynamic-loader.js || exit 1
+        curl -f http://localhost:8080/src/modules/advanced-portfolio.js || exit 1
+        echo "✅ All core URLs accessible"
+        
+    - name: 📝 Test HTML validity
+      run: |
+        # Check for basic HTML structure
+        grep -q "<html" index.html && echo "✅ HTML tag found"
+        grep -q "React" index.html && echo "✅ React included"
+        grep -q "dynamic-loader" index.html && echo "✅ Modular architecture included"
+        grep -q "initializeRetirementPlannerCore" index.html && echo "✅ Initialization function included"
+        
+    - name: 🧮 Test JavaScript syntax
+      run: |
+        # Use Node.js to check syntax of main files
+        for file in src/core/*.js src/modules/*.js src/utils/*.js src/components/*.js; do
+          if [ -f "$file" ]; then
+            node -c "$file" && echo "✅ $file syntax OK"
+          fi
+        done
+        
+    - name: 🌐 Run Puppeteer browser test
+      run: |
+        npm install # Install puppeteer
+        node -e 'const puppeteer = require("puppeteer");
+        (async () => {
+          const browser = await puppeteer.launch({
+            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+          });
+          const page = await browser.newPage();
+          await page.goto("http://localhost:8080");
+          await page.waitForSelector("#root", { timeout: 5000 });
+          const appElement = await page.$("#root");
+          if (appElement) {
+            console.log("✅ App element found");
+          } else {
+            console.error("❌ App element not found");
+            process.exit(1);
+          }
+          await browser.close();
+        })();'
+
+  deploy:
+    name: 🚀 Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: [test, browser-test]
+    if: github.ref == 'refs/heads/main'
+    
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+      
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+      
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🛠️ Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: 📤 Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: '.'
+        
+    - name: 🚀 Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+
+  performance-test:
+    name: ⚡ Performance Tests
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 📊 Check file sizes
+      run: |
+        echo "📏 File size analysis:"
+        du -h index.html
+        du -h src/components/*.js | head -5
+        
+        # Check if main HTML is reasonable size (< 100KB)
+        size=$(stat -c%s index.html)
+        if [ $size -gt 100000 ]; then
+          echo "⚠️ WARNING: index.html is ${size} bytes (> 100KB)"
+          exit 1
+        else
+          echo "✅ HTML size OK: ${size} bytes"
+        fi
+        
+    - name: 🔍 Check for performance anti-patterns
+      run: |
+        # Check for common performance issues
+        if grep -q "console.log" src/**/*.js; then
+          echo "⚠️ WARNING: console.log found in production code"
+        fi
+        
+        if grep -q "alert(" src/**/*.js; then
+          echo "⚠️ WARNING: alert() found in code"
+        fi
+        
+        echo "✅ Performance checks completed"
