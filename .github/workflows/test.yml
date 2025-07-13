@@ -63,11 +63,10 @@ jobs:
         
     - name: 📝 Test HTML validity
       run: |
-        # Check for basic HTML structure
+        # Check for basic HTML structure and bundled assets
         grep -q "<html" dist/index.html && echo "✅ HTML tag found"
-        grep -q "React" dist/index.html && echo "✅ React included"
-        grep -q "dynamic-loader" dist/index.html && echo "✅ Modular architecture included"
-        grep -q "initializeRetirementPlannerCore" dist/index.html && echo "✅ Initialization function included"
+        grep -q "<script type=\"module\" crossorigin src=\"/assets/index-" dist/index.html && echo "✅ Bundled JS script found"
+        grep -q "<link rel=\"stylesheet\" crossorigin href=\"/assets/index-" dist/index.html && echo "✅ Bundled CSS stylesheet found"
         
     - name: 🧮 Test JavaScript syntax
       run: |
