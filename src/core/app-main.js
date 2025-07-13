@@ -1173,6 +1173,140 @@
                                     language === 'he' ? 'ארה״ב' : 'United States')
                             ])
                         ])
+                    ]),
+
+                    // RSU (Restricted Stock Units) Section
+                    React.createElement('div', {
+                        key: 'rsu-section',
+                        className: "bg-indigo-50 rounded-lg p-4 border border-indigo-200 mt-6"
+                    }, [
+                        React.createElement('h3', {
+                            key: 'rsu-title',
+                            className: "text-lg font-semibold text-indigo-700 mb-4 flex items-center"
+                        }, [
+                            React.createElement('span', { key: 'rsu-icon', className: "mr-2" }, '📈'),
+                            language === 'he' ? 'יחידות מניה מוגבלות (RSU)' : 'Restricted Stock Units (RSU)'
+                        ]),
+                        
+                        React.createElement('div', {
+                            key: 'rsu-grid',
+                            className: "grid grid-cols-1 md:grid-cols-2 gap-4"
+                        }, [
+                            React.createElement('div', { key: 'rsu-company' }, [
+                                React.createElement('label', {
+                                    key: 'rsu-company-label',
+                                    className: "block text-sm font-medium text-gray-700 mb-1"
+                                }, language === 'he' ? 'חברה' : 'Company'),
+                                React.createElement('select', {
+                                    key: 'rsu-company-select',
+                                    value: inputs.rsuCompany || '',
+                                    onChange: (e) => setInputs({...inputs, rsuCompany: e.target.value}),
+                                    className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 text-sm"
+                                }, [
+                                    React.createElement('option', { key: 'rsu-none', value: '' }, 
+                                        language === 'he' ? 'בחר חברה' : 'Select Company'),
+                                    React.createElement('option', { key: 'rsu-aapl', value: 'AAPL' }, 'Apple (AAPL)'),
+                                    React.createElement('option', { key: 'rsu-googl', value: 'GOOGL' }, 'Google (GOOGL)'),
+                                    React.createElement('option', { key: 'rsu-msft', value: 'MSFT' }, 'Microsoft (MSFT)'),
+                                    React.createElement('option', { key: 'rsu-amzn', value: 'AMZN' }, 'Amazon (AMZN)'),
+                                    React.createElement('option', { key: 'rsu-meta', value: 'META' }, 'Meta (META)'),
+                                    React.createElement('option', { key: 'rsu-tsla', value: 'TSLA' }, 'Tesla (TSLA)'),
+                                    React.createElement('option', { key: 'rsu-nvda', value: 'NVDA' }, 'NVIDIA (NVDA)'),
+                                    React.createElement('option', { key: 'rsu-other', value: 'OTHER' }, 
+                                        language === 'he' ? 'אחר' : 'Other')
+                                ])
+                            ]),
+
+                            React.createElement('div', { key: 'rsu-units' }, [
+                                React.createElement('label', {
+                                    key: 'rsu-units-label',
+                                    className: "block text-sm font-medium text-gray-700 mb-1"
+                                }, language === 'he' ? 'מספר יחידות שנתי' : 'Annual RSU Units'),
+                                React.createElement('input', {
+                                    key: 'rsu-units-input',
+                                    type: 'number',
+                                    value: inputs.rsuUnits || '',
+                                    onChange: (e) => setInputs({...inputs, rsuUnits: parseInt(e.target.value) || 0}),
+                                    placeholder: language === 'he' ? 'מספר יחידות' : 'Number of units',
+                                    className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 text-sm"
+                                })
+                            ]),
+
+                            React.createElement('div', { key: 'rsu-current-price' }, [
+                                React.createElement('label', {
+                                    key: 'rsu-current-price-label',
+                                    className: "block text-sm font-medium text-gray-700 mb-1"
+                                }, language === 'he' ? 'מחיר נוכחי ($)' : 'Current Price ($)'),
+                                React.createElement('input', {
+                                    key: 'rsu-current-price-input',
+                                    type: 'number',
+                                    step: '0.01',
+                                    value: inputs.rsuCurrentPrice || '',
+                                    onChange: (e) => setInputs({...inputs, rsuCurrentPrice: parseFloat(e.target.value) || 0}),
+                                    placeholder: language === 'he' ? 'מחיר למניה' : 'Price per share',
+                                    className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 text-sm"
+                                })
+                            ]),
+
+                            React.createElement('div', { key: 'rsu-vesting-years' }, [
+                                React.createElement('label', {
+                                    key: 'rsu-vesting-years-label',
+                                    className: "block text-sm font-medium text-gray-700 mb-1"
+                                }, language === 'he' ? 'תקופת הבשלה (שנים)' : 'Vesting Period (Years)'),
+                                React.createElement('select', {
+                                    key: 'rsu-vesting-years-select',
+                                    value: inputs.rsuVestingYears || 4,
+                                    onChange: (e) => setInputs({...inputs, rsuVestingYears: parseInt(e.target.value)}),
+                                    className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 text-sm"
+                                }, [
+                                    React.createElement('option', { key: 'vest-1', value: 1 }, '1 ' + (language === 'he' ? 'שנה' : 'year')),
+                                    React.createElement('option', { key: 'vest-2', value: 2 }, '2 ' + (language === 'he' ? 'שנים' : 'years')),
+                                    React.createElement('option', { key: 'vest-3', value: 3 }, '3 ' + (language === 'he' ? 'שנים' : 'years')),
+                                    React.createElement('option', { key: 'vest-4', value: 4 }, '4 ' + (language === 'he' ? 'שנים' : 'years')),
+                                    React.createElement('option', { key: 'vest-5', value: 5 }, '5 ' + (language === 'he' ? 'שנים' : 'years'))
+                                ])
+                            ]),
+
+                            React.createElement('div', { key: 'rsu-tax-country' }, [
+                                React.createElement('label', {
+                                    key: 'rsu-tax-country-label',
+                                    className: "block text-sm font-medium text-gray-700 mb-1"
+                                }, language === 'he' ? 'מדינת מס RSU' : 'RSU Tax Country'),
+                                React.createElement('select', {
+                                    key: 'rsu-tax-country-select',
+                                    value: inputs.rsuTaxCountry || 'israel',
+                                    onChange: (e) => setInputs({...inputs, rsuTaxCountry: e.target.value}),
+                                    className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 text-sm"
+                                }, [
+                                    React.createElement('option', { key: 'rsu-israel', value: 'israel' }, 
+                                        language === 'he' ? 'ישראל' : 'Israel'),
+                                    React.createElement('option', { key: 'rsu-us', value: 'us' }, 
+                                        language === 'he' ? 'ארה״ב' : 'United States')
+                                ])
+                            ]),
+
+                            React.createElement('div', { key: 'rsu-expected-growth' }, [
+                                React.createElement('label', {
+                                    key: 'rsu-expected-growth-label',
+                                    className: "block text-sm font-medium text-gray-700 mb-1"
+                                }, language === 'he' ? 'צמיחה צפויה שנתית (%)' : 'Expected Annual Growth (%)'),
+                                React.createElement('input', {
+                                    key: 'rsu-expected-growth-input',
+                                    type: 'number',
+                                    step: '0.1',
+                                    value: inputs.rsuExpectedGrowth || 10,
+                                    onChange: (e) => setInputs({...inputs, rsuExpectedGrowth: parseFloat(e.target.value) || 0}),
+                                    className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 text-sm"
+                                })
+                            ])
+                        ]),
+
+                        React.createElement('div', {
+                            key: 'rsu-info',
+                            className: "mt-3 p-3 bg-indigo-100 rounded text-sm text-indigo-700"
+                        }, language === 'he' ? 
+                            '💡 יחידות מניה מוגבלות (RSU) הן הטבה שכיחה בחברות טכנולוגיה. המחיר יתעדכן אוטומטית מ-API' :
+                            '💡 Restricted Stock Units (RSUs) are common tech company benefits. Stock prices will update automatically via API')
                     ])
                 ])
             ])
@@ -1421,6 +1555,95 @@
                             ])
                         ])
                     ]),
+                    
+                    // Per-partner breakdown for couples
+                    ...(inputs.planningType === 'couple' ? [
+                        React.createElement('div', {
+                            key: 'couple-breakdown',
+                            className: "bg-pink-50 rounded-lg p-4 border border-pink-200 mt-4"
+                        }, [
+                            React.createElement('h4', {
+                                key: 'couple-breakdown-title',
+                                className: "text-lg font-semibold text-pink-700 mb-3"
+                            }, language === 'he' ? 'פירוט לפי בן/בת זוג' : 'Per-Partner Breakdown'),
+                            
+                            React.createElement('div', {
+                                key: 'partners-breakdown-grid',
+                                className: "grid grid-cols-1 md:grid-cols-2 gap-4"
+                            }, [
+                                // Partner 1 breakdown
+                                React.createElement('div', {
+                                    key: 'partner1-breakdown',
+                                    className: "bg-white rounded-lg p-3 border border-pink-300"
+                                }, [
+                                    React.createElement('h5', {
+                                        key: 'partner1-breakdown-title',
+                                        className: "font-medium text-pink-700 mb-2"
+                                    }, inputs.partner1Name || (language === 'he' ? 'בן/בת זוג 1' : 'Partner 1')),
+                                    
+                                    React.createElement('div', {
+                                        key: 'partner1-calculations',
+                                        className: "space-y-2 text-sm"
+                                    }, [
+                                        React.createElement('div', { key: 'p1-pension' }, [
+                                            React.createElement('span', { key: 'p1-pension-label', className: "text-blue-600" }, 
+                                                language === 'he' ? 'פנסיה: ' : 'Pension: '),
+                                            React.createElement('span', { key: 'p1-pension-amount', className: "font-bold" }, 
+                                                `₪${Math.round(((inputs.partner1Salary || 0) * 0.245 * 12 * (inputs.retirementAge - inputs.currentAge || 37)) * 1.07 ** (inputs.retirementAge - inputs.currentAge || 37) || 0).toLocaleString()}`)
+                                        ]),
+                                        React.createElement('div', { key: 'p1-training' }, [
+                                            React.createElement('span', { key: 'p1-training-label', className: "text-purple-600" }, 
+                                                language === 'he' ? 'קרן השתלמות: ' : 'Training Fund: '),
+                                            React.createElement('span', { key: 'p1-training-amount', className: "font-bold" }, 
+                                                `₪${Math.round((Math.min(inputs.partner1Salary || 0, 15972) * (inputs.partner1TrainingFundRate || 10) / 100 * 12 * Math.min(inputs.retirementAge - inputs.currentAge || 37, 6)) * 1.06 ** Math.min(inputs.retirementAge - inputs.currentAge || 37, 6) || 0).toLocaleString()}`)
+                                        ]),
+                                        React.createElement('div', { key: 'p1-current' }, [
+                                            React.createElement('span', { key: 'p1-current-label', className: "text-green-600" }, 
+                                                language === 'he' ? 'חיסכון נוכחי: ' : 'Current Savings: '),
+                                            React.createElement('span', { key: 'p1-current-amount', className: "font-bold" }, 
+                                                `₪${Math.round((inputs.partner1CurrentSavings || 0) * 1.07 ** (inputs.retirementAge - inputs.currentAge || 37) || 0).toLocaleString()}`)
+                                        ])
+                                    ])
+                                ]),
+                                
+                                // Partner 2 breakdown
+                                React.createElement('div', {
+                                    key: 'partner2-breakdown',
+                                    className: "bg-white rounded-lg p-3 border border-pink-300"
+                                }, [
+                                    React.createElement('h5', {
+                                        key: 'partner2-breakdown-title',
+                                        className: "font-medium text-pink-700 mb-2"
+                                    }, inputs.partner2Name || (language === 'he' ? 'בן/בת זוג 2' : 'Partner 2')),
+                                    
+                                    React.createElement('div', {
+                                        key: 'partner2-calculations',
+                                        className: "space-y-2 text-sm"
+                                    }, [
+                                        React.createElement('div', { key: 'p2-pension' }, [
+                                            React.createElement('span', { key: 'p2-pension-label', className: "text-blue-600" }, 
+                                                language === 'he' ? 'פנסיה: ' : 'Pension: '),
+                                            React.createElement('span', { key: 'p2-pension-amount', className: "font-bold" }, 
+                                                `₪${Math.round(((inputs.partner2Salary || 0) * 0.245 * 12 * (inputs.retirementAge - inputs.currentAge || 37)) * 1.07 ** (inputs.retirementAge - inputs.currentAge || 37) || 0).toLocaleString()}`)
+                                        ]),
+                                        React.createElement('div', { key: 'p2-training' }, [
+                                            React.createElement('span', { key: 'p2-training-label', className: "text-purple-600" }, 
+                                                language === 'he' ? 'קרן השתלמות: ' : 'Training Fund: '),
+                                            React.createElement('span', { key: 'p2-training-amount', className: "font-bold" }, 
+                                                `₪${Math.round((Math.min(inputs.partner2Salary || 0, 15972) * (inputs.partner2TrainingFundRate || 10) / 100 * 12 * Math.min(inputs.retirementAge - inputs.currentAge || 37, 6)) * 1.06 ** Math.min(inputs.retirementAge - inputs.currentAge || 37, 6) || 0).toLocaleString()}`)
+                                        ]),
+                                        React.createElement('div', { key: 'p2-current' }, [
+                                            React.createElement('span', { key: 'p2-current-label', className: "text-green-600" }, 
+                                                language === 'he' ? 'חיסכון נוכחי: ' : 'Current Savings: '),
+                                            React.createElement('span', { key: 'p2-current-amount', className: "font-bold" }, 
+                                                `₪${Math.round((inputs.partner2CurrentSavings || 0) * 1.07 ** (inputs.retirementAge - inputs.currentAge || 37) || 0).toLocaleString()}`)
+                                        ])
+                                    ])
+                                ])
+                            ])
+                        ])
+                    ] : []),
+                    
                     React.createElement('div', { 
                         key: 'monthly',
                         className: "bg-orange-50 rounded-lg p-4 border border-orange-200" 

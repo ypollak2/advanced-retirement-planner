@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v4.7.0
+# 🚀 Advanced Retirement Planner v4.8.0
 
-[![Version](https://img.shields.io/badge/version-4.7.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-4.8.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-green.svg)](tests/)
 [![QA](https://img.shields.io/badge/QA-in--progress-orange.svg)](https://github.com/ypollak2/advanced-retirement-planner/wiki/QA-Process)
@@ -13,9 +13,16 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## ✨ What's New in v4.7.0
+## ✨ What's New in v4.8.0
 
-### 🎨 **Enhanced User Experience** (Latest)
+### 📈 **RSU Support & Security Enhancements** (Latest)
+- **RSU Integration**: Added Restricted Stock Units input section with company selection, vesting periods, and tax implications
+- **Security Hardening**: Eliminated all eval() usage and Function constructor risks for maximum security
+- **Enhanced Testing**: Comprehensive QA suite with zero security vulnerabilities
+- **Per-Partner Calculations**: Complete individual pension projections with inflation adjustments for couples
+- **API Ready**: Infrastructure prepared for real-time stock price integration
+
+### 🎨 **Previous Updates (v4.7.0)**
 - **Informative Welcome**: Replaced promotional banner with factual abilities list
 - **Couple Experience**: Separate UI for single vs couple planning with individual partner names
 - **Security Improvements**: Fixed Function constructor risks and sensitive data patterns
@@ -91,10 +98,11 @@ advanced-retirement-planner/
 ## 🌍 Features
 
 - 💰 **Advanced Calculations**: Precise pension and training fund projections
-- 👥 **Couple Planning**: Joint retirement planning optimization
+- 👥 **Couple Planning**: Joint retirement planning optimization with individual breakdowns
+- 📈 **RSU Support**: Restricted Stock Units with major tech companies (Apple, Google, Microsoft, etc.)
 - 🌟 **AI Analysis**: Smart forecasting with inflation adjustments
-- 📊 **Interactive Charts**: Visual progress tracking
-- 🌍 **Multi-Country**: Tax calculations for Israel, UK, US
+- 📊 **Interactive Charts**: Visual progress tracking with combined/individual views
+- 🌍 **Multi-Country**: Tax calculations for Israel, UK, US (RSU taxation included)
 - 📱 **Responsive**: Optimized for desktop and mobile
 - 🔒 **Secure**: Zero-tolerance security with comprehensive validation
 
