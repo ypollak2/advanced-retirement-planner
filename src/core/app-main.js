@@ -40,8 +40,8 @@
         style: { fontSize: `${size}px` } 
     }, '⚠️');
 
-    // Enhanced Chart Component with multiple datasets and inflation adjustment
-    const SimpleChart = ({ data, type = 'line', language = 'he', showInflationAdjusted = false }) => {
+    // Enhanced Chart Component with multiple datasets, inflation adjustment, and partner names
+    const SimpleChart = ({ data, type = 'line', language = 'he', showInflationAdjusted = false, partnerNames = null, chartTitle = null }) => {
         const chartRef = React.useRef(null);
         const chartInstance = React.useRef(null);
         
@@ -55,6 +55,20 @@
                     }
                     
                     const isHebrew = language === 'he';
+                    
+                    // Generate dynamic chart title with partner names
+                    let dynamicTitle = chartTitle;
+                    if (!dynamicTitle && partnerNames) {
+                        if (partnerNames.partner1Name && partnerNames.partner2Name) {
+                            dynamicTitle = isHebrew ? 
+                                `תחזית פרישה עבור ${partnerNames.partner1Name} ו${partnerNames.partner2Name}` :
+                                `Retirement Projection for ${partnerNames.partner1Name} & ${partnerNames.partner2Name}`;
+                        } else if (partnerNames.partner1Name) {
+                            dynamicTitle = isHebrew ? 
+                                `תחזית פרישה עבור ${partnerNames.partner1Name}` :
+                                `Retirement Projection for ${partnerNames.partner1Name}`;
+                        }
+                    }
                 
                 const chartData = {
                     labels: data.map(d => isHebrew ? `גיל ${d.age}` : `Age ${d.age}`),
@@ -108,13 +122,52 @@
                         plugins: {
                             title: {
                                 display: true,
-                                text: showInflationAdjusted ? 
+                                text: dynamicTitle || (showInflationAdjusted ? 
                                     (isHebrew ? 'התפתחות הצבירה (מותאמת אינפלציה)' : 'Accumulation Progress (Inflation Adjusted)') :
-                                    (isHebrew ? 'התפתחות הצבירה (ערך נומינלי)' : 'Accumulation Progress (Nominal Value)')
+                                    (isHebrew ? 'התפתחות הצבירה (ערך נומינלי)' : 'Accumulation Progress (Nominal Value)')),
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                },
+                                color: '#374151',
+                                padding: {
+                                    top: 10,
+                                    bottom: 20
+                                }
                             },
                             legend: {
                                 display: true,
-                                position: 'top'
+                                position: 'top',
+                                labels: {
+                                    padding: 20,
+                                    usePointStyle: true,
+                                    font: {
+                                        size: 12,
+                                        weight: '500'
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                borderColor: '#374151',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                displayColors: true,
+                                callbacks: {
+                                    title: function(context) {
+                                        return context[0].label;
+                                    },
+                                    label: function(context) {
+                                        const value = context.parsed.y;
+                                        const formattedValue = value >= 1000000 ? 
+                                            '₪' + (value / 1000000).toFixed(1) + 'M' :
+                                            value >= 1000 ? '₪' + (value / 1000).toFixed(0) + 'K' :
+                                            '₪' + value.toFixed(0);
+                                        return context.dataset.label + ': ' + formattedValue;
+                                    }
+                                }
                             }
                         },
                         scales: {
@@ -679,32 +732,90 @@
             
             // Bottom Line Summary is now rendered inside SavingsSummaryPanel
             
-            // Export Buttons
+            // Enhanced Export Buttons with elegant design
             React.createElement('div', {
                 key: 'export-buttons',
-                className: "mt-6 bg-white rounded-lg shadow p-4 border border-gray-200 flex flex-col gap-3"
+                className: "mt-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl shadow-lg p-6 border border-blue-200"
             }, [
                 React.createElement('div', { 
-                    key: 'export-title',
-                    className: "text-sm font-medium text-gray-700 mb-3" 
-                }, language === 'he' ? 'ייצוא נתונים' : 'Export Data'),
-                
-                React.createElement('button', {
-                    key: 'export-png',
-                    onClick: exportToPNG,
-                    className: "btn-primary w-full text-sm flex items-center justify-center space-x-2 py-3 text-base"
+                    key: 'export-header',
+                    className: "flex items-center gap-3 mb-4" 
                 }, [
-                    React.createElement('span', { key: 'icon' }, '🖼️'),
-                    React.createElement('span', { key: 'text' }, language === 'he' ? 'ייצא כתמונה' : 'Export as PNG')
+                    React.createElement('div', {
+                        key: 'export-icon',
+                        className: "w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold"
+                    }, '📊'),
+                    React.createElement('h3', { 
+                        key: 'export-title',
+                        className: "text-lg font-semibold text-gray-800" 
+                    }, language === 'he' ? 'ייצוא והדפסה' : 'Export & Share'),
+                    React.createElement('div', {
+                        key: 'export-badge',
+                        className: "px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full"
+                    }, language === 'he' ? 'מקצועי' : 'Professional')
                 ]),
                 
-                React.createElement('button', {
-                    key: 'export-ai',
-                    onClick: exportForAI,
-                    className: "btn-primary w-full text-sm flex items-center justify-center space-x-2 py-3 text-base"
+                React.createElement('div', {
+                    key: 'export-buttons-grid',
+                    className: "grid grid-cols-1 md:grid-cols-2 gap-3"
                 }, [
-                    React.createElement('span', { key: 'icon' }, '🤖'),
-                    React.createElement('span', { key: 'text' }, language === 'he' ? 'ייצא לכלי AI' : 'Export for AI Tools')
+                    React.createElement('button', {
+                        key: 'export-png',
+                        onClick: exportToPNG,
+                        className: "group relative bg-white hover:bg-blue-50 border-2 border-blue-200 hover:border-blue-300 rounded-xl p-4 transition-all duration-200 hover:shadow-md"
+                    }, [
+                        React.createElement('div', {
+                            key: 'png-content',
+                            className: "flex items-center gap-3"
+                        }, [
+                            React.createElement('div', {
+                                key: 'png-icon-bg',
+                                className: "w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white text-lg group-hover:scale-110 transition-transform"
+                            }, '🖼️'),
+                            React.createElement('div', {
+                                key: 'png-text-content',
+                                className: "text-left"
+                            }, [
+                                React.createElement('div', {
+                                    key: 'png-title',
+                                    className: "font-semibold text-gray-800 text-sm"
+                                }, language === 'he' ? 'ייצא כתמונה' : 'Export as Image'),
+                                React.createElement('div', {
+                                    key: 'png-subtitle',
+                                    className: "text-xs text-gray-500"
+                                }, language === 'he' ? 'PNG באיכות גבוהה' : 'High-quality PNG')
+                            ])
+                        ])
+                    ]),
+                    
+                    React.createElement('button', {
+                        key: 'export-ai',
+                        onClick: exportForAI,
+                        className: "group relative bg-white hover:bg-purple-50 border-2 border-purple-200 hover:border-purple-300 rounded-xl p-4 transition-all duration-200 hover:shadow-md"
+                    }, [
+                        React.createElement('div', {
+                            key: 'ai-content',
+                            className: "flex items-center gap-3"
+                        }, [
+                            React.createElement('div', {
+                                key: 'ai-icon-bg',
+                                className: "w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-lg group-hover:scale-110 transition-transform"
+                            }, '🤖'),
+                            React.createElement('div', {
+                                key: 'ai-text-content',
+                                className: "text-left"
+                            }, [
+                                React.createElement('div', {
+                                    key: 'ai-title',
+                                    className: "font-semibold text-gray-800 text-sm"
+                                }, language === 'he' ? 'ייצא לכלי AI' : 'Export for AI'),
+                                React.createElement('div', {
+                                    key: 'ai-subtitle',
+                                    className: "text-xs text-gray-500"
+                                }, language === 'he' ? 'ניתוח מתקדם' : 'Advanced Analysis')
+                            ])
+                        ])
+                    ])
                 ]),
                 
                 React.createElement('button', {
@@ -2800,7 +2911,11 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                             key: 'main-chart',
                             data: generateChartData(inputs, chartView, showInflationChart),
                             language,
-                            showInflationAdjusted: showInflationChart
+                            showInflationAdjusted: showInflationChart,
+                            partnerNames: inputs.coupleMode ? {
+                                partner1Name: inputs.partner1Name,
+                                partner2Name: inputs.partner2Name
+                            } : null
                         })
                     ])
                 ])
