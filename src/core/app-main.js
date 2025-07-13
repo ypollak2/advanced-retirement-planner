@@ -272,15 +272,23 @@
         const safeAvgNetReturn = avgNetReturn || Math.max(0.1, (pensionNetReturn + trainingNetReturn) / 2);
         
         // Enhanced safe defaults for current savings with more realistic values
-        const safeCurrentPensionSavings = inputs.currentSavings || (inputs.currentAge > 25 ? (inputs.currentAge - 22) * 12000 : 50000);
-        const safeCurrentTrainingFundSavings = inputs.currentTrainingFundSavings || (inputs.currentAge > 25 ? (inputs.currentAge - 22) * 8000 : 25000);
-        const totalSavings = Math.max(0, safeCurrentPensionSavings + safeCurrentTrainingFundSavings);
+        // If user has entered 0 or very low values, use age-based estimates for better UX
+        const rawPensionSavings = inputs.currentSavings || 0;
+        const rawTrainingFundSavings = inputs.currentTrainingFundSavings || 0;
+        const userAge = inputs.currentAge || 30;
+        
+        const safeCurrentPensionSavings = rawPensionSavings > 1000 ? rawPensionSavings : 
+            (userAge > 25 ? Math.max((userAge - 22) * 12000, 50000) : 50000);
+        const safeCurrentTrainingFundSavings = rawTrainingFundSavings > 500 ? rawTrainingFundSavings : 
+            (userAge > 25 ? Math.max((userAge - 22) * 8000, 25000) : 25000);
+        const totalSavings = Math.max(75000, safeCurrentPensionSavings + safeCurrentTrainingFundSavings);
         
         const formatCurrency = (amount, symbol = '₪') => {
             // Safety check for invalid numbers
             if (!amount || isNaN(amount) || !isFinite(amount)) {
                 return `${symbol}0`;
             }
+            // Always round to whole numbers - no decimals/cents
             return `${symbol}${Math.round(Math.abs(amount)).toLocaleString()}`;
         };
         
@@ -343,8 +351,8 @@
                 ])
             ]),
             
-            // Monthly Salary & Tax Calculation
-            React.createElement('div', {
+            // Monthly Salary & Tax Calculation (only for single planning)
+            inputs.planningType !== 'couple' ? React.createElement('div', {
                 key: 'salary-section',
                 className: "bg-blue-50 rounded-lg p-3 mb-4 border border-blue-200"
             }, (() => {
@@ -373,7 +381,7 @@
                     React.createElement('div', { key: 'tax-rate-info', className: "text-xs text-blue-600 mt-1" }, 
                         language === 'he' ? `שיעור מס: ${taxResult.taxRate}%` : `Tax Rate: ${taxResult.taxRate}%`)
                 ];
-            })()),
+            })()) : null,
 
             // Monthly Contributions
             React.createElement('div', {
@@ -454,7 +462,7 @@
                         currencyError ? "Error" :
                         exchangeRates[currency] ? 
                             (currency === 'BTC' || currency === 'ETH' ? 
-                                `${symbol}${(totalSavings * exchangeRates[currency]).toFixed(6)}` :
+                                `${symbol}${Math.round(totalSavings * exchangeRates[currency] * 100000) / 100000}` :
                                 `${symbol}${Math.round(totalSavings * exchangeRates[currency]).toLocaleString()}`) :
                             "N/A"
                     )
@@ -2589,15 +2597,15 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                 }, language === 'he' ? 'ניתוח מתקדם' : 'Analysis')
             ]),
 
-            // Main Content
+            // Main Content - New Layout Structure
             React.createElement('div', { 
                 key: 'main-content',
-                className: "dashboard-grid px-4 pb-8" 
+                className: "px-4 pb-8 max-w-7xl mx-auto" 
             }, [
-                // Left Column - Inputs
+                // Inputs Section (Full Width)
                 React.createElement('div', { 
-                    key: 'inputs-column',
-                    className: "space-y-6" 
+                    key: 'inputs-section',
+                    className: "mb-8 space-y-6" 
                 }, [
                     activeTab === 'basic' ? React.createElement(BasicInputs, {
                         key: 'basic-inputs',
@@ -2639,11 +2647,12 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                             language === 'he' ? 'טוען כלי ניתוח...' : 'Loading analysis tools...') : null
                 ]),
 
-                // Right Column - Results
+                // Results Section (Centered)
                 React.createElement('div', { 
-                    key: 'results-column',
-                    className: "results-column sidebar-panel space-y-6" 
+                    key: 'results-section',
+                    className: "grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8" 
                 }, [
+                    // Basic Results
                     activeTab === 'basic' ? React.createElement(BasicResults, {
                         key: 'basic-results',
                         results,
@@ -2653,6 +2662,7 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                         formatCurrency
                     }) : null,
 
+                    // Savings Summary
                     React.createElement(SavingsSummaryPanel, {
                         key: 'savings-summary',
                         inputs,
@@ -2730,64 +2740,24 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                                 className: "px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
                             }, language === 'he' ? 'הסתר' : 'Hide')
                         ])
+                    ]),
+                    
+                    // Main Chart Component
+                    React.createElement('div', {
+                        key: 'chart-canvas-container',
+                        className: "w-full h-96 mt-6"
+                    }, [
+                        React.createElement(SimpleChart, {
+                            key: 'main-chart',
+                            data: generateChartData(),
+                            language,
+                            showInflationAdjusted: showInflationChart
+                        })
                     ])
-                    // TODO: Add SimpleChart component here
                 ])
             ]) : null,
 
             // LLM Analysis Display
-                        React.createElement('div', {
-                            key: 'chart-header',
-                            className: "flex justify-between items-center mb-6"
-                        }, [
-                            React.createElement('h3', {
-                                key: 'chart-title',
-                                className: "text-2xl font-bold text-gray-800 flex items-center"
-                            }, [
-                                React.createElement('span', { key: 'icon', className: "mr-3 text-3xl" }, '📊'),
-                                language === 'he' ? 'גרף התקדמות החיסכון' : 'Savings Progress Chart'
-                            ]),
-                            React.createElement('div', {
-                                key: 'chart-controls',
-                                className: "flex space-x-2"
-                            }, [
-                                // Chart view selection for couples
-                                ...(inputs.planningType === 'couple' ? [
-                                    React.createElement('select', {
-                                        key: 'chart-view-selector',
-                                        value: chartView,
-                                        onChange: (e) => setChartView(e.target.value),
-                                        className: "px-2 py-1 text-sm border rounded bg-white"
-                                    }, [
-                                        React.createElement('option', {
-                                            key: 'combined',
-                                            value: 'combined'
-                                        }, language === 'he' ? 'משולב' : 'Combined'),
-                                        React.createElement('option', {
-                                            key: 'partner1',
-                                            value: 'partner1'
-                                        }, inputs.partner1Name || (language === 'he' ? 'בן/בת זוג 1' : 'Partner 1')),
-                                        React.createElement('option', {
-                                            key: 'partner2',
-                                            value: 'partner2'
-                                        }, inputs.partner2Name || (language === 'he' ? 'בן/בת זוג 2' : 'Partner 2'))
-                                    ])
-                                ] : []),
-                                React.createElement('button', {
-                                    key: 'inflation-toggle',
-                                    onClick: () => setShowInflationChart(!showInflationChart),
-                                    className: `px-3 py-1 text-sm rounded ${showInflationChart ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-blue-600`
-                                }, language === 'he' ? 'מותאם אינפלציה' : 'Inflation Adjusted'),
-                                React.createElement('button', {
-                                    key: 'hide-chart',
-                                    onClick: () => setShowChart(false),
-                                    className: "px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
-                                }, language === 'he' ? 'הסתר' : 'Hide')
-                            ])
-                        ]),
-                        React.createElement(SimpleChart, {
-                            key: 'enhanced-savings-chart',
-                            data: (() => {
                                 const chartData = [];
                                 const currentAge = inputs.currentAge || 30;
                                 const retirementAge = inputs.retirementAge || 67;
