@@ -1468,6 +1468,7 @@
         const [language, setLanguage] = React.useState('he');
         const [showChart, setShowChart] = React.useState(false);
         const [showInflationChart, setShowInflationChart] = React.useState(false);
+        const [chartView, setChartView] = React.useState('combined'); // 'combined', 'partner1', 'partner2'
         const [llmAnalysis, setLlmAnalysis] = React.useState('');
         const [showWelcome, setShowWelcome] = React.useState(true);
         const [showTutorial, setShowTutorial] = React.useState(false);
@@ -2170,6 +2171,28 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                                 key: 'chart-controls',
                                 className: "flex space-x-2"
                             }, [
+                                // Chart view selection for couples
+                                ...(inputs.planningType === 'couple' ? [
+                                    React.createElement('select', {
+                                        key: 'chart-view-selector',
+                                        value: chartView,
+                                        onChange: (e) => setChartView(e.target.value),
+                                        className: "px-2 py-1 text-sm border rounded bg-white"
+                                    }, [
+                                        React.createElement('option', {
+                                            key: 'combined',
+                                            value: 'combined'
+                                        }, language === 'he' ? 'משולב' : 'Combined'),
+                                        React.createElement('option', {
+                                            key: 'partner1',
+                                            value: 'partner1'
+                                        }, inputs.partner1Name || (language === 'he' ? 'בן/בת זוג 1' : 'Partner 1')),
+                                        React.createElement('option', {
+                                            key: 'partner2',
+                                            value: 'partner2'
+                                        }, inputs.partner2Name || (language === 'he' ? 'בן/בת זוג 2' : 'Partner 2'))
+                                    ])
+                                ] : []),
                                 React.createElement('button', {
                                     key: 'inflation-toggle',
                                     onClick: () => setShowInflationChart(!showInflationChart),
@@ -2192,29 +2215,70 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                                 const pensionReturn = ((inputs.expectedReturn || 7) - (inputs.accumulationFees || 0.1)) / 100;
                                 const trainingReturn = ((inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.6)) / 100;
                                 const personalReturn = (inputs.expectedReturn || 7) / 100;
+
+                                // Calculate partner-specific data based on chart view
+                                const getPartnerData = (partnerNum) => {
+                                    if (inputs.planningType !== 'couple') return null;
+                                    
+                                    const salary = partnerNum === 1 ? (inputs.partner1Salary || 0) : (inputs.partner2Salary || 0);
+                                    const managementFees = partnerNum === 1 ? (inputs.partner1ManagementFees || 1.0) : (inputs.partner2ManagementFees || 1.0);
+                                    const trainingFundRate = partnerNum === 1 ? (inputs.partner1TrainingFundRate || 10.0) : (inputs.partner2TrainingFundRate || 10.0);
+                                    const currentSavings = partnerNum === 1 ? (inputs.partner1CurrentSavings || 0) : (inputs.partner2CurrentSavings || 0);
+                                    
+                                    return { salary, managementFees, trainingFundRate, currentSavings };
+                                };
                                 
                                 for (let age = currentAge; age <= retirementAge; age += 3) {
                                     const yearsInvested = age - currentAge;
                                     
-                                    // Calculate individual components
-                                    const pensionContribution = (totalMonthlySalary * (inputs.pensionContribution || 18.5) / 100) + 
-                                                               (totalMonthlySalary * (inputs.employerContribution || 6) / 100);
-                                    // Use proper training fund ceiling calculation
-                                    const trainingEmployeeRate = inputs.trainingFundEmployeeRate || 2.5;
-                                    const trainingEmployerRate = inputs.trainingFundEmployerRate || 7.5;
-                                    const trainingTotalRate = trainingEmployeeRate + trainingEmployerRate;
-                                    const trainingCeiling = inputs.trainingFundCeiling || 15972;
-                                    const salaryForTraining = inputs.trainingFundContributeAboveCeiling ? 
-                                        totalMonthlySalary : Math.min(totalMonthlySalary, trainingCeiling);
-                                    const trainingContribution = inputs.hasTrainingFund ? 
-                                        (salaryForTraining * trainingTotalRate / 100) : 0;
-                                    const personalContribution = Math.max(0, monthlyTotal - pensionContribution - trainingContribution);
+                                    let pensionFV = 0, trainingFV = 0, personalFV = 0, currentSavingsGrowth = 0;
                                     
-                                    const pensionFV = pensionContribution * 12 * ((Math.pow(1 + pensionReturn, yearsInvested) - 1) / pensionReturn) * (1 + pensionReturn);
-                                    const trainingFV = trainingContribution * 12 * ((Math.pow(1 + trainingReturn, yearsInvested) - 1) / trainingReturn) * (1 + trainingReturn);
-                                    const personalFV = personalContribution * 12 * ((Math.pow(1 + personalReturn, yearsInvested) - 1) / personalReturn) * (1 + personalReturn);
+                                    if (inputs.planningType === 'couple' && chartView !== 'combined') {
+                                        // Individual partner calculation
+                                        const partnerNum = chartView === 'partner1' ? 1 : 2;
+                                        const partnerData = getPartnerData(partnerNum);
+                                        
+                                        if (partnerData) {
+                                            const partnerPensionContribution = (partnerData.salary * (inputs.pensionContribution || 18.5) / 100) + 
+                                                                           (partnerData.salary * (inputs.employerContribution || 6) / 100);
+                                            
+                                            const partnerTrainingCeiling = inputs.trainingFundCeiling || 15972;
+                                            const partnerSalaryForTraining = inputs.trainingFundContributeAboveCeiling ? 
+                                                partnerData.salary : Math.min(partnerData.salary, partnerTrainingCeiling);
+                                            const partnerTrainingContribution = inputs.hasTrainingFund ? 
+                                                (partnerSalaryForTraining * partnerData.trainingFundRate / 100) : 0;
+                                            
+                                            const partnerPersonalContribution = Math.max(0, 
+                                                (partnerData.salary * 0.15) - partnerPensionContribution - partnerTrainingContribution);
+                                            
+                                            pensionFV = partnerPensionContribution * 12 * ((Math.pow(1 + pensionReturn, yearsInvested) - 1) / pensionReturn) * (1 + pensionReturn);
+                                            trainingFV = partnerTrainingContribution * 12 * ((Math.pow(1 + trainingReturn, yearsInvested) - 1) / trainingReturn) * (1 + trainingReturn);
+                                            personalFV = partnerPersonalContribution * 12 * ((Math.pow(1 + personalReturn, yearsInvested) - 1) / personalReturn) * (1 + personalReturn);
+                                            currentSavingsGrowth = partnerData.currentSavings * Math.pow(1 + pensionReturn, yearsInvested);
+                                        }
+                                    } else {
+                                        // Combined calculation (original logic)
+                                        const pensionContribution = (totalMonthlySalary * (inputs.pensionContribution || 18.5) / 100) + 
+                                                                   (totalMonthlySalary * (inputs.employerContribution || 6) / 100);
+                                        
+                                        const trainingEmployeeRate = inputs.trainingFundEmployeeRate || 2.5;
+                                        const trainingEmployerRate = inputs.trainingFundEmployerRate || 7.5;
+                                        const trainingTotalRate = trainingEmployeeRate + trainingEmployerRate;
+                                        const trainingCeiling = inputs.trainingFundCeiling || 15972;
+                                        const salaryForTraining = inputs.trainingFundContributeAboveCeiling ? 
+                                            totalMonthlySalary : Math.min(totalMonthlySalary, trainingCeiling);
+                                        const trainingContribution = inputs.hasTrainingFund ? 
+                                            (salaryForTraining * trainingTotalRate / 100) : 0;
+                                        
+                                        const personalContribution = Math.max(0, monthlyTotal - pensionContribution - trainingContribution);
+                                        
+                                        pensionFV = pensionContribution * 12 * ((Math.pow(1 + pensionReturn, yearsInvested) - 1) / pensionReturn) * (1 + pensionReturn);
+                                        trainingFV = trainingContribution * 12 * ((Math.pow(1 + trainingReturn, yearsInvested) - 1) / trainingReturn) * (1 + trainingReturn);
+                                        personalFV = personalContribution * 12 * ((Math.pow(1 + personalReturn, yearsInvested) - 1) / personalReturn) * (1 + personalReturn);
+                                        currentSavingsGrowth = (inputs.currentSavings || 0) * Math.pow(1 + pensionReturn, yearsInvested);
+                                    }
                                     
-                                    const totalNominal = pensionFV + trainingFV + personalFV + (inputs.currentSavings || 0) * Math.pow(1 + pensionReturn, yearsInvested);
+                                    const totalNominal = pensionFV + trainingFV + personalFV + currentSavingsGrowth;
                                     const totalInflationAdjusted = totalNominal / Math.pow(1 + inflationRate, yearsInvested);
                                     
                                     chartData.push({
