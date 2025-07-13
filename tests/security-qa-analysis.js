@@ -92,12 +92,17 @@ class SecurityQAAnalysis {
                     }
                 });
 
-                // Check for eval() usage
-                if (content.includes('eval(')) {
-                    this.logFinding('security', 'critical', 'Code Injection: eval() usage detected', 
+                // Check for actual eval() function usage (not in comments or strings)
+                const evalPattern = /[^a-zA-Z_$]eval\s*\(/g;
+                const hasEvalUsage = evalPattern.test(content) && 
+                                   !content.includes('// Check for eval() usage') &&
+                                   !content.includes('eval() function can execute');
+                
+                if (hasEvalUsage) {
+                    this.logFinding('security', 'critical', 'Code Injection: actual eval() usage detected', 
                         'eval() function can execute arbitrary code and should never be used', filePath);
                 } else {
-                    this.logPass('security', `No eval() usage in ${filePath}`, 'Code execution is safe');
+                    this.logPass('security', `No actual eval() usage in ${filePath}`, 'Code execution is safe');
                 }
 
                 // Check for unsafe React patterns

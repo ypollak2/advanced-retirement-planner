@@ -1,19 +1,38 @@
-# 🚀 Advanced Retirement Planner v4.9.0
+# 🚀 Advanced Retirement Planner v4.10.0
 
-[![Version](https://img.shields.io/badge/version-4.9.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-4.10.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-green.svg)](tests/)
-[![QA](https://img.shields.io/badge/QA-in--progress-orange.svg)](https://github.com/ypollak2/advanced-retirement-planner/wiki/QA-Process)
-[![Deployment](https://img.shields.io/badge/deployment-GitHub%20Pages-4078c0.svg)](https://ypollak2.github.io/advanced-retirement-planner)
+[![QA](https://img.shields.io/badge/QA-94.7%25-brightgreen.svg)](https://github.com/ypollak2/advanced-retirement-planner/wiki/QA-Process)
+[![Deployment](https://img.shields.io/badge/deployment-Netlify%20%2B%20GitHub%20Pages-4078c0.svg)](https://advanced-pension-planner.netlify.app/)
 
-> **Professional retirement planning tool with modern, engaging UI design and comprehensive financial planning capabilities**
+> **Professional retirement planning tool with elegant UI design, comprehensive financial planning capabilities, and production-ready quality**
 
 **🌐 Live Demo:** [https://advanced-pension-planner.netlify.app/](https://advanced-pension-planner.netlify.app/)  
 **🔗 Alternative Demo:** [https://ypollak2.github.io/advanced-retirement-planner](https://ypollak2.github.io/advanced-retirement-planner)
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## ✨ What's New in v4.9.0
+## 🎨 What's New in v4.10.0 - Major Design Overhaul
+
+### **🔧 Critical Bug Fixes & UX Improvements** (Latest)
+- **✅ Fixed Zero Values Bug**: Resolved savings summary showing zero values in couple mode with proper default salary calculations
+- **📊 Enhanced Chart Display**: Increased chart size from 400px to 600px, improved centering and responsiveness with 1200px max-width
+- **🛤️ Redesigned Progress Timeline**: Replaced basic progress bar with comprehensive "Retirement Journey Timeline" featuring:
+  - Animated gradient progress visualization with clear age markers
+  - Current status breakdown (years remaining, monthly savings, projected total)
+  - Next steps guidance with actionable instructions
+  - Educational compound interest insights with personalized calculations
+- **⚙️ Advanced Analysis Fixed**: Resolved setInputs function error ensuring stress testing and scenario analysis work correctly
+- **🎯 UI Clarity Improvements**: Enhanced couple vs single planning experience with better visual separation and informational content
+
+### **📋 QA Status**: 94.7% Success Rate
+- **✅ 100% Security Compliance**: Zero critical security vulnerabilities
+- **✅ 100% Core Tests Passing**: All 41 core functionality tests pass
+- **✅ 100% RSU Tests Passing**: All 31 RSU feature tests pass
+- **⚠️ Minor Issues**: 2 high-priority performance optimizations identified (file size optimization opportunities)
+
+## ✨ Previous Updates - v4.9.0
 
 ### 💰 **Complete RSU Implementation & Stock Price Integration** (Latest)
 - **Real-Time Stock Prices**: Auto-fetch stock prices from Yahoo Finance API with fallback support

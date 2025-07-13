@@ -281,10 +281,15 @@
             };
         }, [data, type, language]);
         
-        return React.createElement('canvas', { 
-            ref: chartRef,
-            style: { maxHeight: '400px' }
-        });
+        return React.createElement('div', {
+            className: "w-full flex justify-center"
+        }, [
+            React.createElement('canvas', { 
+                key: 'chart-canvas',
+                ref: chartRef,
+                style: { maxHeight: '600px', width: '100%', maxWidth: '1200px' }
+            })
+        ]);
     };
 
     // Bottom Line Summary Component - Key metrics display
@@ -364,10 +369,12 @@
         
         // Use passed-in calculated values (or defaults if not provided)
         const safeYearsToRetirement = yearsToRetirement || Math.max(0, (inputs.retirementAge || 67) - (inputs.currentAge || 30));
-        const safeTotalMonthlySalary = totalMonthlySalary || (inputs.currentMonthlySalary || 15000);
-        const safeEstimatedMonthlyIncome = estimatedMonthlyIncome || 0;
-        const safeProjectedWithGrowth = projectedWithGrowth || 0;
-        const safeBuyingPowerToday = buyingPowerToday || 0;
+        const safeTotalMonthlySalary = totalMonthlySalary || (inputs.planningType === 'couple' 
+            ? (inputs.partner1Salary || 15000) + (inputs.partner2Salary || 12000)
+            : (inputs.currentMonthlySalary || 15000));
+        const safeEstimatedMonthlyIncome = estimatedMonthlyIncome || (safeTotalMonthlySalary * 0.21 * 12 * safeYearsToRetirement * 1.07 / (25 * 12));
+        const safeProjectedWithGrowth = projectedWithGrowth || (safeTotalMonthlySalary * 0.21 * 12 * safeYearsToRetirement * 1.07);
+        const safeBuyingPowerToday = buyingPowerToday || (safeProjectedWithGrowth / Math.pow(1.03, safeYearsToRetirement));
         const pensionNetReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.accumulationFees || 1.0));
         const trainingNetReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.6));
         const safeAvgNetReturn = avgNetReturn || Math.max(0.1, (pensionNetReturn + trainingNetReturn) / 2);
@@ -468,7 +475,7 @@
                 React.createElement('div', { className: "text-sm text-gray-700 font-medium mb-2" }, 
                     language === 'he' ? 'הפקדות חודשיות' : 'Monthly Contributions'),
                 React.createElement('div', { className: "text-base font-bold text-gray-800" }, 
-                    formatCurrency(monthlyTotal))
+                    formatCurrency(monthlyTotal || (safeTotalMonthlySalary * 0.21)))
             ]),
             
             // Projected at Retirement
@@ -479,7 +486,7 @@
                 React.createElement('div', { className: "text-sm text-yellow-700 font-medium" }, 
                     language === 'he' ? 'צפי בפרישה (אחרי דמי ניהול)' : 'Projected at Retirement (After Fees)'),
                 React.createElement('div', { className: "text-lg font-bold text-yellow-800" }, 
-                    formatCurrency(projectedWithGrowth)),
+                    formatCurrency(safeProjectedWithGrowth)),
                 React.createElement('div', { className: "text-xs text-yellow-600 mt-1" }, 
                     language === 'he' ? `תשואה נטו ממוצעת: ${safeAvgNetReturn.toFixed(1)}%` : `Avg Net Return: ${safeAvgNetReturn.toFixed(1)}%`)
             ]),
@@ -496,13 +503,13 @@
                         React.createElement('div', { className: "text-xs text-orange-600" }, 
                             language === 'he' ? 'סה״כ:' : 'Total:'),
                         React.createElement('div', { className: "text-base font-bold text-orange-800" }, 
-                            formatCurrency(buyingPowerToday))
+                            formatCurrency(safeBuyingPowerToday))
                     ]),
                     React.createElement('div', { key: 'monthly' }, [
                         React.createElement('div', { className: "text-xs text-orange-600" }, 
                             language === 'he' ? 'חודשי:' : 'Monthly:'),
                         React.createElement('div', { className: "text-base font-bold text-orange-800" }, 
-                            formatCurrency(buyingPowerToday * (safeAvgNetReturn/100) / 12))
+                            formatCurrency(safeBuyingPowerToday * (safeAvgNetReturn/100) / 12))
                     ])
                 ])
             ]),
@@ -588,23 +595,155 @@
                     ])
                 ]),
                 
-                // Progress indicators
+                // Enhanced Progress Timeline with Instructions
                 React.createElement('div', { 
-                    key: 'progress',
-                    className: "space-y-2 mt-4" 
+                    key: 'progress-timeline',
+                    className: "border-t border-gray-200 pt-4 mt-4 space-y-4" 
                 }, [
-                    React.createElement('div', { className: "text-xs text-gray-600 mb-1" }, 
-                        language === 'he' ? 'התקדמות לקראת פרישה' : 'Progress to Retirement'),
-                    React.createElement('div', { className: "progress-bar" }, [
-                        React.createElement('div', { 
-                            className: "progress-fill",
-                            style: { 
-                                width: `${Math.min(100, ((inputs.currentAge || 30) - 25) / ((inputs.retirementAge || 67) - 25) * 100)}%` 
-                            }
-                        })
+                    React.createElement('div', { 
+                        key: 'timeline-title',
+                        className: "text-sm font-bold text-purple-700 mb-3 flex items-center" 
+                    }, [
+                        React.createElement('span', { key: 'icon', className: "mr-2" }, '🛤️'),
+                        language === 'he' ? 'מסלול הדרך לפרישה' : 'Retirement Journey Timeline'
                     ]),
-                    React.createElement('div', { className: "text-xs text-gray-500 text-center" }, 
-                        `${Math.round(((inputs.currentAge || 30) - 25) / ((inputs.retirementAge || 67) - 25) * 100)}% ${language === 'he' ? 'מהדרך' : 'complete'}`)
+                    
+                    // Timeline Visual
+                    React.createElement('div', { 
+                        key: 'timeline-visual',
+                        className: "relative bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-4 mb-4" 
+                    }, [
+                        // Progress track
+                        React.createElement('div', { 
+                            key: 'progress-track',
+                            className: "relative h-3 bg-gray-200 rounded-full overflow-hidden" 
+                        }, [
+                            React.createElement('div', { 
+                                key: 'progress-fill',
+                                className: "h-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-1000 ease-out",
+                                style: { 
+                                    width: `${Math.min(100, Math.max(0, ((inputs.currentAge || 30) - 22) / ((inputs.retirementAge || 67) - 22) * 100))}%` 
+                                }
+                            })
+                        ]),
+                        
+                        // Timeline markers
+                        React.createElement('div', { 
+                            key: 'timeline-markers',
+                            className: "flex justify-between items-center mt-3 text-xs" 
+                        }, [
+                            React.createElement('div', { 
+                                key: 'start-marker',
+                                className: "text-center" 
+                            }, [
+                                React.createElement('div', { className: "w-3 h-3 bg-blue-500 rounded-full mx-auto mb-1" }),
+                                React.createElement('div', { className: "font-medium text-blue-700" }, 
+                                    language === 'he' ? 'התחלה' : 'Start'),
+                                React.createElement('div', { className: "text-gray-500" }, 
+                                    `${language === 'he' ? 'גיל' : 'Age'} 22`)
+                            ]),
+                            
+                            React.createElement('div', { 
+                                key: 'current-marker',
+                                className: "text-center" 
+                            }, [
+                                React.createElement('div', { className: "w-4 h-4 bg-purple-500 rounded-full mx-auto mb-1 animate-pulse" }),
+                                React.createElement('div', { className: "font-bold text-purple-700" }, 
+                                    language === 'he' ? 'כרגע' : 'Now'),
+                                React.createElement('div', { className: "text-purple-600" }, 
+                                    `${language === 'he' ? 'גיל' : 'Age'} ${inputs.currentAge || 30}`)
+                            ]),
+                            
+                            React.createElement('div', { 
+                                key: 'retirement-marker',
+                                className: "text-center" 
+                            }, [
+                                React.createElement('div', { className: "w-3 h-3 bg-green-500 rounded-full mx-auto mb-1" }),
+                                React.createElement('div', { className: "font-medium text-green-700" }, 
+                                    language === 'he' ? 'פרישה' : 'Retirement'),
+                                React.createElement('div', { className: "text-gray-500" }, 
+                                    `${language === 'he' ? 'גיל' : 'Age'} ${inputs.retirementAge || 67}`)
+                            ])
+                        ]),
+                        
+                        // Progress percentage
+                        React.createElement('div', { 
+                            key: 'progress-percentage',
+                            className: "text-center mt-3" 
+                        }, [
+                            React.createElement('div', { className: "text-2xl font-bold text-purple-600" }, 
+                                `${Math.round(Math.max(0, ((inputs.currentAge || 30) - 22) / ((inputs.retirementAge || 67) - 22) * 100))}%`),
+                            React.createElement('div', { className: "text-sm text-gray-600" }, 
+                                language === 'he' ? 'מהדרך אל הפרישה' : 'of the way to retirement')
+                        ])
+                    ]),
+                    
+                    // Key Milestones & Instructions
+                    React.createElement('div', { 
+                        key: 'milestones',
+                        className: "space-y-3" 
+                    }, [
+                        React.createElement('div', { 
+                            key: 'milestone-title',
+                            className: "text-sm font-semibold text-gray-700 mb-2" 
+                        }, language === 'he' ? 'נקודות ציון חשובות:' : 'Important Milestones:'),
+                        
+                        // Current status
+                        React.createElement('div', { 
+                            key: 'current-status',
+                            className: "bg-purple-50 rounded-lg p-3 border border-purple-200" 
+                        }, [
+                            React.createElement('div', { className: "flex items-center mb-2" }, [
+                                React.createElement('span', { className: "text-lg mr-2" }, '📍'),
+                                React.createElement('span', { className: "font-semibold text-purple-700" }, 
+                                    language === 'he' ? 'המצב הנוכחי שלך' : 'Your Current Status')
+                            ]),
+                            React.createElement('div', { className: "text-sm text-purple-600 space-y-1" }, [
+                                React.createElement('div', {}, 
+                                    `${language === 'he' ? 'עוד' : 'Only'} ${(inputs.retirementAge || 67) - (inputs.currentAge || 30)} ${language === 'he' ? 'שנים עד הפרישה' : 'years until retirement'}`),
+                                React.createElement('div', {}, 
+                                    `${language === 'he' ? 'חיסכון חודשי:' : 'Monthly savings:'} ${formatCurrency(monthlyTotal || (safeTotalMonthlySalary * 0.21))}`),
+                                React.createElement('div', {}, 
+                                    `${language === 'he' ? 'צפי צבירה:' : 'Projected total:'} ${formatCurrency(safeProjectedWithGrowth)}`)
+                            ])
+                        ]),
+                        
+                        // Next steps
+                        React.createElement('div', { 
+                            key: 'next-steps',
+                            className: "bg-blue-50 rounded-lg p-3 border border-blue-200" 
+                        }, [
+                            React.createElement('div', { className: "flex items-center mb-2" }, [
+                                React.createElement('span', { className: "text-lg mr-2" }, '🎯'),
+                                React.createElement('span', { className: "font-semibold text-blue-700" }, 
+                                    language === 'he' ? 'הצעדים הבאים' : 'Next Steps')
+                            ]),
+                            React.createElement('div', { className: "text-sm text-blue-600 space-y-1" }, [
+                                React.createElement('div', {}, 
+                                    language === 'he' ? '✓ המשך להפקיד בקביעות' : '✓ Continue regular contributions'),
+                                React.createElement('div', {}, 
+                                    language === 'he' ? '✓ בדוק דמי ניהול מידי שנה' : '✓ Review management fees annually'),
+                                React.createElement('div', {}, 
+                                    language === 'he' ? '✓ עדכן תוכנית כל 2-3 שנים' : '✓ Update plan every 2-3 years')
+                            ])
+                        ]),
+                        
+                        // Time remaining insight
+                        React.createElement('div', { 
+                            key: 'time-insight',
+                            className: "bg-green-50 rounded-lg p-3 border border-green-200" 
+                        }, [
+                            React.createElement('div', { className: "flex items-center mb-2" }, [
+                                React.createElement('span', { className: "text-lg mr-2" }, '⏰'),
+                                React.createElement('span', { className: "font-semibold text-green-700" }, 
+                                    language === 'he' ? 'זמן הוא הנכס שלך' : 'Time is Your Asset')
+                            ]),
+                            React.createElement('div', { className: "text-sm text-green-600" }, 
+                                language === 'he' ? 
+                                    `יש לך עוד ${((inputs.retirementAge || 67) - (inputs.currentAge || 30)) * 12} תשלומים חודשיים להשקיע. כל תשלום נוסף משפיע משמעותית על הצבירה הסופית בזכות הריבית דריבית.` :
+                                    `You have ${((inputs.retirementAge || 67) - (inputs.currentAge || 30)) * 12} more monthly payments to make. Each additional payment significantly impacts your final accumulation through compound interest.`)
+                        ])
+                    ])
                 ])
             ]),
             
@@ -999,7 +1138,7 @@
                                 key: 'training-fund-input',
                                 type: 'number',
                                 value: inputs.currentTrainingFundSavings || 0,
-                                onChange: (e) => setInputs({...inputs, trainingFund: parseInt(e.target.value) || 0}),
+                                onChange: (e) => setInputs({...inputs, currentTrainingFundSavings: parseInt(e.target.value) || 0}),
                                 className: "financial-input"
                             })
                         ])
@@ -1008,7 +1147,7 @@
                         key: 'row3',
                         className: "grid grid-cols-2 gap-4" 
                     }, [
-                        inputs.planningType !== 'couple' && React.createElement('div', { key: 'salary' }, [
+                        inputs.planningType !== 'couple' ? React.createElement('div', { key: 'salary' }, [
                             React.createElement('label', { 
                                 key: 'salary-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
@@ -1020,6 +1159,23 @@
                                 onChange: (e) => setInputs({...inputs, currentMonthlySalary: parseInt(e.target.value) || 0}),
                                 className: "financial-input"
                             })
+                        ]) : React.createElement('div', { 
+                            key: 'couple-salary-info',
+                            className: "col-span-1 bg-blue-50 rounded-lg p-3 border border-blue-200"
+                        }, [
+                            React.createElement('div', {
+                                key: 'info-icon',
+                                className: "flex items-center text-blue-700 text-sm font-medium mb-1"
+                            }, [
+                                React.createElement('span', { key: 'icon', className: "mr-2" }, 'ℹ️'),
+                                language === 'he' ? 'תכנון זוגי' : 'Couple Planning'
+                            ]),
+                            React.createElement('p', {
+                                key: 'info-text',
+                                className: "text-blue-600 text-xs"
+                            }, language === 'he' ? 
+                                'המשכורות מוגדרות למעלה עבור כל בן/בת זוג בנפרד. התוצאות יחושבו על בסיס המשכורות המשולבות.' :
+                                'Salaries are defined above for each partner separately. Results will be calculated based on combined salaries.')
                         ]),
                         React.createElement('div', { key: 'training-contribution' }, [
                             React.createElement('label', { 
@@ -1921,8 +2077,8 @@
         // Financial calculations
         const yearsToRetirement = Math.max(0, (inputs.retirementAge || 67) - (inputs.currentAge || 30));
         const totalMonthlySalary = inputs.planningType === 'couple' 
-            ? (inputs.partner1Salary || 0) + (inputs.partner2Salary || 0)
-            : (inputs.currentMonthlySalary || 0);
+            ? (inputs.partner1Salary || 15000) + (inputs.partner2Salary || 12000)
+            : (inputs.currentMonthlySalary || 15000);
 
         const monthlyPensionContribution = totalMonthlySalary * (inputs.pensionContribution || 18.5) / 100;
         
@@ -2545,6 +2701,7 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                         React.createElement(window.ScenariosStress, {
                             key: 'stress-testing',
                             inputs,
+                            setInputs,
                             language
                         }) : activeTab === 'stress' ?
                         React.createElement('div', { className: "financial-card p-6" }, 
@@ -2596,16 +2753,19 @@ Recommendations: Continue regular contributions and review portfolio allocation 
                     // Enhanced Chart Display with Components and Inflation Toggle
                     showChart ? React.createElement('div', {
                         key: 'chart-container',
-                        className: "financial-card p-6 mt-4"
+                        className: "financial-card p-8 mt-6 mx-auto max-w-7xl w-full"
                     }, [
                         React.createElement('div', {
                             key: 'chart-header',
-                            className: "flex justify-between items-center mb-4"
+                            className: "flex justify-between items-center mb-6"
                         }, [
                             React.createElement('h3', {
                                 key: 'chart-title',
-                                className: "text-lg font-bold text-gray-800"
-                            }, language === 'he' ? 'גרף התקדמות החיסכון' : 'Savings Progress Chart'),
+                                className: "text-2xl font-bold text-gray-800 flex items-center"
+                            }, [
+                                React.createElement('span', { key: 'icon', className: "mr-3 text-3xl" }, '📊'),
+                                language === 'he' ? 'גרף התקדמות החיסכון' : 'Savings Progress Chart'
+                            ]),
                             React.createElement('div', {
                                 key: 'chart-controls',
                                 className: "flex space-x-2"
