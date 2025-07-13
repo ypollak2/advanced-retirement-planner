@@ -59,10 +59,10 @@ jobs:
     - name: 📝 Test HTML validity
       run: |
         # Check for basic HTML structure
-        grep -q "<html" index.html && echo "✅ HTML tag found"
-        grep -q "React" index.html && echo "✅ React included"
-        grep -q "dynamic-loader" index.html && echo "✅ Modular architecture included"
-        grep -q "initializeRetirementPlannerCore" index.html && echo "✅ Initialization function included"
+        grep -q "<html" dist/index.html && echo "✅ HTML tag found"
+        grep -q "React" dist/index.html && echo "✅ React included"
+        grep -q "dynamic-loader" dist/index.html && echo "✅ Modular architecture included"
+        grep -q "initializeRetirementPlannerCore" dist/index.html && echo "✅ Initialization function included"
         
     - name: 🧮 Test JavaScript syntax
       run: |
