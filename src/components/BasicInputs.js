@@ -553,8 +553,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, Calculator, PiggyBank, Do
                                 key: 'rsu-company-enhanced',
                                 inputs,
                                 setInputs,
-                                language,
-                                fetchStockPrice
+                                language
                             }),
 
                             React.createElement('div', { key: 'rsu-units' }, [
