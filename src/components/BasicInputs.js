@@ -385,7 +385,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, Calculator, PiggyBank, Do
                             React.createElement('input', {
                                 key: 'training-contribution-display',
                                 type: 'number',
-                                value: Math.round(monthlyTrainingFundContribution),
+                                value: Math.round((inputs.currentSalary || 20000) * 0.075),
                                 readOnly: true,
                                 className: "financial-input bg-gray-100"
                             })
