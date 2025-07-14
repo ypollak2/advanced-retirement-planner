@@ -581,7 +581,7 @@ function testGitHubActions() {
                 hasTestScript ? 'Test script available for CI/CD' : 'Missing test script for CI/CD');
         }
         
-        // Check for syntax errors that would break CI/CD
+        // Check for critical syntax errors that would break CI/CD
         const jsFiles = [
             'src/components/FinancialChart.js',
             'src/components/RetirementPlannerApp.js',
@@ -594,17 +594,14 @@ function testGitHubActions() {
         jsFiles.forEach(file => {
             if (fs.existsSync(file)) {
                 try {
-                    const content = fs.readFileSync(file, 'utf8');
-                    // Check for common syntax errors that break CI/CD
-                    if (content.includes('}, [') && !content.includes('React.useEffect')) {
-                        syntaxErrorCount++;
-                        logTest(`GitHub Actions: ${file} syntax validation`, false, 
-                            'Potential useEffect syntax error detected');
-                    }
+                    // Use Node.js built-in syntax checker
+                    require('child_process').execSync(`node -c "${file}"`, { stdio: 'pipe' });
+                    logTest(`GitHub Actions: ${file} syntax validation`, true, 
+                        'Syntax validation passed');
                 } catch (error) {
                     syntaxErrorCount++;
                     logTest(`GitHub Actions: ${file} syntax validation`, false, 
-                        `File read error: ${error.message}`);
+                        `Syntax error detected: ${error.message.split('\n')[0]}`);
                 }
             }
         });
