@@ -2,6 +2,12 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
     const [searchQuery, setSearchQuery] = React.useState('');
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
+    const [stockPrice, setStockPrice] = React.useState(null);
+    const [priceLoading, setPriceLoading] = React.useState(false);
+    const [manualPriceMode, setManualPriceMode] = React.useState(false);
+    const [manualPrice, setManualPrice] = React.useState('');
+    const [priceSource, setPriceSource] = React.useState('');
+    const [lastUpdated, setLastUpdated] = React.useState(null);
     
     // Comprehensive list of tech companies with RSUs
     const companies = [
@@ -75,8 +81,81 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
         setSearchQuery('');
         
         if (symbol && symbol !== 'OTHER' && symbol !== '') {
-            // Stock price will be entered manually for now
-            console.log('Selected company:', symbol);
+            await fetchStockPriceForSymbol(symbol);
+        } else {
+            // Reset price data for OTHER or empty selection
+            setStockPrice(null);
+            setPriceSource('');
+            setLastUpdated(null);
+            setManualPriceMode(false);
+        }
+    };
+    
+    // Function to fetch stock price using the API
+    const fetchStockPriceForSymbol = async (symbol) => {
+        if (!symbol || !window.fetchStockPrice) return;
+        
+        setPriceLoading(true);
+        setManualPriceMode(false);
+        
+        try {
+            const price = await window.fetchStockPrice(symbol);
+            if (price && price > 0) {
+                setStockPrice(price);
+                setLastUpdated(new Date().toLocaleTimeString());
+                
+                // Check cache info for source
+                if (window.getStockPriceCacheInfo) {
+                    const cacheInfo = window.getStockPriceCacheInfo();
+                    const symbolData = cacheInfo.data.find(item => item.symbol === symbol);
+                    if (symbolData) {
+                        setPriceSource(symbolData.source);
+                    }
+                }
+                
+                // Update inputs with fetched price
+                setInputs(prev => ({
+                    ...prev,
+                    rsuCurrentStockPrice: price
+                }));
+                
+                console.log(`✅ Stock price fetched for ${symbol}: $${price}`);
+            } else {
+                throw new Error('Price not available');
+            }
+        } catch (error) {
+            console.warn(`⚠️ Failed to fetch price for ${symbol}:`, error.message);
+            // Fall back to manual input mode
+            setManualPriceMode(true);
+            setStockPrice(null);
+            setPriceSource('manual');
+        } finally {
+            setPriceLoading(false);
+        }
+    };
+    
+    // Handle manual price input
+    const handleManualPriceSubmit = () => {
+        const price = parseFloat(manualPrice);
+        if (price && price > 0) {
+            setStockPrice(price);
+            setLastUpdated(new Date().toLocaleTimeString());
+            setPriceSource('manual');
+            
+            // Update inputs with manual price
+            setInputs(prev => ({
+                ...prev,
+                rsuCurrentStockPrice: price
+            }));
+            
+            console.log(`✅ Manual price set for ${inputs.rsuCompany}: $${price}`);
+        }
+    };
+    
+    // Refresh stock price
+    const refreshStockPrice = () => {
+        if (inputs.rsuCompany && inputs.rsuCompany !== 'OTHER') {
+            fetchStockPriceForSymbol(inputs.rsuCompany);
         }
     };
     
@@ -204,14 +283,14 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
             onClick: () => setIsDropdownOpen(false)
         }) : null,
         
-        // Selected company display
+        // Selected company display with stock price
         selectedCompany ? React.createElement('div', {
             key: 'selected-display',
-            className: "mt-2 p-3 bg-indigo-50 border border-indigo-200 rounded-lg"
+            className: "mt-2 p-4 bg-indigo-50 border border-indigo-200 rounded-lg"
         }, [
             React.createElement('div', {
                 key: 'selected-info',
-                className: "flex items-center justify-between"
+                className: "flex items-center justify-between mb-3"
             }, [
                 React.createElement('div', { key: 'selected-details' }, [
                     React.createElement('div', {
@@ -226,11 +305,96 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
                 React.createElement('button', {
                     key: 'clear-selection',
                     onClick: () => {
-                        setInputs({...inputs, rsuCompany: ''});
+                        setInputs({...inputs, rsuCompany: '', rsuCurrentStockPrice: 0});
                         setSearchQuery('');
+                        setStockPrice(null);
+                        setPriceSource('');
+                        setLastUpdated(null);
+                        setManualPriceMode(false);
                     },
                     className: "text-indigo-600 hover:text-indigo-800 text-xs font-semibold px-2 py-1 hover:bg-indigo-100 rounded"
                 }, language === 'he' ? 'נקה' : 'Clear')
+            ]),
+            
+            // Stock Price Section
+            React.createElement('div', {
+                key: 'stock-price-section',
+                className: "bg-white rounded-lg p-3 border border-indigo-100"
+            }, [
+                React.createElement('div', {
+                    key: 'price-header',
+                    className: "flex items-center justify-between mb-2"
+                }, [
+                    React.createElement('span', {
+                        key: 'price-label',
+                        className: "text-sm font-medium text-gray-700"
+                    }, language === 'he' ? 'מחיר המניה הנוכחי' : 'Current Stock Price'),
+                    React.createElement('div', {
+                        key: 'price-actions',
+                        className: "flex gap-2"
+                    }, [
+                        !manualPriceMode && React.createElement('button', {
+                            key: 'refresh-price',
+                            onClick: refreshStockPrice,
+                            disabled: priceLoading,
+                            className: "text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 disabled:opacity-50"
+                        }, priceLoading ? '🔄' : '↻'),
+                        React.createElement('button', {
+                            key: 'toggle-manual',
+                            onClick: () => setManualPriceMode(!manualPriceMode),
+                            className: "text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                        }, manualPriceMode ? (language === 'he' ? 'API' : 'API') : (language === 'he' ? 'ידני' : 'Manual'))
+                    ])
+                ]),
+                
+                // Price Display or Manual Input
+                priceLoading ? React.createElement('div', {
+                    key: 'price-loading',
+                    className: "flex items-center gap-2 text-sm text-gray-600"
+                }, [
+                    React.createElement('div', {
+                        className: "animate-spin w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full"
+                    }),
+                    language === 'he' ? 'טוען מחיר...' : 'Loading price...'
+                ]) : manualPriceMode ? React.createElement('div', {
+                    key: 'manual-price-input',
+                    className: "flex gap-2"
+                }, [
+                    React.createElement('input', {
+                        key: 'manual-price-field',
+                        type: 'number',
+                        value: manualPrice,
+                        onChange: (e) => setManualPrice(e.target.value),
+                        placeholder: language === 'he' ? 'הזן מחיר...' : 'Enter price...',
+                        className: "flex-1 px-2 py-1 border border-gray-300 rounded text-sm"
+                    }),
+                    React.createElement('button', {
+                        key: 'submit-manual-price',
+                        onClick: handleManualPriceSubmit,
+                        disabled: !manualPrice || parseFloat(manualPrice) <= 0,
+                        className: "px-3 py-1 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700 disabled:opacity-50"
+                    }, language === 'he' ? 'שמור' : 'Set')
+                ]) : stockPrice ? React.createElement('div', {
+                    key: 'price-display',
+                    className: "space-y-1"
+                }, [
+                    React.createElement('div', {
+                        key: 'price-value',
+                        className: "text-lg font-bold text-green-600"
+                    }, `$${stockPrice.toFixed(2)}`),
+                    React.createElement('div', {
+                        key: 'price-meta',
+                        className: "text-xs text-gray-500 flex items-center gap-2"
+                    }, [
+                        React.createElement('span', { key: 'source' }, 
+                            `${language === 'he' ? 'מקור' : 'Source'}: ${priceSource === 'fallback' ? (language === 'he' ? 'נתונים סטטיים' : 'Static Data') : priceSource === 'manual' ? (language === 'he' ? 'ידני' : 'Manual') : 'API'}`),
+                        lastUpdated && React.createElement('span', { key: 'time' }, 
+                            `${language === 'he' ? 'עודכן' : 'Updated'}: ${lastUpdated}`)
+                    ])
+                ]) : React.createElement('div', {
+                    key: 'no-price',
+                    className: "text-sm text-gray-500 italic"
+                }, language === 'he' ? 'לחץ על כפתור הרענון כדי לקבל מחיר' : 'Click refresh to fetch price')
             ])
         ]) : null
     ]);

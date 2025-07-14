@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Retirement Planner v5.2.1</title>
+    <title>Advanced Retirement Planner v5.3.0</title>
     <meta name="description" content="Advanced retirement planning tool with comprehensive investment tracking">
     
     <!-- Tailwind CSS via CDN -->
@@ -41,7 +41,7 @@
 <body>
     <!-- Version indicator -->
     <div class="version-indicator">
-        ✨ v5.2.1
+        ✨ v5.3.0
     </div>
     
     <div id="root" class="min-h-screen" role="main" aria-label="Retirement Planner Application"></div>
@@ -58,6 +58,9 @@
     <script src="src/data/marketConstants.js?v=5.2.1"></script>
     <script src="src/utils/retirementCalculations.js?v=5.2.1"></script>
     <script src="src/utils/chartDataGenerator.js?v=5.2.1"></script>
+    <script src="src/utils/stockPriceAPI.js?v=5.3.0"></script>
+    <script src="src/utils/exportFunctions.js?v=5.3.0"></script>
+    <script src="src/utils/stressTestScenarios.js?v=5.3.0"></script>
     
     <!-- Base Components (loaded first) -->
     <script src="src/components/EnhancedRSUCompanySelector.js?v=5.2.1"></script>
@@ -68,6 +71,9 @@
     <script src="src/components/HelpTooltip.js?v=5.2.1"></script>
     <script src="src/components/ReadinessScore.js?v=5.2.1"></script>
     <script src="src/components/DynamicPartnerCharts.js?v=5.2.1"></script>
+    <script src="src/components/ExportControls.js?v=5.3.0"></script>
+    <script src="src/components/StressTestInterface.js?v=5.3.0"></script>
+    <script src="src/components/SummaryPanel.js?v=5.3.0"></script>
     <script src="src/components/BasicInputs.js?v=5.2.1"></script>
     <script src="src/components/RetirementAdvancedForm.js?v=5.2.1"></script>
     <script src="src/components/RetirementResultsPanel.js?v=5.2.1"></script>
@@ -100,13 +106,13 @@
                         if (ReactDOM.createRoot) {
                             const root = ReactDOM.createRoot(document.getElementById('root'));
                             root.render(React.createElement(window.RetirementPlannerApp));
-                            console.log('✅ Advanced Retirement Planner v5.2.1 initialized successfully');
+                            console.log('✅ Advanced Retirement Planner v5.3.0 initialized successfully');
                         } else if (ReactDOM.render) {
                             ReactDOM.render(
                                 React.createElement(window.RetirementPlannerApp),
                                 document.getElementById('root')
                             );
-                            console.log('✅ Advanced Retirement Planner v5.2.1 initialized (React 17 mode)');
+                            console.log('✅ Advanced Retirement Planner v5.3.0 initialized (React 17 mode)');
                         }
                     } else {
                         throw new Error('Required components not loaded');

@@ -137,6 +137,35 @@ const ResultsPanel = ({
             partnerResults: partnerResults,
             language: language,
             formatCurrency: formatCurrency
+        }),
+        
+        // Summary Panel
+        effectiveResults && window.SummaryPanel && React.createElement(window.SummaryPanel, {
+            key: 'summary-panel',
+            inputs: inputs,
+            results: effectiveResults,
+            partnerResults: partnerResults,
+            language: language,
+            formatCurrency: formatCurrency
+        }),
+        
+        // Stress Test Interface
+        effectiveResults && window.StressTestInterface && React.createElement(window.StressTestInterface, {
+            key: 'stress-test',
+            inputs: inputs,
+            workPeriods: workPeriods,
+            results: effectiveResults,
+            language: language,
+            formatCurrency: formatCurrency
+        }),
+        
+        // Export Controls
+        effectiveResults && window.ExportControls && React.createElement(window.ExportControls, {
+            key: 'export-controls',
+            inputs: inputs,
+            results: effectiveResults,
+            partnerResults: partnerResults,
+            language: language
         })
     ]);
 };

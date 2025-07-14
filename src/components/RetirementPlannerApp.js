@@ -150,7 +150,7 @@ const RetirementPlannerApp = () => {
         }, [
             React.createElement('h1', {
                 key: 'title',
-                className: 'animate-fade-in-up'
+                className: 'animate-fade-in-up truncate-ellipsis responsive-text'
             }, t.title || 'מחשבון פנסיה מתקדם'),
             React.createElement('p', {
                 key: 'subtitle',
@@ -279,7 +279,7 @@ const RetirementPlannerApp = () => {
                 React.createElement('span', {
                     key: 'version',
                     className: 'version'
-                }, 'v5.2.1'),
+                }, 'v5.3.0'),
                 ' • Created by ',
                 React.createElement('span', {
                     key: 'author',

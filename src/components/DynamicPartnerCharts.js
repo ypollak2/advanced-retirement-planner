@@ -5,6 +5,7 @@ const DynamicPartnerCharts = ({
     inputs, 
     results, 
     partnerResults, 
+    stressTestResults,
     language = 'he',
     formatCurrency
 }) => {
