@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Retirement Planner v5.0.1 - Enhanced UI & Partner Data Fix</title>
+    <title>Advanced Retirement Planner v5.1.4</title>
     <meta name="description" content="Advanced retirement planning tool with comprehensive investment tracking">
     
     <!-- Tailwind CSS via CDN -->
@@ -36,13 +36,12 @@
             min-height: 100vh;
         }
     </style>
-  <script type="module" crossorigin src="/assets/index-DXJtIB5A.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-CceL9Pmd.css">
 </head>
 <body>
     <!-- Version indicator -->
     <div class="version-indicator">
-        ✨ v5.0.1
+        ✨ v5.1.4
     </div>
     
     <div id="root" class="min-h-screen" role="main" aria-label="Retirement Planner Application"></div>
@@ -54,7 +53,50 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Application Scripts -->
+    <!-- Component Scripts -->
+    <script src="src/translations/multiLanguage.js?v=5.1.4"></script>
+    <script src="src/data/marketConstants.js?v=5.1.4"></script>
+    <script src="src/utils/retirementCalculations.js?v=5.1.4"></script>
+    
+    <!-- Base Components (loaded first) -->
+    <script src="src/components/EnhancedRSUCompanySelector.js?v=5.1.4"></script>
+    <script src="src/components/BottomLineSummary.js?v=5.1.4"></script>
+    <script src="src/components/FinancialChart.js?v=5.1.4"></script>
+    
+    <!-- Main Components (depend on base components) -->
+    <script src="src/components/RetirementBasicForm.js?v=5.1.4"></script>
+    <script src="src/components/RetirementAdvancedForm.js?v=5.1.4"></script>
+    <script src="src/components/RetirementResultsPanel.js?v=5.1.4"></script>
+    <script src="src/components/SavingsSummaryPanel.js?v=5.1.4"></script>
+    <script src="src/components/RetirementPlannerApp.js?v=5.1.4"></script>
+    
+    <!-- Application Initialization -->
+    <script>
+        // Initialize the complete RetirementPlannerApp after all components load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.RetirementPlannerApp && ReactDOM.createRoot) {
+                const root = ReactDOM.createRoot(document.getElementById('root'));
+                root.render(React.createElement(window.RetirementPlannerApp));
+                console.log('✅ Advanced Retirement Planner v5.1.4 initialized successfully');
+            } else if (window.RetirementPlannerApp && ReactDOM.render) {
+                ReactDOM.render(
+                    React.createElement(window.RetirementPlannerApp),
+                    document.getElementById('root')
+                );
+                console.log('✅ Advanced Retirement Planner v5.1.4 initialized (React 17 mode)');
+            } else {
+                console.error('❌ RetirementPlannerApp component not found');
+                document.getElementById('root').innerHTML = `
+                    <div style="text-align: center; padding: 50px; font-family: Arial;">
+                        <h2 style="color: #e53e3e;">Application Loading Error</h2>
+                        <p>The retirement planner could not initialize. Please refresh the page.</p>
+                        <button id="refresh-btn" style="padding: 10px 20px; background: #4299e1; color: white; border: none; border-radius: 5px; cursor: pointer;">Refresh Page</button>
+                        <script>document.getElementById('refresh-btn').addEventListener('click', () => location.reload());</script>
+                    </div>
+                `;
+            }
+        });
+    </script>
 
-    </body>
+</body>
 </html>
