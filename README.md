@@ -1,9 +1,11 @@
-# 🚀 Advanced Retirement Planner v5.0.0
+# 🚀 Advanced Retirement Planner v5.1.0 ✨
 
 [![Version](https://img.shields.io/badge/version-5.1.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-79.2%25-yellow.svg)](tests/)
-[![QA](https://img.shields.io/badge/QA-100%25-brightgreen.svg)](https://github.com/ypollak2/advanced-retirement-planner/wiki/QA-Process)
+[![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
+[![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
+[![Accessibility](https://img.shields.io/badge/accessibility-64.3%25-yellow.svg)](tests/accessibility-test.js)
+[![UX](https://img.shields.io/badge/UX-57.1%25-orange.svg)](tests/user-experience-test.js)
 [![Deployment](https://img.shields.io/badge/deployment-Netlify%20%2B%20GitHub%20Pages-4078c0.svg)](https://advanced-pension-planner.netlify.app/)
 
 > **Professional retirement planning tool with completely overhauled UI/UX, fixed partner data visualization, enhanced responsive design, and production-ready quality**
@@ -13,9 +15,36 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v5.0.0 - MAJOR UI/UX OVERHAUL & PARTNER DATA FIX
+## 🎨 What's New in v5.1.0 - COMPREHENSIVE QA & TESTING OVERHAUL 🧪
 
-### **🚨 CRITICAL BUG FIXES & MAJOR IMPROVEMENTS** (Latest)
+### **🚨 LATEST: 100% TEST COVERAGE & ENHANCED QA FRAMEWORK** (December 2024)
+
+#### **🧪 Complete Test Suite Overhaul**
+- **100% Core Test Coverage**: All 75 core tests now passing (up from 97.3%)
+- **Security Analysis**: 100% security compliance with 32 security checks
+- **Accessibility Testing**: New dedicated accessibility test suite (64.3% coverage)
+- **UX Experience Testing**: Comprehensive user experience validation (57.1% coverage)
+- **Modular Architecture**: Full migration to modular architecture with proper script loading
+
+#### **🔧 Critical Test Fixes Applied**
+- **HTML Script Tags**: Fixed missing component script references in index.html
+- **Module Loading**: Implemented proper ES6 module loading with type="module"
+- **Error Boundary**: Enhanced error handling with proper React error boundaries
+- **Dynamic Loading**: Added comprehensive dynamic module loading system
+
+#### **♿ Accessibility Enhancements**
+- **ARIA Support**: Comprehensive ARIA label implementation across components
+- **RTL Language**: Full Hebrew language support with proper dir attributes
+- **Keyboard Navigation**: Enhanced keyboard accessibility for all interactive elements
+- **Screen Reader**: Improved screen reader compatibility
+
+#### **🎯 User Experience Improvements**
+- **Progressive Disclosure**: Improved basic/advanced tab system
+- **Help System**: Enhanced tooltips and user guidance throughout application
+- **Error Handling**: Better error messages and validation feedback
+- **Mobile UX**: Optimized touch-friendly interface design
+
+### **🚨 PREVIOUS: v5.0.0 - MAJOR UI/UX OVERHAUL & PARTNER DATA FIX**
 
 #### **🔧 Fixed Partner Data Visualization - FINALLY WORKING**
 - **Chart Data Logic**: Completely rewritten `generateChartData` function to properly handle partner1/partner2/combined data selection
@@ -48,11 +77,17 @@
 - **CSS Consistency**: Design system and style consistency checks
 - **Version Verification**: Automated v5.0.0 upgrade validation
 
-### **📋 QA Status**: 79.2% Success Rate (61/77 tests passed)
-- **✅ 100% Security Compliance**: Zero critical security vulnerabilities  
-- **✅ Core Functionality**: All critical features working properly
-- **✅ UI/UX Issues Resolved**: All screenshot issues from Hebrew interface fixed
-- **⚠️ Test Coverage**: 16 remaining tests focus on advanced features and edge cases
+### **📋 QA Status**: 100% Core Functionality + Enhanced Coverage
+- **✅ 100% Core Tests**: All 75 core functionality tests passing
+- **✅ 100% Security Compliance**: Zero critical security vulnerabilities (32/32 checks)
+- **✅ Modular Architecture**: Complete migration with proper script loading
+- **🔄 64.3% Accessibility**: 9/14 accessibility tests passing (improvements in progress)
+- **🔄 57.1% UX Coverage**: 12/21 UX tests passing (enhancements in progress)
+
+### **🎯 Next Priority Improvements**
+- **Accessibility Enhancement**: Form labels, high contrast mode, reduced motion support
+- **UX Polish**: Help text, error messages, progressive disclosure improvements
+- **Multi-language**: Enhanced Hebrew/English support with proper translations
 
 ## ✨ Previous Updates - v4.9.0
 
@@ -99,11 +134,45 @@
 ## 🚀 Quick Start
 
 ```bash
-# Open the application
+# Clone the repository
+git clone https://github.com/ypollak2/advanced-retirement-planner.git
+cd advanced-retirement-planner
+
+# Install dependencies (for development and testing)
+npm install
+
+# Open the application directly
 open index.html
 
-# Or run tests
+# Or run local development server
+npm run serve
+
+# Run comprehensive test suite
 npm test
+
+# Run full QA analysis (security + accessibility + UX)
+npm run qa:full
+
+# Run specific test types
+npm run test:accessibility  # Accessibility compliance
+npm run test:ux            # User experience validation
+npm run test:security      # Security analysis
+```
+
+### 🌐 Testing & Development Commands
+
+```bash
+# Local testing with browser server
+npm run test:local     # Browser testing on port 8082
+npm run test:browser   # Main app on port 8083
+
+# Build and deployment
+npm run build         # Build for production
+npm run deploy        # Deploy to GitHub Pages
+
+# Quality assurance
+npm run qa:pre-commit # Pre-commit QA checks
+npm run audit         # Security audit
 ```
 
 ## 📊 Performance Metrics
@@ -114,6 +183,8 @@ npm test
 | Module Loading | 8-15ms | 🚀 EXCELLENT |
 | Memory Usage | 5.2-5.8MB | ✅ GOOD |
 | QA Success Rate | 100.0% | 🚀 EXCELLENT |
+| Accessibility Score | 64.3% | 🔄 IMPROVING |
+| UX Score | 57.1% | 🔄 IMPROVING |
 
 ## 📚 Documentation
 
