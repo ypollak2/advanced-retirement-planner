@@ -14,8 +14,8 @@ const ResultsPanel = ({
     claudeInsights,
     exportRetirementSummary,
     exportAsImage,
-    partnerResults = null,
-    chartView = 'combined',
+    partnerResults,
+    chartView,
     // Icon components
     PiggyBank,
     Calculator,
@@ -25,7 +25,7 @@ const ResultsPanel = ({
     TrendingUp,
     SimpleChart,
     ReadinessScore
-) => {
+}) => {
     const chartRef = React.useRef(null);
     const chartInstance = React.useRef(null);
 
@@ -161,13 +161,17 @@ const ResultsPanel = ({
         }
     };
     
+    // Set default values
+    const effectivePartnerResults = partnerResults || null;
+    const effectiveChartView = chartView || 'combined';
+
     // Handle partner-specific data
     const getEffectiveResults = () => {
-        if (inputs?.planningType === 'couple' && partnerResults) {
-            if (chartView === 'partner1' && partnerResults.partner1) {
-                return partnerResults.partner1;
-            } else if (chartView === 'partner2' && partnerResults.partner2) {
-                return partnerResults.partner2;
+        if (inputs?.planningType === 'couple' && effectivePartnerResults) {
+            if (effectiveChartView === 'partner1' && effectivePartnerResults.partner1) {
+                return effectivePartnerResults.partner1;
+            } else if (effectiveChartView === 'partner2' && effectivePartnerResults.partner2) {
+                return effectivePartnerResults.partner2;
             }
         }
         return results;
