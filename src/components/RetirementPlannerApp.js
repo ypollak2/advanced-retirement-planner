@@ -257,7 +257,7 @@ const RetirementPlannerApp = () => {
                     className: 'lg:col-span-1'
                 }, results && window.ResultsPanel && React.createElement(window.ResultsPanel, {
                     results,
-                    inputs: {},
+                    inputs: inputs,
                     workPeriods: [],
                     language,
                     t,
@@ -275,7 +275,8 @@ const RetirementPlannerApp = () => {
                     Target: () => React.createElement('span', {}, '🎯'),
                     AlertCircle: () => React.createElement('span', {}, '⚠️'),
                     TrendingUp: () => React.createElement('span', {}, '📈'),
-                    SimpleChart: window.SimpleChart
+                    SimpleChart: window.SimpleChart,
+                    ReadinessScore: window.ReadinessScore
                 }))
             ])
         ])

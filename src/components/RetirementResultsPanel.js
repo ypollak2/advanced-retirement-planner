@@ -23,7 +23,8 @@ const ResultsPanel = ({
     Target,
     AlertCircle,
     TrendingUp,
-    SimpleChart
+    SimpleChart,
+    ReadinessScore
 }) => {
     // Data validation for results
     const validateResults = (resultData) => {
@@ -75,6 +76,17 @@ const ResultsPanel = ({
     }
 
     return React.createElement('div', { className: "space-y-6" }, [
+        // Retirement Readiness Score
+        ReadinessScore && React.createElement(ReadinessScore, {
+            key: 'readiness-score',
+            currentAge: inputs?.age || effectiveResults.currentAge,
+            retirementAge: inputs?.retirementAge || effectiveResults.retirementAge,
+            currentSavings: inputs?.currentSavings || 0,
+            monthlyContribution: inputs?.monthlyContribution || 0,
+            targetRetirementIncome: inputs?.targetMonthlyIncome || effectiveResults.monthlyIncome,
+            language: language
+        }),
+        
         React.createElement('div', { 
             key: 'results',
             className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in"
