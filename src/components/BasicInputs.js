@@ -1,4 +1,4 @@
-const BasicInputs = ({ inputs, setInputs, language, t, monthlyTrainingFundContribution }) => {
+const BasicInputs = ({ inputs, setInputs, language, t, Calculator, PiggyBank, DollarSign }) => {
         return React.createElement('div', { className: "space-y-6" }, [
             // Basic Data Section
             React.createElement('div', { 
@@ -272,10 +272,17 @@ const BasicInputs = ({ inputs, setInputs, language, t, monthlyTrainingFundContri
                         className: "grid grid-cols-2 gap-4" 
                     }, [
                         React.createElement('div', { key: 'age' }, [
-                            React.createElement('label', { 
-                                key: 'age-label',
-                                className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, t.currentAge || 'Current Age'),
+                            React.createElement('div', { key: 'age-label-wrapper', className: 'flex items-center gap-2 mb-1' }, [
+                                React.createElement('label', { 
+                                    key: 'age-label',
+                                    className: "block text-sm font-medium text-gray-700" 
+                                }, t.currentAge || 'Current Age'),
+                                window.HelpTooltip && React.createElement(window.HelpTooltip, {
+                                    key: 'age-help',
+                                    term: 'currentAge',
+                                    language: language
+                                }, '❓')
+                            ]),
                             React.createElement('input', {
                                 key: 'current-age-input',
                                 type: 'number',
@@ -285,10 +292,17 @@ const BasicInputs = ({ inputs, setInputs, language, t, monthlyTrainingFundContri
                             })
                         ]),
                         React.createElement('div', { key: 'retirement' }, [
-                            React.createElement('label', { 
-                                key: 'retirement-label',
-                                className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, t.retirementAge || 'Retirement Age'),
+                            React.createElement('div', { key: 'retirement-label-wrapper', className: 'flex items-center gap-2 mb-1' }, [
+                                React.createElement('label', { 
+                                    key: 'retirement-label',
+                                    className: "block text-sm font-medium text-gray-700" 
+                                }, t.retirementAge || 'Retirement Age'),
+                                window.HelpTooltip && React.createElement(window.HelpTooltip, {
+                                    key: 'retirement-help',
+                                    term: 'retirementAge',
+                                    language: language
+                                }, '❓')
+                            ]),
                             React.createElement('input', {
                                 key: 'retirement-age-input',
                                 type: 'number',

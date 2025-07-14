@@ -79,11 +79,11 @@ const ResultsPanel = ({
         // Retirement Readiness Score
         ReadinessScore && React.createElement(ReadinessScore, {
             key: 'readiness-score',
-            currentAge: inputs?.age || effectiveResults.currentAge,
-            retirementAge: inputs?.retirementAge || effectiveResults.retirementAge,
-            currentSavings: inputs?.currentSavings || 0,
-            monthlyContribution: inputs?.monthlyContribution || 0,
-            targetRetirementIncome: inputs?.targetMonthlyIncome || effectiveResults.monthlyIncome,
+            currentAge: inputs?.currentAge || effectiveResults.currentAge || 30,
+            retirementAge: inputs?.retirementAge || effectiveResults.retirementAge || 67,
+            currentSavings: inputs?.currentSavings || 50000,
+            monthlyContribution: (inputs?.monthlyContribution || 0) + (inputs?.trainingFundMonthly || 0),
+            targetRetirementIncome: inputs?.currentMonthlyExpenses || effectiveResults.monthlyIncome || 15000,
             language: language
         }),
         
