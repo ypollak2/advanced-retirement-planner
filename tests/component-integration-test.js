@@ -212,6 +212,42 @@ function testComponentLoadingSimulation() {
         logTest('Cache busting on scripts', hasCacheBusting,
             `All component scripts should have ?v=${currentVersion}`);
         
+        // CRITICAL: Check that all used components are loaded in HTML
+        const coreAppContent = fs.readFileSync('src/core/app-main.js', 'utf8');
+        const usedComponents = (coreAppContent.match(/React\.createElement\(([A-Z][A-Za-z]*)/g) || [])
+            .map(match => match.replace('React.createElement(', ''))
+            .filter(comp => comp !== 'ErrorBoundary' && comp !== 'React'); // Filter out built-ins
+        
+        usedComponents.forEach(component => {
+            const isLoadedInHTML = scriptTags.some(tag => 
+                tag.includes(`src/components/`) && tag.includes(component)
+            );
+            logTest(`${component} component loaded in HTML`, isLoadedInHTML,
+                `CRITICAL: ${component} is used in app-main.js but not loaded in HTML - this will cause runtime errors!`);
+        });
+        
+        // Check for component dependencies (components that use other components)
+        const componentFiles = fs.readdirSync('src/components/').filter(f => f.endsWith('.js'));
+        componentFiles.forEach(file => {
+            if (!fs.existsSync(`src/components/${file}`)) return;
+            
+            const content = fs.readFileSync(`src/components/${file}`, 'utf8');
+            const dependencies = (content.match(/React\.createElement\(([A-Z][A-Za-z]*)/g) || [])
+                .map(match => match.replace('React.createElement(', ''))
+                .filter(comp => comp !== 'ErrorBoundary' && comp !== 'React');
+            
+            dependencies.forEach(dep => {
+                const depFile = `${dep}.js`;
+                const depExists = componentFiles.includes(depFile);
+                const depLoadedInHTML = scriptTags.some(tag => tag.includes(depFile));
+                
+                if (depExists) {
+                    logTest(`${dep} dependency for ${file}`, depLoadedInHTML,
+                        `${file} depends on ${dep}, must be loaded in HTML before ${file}`);
+                }
+            });
+        });
+        
     } catch (error) {
         logTest('Component loading simulation', false, `Error: ${error.message}`);
     }

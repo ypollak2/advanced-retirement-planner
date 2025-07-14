@@ -1,6 +1,6 @@
 // ResultsDisplay Component - Displays calculated retirement projections and financial summaries with partner data support
 
-const ResultsDisplay = ({ 
+const ResultsPanel = ({ 
     results, 
     inputs, 
     workPeriods, 
@@ -115,4 +115,4 @@ const ResultsDisplay = ({
 };
 
 // Export to window for global access
-window.ResultsPanel = ResultsDisplay;
+window.ResultsPanel = ResultsPanel;

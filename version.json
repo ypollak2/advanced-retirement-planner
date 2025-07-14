@@ -1,6 +1,6 @@
 {
-  "version": "5.1.2",
+  "version": "5.1.3",
   "build": "2024-12-14",
-  "commit": "v5.1.2-version-consistency-fix",
-  "description": "Version consistency fix: Synchronized version.js with package.json and established CI/CD compliance"
+  "commit": "v5.1.3-component-dependency-fix",
+  "description": "Component dependency fix: Resolved missing component script tags and runtime integration errors"
 }

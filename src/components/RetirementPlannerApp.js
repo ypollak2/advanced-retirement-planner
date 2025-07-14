@@ -6,7 +6,7 @@ const truncateTitle = (title, maxLength = 50) => {
     return title.length > maxLength ? title.substring(0, maxLength) + '...' : title;
 };
 
-const RetirementPlanner = () => {
+const RetirementPlannerApp = () => {
     const [language, setLanguage] = React.useState('he');
     const [activeTab, setActiveTab] = React.useState('basic');
     const [results, setResults] = React.useState(null);
@@ -133,7 +133,11 @@ const RetirementPlanner = () => {
             className: 'text-4xl font-bold text-gray-800 mb-4 truncate-multiline truncate-2-lines'
         }, titleText);
     };
+    
+    return React.createElement('div', { className: 'retirement-planner-app' },
+        React.createElement(AppTitle, { key: 'title' })
+    );
 };
 
 // Export to window for global access
-window.RetirementPlannerApp = RetirementPlanner;
+window.RetirementPlannerApp = RetirementPlannerApp;

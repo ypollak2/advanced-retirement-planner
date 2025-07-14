@@ -125,12 +125,14 @@
         return React.createElement('div', null, 
             React.createElement(ErrorBoundary, null, 
                 React.createElement(BasicInputs, { 
+                    key: 'basic-inputs',
                     inputs, setInputs, language, t, monthlyTrainingFundContribution, handleInputChange,
                     Calculator, PiggyBank, DollarSign 
                 })
             ),
             React.createElement(ErrorBoundary, null, 
                 React.createElement(SavingsSummaryPanel, { 
+                    key: 'savings-summary',
                     inputs, language, t, totalMonthlySalary, yearsToRetirement, 
                     estimatedMonthlyIncome, projectedWithGrowth, buyingPowerToday, 
                     monthlyTotal, avgNetReturn, exportToPNG, exportForAI, 
