@@ -15,7 +15,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && gh-pages -d dist",
+    "deploy": "gh-pages -d .",
     "test": "node tests/test-runner.js",
     "test:security": "node tests/test-runner.js | grep -E '(Security|PASS|FAIL)'",
     "test:accessibility": "node tests/accessibility-test.js",
