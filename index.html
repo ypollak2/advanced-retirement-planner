@@ -72,16 +72,31 @@
     
     <!-- Application Initialization -->
     <script>
-        // Initialize the full application after all components load
+        // Initialize the complete RetirementPlannerApp after all components load
         document.addEventListener('DOMContentLoaded', function() {
-            if (window.initializeApp) {
-                window.initializeApp();
+            if (window.RetirementPlannerApp && ReactDOM.createRoot) {
+                const root = ReactDOM.createRoot(document.getElementById('root'));
+                root.render(React.createElement(window.RetirementPlannerApp));
+                console.log('✅ Advanced Retirement Planner v5.1.4 initialized successfully');
+            } else if (window.RetirementPlannerApp && ReactDOM.render) {
+                ReactDOM.render(
+                    React.createElement(window.RetirementPlannerApp),
+                    document.getElementById('root')
+                );
+                console.log('✅ Advanced Retirement Planner v5.1.4 initialized (React 17 mode)');
             } else {
-                console.error('Application initialization function not found');
+                console.error('❌ RetirementPlannerApp component not found');
+                document.getElementById('root').innerHTML = `
+                    <div style="text-align: center; padding: 50px; font-family: Arial;">
+                        <h2 style="color: #e53e3e;">Application Loading Error</h2>
+                        <p>The retirement planner could not initialize. Please refresh the page.</p>
+                        <button id="refresh-btn" style="padding: 10px 20px; background: #4299e1; color: white; border: none; border-radius: 5px; cursor: pointer;">Refresh Page</button>
+                        <script>document.getElementById('refresh-btn').addEventListener('click', () => location.reload());</script>
+                    </div>
+                `;
             }
         });
     </script>
-    <script src="src/app.js?v=5.1.4"></script>
 
 </body>
 </html>
