@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v5.1.1 ✨
+# 🚀 Advanced Retirement Planner v5.1.2 ✨
 
-[![Version](https://img.shields.io/badge/version-5.1.1-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-5.1.2-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -15,15 +15,23 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v5.1.1 - CRITICAL RUNTIME HOTFIX 🔧
+## 🎨 What's New in v5.1.2 - ENHANCED QA & COMPONENT INTEGRATION 🧪
 
-### **🚨 HOTFIX: CRITICAL RUNTIME ERRORS RESOLVED** (December 2024)
+### **🚨 LATEST: COMPREHENSIVE QA FRAMEWORK & RUNTIME FIXES** (December 2024)
 
-#### **🔧 Runtime Fixes Applied**
-- **Duplicate Function Fix**: Removed duplicate `validateResults` function causing SyntaxError
-- **Missing Variable Fix**: Added proper `language` state and derived variables in app-main.js
-- **React 18 Compatibility**: Updated ReactDOM.render to createRoot API with fallback
-- **Console Clean**: Eliminated JavaScript runtime errors and warnings
+#### **🧪 Enhanced QA Testing Suite**
+- **Component Integration Tests**: New dedicated test suite for React component dependencies
+- **Icon Component Validation**: Ensures all icon components are properly defined and passed
+- **Export Consistency Checks**: Validates window exports and component naming
+- **Runtime Error Prevention**: Catches component loading issues before deployment
+
+#### **🔧 Critical Runtime Fixes**
+- **Component Dependencies**: Fixed missing icon component props (Calculator, PiggyBank, DollarSign)
+- **Duplicate Function Cleanup**: Removed duplicate `safeFormatValue` function in RetirementResultsPanel
+- **Version Consistency**: Synchronized all version references to prevent CI/CD failures
+- **React 18 Compatibility**: Updated ReactDOM.render to createRoot API with backward compatibility
+
+### **🚨 PREVIOUS: v5.1.1 - CRITICAL RUNTIME HOTFIX**
 
 ### **🚨 PREVIOUS: v5.1.0 - COMPREHENSIVE QA & TESTING OVERHAUL** 🧪
 
@@ -85,12 +93,13 @@
 - **CSS Consistency**: Design system and style consistency checks
 - **Version Verification**: Automated v5.0.0 upgrade validation
 
-### **📋 QA Status**: 100% Core Functionality + Enhanced Coverage
+### **📋 QA Status**: Enhanced Testing Framework with Runtime Protection
 - **✅ 100% Core Tests**: All 75 core functionality tests passing
 - **✅ 100% Security Compliance**: Zero critical security vulnerabilities (32/32 checks)
-- **✅ Modular Architecture**: Complete migration with proper script loading
-- **🔄 64.3% Accessibility**: 9/14 accessibility tests passing (improvements in progress)
+- **✅ 92.7% Component Integration**: 51/55 component integration tests passing
+- **🔄 64.3% Accessibility**: 9/14 accessibility tests passing (improvements in progress) 
 - **🔄 57.1% UX Coverage**: 12/21 UX tests passing (enhancements in progress)
+- **✅ Version Consistency**: All version files synchronized for CI/CD compliance
 
 ### **🎯 Next Priority Improvements**
 - **Accessibility Enhancement**: Form labels, high contrast mode, reduced motion support

@@ -112,18 +112,6 @@ const ResultsDisplay = ({
             ])
         ])
     ]);
-
-    const safeFormatValue = (value, formatter) => {
-        if (typeof value !== 'number' || isNaN(value)) {
-            return 'N/A';
-        }
-        try {
-            return formatter ? formatter(value) : `₪${value.toLocaleString()}`;
-        } catch (error) {
-            console.error('Error formatting value:', error);
-            return 'Error';
-        }
-    };
 };
 
 // Export to window for global access

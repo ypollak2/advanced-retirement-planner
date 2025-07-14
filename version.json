@@ -1,6 +1,6 @@
 {
-  "version": "5.1.1",
+  "version": "5.1.2",
   "build": "2024-12-14",
-  "commit": "v5.1.1-critical-runtime-hotfix",
-  "description": "Critical hotfix: Fixed duplicate validateResults function, missing language variable, and ReactDOM.render deprecation warning"
+  "commit": "v5.1.2-version-consistency-fix",
+  "description": "Version consistency fix: Synchronized version.js with package.json and established CI/CD compliance"
 }

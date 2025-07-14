@@ -82,6 +82,19 @@
         const monthlyTotal = 0; // Placeholder
         const avgNetReturn = inputs.expectedReturn;
         
+        // Icon components (simple emoji-based)
+        const Calculator = () => React.createElement('span', { className: 'text-lg' }, '📊');
+        const PiggyBank = () => React.createElement('span', { className: 'text-lg' }, '🏦');
+        const DollarSign = () => React.createElement('span', { className: 'text-lg' }, '💰');
+        const Target = () => React.createElement('span', { className: 'text-lg' }, '🎯');
+        const AlertCircle = () => React.createElement('span', { className: 'text-lg' }, '⚠️');
+        const TrendingUp = () => React.createElement('span', { className: 'text-lg' }, '📈');
+        const Settings = () => React.createElement('span', { className: 'text-lg' }, '⚙️');
+        const Building = () => React.createElement('span', { className: 'text-lg' }, '🏢');
+        const Globe = () => React.createElement('span', { className: 'text-lg' }, '🌍');
+        const Plus = () => React.createElement('span', { className: 'text-lg' }, '➕');
+        const Trash2 = () => React.createElement('span', { className: 'text-lg' }, '🗑️');
+
         // Placeholder functions
         const exportToPNG = () => console.log('Export to PNG');
         const exportForAI = () => console.log('Export for AI');
@@ -111,7 +124,10 @@
         // ... rest of the component
         return React.createElement('div', null, 
             React.createElement(ErrorBoundary, null, 
-                React.createElement(BasicInputs, { inputs, setInputs, language, t, monthlyTrainingFundContribution, handleInputChange })
+                React.createElement(BasicInputs, { 
+                    inputs, setInputs, language, t, monthlyTrainingFundContribution, handleInputChange,
+                    Calculator, PiggyBank, DollarSign 
+                })
             ),
             React.createElement(ErrorBoundary, null, 
                 React.createElement(SavingsSummaryPanel, { 
