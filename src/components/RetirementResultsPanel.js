@@ -70,15 +70,6 @@ const ResultsDisplay = ({
 
     const effectiveResults = getEffectiveResults();
 
-    const validateResults = (data) => {
-        if (!data || typeof data !== 'object') {
-            console.warn('RetirementResultsPanel: Invalid or missing results data.');
-            return false;
-        }
-        const requiredKeys = ['totalSavings', 'monthlyIncome'];
-        return requiredKeys.every(key => key in data && typeof data[key] === 'number');
-    };
-
     if (!validateResults(effectiveResults)) {
         return React.createElement('div', { className: 'text-red-500' }, 'Invalid data provided to results panel.');
     }

@@ -338,15 +338,16 @@ function testVersion5Upgrade() {
         logTest('Version 5.0.0+ detected', isVersion5Plus, 
             `Current version: ${versionData.version}`);
         
-        // Check HTML title for v5.0.0 reference
+        // Check HTML title for current version reference
         if (fs.existsSync('index.html')) {
             const html = fs.readFileSync('index.html', 'utf8');
-            const titleHasV5 = html.includes('v5.1.0') || html.includes('5.1.0');
-            logTest('HTML title includes v5.1.0', titleHasV5);
+            const currentVersion = versionData.version;
+            const titleHasVersion = html.includes(`v${currentVersion}`) || html.includes(currentVersion);
+            logTest(`HTML title includes v${currentVersion}`, titleHasVersion);
             
             // Verify version indicator display
-            const hasVersionIndicator = html.includes('version-indicator') && html.includes('v5.1.0');
-            logTest('Version indicator displays v5.1.0', hasVersionIndicator);
+            const hasVersionIndicator = html.includes('version-indicator') && html.includes(`v${currentVersion}`);
+            logTest(`Version indicator displays v${currentVersion}`, hasVersionIndicator);
         }
         
     } catch (error) {

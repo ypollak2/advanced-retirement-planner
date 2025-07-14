@@ -1,6 +1,6 @@
 {
-  "version": "5.1.0",
+  "version": "5.1.1",
   "build": "2024-12-14",
-  "commit": "v5.1-comprehensive-qa-testing",
-  "description": "Comprehensive QA & testing overhaul with 100% core test coverage, enhanced accessibility framework, UX testing suite, and modular architecture migration"
+  "commit": "v5.1.1-critical-runtime-hotfix",
+  "description": "Critical hotfix: Fixed duplicate validateResults function, missing language variable, and ReactDOM.render deprecation warning"
 }

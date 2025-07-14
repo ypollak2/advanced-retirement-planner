@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v5.1.0 ✨
+# 🚀 Advanced Retirement Planner v5.1.1 ✨
 
-[![Version](https://img.shields.io/badge/version-5.1.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-5.1.1-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -15,9 +15,17 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v5.1.0 - COMPREHENSIVE QA & TESTING OVERHAUL 🧪
+## 🎨 What's New in v5.1.1 - CRITICAL RUNTIME HOTFIX 🔧
 
-### **🚨 LATEST: 100% TEST COVERAGE & ENHANCED QA FRAMEWORK** (December 2024)
+### **🚨 HOTFIX: CRITICAL RUNTIME ERRORS RESOLVED** (December 2024)
+
+#### **🔧 Runtime Fixes Applied**
+- **Duplicate Function Fix**: Removed duplicate `validateResults` function causing SyntaxError
+- **Missing Variable Fix**: Added proper `language` state and derived variables in app-main.js
+- **React 18 Compatibility**: Updated ReactDOM.render to createRoot API with fallback
+- **Console Clean**: Eliminated JavaScript runtime errors and warnings
+
+### **🚨 PREVIOUS: v5.1.0 - COMPREHENSIVE QA & TESTING OVERHAUL** 🧪
 
 #### **🧪 Complete Test Suite Overhaul**
 - **100% Core Test Coverage**: All 75 core tests now passing (up from 97.3%)

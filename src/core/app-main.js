@@ -61,6 +61,33 @@
             partner2Age: 28
         });
 
+        // Language and UI state
+        const [language, setLanguage] = React.useState('he');
+        
+        // Translations
+        const t = window.multiLanguage ? window.multiLanguage[language] : {
+            title: 'Advanced Retirement Planner',
+            subtitle: 'Professional Pension Planning Tool'
+        };
+
+        // Calculate derived values
+        const monthlyTrainingFundContribution = inputs.hasTrainingFund ? 
+            Math.min(inputs.currentMonthlySalary, inputs.trainingFundCeiling) * 0.10 : 0;
+        
+        const totalMonthlySalary = inputs.currentMonthlySalary;
+        const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
+        const estimatedMonthlyIncome = 0; // Placeholder
+        const projectedWithGrowth = 0; // Placeholder
+        const buyingPowerToday = 0; // Placeholder
+        const monthlyTotal = 0; // Placeholder
+        const avgNetReturn = inputs.expectedReturn;
+        
+        // Placeholder functions
+        const exportToPNG = () => console.log('Export to PNG');
+        const exportForAI = () => console.log('Export for AI');
+        const setShowChart = () => console.log('Show chart');
+        const generateLLMAnalysis = () => console.log('Generate LLM analysis');
+
         const handleInputChange = (e) => {
             try {
                 const { name, value, type, checked } = e.target;
@@ -103,12 +130,23 @@
     window.initializeRetirementPlannerCore = () => {
         const container = document.getElementById('root');
         if (container) {
-            ReactDOM.render(
-                React.createElement(ErrorBoundary, null, 
-                    React.createElement(RetirementPlannerCore)
-                ),
-                container
-            );
+            // Use React 18 createRoot API
+            if (ReactDOM.createRoot) {
+                const root = ReactDOM.createRoot(container);
+                root.render(
+                    React.createElement(ErrorBoundary, null, 
+                        React.createElement(RetirementPlannerCore)
+                    )
+                );
+            } else {
+                // Fallback for React 17
+                ReactDOM.render(
+                    React.createElement(ErrorBoundary, null, 
+                        React.createElement(RetirementPlannerCore)
+                    ),
+                    container
+                );
+            }
         } else {
             console.error('Target container not found');
         }
