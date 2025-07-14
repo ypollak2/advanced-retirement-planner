@@ -57,13 +57,13 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=16.0.0",
+    "node": ">=18.0.0",
     "npm": ">=8.0.0"
   },
   "devDependencies": {
     "gh-pages": "^6.0.0",
     "license-checker": "^25.0.1",
-    "vite": "^7.0.3",
+    "vite": "^5.4.10",
     "puppeteer": "^22.0.0"
   },
   "peerDependencies": {
