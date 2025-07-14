@@ -197,15 +197,15 @@ function testHtmlStructure() {
             },
             { 
                 name: 'Error boundary', 
-                test: fs.readFileSync('src/core/app-main.js', 'utf8').includes('ErrorBoundary') 
+                test: fs.existsSync('src/app.js') && fs.readFileSync('src/app.js', 'utf8').includes('ErrorBoundary') 
             },
             { 
                 name: 'Module loading check', 
-                test: arch.html.includes('type="module"') && arch.html.includes('src/core/app-main.js') 
+                test: arch.html.includes('src/app.js') && arch.html.includes('initializeApp') 
             },
             { 
                 name: 'Application initialization', 
-                test: fs.existsSync('src/core/app-main.js') && fs.readFileSync('src/core/app-main.js', 'utf8').includes('window.initializeRetirementPlannerCore') 
+                test: fs.existsSync('src/app.js') && fs.readFileSync('src/app.js', 'utf8').includes('window.initializeApp') 
             }
         ];
         
