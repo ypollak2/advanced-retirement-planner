@@ -1,4 +1,4 @@
-const EnhancedRSUCompanySelector = ({ inputs, setInputs, language, fetchStockPrice }) => {
+const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
     const [searchQuery, setSearchQuery] = React.useState('');
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
@@ -75,17 +75,8 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language, fetchStockPri
         setSearchQuery('');
         
         if (symbol && symbol !== 'OTHER' && symbol !== '') {
-            setIsLoading(true);
-            try {
-                const price = await fetchStockPrice(symbol);
-                if (price) {
-                    setInputs(prev => ({...prev, rsuCurrentPrice: price}));
-                }
-            } catch (error) {
-                console.log('Stock price fetch failed, using manual input');
-            } finally {
-                setIsLoading(false);
-            }
+            // Stock price will be entered manually for now
+            console.log('Selected company:', symbol);
         }
     };
     
