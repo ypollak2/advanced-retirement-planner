@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Retirement Planner v5.2.0</title>
+    <title>Advanced Retirement Planner v5.2.1</title>
     <meta name="description" content="Advanced retirement planning tool with comprehensive investment tracking">
     
     <!-- Tailwind CSS via CDN -->
@@ -41,7 +41,7 @@
 <body>
     <!-- Version indicator -->
     <div class="version-indicator">
-        ✨ v5.2.0
+        ✨ v5.2.1
     </div>
     
     <div id="root" class="min-h-screen" role="main" aria-label="Retirement Planner Application"></div>
@@ -54,44 +54,70 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Component Scripts -->
-    <script src="src/translations/multiLanguage.js?v=5.2.0"></script>
-    <script src="src/data/marketConstants.js?v=5.2.0"></script>
-    <script src="src/utils/retirementCalculations.js?v=5.2.0"></script>
+    <script src="src/translations/multiLanguage.js?v=5.2.1"></script>
+    <script src="src/data/marketConstants.js?v=5.2.1"></script>
+    <script src="src/utils/retirementCalculations.js?v=5.2.1"></script>
+    <script src="src/utils/chartDataGenerator.js?v=5.2.1"></script>
     
     <!-- Base Components (loaded first) -->
-    <script src="src/components/EnhancedRSUCompanySelector.js?v=5.2.0"></script>
-    <script src="src/components/BottomLineSummary.js?v=5.2.0"></script>
-    <script src="src/components/FinancialChart.js?v=5.2.0"></script>
+    <script src="src/components/EnhancedRSUCompanySelector.js?v=5.2.1"></script>
+    <script src="src/components/BottomLineSummary.js?v=5.2.1"></script>
+    <script src="src/components/FinancialChart.js?v=5.2.1"></script>
     
     <!-- Main Components (depend on base components) -->
-    <script src="src/components/HelpTooltip.js?v=5.2.0"></script>
-    <script src="src/components/ReadinessScore.js?v=5.2.0"></script>
-    <script src="src/components/BasicInputs.js?v=5.2.0"></script>
-    <script src="src/components/RetirementAdvancedForm.js?v=5.2.0"></script>
-    <script src="src/components/RetirementResultsPanel.js?v=5.2.0"></script>
-    <script src="src/components/SavingsSummaryPanel.js?v=5.2.0"></script>
-    <script src="src/components/RetirementPlannerApp.js?v=5.2.0"></script>
+    <script src="src/components/HelpTooltip.js?v=5.2.1"></script>
+    <script src="src/components/ReadinessScore.js?v=5.2.1"></script>
+    <script src="src/components/BasicInputs.js?v=5.2.1"></script>
+    <script src="src/components/RetirementAdvancedForm.js?v=5.2.1"></script>
+    <script src="src/components/RetirementResultsPanel.js?v=5.2.1"></script>
+    <script src="src/components/SavingsSummaryPanel.js?v=5.2.1"></script>
+    <script src="src/components/RetirementPlannerApp.js?v=5.2.1"></script>
     
     <!-- Application Initialization -->
     <script>
+        // Enhanced error handling and component validation
+        function validateComponents() {
+            const requiredComponents = [
+                'RetirementPlannerApp', 'BasicInputs', 'AdvancedInputs', 'ResultsPanel',
+                'ReadinessScore', 'HelpTooltip', 'calculateRetirement', 'formatCurrency'
+            ];
+            
+            const missing = requiredComponents.filter(comp => !window[comp]);
+            if (missing.length > 0) {
+                console.warn('⚠️ Missing components:', missing);
+                return false;
+            }
+            return true;
+        }
+
         // Initialize the complete RetirementPlannerApp after all components load
         document.addEventListener('DOMContentLoaded', function() {
-            if (window.RetirementPlannerApp && ReactDOM.createRoot) {
-                const root = ReactDOM.createRoot(document.getElementById('root'));
-                root.render(React.createElement(window.RetirementPlannerApp));
-                console.log('✅ Advanced Retirement Planner v5.2.0 initialized successfully');
-            } else if (window.RetirementPlannerApp && ReactDOM.render) {
-                ReactDOM.render(
-                    React.createElement(window.RetirementPlannerApp),
-                    document.getElementById('root')
-                );
-                console.log('✅ Advanced Retirement Planner v5.2.0 initialized (React 17 mode)');
-            } else {
-                console.error('❌ RetirementPlannerApp component not found');
+            try {
+                // Wait a bit for all scripts to load
+                setTimeout(() => {
+                    if (window.RetirementPlannerApp && validateComponents()) {
+                        if (ReactDOM.createRoot) {
+                            const root = ReactDOM.createRoot(document.getElementById('root'));
+                            root.render(React.createElement(window.RetirementPlannerApp));
+                            console.log('✅ Advanced Retirement Planner v5.2.1 initialized successfully');
+                        } else if (ReactDOM.render) {
+                            ReactDOM.render(
+                                React.createElement(window.RetirementPlannerApp),
+                                document.getElementById('root')
+                            );
+                            console.log('✅ Advanced Retirement Planner v5.2.1 initialized (React 17 mode)');
+                        }
+                    } else {
+                        throw new Error('Required components not loaded');
+                    }
+                }, 100);
+            } catch (error) {
+                console.error('❌ Application initialization error:', error);
                 document.getElementById('root').innerHTML = `
                     <div style="text-align: center; padding: 50px; font-family: Arial;">
                         <h2 style="color: #e53e3e;">Application Loading Error</h2>
-                        <p>The retirement planner could not initialize. Please refresh the page.</p>
+                        <p>The retirement planner could not initialize: ${error.message}</p>
+                        <p><small>Check browser console for details</small></p>
                         <button id="refresh-btn" style="padding: 10px 20px; background: #4299e1; color: white; border: none; border-radius: 5px; cursor: pointer;">Refresh Page</button>
                         <script>document.getElementById('refresh-btn').addEventListener('click', () => location.reload());<\/script>
                     </div>

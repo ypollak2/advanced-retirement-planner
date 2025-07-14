@@ -1,9 +1,9 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "5.2.0",
+    number: "5.2.1",
     build: "2025-07-14",
-    commit: "v5.2.0-deployment-fix",
-    description: "North Star foundation features with deployment fix"
+    commit: "v5.2.1-comprehensive-qa-fix",
+    description: "Comprehensive QA suite with runtime error fixes and cache busting"
 };
 
 // Export version for use in other modules
