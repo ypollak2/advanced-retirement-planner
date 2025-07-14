@@ -43,7 +43,7 @@ const SimpleChart = ({ data, type = 'line', language = 'he', partnerData = null,
         safeRenderChart();
     }, [data, partnerData, chartView, language]);
     
-    const renderChart = () => {
+    React.useEffect(() => {
         if (chartRef.current && data && data.length > 0 && window.Chart) {
             const ctx = chartRef.current.getContext('2d');
             

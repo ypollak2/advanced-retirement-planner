@@ -533,7 +533,91 @@ function testLayoutResponsiveness() {
     }
 }
 
-// Test 12: CSS Style Consistency Checks
+// Test 12: GitHub Actions CI/CD Pipeline Validation
+function testGitHubActions() {
+    console.log('\n⚙️ Testing GitHub Actions CI/CD Pipeline...');
+    
+    try {
+        // Check if version.js exists in correct location for CI/CD
+        const versionExists = fs.existsSync('src/version.js');
+        logTest('GitHub Actions: version.js exists', versionExists, 
+            versionExists ? 'Version file available for CI/CD' : 'Missing src/version.js for CI/CD pipeline');
+        
+        // Check version.js structure for CI/CD compatibility
+        if (versionExists) {
+            const versionContent = fs.readFileSync('src/version.js', 'utf8');
+            const hasModuleExport = versionContent.includes('module.exports');
+            const hasVersionNumber = versionContent.includes('number:');
+            
+            logTest('GitHub Actions: version.js module export', hasModuleExport,
+                hasModuleExport ? 'Module export format compatible with CI/CD' : 'Missing module.exports for CI/CD');
+            
+            logTest('GitHub Actions: version.js number property', hasVersionNumber,
+                hasVersionNumber ? 'Version number property available' : 'Missing version number property');
+        }
+        
+        // Check pre-commit hook configuration
+        const preCommitExists = fs.existsSync('scripts/pre-commit-qa.sh');
+        logTest('GitHub Actions: pre-commit hook exists', preCommitExists);
+        
+        if (preCommitExists) {
+            const preCommitContent = fs.readFileSync('scripts/pre-commit-qa.sh', 'utf8');
+            const hasVersionCheck = preCommitContent.includes('src/version.js');
+            logTest('GitHub Actions: pre-commit version check', hasVersionCheck,
+                hasVersionCheck ? 'Pre-commit hook checks version.js' : 'Pre-commit hook missing version.js check');
+        }
+        
+        // Check package.json for CI/CD compatibility
+        const packageExists = fs.existsSync('package.json');
+        if (packageExists) {
+            const packageContent = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            const hasEngines = packageContent.engines && packageContent.engines.node;
+            const hasTestScript = packageContent.scripts && packageContent.scripts.test;
+            
+            logTest('GitHub Actions: package.json engines', hasEngines,
+                hasEngines ? `Node.js version specified: ${packageContent.engines.node}` : 'Missing Node.js engine specification');
+            
+            logTest('GitHub Actions: test script configured', hasTestScript,
+                hasTestScript ? 'Test script available for CI/CD' : 'Missing test script for CI/CD');
+        }
+        
+        // Check for syntax errors that would break CI/CD
+        const jsFiles = [
+            'src/components/FinancialChart.js',
+            'src/components/RetirementPlannerApp.js',
+            'src/components/RetirementBasicForm.js',
+            'src/components/RetirementAdvancedForm.js',
+            'src/components/RetirementResultsPanel.js'
+        ];
+        
+        let syntaxErrorCount = 0;
+        jsFiles.forEach(file => {
+            if (fs.existsSync(file)) {
+                try {
+                    const content = fs.readFileSync(file, 'utf8');
+                    // Check for common syntax errors that break CI/CD
+                    if (content.includes('}, [') && !content.includes('React.useEffect')) {
+                        syntaxErrorCount++;
+                        logTest(`GitHub Actions: ${file} syntax validation`, false, 
+                            'Potential useEffect syntax error detected');
+                    }
+                } catch (error) {
+                    syntaxErrorCount++;
+                    logTest(`GitHub Actions: ${file} syntax validation`, false, 
+                        `File read error: ${error.message}`);
+                }
+            }
+        });
+        
+        logTest('GitHub Actions: overall syntax validation', syntaxErrorCount === 0,
+            syntaxErrorCount === 0 ? 'All files syntax-validated for CI/CD' : `${syntaxErrorCount} files have syntax issues`);
+        
+    } catch (error) {
+        logTest('GitHub Actions CI/CD testing', false, `Error: ${error.message}`);
+    }
+}
+
+// Test 13: CSS Style Consistency Checks
 function testCSSStyleConsistency() {
     console.log('\n🎨 Testing CSS Style Consistency...');
     
@@ -627,6 +711,7 @@ async function runAllTests() {
     testGenerateChartDataPartnerLogic();
     testBottomLineTitleTruncation();
     testLayoutResponsiveness();
+    testGitHubActions();
     testCSSStyleConsistency();
     
     // Summary

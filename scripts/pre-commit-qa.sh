@@ -87,7 +87,7 @@ echo "-----------------------------------"
 
 # Check version consistency
 PACKAGE_VERSION=$(node -p "require('./package.json').version" 2>/dev/null)
-VERSION_JS=$(node -p "require('./version.js').full" 2>/dev/null)
+VERSION_JS=$(node -p "require('./src/version.js').number" 2>/dev/null)
 
 if [ "$PACKAGE_VERSION" = "$VERSION_JS" ]; then
     print_status "PASS" "Version consistency verified ($PACKAGE_VERSION)"
@@ -126,7 +126,7 @@ REQUIRED_FILES=(
     "src/utils/pensionCalculations.js"
     "src/utils/rsuCalculations.js"
     "src/styles/main.css"
-    "version.js"
+    "src/version.js"
 )
 
 MISSING_FILES=()
