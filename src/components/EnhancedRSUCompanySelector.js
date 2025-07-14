@@ -244,3 +244,6 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language, fetchStockPri
         ]) : null
     ]);
 };
+
+// Export to window for global access
+window.EnhancedRSUCompanySelector = EnhancedRSUCompanySelector;

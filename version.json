@@ -1,6 +1,6 @@
 {
-  "version": "5.1.3",
+  "version": "5.1.4",
   "build": "2024-12-14",
-  "commit": "v5.1.3-component-dependency-fix",
-  "description": "Component dependency fix: Resolved missing component script tags and runtime integration errors"
+  "commit": "v5.1.4-missing-component-exports-fix",
+  "description": "CRITICAL: Fixed missing window exports for all components - application now loads successfully"
 }

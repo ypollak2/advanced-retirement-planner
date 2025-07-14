@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Retirement Planner v5.1.3</title>
+    <title>Advanced Retirement Planner v5.1.4</title>
     <meta name="description" content="Advanced retirement planning tool with comprehensive investment tracking">
     
     <!-- Tailwind CSS via CDN -->
@@ -41,7 +41,7 @@
 <body>
     <!-- Version indicator -->
     <div class="version-indicator">
-        ✨ v5.1.3
+        ✨ v5.1.4
     </div>
     
     <div id="root" class="min-h-screen" role="main" aria-label="Retirement Planner Application"></div>
@@ -54,27 +54,34 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Component Scripts -->
-    <script src="src/translations/multiLanguage.js?v=5.1.3"></script>
-    <script src="src/data/marketConstants.js?v=5.1.3"></script>
-    <script src="src/utils/retirementCalculations.js?v=5.1.3"></script>
+    <script src="src/translations/multiLanguage.js?v=5.1.4"></script>
+    <script src="src/data/marketConstants.js?v=5.1.4"></script>
+    <script src="src/utils/retirementCalculations.js?v=5.1.4"></script>
     
     <!-- Base Components (loaded first) -->
-    <script src="src/components/EnhancedRSUCompanySelector.js?v=5.1.3"></script>
-    <script src="src/components/BottomLineSummary.js?v=5.1.3"></script>
-    <script src="src/components/FinancialChart.js?v=5.1.3"></script>
+    <script src="src/components/EnhancedRSUCompanySelector.js?v=5.1.4"></script>
+    <script src="src/components/BottomLineSummary.js?v=5.1.4"></script>
+    <script src="src/components/FinancialChart.js?v=5.1.4"></script>
     
     <!-- Main Components (depend on base components) -->
-    <script src="src/components/RetirementBasicForm.js?v=5.1.3"></script>
-    <script src="src/components/RetirementAdvancedForm.js?v=5.1.3"></script>
-    <script src="src/components/RetirementResultsPanel.js?v=5.1.3"></script>
-    <script src="src/components/SavingsSummaryPanel.js?v=5.1.3"></script>
-    <script src="src/components/RetirementPlannerApp.js?v=5.1.3"></script>
-    
-    <!-- Core Application - Main entry point -->
-    <script type="module" src="src/core/app-main.js?v=5.1.3"></script>
+    <script src="src/components/RetirementBasicForm.js?v=5.1.4"></script>
+    <script src="src/components/RetirementAdvancedForm.js?v=5.1.4"></script>
+    <script src="src/components/RetirementResultsPanel.js?v=5.1.4"></script>
+    <script src="src/components/SavingsSummaryPanel.js?v=5.1.4"></script>
+    <script src="src/components/RetirementPlannerApp.js?v=5.1.4"></script>
     
     <!-- Application Initialization -->
-    <script src="src/app.js?v=5.1.3"></script>
+    <script>
+        // Initialize the full application after all components load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.initializeApp) {
+                window.initializeApp();
+            } else {
+                console.error('Application initialization function not found');
+            }
+        });
+    </script>
+    <script src="src/app.js?v=5.1.4"></script>
 
 </body>
 </html>

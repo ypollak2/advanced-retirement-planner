@@ -569,3 +569,6 @@ const SavingsSummaryPanel = ({
             })
         ]);
     };
+
+// Export to window for global access
+window.SavingsSummaryPanel = SavingsSummaryPanel;

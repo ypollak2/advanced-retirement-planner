@@ -5,13 +5,13 @@
 const APP_VERSION = {
     major: 5,
     minor: 1,
-    patch: 3,
+    patch: 4,
     
     // Build information
     buildDate: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
     qaScore: 100,
-    deploymentId: 'v5.1.3-deployment-' + Date.now(),
-    cacheVersion: 'v5.1.3-cache-' + Date.now(),
+    deploymentId: 'v5.1.4-deployment-' + Date.now(),
+    cacheVersion: 'v5.1.4-cache-' + Date.now(),
     buildTimestamp: new Date().toISOString(),
     
     // Auto-generated version string

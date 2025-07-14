@@ -638,3 +638,6 @@ const BasicInputs = ({ inputs, setInputs, language, t, monthlyTrainingFundContri
             ])
         ]);
     };
+
+// Export to window for global access
+window.BasicInputs = BasicInputs;

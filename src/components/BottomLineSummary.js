@@ -224,3 +224,6 @@ const BottomLineSummary = ({ inputs, language, totalMonthlySalary, yearsToRetire
             ])
         ]);
     };
+
+// Export to window for global access
+window.BottomLineSummary = BottomLineSummary;
