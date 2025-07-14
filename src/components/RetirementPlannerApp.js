@@ -1,10 +1,5 @@
-// Main Retirement Planner Component with enhanced truncation support
-
-// Helper function for title truncation
-const truncateTitle = (title, maxLength = 50) => {
-    if (!title || typeof title !== 'string') return '';
-    return title.length > maxLength ? title.substring(0, maxLength) + '...' : title;
-};
+// Advanced Retirement Planner - Professional UI Component
+// Created by Yali Pollak (יהלי פולק) - v5.2.1
 
 const RetirementPlannerApp = () => {
     const [language, setLanguage] = React.useState('he');
@@ -145,73 +140,64 @@ const RetirementPlannerApp = () => {
     };
 
     return React.createElement('div', {
-        className: 'min-h-screen gradient-bg py-8 px-4',
+        className: 'min-h-screen',
         dir: language === 'he' ? 'rtl' : 'ltr'
     }, [
-        // Header
-        React.createElement('div', {
+        // Professional Header
+        React.createElement('header', {
             key: 'header',
-            className: 'text-center mb-8'
+            className: 'professional-header'
         }, [
             React.createElement('h1', {
                 key: 'title',
-                className: 'text-4xl md:text-6xl font-bold text-white mb-4 animate-fade-in'
-            }, t.title),
+                className: 'animate-fade-in-up'
+            }, t.title || 'מחשבון פנסיה מתקדם'),
             React.createElement('p', {
                 key: 'subtitle',
-                className: 'text-xl text-white/90 animate-fade-in'
-            }, t.subtitle),
+                className: 'animate-fade-in-up'
+            }, t.subtitle || 'כלי מקצועי לתכנון פנסיה עם מעקב השקעות מקיף'),
             // Language Toggle
             React.createElement('div', {
                 key: 'language',
-                className: 'mt-6'
+                className: 'mt-4'
             }, React.createElement('button', {
                 onClick: () => setLanguage(language === 'he' ? 'en' : 'he'),
-                className: 'px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-all backdrop-blur-sm border border-white/30'
+                className: 'btn-professional btn-outline'
             }, language === 'he' ? 'English' : 'עברית'))
         ]),
 
-        // Main Content
+        // Main Container
         React.createElement('div', {
-            key: 'content',
-            className: 'max-w-7xl mx-auto'
+            key: 'container',
+            className: 'max-w-7xl mx-auto px-4 py-8'
         }, [
+
             // Tab Navigation
             React.createElement('div', {
                 key: 'tabs',
-                className: 'flex justify-center mb-8'
-            }, React.createElement('div', {
-                className: 'glass-effect rounded-xl p-2 inline-flex space-x-2'
+                className: 'professional-tabs'
             }, [
                 React.createElement('button', {
                     key: 'basic',
                     onClick: () => setActiveTab('basic'),
-                    className: `px-6 py-3 rounded-lg font-semibold transition-all ${
-                        activeTab === 'basic'
-                            ? 'bg-purple-600 text-white shadow-lg'
-                            : 'text-purple-700 hover:bg-purple-100'
-                    }`
-                }, t.basic),
+                    className: `professional-tab ${activeTab === 'basic' ? 'active' : ''}`
+                }, t.basic || 'נתונים בסיסיים'),
                 React.createElement('button', {
-                    key: 'advanced',
+                    key: 'advanced', 
                     onClick: () => setActiveTab('advanced'),
-                    className: `px-6 py-3 rounded-lg font-semibold transition-all ${
-                        activeTab === 'advanced'
-                            ? 'bg-purple-600 text-white shadow-lg'
-                            : 'text-purple-700 hover:bg-purple-100'
-                    }`
-                }, t.advanced)
-            ])),
+                    className: `professional-tab ${activeTab === 'advanced' ? 'active' : ''}`
+                }, t.advanced || 'נתונים מתקדמים')
+            ]),
 
             // Tab Content
             React.createElement('div', {
                 key: 'tab-content',
-                className: 'grid grid-cols-1 lg:grid-cols-3 gap-8'
+                className: 'professional-grid professional-grid-2'
             }, [
                 // Forms Column
                 React.createElement('div', {
                     key: 'forms',
-                    className: 'lg:col-span-2 space-y-6'
+                    className: 'space-y-6'
                 }, [
                     // Basic Form
                     activeTab === 'basic' && window.BasicInputs && React.createElement(window.BasicInputs, {
@@ -247,14 +233,14 @@ const RetirementPlannerApp = () => {
                         className: 'text-center'
                     }, React.createElement('button', {
                         onClick: handleCalculate,
-                        className: 'px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg'
-                    }, t.calculate))
+                        className: 'btn-professional btn-primary'
+                    }, t.calculate || 'חשב'))
                 ]),
 
                 // Results Column
                 React.createElement('div', {
                     key: 'results',
-                    className: 'lg:col-span-1'
+                    className: 'space-y-6'
                 }, results && window.ResultsPanel && React.createElement(window.ResultsPanel, {
                     results,
                     inputs: inputs,
@@ -278,6 +264,28 @@ const RetirementPlannerApp = () => {
                     SimpleChart: window.SimpleChart,
                     ReadinessScore: window.ReadinessScore
                 }))
+            ])
+        ]),
+
+        // Bottom Attribution
+        React.createElement('footer', {
+            key: 'footer',
+            className: 'bottom-attribution'
+        }, [
+            React.createElement('p', {
+                key: 'attribution'
+            }, [
+                'Advanced Retirement Planner ',
+                React.createElement('span', {
+                    key: 'version',
+                    className: 'version'
+                }, 'v5.2.1'),
+                ' • Created by ',
+                React.createElement('span', {
+                    key: 'author',
+                    className: 'author'
+                }, 'Yali Pollak (יהלי פולק)'),
+                ' • Professional Financial Planning Tool'
             ])
         ])
     ]);
