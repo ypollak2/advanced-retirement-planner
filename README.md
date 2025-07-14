@@ -239,21 +239,25 @@ All comprehensive documentation has been moved to our **[GitHub Wiki](https://gi
 - **[Security Features](https://github.com/ypollak2/advanced-retirement-planner/wiki/Security-Features)** - Security compliance
 - **[Recent Updates](https://github.com/ypollak2/advanced-retirement-planner/wiki/Recent-Updates)** - Latest changes
 
-## 🔧 Project Structure
+## 🔧 Clean Project Structure
 
 ```
 advanced-retirement-planner/
 ├── 📄 index.html                    # Main application entry point
-├── 📁 src/                          # Source code
-│   ├── 📁 core/                     # Core application logic
-│   ├── 📁 modules/                  # Feature modules (dynamically loaded)
-│   ├── 📁 components/               # React components
-│   ├── 📁 utils/                    # Utility functions
-│   └── 📁 translations/             # Hebrew/English support
-├── 📁 tests/                        # Comprehensive test suite
-├── 📁 config/                       # Configuration files
-├── 📁 backups/                      # Backup files and old versions
-└── 📁 alternative-apis/             # API integration examples
+├── 📄 package.json                  # Dependencies and scripts
+├── 📄 version.json                  # Version management
+├── 📁 src/                          # Source code (9 components, 8 utilities, 4 modules)
+│   ├── 📁 components/               # React components (9 files)
+│   ├── 📁 utils/                    # Utility functions (8 files)
+│   ├── 📁 modules/                  # Advanced features (4 files)
+│   ├── 📁 data/                     # Market constants and data
+│   ├── 📁 translations/             # Hebrew/English support
+│   ├── 📁 styles/                   # CSS styling
+│   └── 📄 app.js                    # Main application orchestrator
+├── 📁 tests/                        # Comprehensive test suite (15 test files)
+├── 📁 config/                       # Deployment and build configuration
+├── 📁 docs/                         # Documentation (roadmap, checklist, etc.)
+└── 📁 scripts/                      # Build and deployment scripts
 ```
 
 ## 🌍 Features

@@ -1,51 +1,51 @@
 #!/usr/bin/env node
-// Version management script for Advanced Retirement Planner
 
+// Simple version update script
 const fs = require('fs');
 const path = require('path');
 
-const versionFile = path.join(__dirname, 'version.json');
-const packageFile = path.join(__dirname, 'package.json');
-const readmeFile = path.join(__dirname, 'README.md');
-
 function updateVersion(newVersion) {
-    try {
-        // Read current version
-        const version = JSON.parse(fs.readFileSync(versionFile, 'utf8'));
-        const pkg = JSON.parse(fs.readFileSync(packageFile, 'utf8'));
-        
-        if (newVersion) {
-            version.version = newVersion;
-            pkg.version = newVersion;
-        }
-        
-        // Update build date
-        version.build = new Date().toISOString().split('T')[0];
-        
-        // Update README.md version badge
-        if (fs.existsSync(readmeFile)) {
-            let readme = fs.readFileSync(readmeFile, 'utf8');
-            readme = readme.replace(/version-[\d\.]+/g, `version-${version.version}`);
-            fs.writeFileSync(readmeFile, readme);
-        }
-        
-        // Write updated files
-        fs.writeFileSync(versionFile, JSON.stringify(version, null, 2));
-        fs.writeFileSync(packageFile, JSON.stringify(pkg, null, 2));
-        
-        console.log(`Version updated to ${version.version}`);
-        console.log(`Build date: ${version.build}`);
-        
-    } catch (error) {
-        console.error('Error updating version:', error.message);
+    // Update version.json
+    const versionFile = 'version.json';
+    const versionData = {
+        version: newVersion,
+        build: new Date().toISOString().split('T')[0],
+        commit: `v${newVersion}-update`,
+        description: `Version update to ${newVersion}`
+    };
+    
+    fs.writeFileSync(versionFile, JSON.stringify(versionData, null, 2));
+    console.log(`✅ Updated ${versionFile} to v${newVersion}`);
+    
+    // Update package.json
+    const packageFile = 'package.json';
+    const packageData = JSON.parse(fs.readFileSync(packageFile, 'utf8'));
+    packageData.version = newVersion;
+    fs.writeFileSync(packageFile, JSON.stringify(packageData, null, 2));
+    console.log(`✅ Updated ${packageFile} to v${newVersion}`);
+    
+    // Update README.md
+    const readmeFile = 'README.md';
+    if (fs.existsSync(readmeFile)) {
+        let readmeContent = fs.readFileSync(readmeFile, 'utf8');
+        readmeContent = readmeContent.replace(/v\d+\.\d+\.\d+/g, `v${newVersion}`);
+        readmeContent = readmeContent.replace(/version-\d+\.\d+\.\d+-/g, `version-${newVersion}-`);
+        fs.writeFileSync(readmeFile, readmeContent);
+        console.log(`✅ Updated ${readmeFile} to v${newVersion}`);
+    }
+    
+    console.log(`🎉 Version updated to ${newVersion}`);
+}
+
+// Export for testing
+module.exports = { updateVersion };
+
+// CLI usage
+if (require.main === module) {
+    const version = process.argv[2];
+    if (!version) {
+        console.error('Usage: node update-version.js <version>');
         process.exit(1);
     }
+    updateVersion(version);
 }
-
-// Command line usage
-if (require.main === module) {
-    const newVersion = process.argv[2];
-    updateVersion(newVersion);
-}
-
-module.exports = updateVersion;

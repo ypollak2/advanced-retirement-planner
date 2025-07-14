@@ -127,16 +127,159 @@ const RetirementPlannerApp = () => {
         { index: 'Tel Aviv 35', percentage: 100, customReturn: null }
     ]);
 
-    const AppTitle = () => {
-        const titleText = language === 'he' ? 'מחשבון פרישה מתקדם' : 'Advanced Retirement Planner';
-        return React.createElement('h1', { 
-            className: 'text-4xl font-bold text-gray-800 mb-4 truncate-multiline truncate-2-lines'
-        }, titleText);
+    // Translation support
+    const t = window.multiLanguage ? window.multiLanguage[language] : {
+        title: 'מחשבון פנסיה מתקדם',
+        subtitle: 'כלי מקצועי לתכנון פנסיה עם מעקב השקעות מקיף',
+        basic: 'נתונים בסיסיים',
+        advanced: 'נתונים מתקדמים', 
+        calculate: 'חשב'
     };
-    
-    return React.createElement('div', { className: 'retirement-planner-app' },
-        React.createElement(AppTitle, { key: 'title' })
-    );
+
+    // Calculate function
+    const handleCalculate = () => {
+        if (window.calculateRetirement) {
+            const result = window.calculateRetirement(inputs, workPeriods, [], []);
+            setResults(result);
+        }
+    };
+
+    return React.createElement('div', {
+        className: 'min-h-screen gradient-bg py-8 px-4',
+        dir: language === 'he' ? 'rtl' : 'ltr'
+    }, [
+        // Header
+        React.createElement('div', {
+            key: 'header',
+            className: 'text-center mb-8'
+        }, [
+            React.createElement('h1', {
+                key: 'title',
+                className: 'text-4xl md:text-6xl font-bold text-white mb-4 animate-fade-in'
+            }, t.title),
+            React.createElement('p', {
+                key: 'subtitle',
+                className: 'text-xl text-white/90 animate-fade-in'
+            }, t.subtitle),
+            // Language Toggle
+            React.createElement('div', {
+                key: 'language',
+                className: 'mt-6'
+            }, React.createElement('button', {
+                onClick: () => setLanguage(language === 'he' ? 'en' : 'he'),
+                className: 'px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-all backdrop-blur-sm border border-white/30'
+            }, language === 'he' ? 'English' : 'עברית'))
+        ]),
+
+        // Main Content
+        React.createElement('div', {
+            key: 'content',
+            className: 'max-w-7xl mx-auto'
+        }, [
+            // Tab Navigation
+            React.createElement('div', {
+                key: 'tabs',
+                className: 'flex justify-center mb-8'
+            }, React.createElement('div', {
+                className: 'glass-effect rounded-xl p-2 inline-flex space-x-2'
+            }, [
+                React.createElement('button', {
+                    key: 'basic',
+                    onClick: () => setActiveTab('basic'),
+                    className: `px-6 py-3 rounded-lg font-semibold transition-all ${
+                        activeTab === 'basic'
+                            ? 'bg-purple-600 text-white shadow-lg'
+                            : 'text-purple-700 hover:bg-purple-100'
+                    }`
+                }, t.basic),
+                React.createElement('button', {
+                    key: 'advanced',
+                    onClick: () => setActiveTab('advanced'),
+                    className: `px-6 py-3 rounded-lg font-semibold transition-all ${
+                        activeTab === 'advanced'
+                            ? 'bg-purple-600 text-white shadow-lg'
+                            : 'text-purple-700 hover:bg-purple-100'
+                    }`
+                }, t.advanced)
+            ])),
+
+            // Tab Content
+            React.createElement('div', {
+                key: 'tab-content',
+                className: 'grid grid-cols-1 lg:grid-cols-3 gap-8'
+            }, [
+                // Forms Column
+                React.createElement('div', {
+                    key: 'forms',
+                    className: 'lg:col-span-2 space-y-6'
+                }, [
+                    // Basic Form
+                    activeTab === 'basic' && window.BasicInputs && React.createElement(window.BasicInputs, {
+                        key: 'basic-form',
+                        inputs,
+                        setInputs,
+                        language,
+                        t,
+                        Calculator: () => React.createElement('span', {}, '📊'),
+                        PiggyBank: () => React.createElement('span', {}, '🏛️'),
+                        DollarSign: () => React.createElement('span', {}, '💰')
+                    }),
+                    // Advanced Form  
+                    activeTab === 'advanced' && window.AdvancedInputs && React.createElement(window.AdvancedInputs, {
+                        key: 'advanced-form',
+                        inputs,
+                        setInputs,
+                        language,
+                        t,
+                        Settings: () => React.createElement('span', {}, '⚙️'),
+                        PiggyBank: () => React.createElement('span', {}, '🏛️'),
+                        DollarSign: () => React.createElement('span', {}, '💰'),
+                        TrendingUp: () => React.createElement('span', {}, '📈'),
+                        Building: () => React.createElement('span', {}, '🏢'),
+                        Globe: () => React.createElement('span', {}, '🌍'),
+                        Plus: () => React.createElement('span', {}, '➕'),
+                        Trash2: () => React.createElement('span', {}, '🗑️')
+                    }),
+                    
+                    // Calculate Button
+                    React.createElement('div', {
+                        key: 'calculate-button',
+                        className: 'text-center'
+                    }, React.createElement('button', {
+                        onClick: handleCalculate,
+                        className: 'px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg'
+                    }, t.calculate))
+                ]),
+
+                // Results Column
+                React.createElement('div', {
+                    key: 'results',
+                    className: 'lg:col-span-1'
+                }, results && window.ResultsPanel && React.createElement(window.ResultsPanel, {
+                    results,
+                    inputs: {},
+                    workPeriods: [],
+                    language,
+                    t,
+                    formatCurrency: window.formatCurrency,
+                    convertCurrency: window.convertCurrency,
+                    generateChartData: window.generateChartData,
+                    showChart: false,
+                    chartData: [],
+                    claudeInsights: null,
+                    exportRetirementSummary: () => {},
+                    exportAsImage: () => {},
+                    PiggyBank: () => React.createElement('span', {}, '🏛️'),
+                    Calculator: () => React.createElement('span', {}, '📊'),
+                    DollarSign: () => React.createElement('span', {}, '💰'),
+                    Target: () => React.createElement('span', {}, '🎯'),
+                    AlertCircle: () => React.createElement('span', {}, '⚠️'),
+                    TrendingUp: () => React.createElement('span', {}, '📈'),
+                    SimpleChart: window.SimpleChart
+                }))
+            ])
+        ])
+    ]);
 };
 
 // Export to window for global access
