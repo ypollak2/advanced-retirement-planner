@@ -1,6 +1,6 @@
 {
-  "version": "5.1.4",
-  "build": "2024-12-14",
-  "commit": "v5.1.4-missing-component-exports-fix",
-  "description": "CRITICAL: Fixed missing window exports for all components - application now loads successfully"
+  "version": "5.2.0",
+  "build": "2025-07-14",
+  "commit": "v5.2.0-update",
+  "description": "Version update to 5.2.0"
 }

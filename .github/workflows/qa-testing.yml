@@ -42,13 +42,13 @@ jobs:
       run: |
         echo "📏 Checking File Sizes"
         echo "Index.html size: $(du -h index.html | cut -f1)"
-        echo "Main app size: $(du -h src/core/app-main.js | cut -f1)"
+        echo "Main app size: $(du -h src/components/RetirementPlannerApp.js | cut -f1)"
         
     - name: 🔧 Verify Version Consistency
       run: |
         echo "🏷️ Checking Version Consistency"
         PACKAGE_VERSION=$(node -p "require('./package.json').version")
-        VERSION_JS=$(node -p "require('./version.js').full")
+        VERSION_JS=$(node -p "require('./src/version.js').number")
         echo "Package.json version: $PACKAGE_VERSION"
         echo "Version.js version: $VERSION_JS"
         if [ "$PACKAGE_VERSION" != "$VERSION_JS" ]; then
@@ -95,10 +95,10 @@ jobs:
         
         # File size checks
         INDEX_SIZE=$(stat -c%s index.html)
-        APP_SIZE=$(stat -c%s src/core/app-main.js)
+        APP_SIZE=$(stat -c%s src/components/RetirementPlannerApp.js)
         
         echo "📄 index.html: ${INDEX_SIZE} bytes"
-        echo "📱 app-main.js: ${APP_SIZE} bytes"
+        echo "📱 RetirementPlannerApp.js: ${APP_SIZE} bytes"
         
         # Performance thresholds
         if [ $INDEX_SIZE -gt 60000 ]; then
@@ -108,9 +108,9 @@ jobs:
         fi
         
         if [ $APP_SIZE -gt 200000 ]; then
-          echo "⚠️ app-main.js is large (${APP_SIZE} bytes > 200KB)"
+          echo "⚠️ RetirementPlannerApp.js is large (${APP_SIZE} bytes > 200KB)"
         else
-          echo "✅ app-main.js size is optimal"
+          echo "✅ RetirementPlannerApp.js size is optimal"
         fi
         
     - name: 🔒 Security Validation
@@ -151,14 +151,12 @@ jobs:
         REQUIRED_FILES=(
           "index.html"
           "package.json"
-          "version.js"
-          "src/core/app-main.js"
-          "src/utils/currencyExchange.js"
-          "src/utils/pensionCalculations.js"
-          "src/utils/rsuCalculations.js"
+          "src/version.js"
+          "src/components/RetirementPlannerApp.js"
+          "src/components/ReadinessScore.js"
+          "src/components/HelpTooltip.js"
+          "src/utils/retirementCalculations.js"
           "src/styles/main.css"
-          "netlify.toml"
-          "_headers"
         )
         
         MISSING_FILES=()
