@@ -254,6 +254,120 @@ const AdvancedInputs = ({
                             ])
                         ])
                     ])
+                ]),
+
+                // RSU/Stock Options Section
+                React.createElement('div', { key: 'rsu-section', className: "space-y-4" }, [
+                    React.createElement('h3', {
+                        key: 'rsu-title',
+                        className: "text-lg font-semibold text-orange-600 mb-4 flex items-center"
+                    }, [
+                        React.createElement('span', { key: 'icon' }, '💼'),
+                        React.createElement('span', { key: 'text', className: 'ml-2' }, 
+                            language === 'he' ? 'אופציות עובדים (RSU)' : 'Stock Options & RSUs')
+                    ]),
+                    React.createElement('div', { key: 'rsu-grid', className: "grid grid-cols-1 md:grid-cols-2 gap-4" }, [
+                        // Company Selection
+                        React.createElement('div', { key: 'company' }, [
+                            React.createElement('div', { key: 'company-label-wrapper', className: 'flex items-center gap-2 mb-1' }, [
+                                React.createElement('label', { 
+                                    key: 'label',
+                                    className: "block text-sm font-medium text-gray-700"
+                                }, language === 'he' ? "חברה" : "Company"),
+                                window.HelpTooltip && React.createElement(window.HelpTooltip, {
+                                    key: 'company-help',
+                                    term: 'rsuCompany',
+                                    language: language
+                                }, '❓')
+                            ]),
+                            React.createElement('select', {
+                                key: 'select',
+                                value: inputs.rsuCompany || '',
+                                onChange: (e) => setInputs({...inputs, rsuCompany: e.target.value}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                            }, [
+                                React.createElement('option', { key: 'none', value: '' }, 
+                                    language === 'he' ? 'ללא אופציות' : 'No Stock Options'),
+                                React.createElement('option', { key: 'apple', value: 'AAPL' }, 'Apple (AAPL)'),
+                                React.createElement('option', { key: 'google', value: 'GOOGL' }, 'Google (GOOGL)'),
+                                React.createElement('option', { key: 'microsoft', value: 'MSFT' }, 'Microsoft (MSFT)'),
+                                React.createElement('option', { key: 'meta', value: 'META' }, 'Meta (META)'),
+                                React.createElement('option', { key: 'nvidia', value: 'NVDA' }, 'NVIDIA (NVDA)'),
+                                React.createElement('option', { key: 'amazon', value: 'AMZN' }, 'Amazon (AMZN)'),
+                                React.createElement('option', { key: 'tesla', value: 'TSLA' }, 'Tesla (TSLA)')
+                            ])
+                        ]),
+                        // RSU Value
+                        React.createElement('div', { key: 'rsu-value' }, [
+                            React.createElement('div', { key: 'rsu-label-wrapper', className: 'flex items-center gap-2 mb-1' }, [
+                                React.createElement('label', { 
+                                    key: 'label',
+                                    className: "block text-sm font-medium text-gray-700"
+                                }, language === 'he' ? "ערך אופציות שנתי ($)" : "Annual RSU Value ($)"),
+                                window.HelpTooltip && React.createElement(window.HelpTooltip, {
+                                    key: 'rsu-help',
+                                    term: 'rsuValue',
+                                    language: language
+                                }, '❓')
+                            ]),
+                            React.createElement('input', {
+                                key: 'input',
+                                type: "number",
+                                value: inputs.annualRsuValue || 0,
+                                onChange: (e) => setInputs({...inputs, annualRsuValue: parseInt(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all",
+                                placeholder: language === 'he' ? "0" : "e.g., 50000"
+                            })
+                        ]),
+                        // Vesting Period
+                        React.createElement('div', { key: 'vesting' }, [
+                            React.createElement('div', { key: 'vesting-label-wrapper', className: 'flex items-center gap-2 mb-1' }, [
+                                React.createElement('label', { 
+                                    key: 'label',
+                                    className: "block text-sm font-medium text-gray-700"
+                                }, language === 'he' ? "תקופת הבשלה (שנים)" : "Vesting Period (years)"),
+                                window.HelpTooltip && React.createElement(window.HelpTooltip, {
+                                    key: 'vesting-help',
+                                    term: 'vestingPeriod',
+                                    language: language
+                                }, '❓')
+                            ]),
+                            React.createElement('select', {
+                                key: 'select',
+                                value: inputs.vestingPeriod || 4,
+                                onChange: (e) => setInputs({...inputs, vestingPeriod: parseInt(e.target.value)}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                            }, [
+                                React.createElement('option', { key: '1', value: 1 }, '1 ' + (language === 'he' ? 'שנה' : 'year')),
+                                React.createElement('option', { key: '2', value: 2 }, '2 ' + (language === 'he' ? 'שנים' : 'years')),
+                                React.createElement('option', { key: '3', value: 3 }, '3 ' + (language === 'he' ? 'שנים' : 'years')),
+                                React.createElement('option', { key: '4', value: 4 }, '4 ' + (language === 'he' ? 'שנים' : 'years')),
+                                React.createElement('option', { key: '5', value: 5 }, '5 ' + (language === 'he' ? 'שנים' : 'years'))
+                            ])
+                        ]),
+                        // Tax Rate
+                        React.createElement('div', { key: 'tax-rate' }, [
+                            React.createElement('div', { key: 'tax-label-wrapper', className: 'flex items-center gap-2 mb-1' }, [
+                                React.createElement('label', { 
+                                    key: 'label',
+                                    className: "block text-sm font-medium text-gray-700"
+                                }, language === 'he' ? "שיעור מס על רווחים (%)" : "Capital Gains Tax (%)"),
+                                window.HelpTooltip && React.createElement(window.HelpTooltip, {
+                                    key: 'tax-help',
+                                    term: 'capitalGainsTax',
+                                    language: language
+                                }, '❓')
+                            ]),
+                            React.createElement('input', {
+                                key: 'input',
+                                type: "number",
+                                step: "0.1",
+                                value: inputs.capitalGainsTax || 25,
+                                onChange: (e) => setInputs({...inputs, capitalGainsTax: parseFloat(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                            })
+                        ])
+                    ])
                 ])
             ])
         ])
