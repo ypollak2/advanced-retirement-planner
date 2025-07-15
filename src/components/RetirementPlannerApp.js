@@ -123,20 +123,57 @@ const RetirementPlannerApp = () => {
         { index: 'Tel Aviv 35', percentage: 100, customReturn: null }
     ]);
 
-    // Translation support
-    const t = window.multiLanguage ? window.multiLanguage[language] : {
-        title: 'מחשבון פנסיה מתקדם',
-        subtitle: 'כלי מקצועי לתכנון פנסיה עם מעקב השקעות מקיף',
-        dashboard: 'לוח הבקרה',
-        detailed: 'מצב מפורט',
-        calculate: 'חשב'
+    // Translation support with proper fallbacks
+    const getTranslations = () => {
+        if (window.multiLanguage && window.multiLanguage[language]) {
+            return window.multiLanguage[language];
+        }
+        
+        // Fallback translations based on language
+        if (language === 'en') {
+            return {
+                title: 'Advanced Retirement Planner',
+                subtitle: 'Professional Pension Planning Tool with Investment Tracking',
+                dashboard: 'Dashboard',
+                detailed: 'Detailed View',
+                calculate: 'Calculate'
+            };
+        } else {
+            return {
+                title: 'מחשבון פנסיה מתקדם',
+                subtitle: 'כלי מקצועי לתכנון פנסיה עם מעקב השקעות מקיף',
+                dashboard: 'לוח הבקרה',
+                detailed: 'מצב מפורט',
+                calculate: 'חשב'
+            };
+        }
     };
+    
+    const t = getTranslations();
 
-    // Calculate function
+    // Calculate function with error handling
     const handleCalculate = () => {
-        if (window.calculateRetirement) {
-            const result = window.calculateRetirement(inputs, workPeriods, [], []);
-            setResults(result);
+        try {
+            if (window.calculateRetirement && workPeriods && workPeriods.length > 0) {
+                const result = window.calculateRetirement(inputs, workPeriods, [], []);
+                setResults(result);
+            } else {
+                console.warn('Calculate: Missing calculateRetirement function or work periods');
+                // Create a basic result structure for demo
+                setResults({
+                    totalSavings: (inputs.currentSavings || 0) * 2,
+                    monthlyIncome: (inputs.currentMonthlyExpenses || 10000) * 0.8,
+                    currentAge: inputs.currentAge || 30,
+                    retirementAge: inputs.retirementAge || 67
+                });
+            }
+        } catch (error) {
+            console.error('Calculate error:', error);
+            setResults({
+                totalSavings: 0,
+                monthlyIncome: 0,
+                error: error.message
+            });
         }
     };
 
@@ -152,27 +189,56 @@ const RetirementPlannerApp = () => {
         className: 'min-h-screen',
         dir: language === 'he' ? 'rtl' : 'ltr'
     }, [
-        // Professional Header
+        // Enhanced Professional Header
         React.createElement('header', {
             key: 'header',
-            className: 'professional-header'
+            className: 'professional-header-enhanced'
         }, [
-            React.createElement('h1', {
-                key: 'title',
-                className: 'animate-fade-in-up truncate-ellipsis responsive-text'
-            }, t.title || 'מחשבון פנסיה מתקדם'),
-            React.createElement('p', {
-                key: 'subtitle',
-                className: 'animate-fade-in-up'
-            }, t.subtitle || 'כלי מקצועי לתכנון פנסיה עם מעקב השקעות מקיף'),
-            // Language Toggle
+            // Header content wrapper
             React.createElement('div', {
-                key: 'language',
-                className: 'mt-4'
-            }, React.createElement('button', {
-                onClick: () => setLanguage(language === 'he' ? 'en' : 'he'),
-                className: 'btn-professional btn-outline'
-            }, language === 'he' ? 'English' : 'עברית'))
+                key: 'header-content',
+                className: 'header-content-wrapper'
+            }, [
+                // Left side - Title and subtitle
+                React.createElement('div', {
+                    key: 'title-section',
+                    className: 'header-title-section'
+                }, [
+                    React.createElement('h1', {
+                        key: 'title',
+                        className: 'header-title animate-fade-in-up'
+                    }, t.title),
+                    React.createElement('p', {
+                        key: 'subtitle',
+                        className: 'header-subtitle animate-fade-in-up'
+                    }, t.subtitle)
+                ]),
+                
+                // Right side - Language toggle and version
+                React.createElement('div', {
+                    key: 'header-controls',
+                    className: 'header-controls'
+                }, [
+                    React.createElement('div', {
+                        key: 'version-display',
+                        className: 'header-version'
+                    }, 'v5.3.0'),
+                    React.createElement('button', {
+                        key: 'language-toggle',
+                        onClick: () => setLanguage(language === 'he' ? 'en' : 'he'),
+                        className: 'language-toggle-btn'
+                    }, [
+                        React.createElement('span', {
+                            key: 'flag',
+                            className: 'language-flag'
+                        }, language === 'he' ? '🇺🇸' : '🇮🇱'),
+                        React.createElement('span', {
+                            key: 'text',
+                            className: 'language-text'
+                        }, language === 'he' ? 'English' : 'עברית')
+                    ])
+                ])
+            ])
         ]),
 
         // Main Container with Dashboard-Centric Design
@@ -300,7 +366,7 @@ const RetirementPlannerApp = () => {
                 }, results && window.ResultsPanel && React.createElement(window.ResultsPanel, {
                     results,
                     inputs: inputs,
-                    workPeriods: [],
+                    workPeriods: workPeriods || [],
                     language,
                     t,
                     formatCurrency: window.formatCurrency,

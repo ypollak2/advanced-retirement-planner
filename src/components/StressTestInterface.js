@@ -97,9 +97,14 @@ const StressTestInterface = ({
 
     // Initialize comparison data on component mount
     React.useEffect(() => {
-        if (window.generateStressTestComparison && inputs && workPeriods) {
-            const comparison = window.generateStressTestComparison(inputs, workPeriods, language);
-            setComparisonData(comparison);
+        if (window.generateStressTestComparison && inputs && workPeriods && workPeriods.length > 0) {
+            try {
+                const comparison = window.generateStressTestComparison(inputs, workPeriods, language);
+                setComparisonData(comparison);
+            } catch (error) {
+                console.warn('StressTestInterface: Failed to generate comparison data:', error);
+                setComparisonData(null);
+            }
         }
     }, [inputs, workPeriods, language]);
 

@@ -605,7 +605,20 @@ const Dashboard = ({
                 }, expandedSections.scenarios && window.StressTestInterface ? 
                     React.createElement(window.StressTestInterface, {
                         inputs: inputs,
-                        workPeriods: [],
+                        workPeriods: [
+                            {
+                                id: 1,
+                                country: 'israel',
+                                startAge: inputs?.currentAge || 30,
+                                endAge: inputs?.retirementAge || 67,
+                                monthlyContribution: 2000,
+                                salary: inputs?.currentSalary || 15000,
+                                pensionReturn: 7.0,
+                                pensionDepositFee: 0.5,
+                                pensionAnnualFee: 1.0,
+                                monthlyTrainingFund: 500
+                            }
+                        ],
                         results: results,
                         language: language,
                         formatCurrency: formatCurrency

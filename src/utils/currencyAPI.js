@@ -14,28 +14,26 @@ class CurrencyAPI {
             ETH: 0.0003
         };
         
-        // Multiple API endpoints for redundancy
+        // API endpoints with CORS-friendly options
         this.apiEndpoints = [
             {
-                name: 'ExchangeRate-API',
-                url: 'https://api.exchangerate-api.com/v4/latest/ILS',
-                parse: (data) => ({
-                    USD: 1 / data.rates.USD,
-                    GBP: 1 / data.rates.GBP,
-                    EUR: 1 / data.rates.EUR
-                })
-            },
-            {
-                name: 'Fixer.io',
-                url: 'https://api.fixer.io/latest?base=ILS',
-                parse: (data) => data.rates
+                name: 'CoinGecko-Exchange',
+                url: 'https://api.coingecko.com/api/v3/exchange_rates',
+                parse: (data) => {
+                    const rates = data.rates;
+                    return {
+                        USD: rates.usd?.value || 3.7,
+                        EUR: rates.eur?.value || 4.0,
+                        GBP: rates.gbp?.value || 4.6
+                    };
+                }
             },
             {
                 name: 'CoinGecko-Crypto',
                 url: 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=ils',
                 parse: (data) => ({
-                    BTC: 1 / data.bitcoin.ils,
-                    ETH: 1 / data.ethereum.ils
+                    BTC: 1 / (data.bitcoin?.ils || 200000),
+                    ETH: 1 / (data.ethereum?.ils || 12000)
                 })
             }
         ];
