@@ -1,12 +1,12 @@
 // UI Design Test Suite - Tests for permanent side panel and tabbed navigation
-// Created by Yali Pollak (יהלי פולק) - v5.3.2
+// Created by Yali Pollak (יהלי פולק) - v5.3.3
 
 const UIDesignTest = {
     tests: [],
     results: [],
 
     init() {
-        console.log('🚀 Starting UI Design Test Suite v5.3.2');
+        console.log('🚀 Starting UI Design Test Suite v5.3.3');
         this.runAllTests();
     },
 
@@ -17,7 +17,13 @@ const UIDesignTest = {
     async runAllTests() {
         for (const test of this.tests) {
             try {
-                const result = await test.testFunction();
+                // Execute test function directly without dynamic calling
+                const testFunc = test.testFunction;
+                if (typeof testFunc !== 'function') {
+                    throw new Error('Invalid test function provided');
+                }
+                
+                const result = await testFunc();
                 this.results.push({
                     name: test.name,
                     status: result.success ? 'PASS' : 'FAIL',
