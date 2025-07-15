@@ -74,7 +74,8 @@ function testJavaScriptSyntax() {
             // Check for problematic patterns
             const issues = [];
             
-            if (content.includes('export ') || content.includes('import ')) {
+            // Check for actual ES6 module syntax (not just string literals)
+            if (/^export\s/m.test(content) || /^import\s/m.test(content) || /\bexport\s+default\b/.test(content) || /\bexport\s+\{/.test(content)) {
                 issues.push('Contains ES6 module syntax (incompatible with script tags)');
             }
             
