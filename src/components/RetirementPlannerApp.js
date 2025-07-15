@@ -437,6 +437,25 @@ function RetirementPlannerApp() {
                         ])
                     ]),
                     
+                    // Currency Selector Card
+                    React.createElement('div', {
+                        key: 'currency-selector',
+                        className: 'bg-white rounded-xl p-6 shadow-sm border border-gray-200'
+                    }, [
+                        React.createElement('h3', {
+                            key: 'currency-title',
+                            className: 'text-lg font-semibold text-gray-800 mb-4'
+                        }, language === 'he' ? 'מטבע תצוגה' : 'Display Currency'),
+                        window.CurrencySelector && React.createElement(window.CurrencySelector, {
+                            key: 'currency-selector-component',
+                            selectedCurrency: workingCurrency,
+                            onCurrencyChange: setWorkingCurrency,
+                            language: language,
+                            compact: true,
+                            showRates: false
+                        })
+                    ]),
+                    
                     // Quick Actions Card
                     React.createElement('div', {
                         key: 'quick-actions',
@@ -559,6 +578,7 @@ function RetirementPlannerApp() {
                     workPeriods: workPeriods || [],
                     language,
                     t,
+                    workingCurrency: workingCurrency,
                     formatCurrency: window.formatCurrency,
                     convertCurrency: window.convertCurrency,
                     generateChartData: window.generateChartData,

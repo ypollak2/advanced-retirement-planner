@@ -6,6 +6,7 @@ const ResultsPanel = ({
     workPeriods, 
     language, 
     t, 
+    workingCurrency = 'ILS',
     formatCurrency, 
     convertCurrency,
     generateChartData,
@@ -42,19 +43,37 @@ const ResultsPanel = ({
         return true;
     };
     
-    // Error handling wrapper
+    // Currency symbols mapping
+    const getCurrencySymbol = (currency) => {
+        const symbols = {
+            'ILS': '₪',
+            'USD': '$',
+            'EUR': '€',
+            'GBP': '£',
+            'BTC': '₿',
+            'ETH': 'Ξ'
+        };
+        return symbols[currency] || '₪';
+    };
+
+    // Error handling wrapper with currency support
     const safeFormatValue = (value, formatter = null) => {
         try {
-            if (value == null || isNaN(value)) return '₪0';
+            if (value == null || isNaN(value)) {
+                const symbol = getCurrencySymbol(workingCurrency);
+                return `${symbol}0`;
+            }
             
             if (formatter && typeof formatter === 'function') {
                 return formatter(value);
             }
             
-            return `₪${value.toLocaleString()}`;
+            const symbol = getCurrencySymbol(workingCurrency);
+            return `${symbol}${value.toLocaleString()}`;
         } catch (error) {
             console.error('RetirementResultsPanel: Error formatting value:', error);
-            return '₪0';
+            const symbol = getCurrencySymbol(workingCurrency);
+            return `${symbol}0`;
         }
     };
     
