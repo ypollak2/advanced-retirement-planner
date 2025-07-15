@@ -7,7 +7,7 @@ const ReadinessScore = ({
     currentSavings, 
     monthlyContribution, 
     targetRetirementIncome, 
-    language = 'he' 
+    language = 'en' 
 }) => {
     const [score, setScore] = React.useState(0);
     const [scoreDetails, setScoreDetails] = React.useState({});

@@ -1,11 +1,11 @@
 {
-  "version": "5.3.0",
+  "version": "5.3.1",
   "name": "Advanced Retirement Planner",
   "description": "Professional-grade retirement planning with stress testing, AI integration, and comprehensive export functionality",
   "author": "Yali Pollak (יהלי פולק)",
-  "lastUpdated": "2025-01-15T00:00:00.000Z",
-  "build": "2025-01-15",
-  "commit": "v5.3.0-professional-overhaul",
+  "lastUpdated": "2025-07-15T00:00:00.000Z",
+  "build": "2025-07-15",
+  "commit": "v5.3.1-language-consistency-fixes",
   "features": [
     "Professional UI redesign with glass-effect cards",
     "5-scenario stress testing system",

@@ -1,11 +1,11 @@
 // Currency Selector Component - Live exchange rates with visual indicators
-// Created by Yali Pollak (יהלי פולק) - v5.3.0
+// Created by Yali Pollak (יהלי פולק) - v5.3.1
 
 const CurrencySelector = ({ 
     selectedCurrency = 'ILS',
     onCurrencyChange,
     amount = 0,
-    language = 'he',
+    language = 'en',
     showRates = true,
     compact = false
 }) => {

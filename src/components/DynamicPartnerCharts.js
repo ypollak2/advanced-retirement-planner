@@ -6,7 +6,7 @@ const DynamicPartnerCharts = ({
     results, 
     partnerResults, 
     stressTestResults,
-    language = 'he',
+    language = 'en',
     formatCurrency
 }) => {
     const [chartView, setChartView] = React.useState('combined');

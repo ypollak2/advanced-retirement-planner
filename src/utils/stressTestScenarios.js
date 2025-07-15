@@ -219,7 +219,7 @@ function applyMarketCrash(results, crashYear, impactPercentage, inputs) {
 }
 
 // Generate comparison data for all scenarios
-function generateStressTestComparison(inputs, workPeriods, language = 'he') {
+function generateStressTestComparison(inputs, workPeriods, language = 'en') {
     const baselineResults = window.calculateRetirement ? window.calculateRetirement(inputs, workPeriods, [], []) : null;
     
     const comparison = {
@@ -248,7 +248,7 @@ function generateStressTestComparison(inputs, workPeriods, language = 'he') {
 }
 
 // Translate Claude scenario description into stress test parameters
-function translateClaudeScenario(scenarioDescription, language = 'he') {
+function translateClaudeScenario(scenarioDescription, language = 'en') {
     // Parse scenario description using keyword matching
     const description = scenarioDescription.toLowerCase();
     

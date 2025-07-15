@@ -6,7 +6,7 @@ function initializeApp() {
         // Use React hooks directly for better compatibility
         
         // Enhanced Chart component with multiple datasets
-        const SimpleChart = ({ data, type = 'line', language = 'he' }) => {
+        const SimpleChart = ({ data, type = 'line', language = 'en' }) => {
             const chartRef = React.useRef(null);
             const chartInstance = React.useRef(null);
             

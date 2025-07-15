@@ -1,11 +1,11 @@
 // Stress Test Interface Component - Advanced scenario testing for retirement planning
-// Created by Yali Pollak (יהלי פולק) - v5.3.0
+// Created by Yali Pollak (יהלי פולק) - v5.3.1
 
 const StressTestInterface = ({ 
     inputs, 
     workPeriods,
     results,
-    language = 'he',
+    language = 'en',
     formatCurrency
 }) => {
     const [activeScenario, setActiveScenario] = React.useState('baseline');

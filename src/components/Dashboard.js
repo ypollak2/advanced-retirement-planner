@@ -1,10 +1,10 @@
 // Dashboard Component - Guided Intelligence UI Design
-// Created by Yali Pollak (יהלי פולק) - v5.3.0
+// Created by Yali Pollak (יהלי פולק) - v5.3.1
 
 const Dashboard = ({ 
     inputs, 
     results, 
-    language = 'he',
+    language = 'en',
     formatCurrency,
     onSectionExpand
 }) => {

@@ -1,7 +1,7 @@
 // HelpTooltip.js - Comprehensive help system with financial literacy education
 // Provides contextual explanations, tooltips, and "What does this mean?" support
 
-const HelpTooltip = ({ term, children, language = 'he', position = 'top' }) => {
+const HelpTooltip = ({ term, children, language = 'en', position = 'top' }) => {
     const [isVisible, setIsVisible] = React.useState(false);
     const [helpContent, setHelpContent] = React.useState(null);
     
@@ -292,7 +292,7 @@ const HelpTooltip = ({ term, children, language = 'he', position = 'top' }) => {
 };
 
 // Enhanced wrapper for form labels with help
-const LabelWithHelp = ({ label, helpTerm, required = false, language = 'he', children }) => {
+const LabelWithHelp = ({ label, helpTerm, required = false, language = 'en', children }) => {
     return React.createElement('div', {
         className: 'space-y-1'
     }, [

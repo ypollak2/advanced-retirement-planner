@@ -1,6 +1,6 @@
 // FinancialChart.js - Chart component using Chart.js with partner data support
 
-const SimpleChart = ({ data, type = 'line', language = 'he', partnerData = null, chartView = 'combined' }) => {
+const SimpleChart = ({ data, type = 'line', language = 'en', partnerData = null, chartView = 'combined' }) => {
     const chartRef = React.useRef(null);
     const chartInstance = React.useRef(null);
     

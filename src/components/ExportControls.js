@@ -5,7 +5,7 @@ const ExportControls = ({
     inputs, 
     results, 
     partnerResults, 
-    language = 'he' 
+    language = 'en' 
 }) => {
     const [isExporting, setIsExporting] = React.useState(false);
     const [exportStatus, setExportStatus] = React.useState(null);

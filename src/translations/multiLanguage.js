@@ -56,7 +56,7 @@ window.translations = {
         // FIRE
         fireTargetAge: "גיל יעד לפרישה מוקדמת",
         fireMonthlyExpenses: "הוצאות חודשיות ב-FIRE (₪)",
-        fireSafeWithdrawlRate: "שיעור משיכה בטוח (%)",
+        fireSafeWithdrawalRate: "שיעור משיכה בטוח (%)",
         fireTarget: "יעד FIRE",
         fireProgress: "התקדמות ל-FIRE",
         // Real Estate
@@ -122,7 +122,7 @@ window.translations = {
         // FIRE
         fireTargetAge: "Target Early Retirement Age",
         fireMonthlyExpenses: "FIRE Monthly Expenses (₪)",
-        fireSafeWithdrawlRate: "Safe Withdrawal Rate (%)",
+        fireSafeWithdrawalRate: "Safe Withdrawal Rate (%)",
         fireTarget: "FIRE Target",
         fireProgress: "FIRE Progress",
         // Real Estate

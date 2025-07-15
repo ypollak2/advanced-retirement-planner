@@ -1,12 +1,12 @@
 // Summary Panel Component - Side panel with key financial summaries and insights
-// Created by Yali Pollak (יהלי פולק) - v5.3.0
+// Created by Yali Pollak (יהלי פולק) - v5.3.1
 
 const SummaryPanel = ({ 
     inputs, 
     results, 
     partnerResults,
     stressTestResults,
-    language = 'he',
+    language = 'en',
     formatCurrency
 }) => {
     // Content translations
