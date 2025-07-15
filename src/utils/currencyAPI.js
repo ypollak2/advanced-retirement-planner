@@ -1,5 +1,5 @@
 // Currency Exchange Rate API - Live rates with fallback system
-// Created by Yali Pollak (יהלי פולק) - v5.3.0
+// Created by Yali Pollak (יהלי פולק) - v5.3.1
 
 class CurrencyAPI {
     constructor() {
@@ -7,34 +7,48 @@ class CurrencyAPI {
         this.lastUpdated = null;
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
         this.fallbackRates = {
-            USD: 3.7,
-            GBP: 4.6,
-            EUR: 4.0,
-            BTC: 0.000002,
-            ETH: 0.0003
+            USD: 3.70,   // Updated fallback rates
+            GBP: 4.65,
+            EUR: 4.02,
+            BTC: 0.0000025,  // ~40,000 USD per BTC
+            ETH: 0.00035     // ~2,850 USD per ETH
         };
         
-        // API endpoints with CORS-friendly options
+        // API endpoints with CORS-friendly options and better fallbacks
         this.apiEndpoints = [
             {
-                name: 'CoinGecko-Exchange',
-                url: 'https://api.coingecko.com/api/v3/exchange_rates',
+                name: 'ExchangeRate-API',
+                url: 'https://api.exchangerate-api.com/v4/latest/ILS',
                 parse: (data) => {
                     const rates = data.rates;
                     return {
-                        USD: rates.usd?.value || 3.7,
-                        EUR: rates.eur?.value || 4.0,
-                        GBP: rates.gbp?.value || 4.6
+                        USD: 1 / (rates.USD || 0.27),
+                        EUR: 1 / (rates.EUR || 0.25),
+                        GBP: 1 / (rates.GBP || 0.22)
                     };
                 }
+            },
+            {
+                name: 'CoinGecko-Fiat',
+                url: 'https://api.coingecko.com/api/v3/simple/price?ids=usd,eur,gbp&vs_currencies=ils',
+                parse: (data) => ({
+                    USD: data.usd?.ils || 3.7,
+                    EUR: data.eur?.ils || 4.0,
+                    GBP: data.gbp?.ils || 4.6
+                })
             },
             {
                 name: 'CoinGecko-Crypto',
                 url: 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=ils',
                 parse: (data) => ({
-                    BTC: 1 / (data.bitcoin?.ils || 200000),
-                    ETH: 1 / (data.ethereum?.ils || 12000)
+                    BTC: 1 / (data.bitcoin?.ils || 150000),
+                    ETH: 1 / (data.ethereum?.ils || 10000)
                 })
+            },
+            {
+                name: 'Fallback-Priority',
+                url: null, // Use fallback rates
+                parse: () => this.fallbackRates
             }
         ];
     }
@@ -205,4 +219,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-console.log('CurrencyAPI v5.3.0 loaded successfully');
+console.log('CurrencyAPI v5.3.1 loaded successfully');

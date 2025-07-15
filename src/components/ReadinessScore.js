@@ -31,7 +31,7 @@ const ReadinessScore = ({
                 savingsRate: 'שיעור החיסכון',
                 timeHorizon: 'זמן עד הפנסיה',
                 currentSavings: 'חיסכון נוכחי',
-                targetIncome: 'הכנסה בפנסיה',
+                retirementGoal: 'התקדמות ליעד הפנסיה',
                 riskManagement: 'ניהול סיכונים'
             },
             recommendations: {
@@ -60,7 +60,7 @@ const ReadinessScore = ({
                 savingsRate: 'Savings Rate',
                 timeHorizon: 'Time to Retirement',
                 currentSavings: 'Current Savings',
-                targetIncome: 'Retirement Income',
+                retirementGoal: 'Retirement Goal Progress',
                 riskManagement: 'Risk Management'
             },
             recommendations: {
@@ -107,7 +107,7 @@ const ReadinessScore = ({
                 savingsRate: calculateSavingsRateScore(monthlySavings, targetMonthlyIncome),
                 timeHorizon: calculateTimeHorizonScore(yearsToRetirement),
                 currentSavings: calculateCurrentSavingsScore(currentTotal, currentAge),
-                projectedSavings: calculateProjectedSavingsScore(projectedTotalSavings, targetRetirementSavings),
+                retirementGoal: calculateRetirementGoalScore(projectedTotalSavings, targetRetirementSavings),
                 riskManagement: calculateRiskScore(currentAge, yearsToRetirement)
             };
             
@@ -116,7 +116,7 @@ const ReadinessScore = ({
                 savingsRate: 0.3,
                 timeHorizon: 0.2,
                 currentSavings: 0.2,
-                projectedSavings: 0.2,
+                retirementGoal: 0.2,
                 riskManagement: 0.1
             };
             
@@ -129,7 +129,7 @@ const ReadinessScore = ({
             setScore(finalScore);
             setScoreDetails({
                 ...factors,
-                projectedSavings: projectedTotalSavings,
+                retirementGoal: projectedTotalSavings,
                 targetSavings: targetRetirementSavings,
                 shortfall: Math.max(0, targetRetirementSavings - projectedTotalSavings)
             });
@@ -186,7 +186,7 @@ const ReadinessScore = ({
         return Math.min(100, ratio * 100);
     };
 
-    const calculateProjectedSavingsScore = (projected, target) => {
+    const calculateRetirementGoalScore = (projected, target) => {
         if (target === 0) return 50; // Default if no target
         
         const ratio = projected / target;
@@ -218,8 +218,8 @@ const ReadinessScore = ({
             });
         }
         
-        if (factors.projectedSavings < 80) {
-            const yearsDelay = Math.ceil((100 - factors.projectedSavings) / 20);
+        if (factors.retirementGoal < 80) {
+            const yearsDelay = Math.ceil((100 - factors.retirementGoal) / 20);
             recs.push({
                 type: 'timeline',
                 priority: 'medium',
@@ -327,7 +327,7 @@ const ReadinessScore = ({
                 key: 'factors-grid',
                 className: 'grid grid-cols-1 md:grid-cols-2 gap-3'
             }, Object.keys(scoreDetails).filter(key => 
-                ['savingsRate', 'timeHorizon', 'currentSavings', 'projectedSavings', 'riskManagement'].includes(key)
+                ['savingsRate', 'timeHorizon', 'currentSavings', 'retirementGoal', 'riskManagement'].includes(key)
             ).map(key => 
                 React.createElement('div', {
                     key: key,

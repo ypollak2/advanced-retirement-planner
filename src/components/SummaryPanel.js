@@ -303,7 +303,27 @@ const SummaryPanel = ({
                     React.createElement('div', {
                         key: 'savings-real',
                         className: 'text-sm font-semibold text-gray-700'
-                    }, formatCurrency ? formatCurrency(totalSavingsReal) : `₪${totalSavingsReal?.toLocaleString()}`)
+                    }, formatCurrency ? formatCurrency(totalSavingsReal) : `₪${totalSavingsReal?.toLocaleString()}`),
+                    
+                    // Multi-currency display for total savings
+                    results?.totalSavings && window.MultiCurrencySavings ? React.createElement('div', {
+                        key: 'multi-currency-savings',
+                        className: 'mt-3 pt-3 border-t border-gray-100'
+                    }, [
+                        React.createElement('div', {
+                            key: 'multi-currency-label',
+                            className: 'text-xs text-gray-500 mb-2'
+                        }, language === 'he' ? 'ערכים במטבעות נוספים' : 'Other Currencies'),
+                        React.createElement(window.MultiCurrencySavings, {
+                            key: 'multi-currency-component',
+                            amount: results.totalSavings,
+                            title: '',
+                            language: language,
+                            compact: true,
+                            showLoading: false,
+                            currencies: ['USD', 'EUR', 'GBP', 'BTC']
+                        })
+                    ]) : null
                 ]),
                 
                 React.createElement('div', {

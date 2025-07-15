@@ -1,10 +1,12 @@
 // Advanced Retirement Planner - Guided Intelligence UI Design
-// Created by Yali Pollak (יהלי פולק) - v5.3.1
+// Created by Yali Pollak (יהלי פולק) - v5.3.2
 
 const RetirementPlannerApp = () => {
     const [language, setLanguage] = React.useState('en');
     const [viewMode, setViewMode] = React.useState('dashboard'); // 'dashboard' or 'detailed'
     const [activeSection, setActiveSection] = React.useState(null);
+    const [workingCurrency, setWorkingCurrency] = React.useState('ILS'); // User's working currency
+    const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
     const [results, setResults] = React.useState(null);
     const [chartData, setChartData] = React.useState([]);
     const [showChart, setShowChart] = React.useState(false);
@@ -185,10 +187,48 @@ const RetirementPlannerApp = () => {
         }
     };
 
+    // Handle quick actions from sidebar
+    const handleQuickAction = (action) => {
+        switch(action) {
+            case 'calculate':
+                handleCalculate();
+                break;
+            case 'optimize':
+                // TODO: Implement optimization logic
+                console.log('Optimization feature coming soon');
+                break;
+            case 'export':
+                // TODO: Implement export logic
+                console.log('Export feature coming soon');
+                break;
+            default:
+                console.log('Unknown action:', action);
+        }
+    };
+
+    // Handle input changes from sidebar
+    const handleInputChange = (field, value) => {
+        setInputs(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
     return React.createElement('div', {
         className: 'min-h-screen',
         dir: language === 'he' ? 'rtl' : 'ltr'
     }, [
+        // Permanent Side Panel
+        window.PermanentSidePanel && React.createElement(window.PermanentSidePanel, {
+            key: 'permanent-sidebar',
+            inputs: inputs,
+            results: results,
+            workingCurrency: workingCurrency,
+            language: language,
+            formatCurrency: window.formatCurrency,
+            onInputChange: handleInputChange,
+            onQuickAction: handleQuickAction
+        }),
         // Enhanced Professional Header
         React.createElement('header', {
             key: 'header',
@@ -222,7 +262,22 @@ const RetirementPlannerApp = () => {
                     React.createElement('div', {
                         key: 'version-display',
                         className: 'header-version'
-                    }, 'v5.3.1'),
+                    }, 'v5.3.2'),
+                    
+                    // Currency selector
+                    React.createElement('select', {
+                        key: 'currency-selector',
+                        value: workingCurrency,
+                        onChange: (e) => setWorkingCurrency(e.target.value),
+                        className: 'currency-selector'
+                    }, [
+                        React.createElement('option', { key: 'ils', value: 'ILS' }, '₪ ILS'),
+                        React.createElement('option', { key: 'usd', value: 'USD' }, '$ USD'),
+                        React.createElement('option', { key: 'eur', value: 'EUR' }, '€ EUR'),
+                        React.createElement('option', { key: 'gbp', value: 'GBP' }, '£ GBP'),
+                        React.createElement('option', { key: 'btc', value: 'BTC' }, '₿ BTC')
+                    ]),
+                    
                     React.createElement('button', {
                         key: 'language-toggle',
                         onClick: () => setLanguage(language === 'he' ? 'en' : 'he'),
@@ -244,7 +299,7 @@ const RetirementPlannerApp = () => {
         // Main Container with Dashboard-Centric Design
         React.createElement('div', {
             key: 'container',
-            className: 'max-w-7xl mx-auto px-4 py-8'
+            className: `main-content-with-sidebar ${sidebarCollapsed ? 'sidebar-collapsed' : ''} ${language === 'he' ? 'rtl' : ''} max-w-7xl mx-auto px-4 py-8`
         }, [
             // View Mode Toggle
             React.createElement('div', {
@@ -401,7 +456,7 @@ const RetirementPlannerApp = () => {
                 React.createElement('span', {
                     key: 'version',
                     className: 'version'
-                }, 'v5.3.1'),
+                }, 'v5.3.2'),
                 ' • Created by ',
                 React.createElement('span', {
                     key: 'author',

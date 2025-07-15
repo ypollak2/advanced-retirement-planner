@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v5.3.1 ✨
+# 🚀 Advanced Retirement Planner v5.3.2 ✨
 
-[![Version](https://img.shields.io/badge/version-5.3.1-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-5.3.2-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -16,37 +16,42 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v5.3.1 - CRITICAL RUNTIME FIXES & STABILITY IMPROVEMENTS 🚀
+## 🎨 What's New in v5.3.2 - MAJOR UI REDESIGN WITH PERMANENT SIDEBAR 🚀
 
-### **🔧 LATEST: RUNTIME ERROR FIXES** (July 2025)
+### **🔧 LATEST: COMPLETE UI OVERHAUL** (July 2025)
 
-#### **✅ Fixed Critical Runtime Errors**
-- **React Key Warnings**: Fixed missing key props in BasicInputs.js select elements and EnhancedRSUCompanySelector.js loading spinner
-- **PDF Export Error**: Fixed jsPDF initialization by checking window.jsPDF instead of global variable
-- **Language Toggle Issues**: Fixed Hebrew appearing when English is selected with proper translation fallbacks
-- **CORS API Issues**: Modified stock price API to prioritize fallback data over blocked external APIs
-- **Calculate Button Crash**: Added comprehensive error handling to prevent screen disappearing
-- **Missing Favicon**: Added favicon.ico to fix 404 errors in browser console
+#### **✨ NEW: Permanent Side Panel Design**
+- **Always-Visible Sidebar**: Fixed 320px sidebar with collapsible design (60px when collapsed)
+- **Tabbed Navigation**: 5 organized tabs - Overview, Savings, Investments, Scenarios, Settings
+- **Responsive Controls**: Quick stats, readiness score, and action buttons always accessible
+- **Mobile Optimization**: Sidebar transforms to overlay on mobile devices with touch-friendly design
+- **RTL Support**: Full Hebrew layout support with proper right-to-left positioning
 
-#### **🎨 Enhanced Visual Design**
-- **Header Redesign**: Professional layout with enhanced language toggle visibility
-- **Language Toggle**: Improved English button visibility with flag icons and responsive design
-- **Error Handling**: Better user feedback with graceful degradation for API failures
-- **Professional Styling**: Enhanced CSS with better contrast and mobile-responsive controls
+#### **📊 Enhanced Chart Visualization**
+- **Stacked Area Charts**: Complete breakdown showing pension, training fund, personal portfolio, real estate, and crypto
+- **Component Tooltips**: Detailed hover information with percentage breakdown of total savings
+- **Visual Clarity**: Enhanced color coding and better data representation
+- **Real-time Updates**: Charts respond to input changes and show all savings components individually
+
+#### **💱 Multi-Currency Integration**
+- **Header Currency Selector**: Choose from ILS, USD, EUR, GBP, BTC with real-time conversion
+- **API Integration**: Live exchange rates with fallback systems for reliability
+- **Multi-Currency Display**: Compact conversion display in sidebar and components
+- **Smart Formatting**: Appropriate decimal places and symbols for each currency
 
 #### **🔧 Technical Improvements**
-- **Stock Price API**: Enhanced fallback system with comprehensive error handling
-- **PDF Export**: Fixed jsPDF dynamic loading with proper initialization checks
-- **Translation System**: Robust language switching with proper fallback mechanisms
-- **Version Consistency**: Updated all files to v5.3.1 with synchronized version management
+- **Fixed Terminology**: Changed confusing "projectedSavings" to intuitive "retirementGoal"
+- **Component Architecture**: Modular sidebar component with proper state management
+- **CSS Framework**: Enhanced responsive design system with CSS custom properties
+- **Comprehensive Testing**: 12-test UI validation suite for design consistency
 
-### **📋 QA Status**: All Runtime Errors Fixed
-- **✅ 100% Console Clean**: Zero React warnings and error messages
-- **✅ 100% API Stability**: Fallback systems for all external dependencies
-- **✅ 100% PDF Export**: Fixed jsPDF initialization and export functionality
-- **✅ 100% Language Toggle**: Proper Hebrew/English switching without errors
-- **✅ 100% Button Functionality**: Calculate button works without crashes
-- **✅ 100% Resource Loading**: No more 404 errors for favicon or missing assets
+### **📋 QA Status**: Complete Design Validation
+- **✅ 100% Language Consistency**: All components use proper English/Hebrew fallbacks
+- **✅ 100% Responsive Design**: Mobile, tablet, and desktop optimizations tested
+- **✅ 100% Component Integration**: All sidebar tabs and features fully functional
+- **✅ 100% Currency Support**: Real-time conversion with API fallback systems
+- **✅ 100% Chart Enhancement**: Detailed savings breakdown with stacked visualization
+- **✅ 100% Accessibility**: Keyboard navigation and screen reader support
 
 ## 🎨 Previous Updates - v5.3.0 - PROFESSIONAL OVERHAUL & ADVANCED FEATURES
 
