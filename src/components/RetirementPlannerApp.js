@@ -1,9 +1,10 @@
-// Advanced Retirement Planner - Professional UI Component
-// Created by Yali Pollak (יהלי פולק) - v5.2.1
+// Advanced Retirement Planner - Guided Intelligence UI Design
+// Created by Yali Pollak (יהלי פולק) - v5.3.0
 
 const RetirementPlannerApp = () => {
     const [language, setLanguage] = React.useState('he');
-    const [activeTab, setActiveTab] = React.useState('basic');
+    const [viewMode, setViewMode] = React.useState('dashboard'); // 'dashboard' or 'detailed'
+    const [activeSection, setActiveSection] = React.useState(null);
     const [results, setResults] = React.useState(null);
     const [chartData, setChartData] = React.useState([]);
     const [showChart, setShowChart] = React.useState(false);
@@ -126,8 +127,8 @@ const RetirementPlannerApp = () => {
     const t = window.multiLanguage ? window.multiLanguage[language] : {
         title: 'מחשבון פנסיה מתקדם',
         subtitle: 'כלי מקצועי לתכנון פנסיה עם מעקב השקעות מקיף',
-        basic: 'נתונים בסיסיים',
-        advanced: 'נתונים מתקדמים', 
+        dashboard: 'לוח הבקרה',
+        detailed: 'מצב מפורט',
         calculate: 'חשב'
     };
 
@@ -136,6 +137,14 @@ const RetirementPlannerApp = () => {
         if (window.calculateRetirement) {
             const result = window.calculateRetirement(inputs, workPeriods, [], []);
             setResults(result);
+        }
+    };
+
+    // Handle section expansion from dashboard
+    const handleSectionExpand = (sectionId, isExpanded) => {
+        if (isExpanded) {
+            setActiveSection(sectionId);
+            setViewMode('detailed');
         }
     };
 
@@ -166,32 +175,67 @@ const RetirementPlannerApp = () => {
             }, language === 'he' ? 'English' : 'עברית'))
         ]),
 
-        // Main Container
+        // Main Container with Dashboard-Centric Design
         React.createElement('div', {
             key: 'container',
             className: 'max-w-7xl mx-auto px-4 py-8'
         }, [
-
-            // Tab Navigation
+            // View Mode Toggle
             React.createElement('div', {
-                key: 'tabs',
-                className: 'professional-tabs'
+                key: 'view-toggle',
+                className: 'professional-tabs mb-6'
             }, [
                 React.createElement('button', {
-                    key: 'basic',
-                    onClick: () => setActiveTab('basic'),
-                    className: `professional-tab ${activeTab === 'basic' ? 'active' : ''}`
-                }, t.basic || 'נתונים בסיסיים'),
+                    key: 'dashboard',
+                    onClick: () => setViewMode('dashboard'),
+                    className: `professional-tab ${viewMode === 'dashboard' ? 'active' : ''}`
+                }, [
+                    React.createElement('span', { key: 'icon' }, '🏠'),
+                    ' ',
+                    t.dashboard || 'לוח הבקרה'
+                ]),
                 React.createElement('button', {
-                    key: 'advanced', 
-                    onClick: () => setActiveTab('advanced'),
-                    className: `professional-tab ${activeTab === 'advanced' ? 'active' : ''}`
-                }, t.advanced || 'נתונים מתקדמים')
+                    key: 'detailed', 
+                    onClick: () => setViewMode('detailed'),
+                    className: `professional-tab ${viewMode === 'detailed' ? 'active' : ''}`
+                }, [
+                    React.createElement('span', { key: 'icon' }, '📊'),
+                    ' ',
+                    t.detailed || 'מצב מפורט'
+                ])
             ]),
 
-            // Tab Content
-            React.createElement('div', {
-                key: 'tab-content',
+            // Dashboard View
+            viewMode === 'dashboard' && React.createElement('div', {
+                key: 'dashboard-view'
+            }, [
+                // Dashboard Component
+                window.Dashboard && React.createElement(window.Dashboard, {
+                    key: 'dashboard',
+                    inputs: inputs,
+                    results: results,
+                    language: language,
+                    formatCurrency: window.formatCurrency,
+                    onSectionExpand: handleSectionExpand
+                }),
+                
+                // Quick Calculate Button for Dashboard
+                !results && React.createElement('div', {
+                    key: 'quick-calculate',
+                    className: 'text-center mt-8'
+                }, React.createElement('button', {
+                    onClick: handleCalculate,
+                    className: 'btn-professional btn-primary btn-large'
+                }, [
+                    React.createElement('span', { key: 'icon' }, '🚀'),
+                    ' ',
+                    t.calculate || 'חשב את התכנית שלי'
+                ]))
+            ]),
+
+            // Detailed View
+            viewMode === 'detailed' && React.createElement('div', {
+                key: 'detailed-view',
                 className: 'professional-grid professional-grid-2'
             }, [
                 // Forms Column
@@ -199,9 +243,9 @@ const RetirementPlannerApp = () => {
                     key: 'forms',
                     className: 'space-y-6'
                 }, [
-                    // Basic Form
-                    activeTab === 'basic' && window.BasicInputs && React.createElement(window.BasicInputs, {
-                        key: 'basic-form',
+                    // Section-specific forms based on activeSection
+                    activeSection === 'pension' && window.BasicInputs && React.createElement(window.BasicInputs, {
+                        key: 'pension-form',
                         inputs,
                         setInputs,
                         language,
@@ -210,9 +254,9 @@ const RetirementPlannerApp = () => {
                         PiggyBank: () => React.createElement('span', {}, '🏛️'),
                         DollarSign: () => React.createElement('span', {}, '💰')
                     }),
-                    // Advanced Form  
-                    activeTab === 'advanced' && window.AdvancedInputs && React.createElement(window.AdvancedInputs, {
-                        key: 'advanced-form',
+                    
+                    activeSection === 'investments' && window.AdvancedInputs && React.createElement(window.AdvancedInputs, {
+                        key: 'investments-form',
                         inputs,
                         setInputs,
                         language,
@@ -225,6 +269,18 @@ const RetirementPlannerApp = () => {
                         Globe: () => React.createElement('span', {}, '🌍'),
                         Plus: () => React.createElement('span', {}, '➕'),
                         Trash2: () => React.createElement('span', {}, '🗑️')
+                    }),
+                    
+                    // Default to basic form if no specific section
+                    !activeSection && window.BasicInputs && React.createElement(window.BasicInputs, {
+                        key: 'default-form',
+                        inputs,
+                        setInputs,
+                        language,
+                        t,
+                        Calculator: () => React.createElement('span', {}, '📊'),
+                        PiggyBank: () => React.createElement('span', {}, '🏛️'),
+                        DollarSign: () => React.createElement('span', {}, '💰')
                     }),
                     
                     // Calculate Button

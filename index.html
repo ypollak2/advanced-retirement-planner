@@ -10,7 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     
     <!-- Main Application Styles -->
-    <link rel="stylesheet" href="src/styles/main.css?v=5.2.0">
+    <link rel="stylesheet" href="src/styles/main.css?v=5.3.0">
     
     <style>
         /* Version indicator - repositioned for better UX */
@@ -54,39 +54,44 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Component Scripts -->
-    <script src="src/translations/multiLanguage.js?v=5.2.1"></script>
-    <script src="src/data/marketConstants.js?v=5.2.1"></script>
-    <script src="src/utils/retirementCalculations.js?v=5.2.1"></script>
-    <script src="src/utils/chartDataGenerator.js?v=5.2.1"></script>
+    <script src="src/translations/multiLanguage.js?v=5.3.0"></script>
+    <script src="src/data/marketConstants.js?v=5.3.0"></script>
+    <script src="src/utils/retirementCalculations.js?v=5.3.0"></script>
+    <script src="src/utils/chartDataGenerator.js?v=5.3.0"></script>
     <script src="src/utils/stockPriceAPI.js?v=5.3.0"></script>
     <script src="src/utils/exportFunctions.js?v=5.3.0"></script>
     <script src="src/utils/stressTestScenarios.js?v=5.3.0"></script>
+    <script src="src/utils/currencyAPI.js?v=5.3.0"></script>
     
     <!-- Base Components (loaded first) -->
-    <script src="src/components/EnhancedRSUCompanySelector.js?v=5.2.1"></script>
-    <script src="src/components/BottomLineSummary.js?v=5.2.1"></script>
-    <script src="src/components/FinancialChart.js?v=5.2.1"></script>
+    <script src="src/components/EnhancedRSUCompanySelector.js?v=5.3.0"></script>
+    <script src="src/components/BottomLineSummary.js?v=5.3.0"></script>
+    <script src="src/components/FinancialChart.js?v=5.3.0"></script>
     
     <!-- Main Components (depend on base components) -->
-    <script src="src/components/HelpTooltip.js?v=5.2.1"></script>
-    <script src="src/components/ReadinessScore.js?v=5.2.1"></script>
-    <script src="src/components/DynamicPartnerCharts.js?v=5.2.1"></script>
+    <script src="src/components/HelpTooltip.js?v=5.3.0"></script>
+    <script src="src/components/ReadinessScore.js?v=5.3.0"></script>
+    <script src="src/components/DynamicPartnerCharts.js?v=5.3.0"></script>
     <script src="src/components/ExportControls.js?v=5.3.0"></script>
     <script src="src/components/StressTestInterface.js?v=5.3.0"></script>
     <script src="src/components/SummaryPanel.js?v=5.3.0"></script>
-    <script src="src/components/BasicInputs.js?v=5.2.1"></script>
-    <script src="src/components/RetirementAdvancedForm.js?v=5.2.1"></script>
-    <script src="src/components/RetirementResultsPanel.js?v=5.2.1"></script>
-    <script src="src/components/SavingsSummaryPanel.js?v=5.2.1"></script>
-    <script src="src/components/RetirementPlannerApp.js?v=5.2.1"></script>
+    <script src="src/components/BasicInputs.js?v=5.3.0"></script>
+    <script src="src/components/RetirementAdvancedForm.js?v=5.3.0"></script>
+    <script src="src/components/RetirementResultsPanel.js?v=5.3.0"></script>
+    <script src="src/components/SavingsSummaryPanel.js?v=5.3.0"></script>
+    
+    <!-- Currency & Dashboard Components -->
+    <script src="src/components/CurrencySelector.js?v=5.3.0"></script>
+    <script src="src/components/Dashboard.js?v=5.3.0"></script>
+    <script src="src/components/RetirementPlannerApp.js?v=5.3.0"></script>
     
     <!-- Application Initialization -->
     <script>
         // Enhanced error handling and component validation
         function validateComponents() {
             const requiredComponents = [
-                'RetirementPlannerApp', 'BasicInputs', 'AdvancedInputs', 'ResultsPanel',
-                'ReadinessScore', 'HelpTooltip', 'calculateRetirement', 'formatCurrency'
+                'RetirementPlannerApp', 'Dashboard', 'CurrencySelector', 'BasicInputs', 'AdvancedInputs', 'ResultsPanel',
+                'ReadinessScore', 'HelpTooltip', 'calculateRetirement', 'formatCurrency', 'currencyAPI'
             ];
             
             const missing = requiredComponents.filter(comp => !window[comp]);
