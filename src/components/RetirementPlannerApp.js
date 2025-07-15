@@ -357,7 +357,7 @@ function RetirementPlannerApp() {
                 }, [
                     React.createElement('span', { key: 'icon' }, '🏠'),
                     ' ',
-                    t.dashboard || 'לוח הבקרה'
+                    t.dashboard || 'Dashboard'
                 ]),
                 React.createElement('button', {
                     key: 'detailed', 
@@ -366,7 +366,7 @@ function RetirementPlannerApp() {
                 }, [
                     React.createElement('span', { key: 'icon' }, '📊'),
                     ' ',
-                    t.detailed || 'מצב מפורט'
+                    t.detailed || 'Detailed View'
                 ])
             ]),
 
@@ -544,7 +544,7 @@ function RetirementPlannerApp() {
                     }, React.createElement('button', {
                         onClick: handleCalculate,
                         className: 'btn-professional btn-primary'
-                    }, t.calculate || 'חשב'))
+                    }, t.calculate || 'Calculate'))
                 ]),
 
                 // Results Column

@@ -83,6 +83,8 @@ window.translations = {
         currentMonthlyExpenses: "Current Monthly Expenses (₪)",
         targetReplacement: "Target Income Replacement (%)",
         calculate: "Calculate",
+        dashboard: "Dashboard",
+        detailed: "Detailed View",
         results: "Calculation Results",
         totalSavings: "Total Savings at Retirement",
         monthlyIncome: "Monthly Pension Income",

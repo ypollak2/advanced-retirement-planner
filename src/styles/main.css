@@ -218,7 +218,6 @@ body {
     padding: var(--spacing-sm) var(--spacing-md);
     min-width: 120px;
   }
-}
 
 @media (max-width: 480px) {
   .header-controls {
