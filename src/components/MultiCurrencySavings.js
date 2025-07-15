@@ -1,15 +1,14 @@
 // Multi-Currency Savings Display Component
 // Shows savings values in multiple currencies with real-time conversion
-// Created by Yali Pollak (יהלי פולק) - v5.3.1
+// Created by Yali Pollak (יהלי פולק) - v5.3.2
 
-const MultiCurrencySavings = ({ 
-    amount, 
-    title = 'Savings', 
-    language = 'en',
-    showLoading = true,
-    compact = false,
-    currencies = ['USD', 'EUR', 'GBP', 'BTC']
-}) => {
+function MultiCurrencySavings(props) {
+    const amount = props.amount;
+    const title = props.title || 'Savings';
+    const language = props.language || 'en';
+    const showLoading = props.showLoading !== false;
+    const compact = props.compact || false;
+    const currencies = props.currencies || ['USD', 'EUR', 'GBP', 'BTC'];
     const [rates, setRates] = React.useState({});
     const [isLoading, setIsLoading] = React.useState(true);
     const [error, setError] = React.useState(null);
@@ -305,7 +304,7 @@ const MultiCurrencySavings = ({
             }, `${t.lastUpdated}: ${getTimeSinceUpdate()}`)
         ]) : null
     ]);
-};
+}
 
 // Export to window for global access
 window.MultiCurrencySavings = MultiCurrencySavings;

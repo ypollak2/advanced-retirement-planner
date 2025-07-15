@@ -1,15 +1,14 @@
 // Permanent Side Panel Component - Always visible sidebar that adapts to user inputs
 // Created by Yali Pollak (יהלי פולק) - v5.3.2
 
-const PermanentSidePanel = ({ 
-    inputs, 
-    results, 
-    workingCurrency,
-    language = 'en',
-    formatCurrency,
-    onInputChange,
-    onQuickAction 
-}) => {
+function PermanentSidePanel(props) {
+    const inputs = props.inputs;
+    const results = props.results;
+    const workingCurrency = props.workingCurrency;
+    const language = props.language || 'en';
+    const formatCurrency = props.formatCurrency;
+    const onInputChange = props.onInputChange;
+    const onQuickAction = props.onQuickAction;
     const [activeTab, setActiveTab] = React.useState('overview');
     const [isCollapsed, setIsCollapsed] = React.useState(false);
 
@@ -538,7 +537,7 @@ const PermanentSidePanel = ({
             }, `${t.lastUpdated}: ${t.now}`)
         ])
     ]);
-};
+}
 
 // Export to window for global access
 window.PermanentSidePanel = PermanentSidePanel;
