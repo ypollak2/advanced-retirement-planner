@@ -353,6 +353,7 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
                     className: "flex items-center gap-2 text-sm text-gray-600"
                 }, [
                     React.createElement('div', {
+                        key: 'loading-spinner',
                         className: "animate-spin w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full"
                     }),
                     language === 'he' ? 'טוען מחיר...' : 'Loading price...'

@@ -1,5 +1,5 @@
 // Stock Price API Integration for RSU Tracking
-// Created by Yali Pollak (יהלי פולק) - v5.2.1
+// Created by Yali Pollak (יהלי פולק) - v5.3.1
 
 // Multiple API endpoints for stock price fetching with fallbacks
 const STOCK_API_ENDPOINTS = {
@@ -105,7 +105,22 @@ async function fetchStockPrice(symbol, useCache = true) {
         }
     }
     
-    // Try different APIs in order
+    // Use fallback prices first due to CORS limitations
+    if (FALLBACK_PRICES[upperSymbol]) {
+        const fallbackPrice = FALLBACK_PRICES[upperSymbol];
+        console.log(`📊 Using fallback price for ${upperSymbol}: $${fallbackPrice}`);
+        
+        // Cache fallback price
+        priceCache.set(upperSymbol, {
+            price: fallbackPrice,
+            timestamp: Date.now(),
+            source: 'fallback'
+        });
+        
+        return fallbackPrice;
+    }
+    
+    // Try different APIs as backup (will likely fail due to CORS)
     const apiKeys = Object.keys(STOCK_API_ENDPOINTS);
     
     for (const apiKey of apiKeys) {
@@ -116,7 +131,6 @@ async function fetchStockPrice(symbol, useCache = true) {
                 headers: {
                     'Accept': 'application/json',
                 },
-                // Add CORS handling
                 mode: 'cors'
             });
             
@@ -140,21 +154,6 @@ async function fetchStockPrice(symbol, useCache = true) {
             console.warn(`⚠️ API ${apiKey} failed for ${upperSymbol}:`, error.message);
             continue;
         }
-    }
-    
-    // Fall back to manual prices if APIs fail
-    if (FALLBACK_PRICES[upperSymbol]) {
-        const fallbackPrice = FALLBACK_PRICES[upperSymbol];
-        console.log(`📊 Using fallback price for ${upperSymbol}: $${fallbackPrice}`);
-        
-        // Cache fallback price with shorter duration
-        priceCache.set(upperSymbol, {
-            price: fallbackPrice,
-            timestamp: Date.now(),
-            source: 'fallback'
-        });
-        
-        return fallbackPrice;
     }
     
     console.error(`❌ Could not fetch price for ${upperSymbol}`);

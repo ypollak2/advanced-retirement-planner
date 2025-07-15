@@ -1,5 +1,5 @@
 // Export Controls Component - Professional export functionality for retirement plans
-// Created by Yali Pollak (יהלי פולק) - v5.2.1
+// Created by Yali Pollak (יהלי פולק) - v5.3.1
 
 const ExportControls = ({ 
     inputs, 

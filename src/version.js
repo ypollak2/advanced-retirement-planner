@@ -1,9 +1,9 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "5.2.1",
-    build: "2025-07-14",
-    commit: "v5.2.1-comprehensive-qa-fix",
-    description: "Comprehensive QA suite with runtime error fixes and cache busting"
+    number: "5.3.1",
+    build: "2025-07-15",
+    commit: "v5.3.1-runtime-error-fixes",
+    description: "Fixed React key warnings, PDF export errors, language toggle issues, and CORS API problems"
 };
 
 // Export version for use in other modules

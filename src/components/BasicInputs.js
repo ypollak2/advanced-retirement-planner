@@ -517,6 +517,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, Calculator, PiggyBank, Do
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, language === 'he' ? "מדינה למס הכנסה" : "Tax Country"),
                             React.createElement('select', {
+                                key: 'tax-country-select',
                                 value: inputs.taxCountry || 'israel',
                                 onChange: (e) => setInputs({...inputs, taxCountry: e.target.value}),
                                 className: "financial-input"
