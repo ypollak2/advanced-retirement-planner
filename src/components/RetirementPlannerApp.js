@@ -2,37 +2,108 @@
 // Created by Yali Pollak (יהלי פולק) - v5.3.3
 
 function RetirementPlannerApp() {
-    const [language, setLanguage] = React.useState('en');
-    const [viewMode, setViewMode] = React.useState('dashboard'); // 'dashboard' or 'detailed'
-    const [activeSection, setActiveSection] = React.useState(null);
-    const [workingCurrency, setWorkingCurrency] = React.useState('ILS'); // User's working currency
-    const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
-    const [results, setResults] = React.useState(null);
-    const [chartData, setChartData] = React.useState([]);
-    const [showChart, setShowChart] = React.useState(false);
-    const [showSalaryInput, setShowSalaryInput] = React.useState(false);
-    const [showFamilyPlanning, setShowFamilyPlanning] = React.useState(false);
-    const [familyPlanningEnabled, setFamilyPlanningEnabled] = React.useState(false);
-    const [children, setChildren] = React.useState([]);
-    const [stressTestResults, setStressTestResults] = React.useState(null);
-    const [showStressTest, setShowStressTest] = React.useState(false);
-    const [selectedScenario, setSelectedScenario] = React.useState(null);
-    const [selectedTimeHorizon, setSelectedTimeHorizon] = React.useState(20);
-    const [historicalReturns, setHistoricalReturns] = React.useState({});
-    const [exchangeRatesLoading, setExchangeRatesLoading] = React.useState(false);
-    const [exchangeRatesLastUpdated, setExchangeRatesLastUpdated] = React.useState(null);
-    const [cryptoPrices, setCryptoPrices] = React.useState({
+    var languageState = React.useState('en');
+    var language = languageState[0];
+    var setLanguage = languageState[1];
+    
+    var viewModeState = React.useState('dashboard');
+    var viewMode = viewModeState[0];
+    var setViewMode = viewModeState[1];
+    
+    var activeSectionState = React.useState(null);
+    var activeSection = activeSectionState[0];
+    var setActiveSection = activeSectionState[1];
+    
+    var workingCurrencyState = React.useState('ILS');
+    var workingCurrency = workingCurrencyState[0];
+    var setWorkingCurrency = workingCurrencyState[1];
+    
+    var sidebarCollapsedState = React.useState(false);
+    var sidebarCollapsed = sidebarCollapsedState[0];
+    var setSidebarCollapsed = sidebarCollapsedState[1];
+    
+    var resultsState = React.useState(null);
+    var results = resultsState[0];
+    var setResults = resultsState[1];
+    
+    var chartDataState = React.useState([]);
+    var chartData = chartDataState[0];
+    var setChartData = chartDataState[1];
+    
+    var showChartState = React.useState(false);
+    var showChart = showChartState[0];
+    var setShowChart = showChartState[1];
+    
+    var showSalaryInputState = React.useState(false);
+    var showSalaryInput = showSalaryInputState[0];
+    var setShowSalaryInput = showSalaryInputState[1];
+    
+    var showFamilyPlanningState = React.useState(false);
+    var showFamilyPlanning = showFamilyPlanningState[0];
+    var setShowFamilyPlanning = showFamilyPlanningState[1];
+    
+    var familyPlanningEnabledState = React.useState(false);
+    var familyPlanningEnabled = familyPlanningEnabledState[0];
+    var setFamilyPlanningEnabled = familyPlanningEnabledState[1];
+    
+    var childrenState = React.useState([]);
+    var children = childrenState[0];
+    var setChildren = childrenState[1];
+    
+    var stressTestResultsState = React.useState(null);
+    var stressTestResults = stressTestResultsState[0];
+    var setStressTestResults = stressTestResultsState[1];
+    
+    var showStressTestState = React.useState(false);
+    var showStressTest = showStressTestState[0];
+    var setShowStressTest = showStressTestState[1];
+    
+    var selectedScenarioState = React.useState(null);
+    var selectedScenario = selectedScenarioState[0];
+    var setSelectedScenario = selectedScenarioState[1];
+    
+    var selectedTimeHorizonState = React.useState(20);
+    var selectedTimeHorizon = selectedTimeHorizonState[0];
+    var setSelectedTimeHorizon = selectedTimeHorizonState[1];
+    
+    var historicalReturnsState = React.useState({});
+    var historicalReturns = historicalReturnsState[0];
+    var setHistoricalReturns = historicalReturnsState[1];
+    
+    var exchangeRatesLoadingState = React.useState(false);
+    var exchangeRatesLoading = exchangeRatesLoadingState[0];
+    var setExchangeRatesLoading = exchangeRatesLoadingState[1];
+    
+    var exchangeRatesLastUpdatedState = React.useState(null);
+    var exchangeRatesLastUpdated = exchangeRatesLastUpdatedState[0];
+    var setExchangeRatesLastUpdated = exchangeRatesLastUpdatedState[1];
+    
+    var cryptoPricesState = React.useState({
         bitcoin: 50000,
         ethereum: 3000,
         binancecoin: 300
     });
-    const [cryptoPricesLoading, setCryptoPricesLoading] = React.useState(false);
-    const [cryptoPricesLastUpdated, setCryptoPricesLastUpdated] = React.useState(null);
-    const [indexDataLoading, setIndexDataLoading] = React.useState(false);
-    const [lastUpdated, setLastUpdated] = React.useState(null);
+    var cryptoPrices = cryptoPricesState[0];
+    var setCryptoPrices = cryptoPricesState[1];
+    
+    var cryptoPricesLoadingState = React.useState(false);
+    var cryptoPricesLoading = cryptoPricesLoadingState[0];
+    var setCryptoPricesLoading = cryptoPricesLoadingState[1];
+    
+    var cryptoPricesLastUpdatedState = React.useState(null);
+    var cryptoPricesLastUpdated = cryptoPricesLastUpdatedState[0];
+    var setCryptoPricesLastUpdated = cryptoPricesLastUpdatedState[1];
+    
+    var indexDataLoadingState = React.useState(false);
+    var indexDataLoading = indexDataLoadingState[0];
+    var setIndexDataLoading = indexDataLoadingState[1];
+    
+    var lastUpdatedState = React.useState(null);
+    var lastUpdated = lastUpdatedState[0];
+    var setLastUpdated = lastUpdatedState[1];
 
     // Initial state with all investment types
-    const [inputs, setInputs] = React.useState({
+    var inputsState = React.useState({
         currentAge: 30,
         retirementAge: 67,
         currentSavings: 50000,
@@ -85,8 +156,10 @@ function RetirementPlannerApp() {
         jointMonthlyExpenses: 0,
         jointRetirementExpenses: 0
     });
+    var inputs = inputsState[0];
+    var setInputs = inputsState[1];
 
-    const [workPeriods, setWorkPeriods] = React.useState([
+    var workPeriodsState = React.useState([
         {
             id: 1,
             country: 'israel',
@@ -100,8 +173,10 @@ function RetirementPlannerApp() {
             monthlyTrainingFund: 500
         }
     ]);
+    var workPeriods = workPeriodsState[0];
+    var setWorkPeriods = workPeriodsState[1];
 
-    const [partnerWorkPeriods, setPartnerWorkPeriods] = React.useState([
+    var partnerWorkPeriodsState = React.useState([
         {
             id: 1,
             country: 'israel',
@@ -115,15 +190,21 @@ function RetirementPlannerApp() {
             monthlyTrainingFund: 400
         }
     ]);
+    var partnerWorkPeriods = partnerWorkPeriodsState[0];
+    var setPartnerWorkPeriods = partnerWorkPeriodsState[1];
 
-    const [pensionIndexAllocation, setPensionIndexAllocation] = React.useState([
+    var pensionIndexAllocationState = React.useState([
         { index: 'S&P 500', percentage: 60, customReturn: null },
         { index: 'Government Bonds', percentage: 40, customReturn: null }
     ]);
+    var pensionIndexAllocation = pensionIndexAllocationState[0];
+    var setPensionIndexAllocation = pensionIndexAllocationState[1];
 
-    const [trainingFundIndexAllocation, setTrainingFundIndexAllocation] = React.useState([
+    var trainingFundIndexAllocationState = React.useState([
         { index: 'Tel Aviv 35', percentage: 100, customReturn: null }
     ]);
+    var trainingFundIndexAllocation = trainingFundIndexAllocationState[0];
+    var setTrainingFundIndexAllocation = trainingFundIndexAllocationState[1];
 
     // Translation support with proper fallbacks
     function getTranslations() {
@@ -151,13 +232,13 @@ function RetirementPlannerApp() {
         }
     }
     
-    const t = getTranslations();
+    var t = getTranslations();
 
     // Calculate function with error handling
     function handleCalculate() {
         try {
             if (window.calculateRetirement && workPeriods && workPeriods.length > 0) {
-                const result = window.calculateRetirement(inputs, workPeriods, [], []);
+                var result = window.calculateRetirement(inputs, workPeriods, [], []);
                 setResults(result);
             } else {
                 console.warn('Calculate: Missing calculateRetirement function or work periods');
@@ -272,7 +353,7 @@ function RetirementPlannerApp() {
                 React.createElement('button', {
                     key: 'dashboard',
                     onClick: function() { setViewMode('dashboard'); },
-                    className: `professional-tab ${viewMode === 'dashboard' ? 'active' : ''}`
+                    className: 'professional-tab' + (viewMode === 'dashboard' ? ' active' : '')
                 }, [
                     React.createElement('span', { key: 'icon' }, '🏠'),
                     ' ',
@@ -281,7 +362,7 @@ function RetirementPlannerApp() {
                 React.createElement('button', {
                     key: 'detailed', 
                     onClick: function() { setViewMode('detailed'); },
-                    className: `professional-tab ${viewMode === 'detailed' ? 'active' : ''}`
+                    className: 'professional-tab' + (viewMode === 'detailed' ? ' active' : '')
                 }, [
                     React.createElement('span', { key: 'icon' }, '📊'),
                     ' ',
@@ -349,7 +430,7 @@ function RetirementPlannerApp() {
                                 React.createElement('span', {
                                     key: 'savings-value',
                                     className: 'font-semibold text-purple-600'
-                                }, window.formatCurrency ? window.formatCurrency(inputs?.currentSavings || 0) : `₪${(inputs?.currentSavings || 0).toLocaleString()}`)
+                                }, window.formatCurrency ? window.formatCurrency(inputs?.currentSavings || 0) : '₪' + (inputs?.currentSavings || 0).toLocaleString())
                             ])
                         ])
                     ]),
