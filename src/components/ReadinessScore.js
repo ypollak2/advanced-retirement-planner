@@ -129,7 +129,7 @@ const ReadinessScore = ({
             setScore(finalScore);
             setScoreDetails({
                 ...factors,
-                retirementGoal: projectedTotalSavings,
+                projectedTotalSavings: projectedTotalSavings,
                 targetSavings: targetRetirementSavings,
                 shortfall: Math.max(0, targetRetirementSavings - projectedTotalSavings)
             });
@@ -341,7 +341,7 @@ const ReadinessScore = ({
                         key: 'factor-score',
                         className: 'text-sm font-semibold',
                         style: { color: scoreDetails[key] >= 70 ? '#10B981' : scoreDetails[key] >= 50 ? '#F59E0B' : '#EF4444' }
-                    }, `${Math.round(scoreDetails[key] || 0)}/100`)
+                    }, `${Math.round(scoreDetails[key] || 0)}%`)
                 ])
             ))
         ]),
