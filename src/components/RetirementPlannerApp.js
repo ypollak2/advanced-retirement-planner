@@ -208,11 +208,7 @@ function RetirementPlannerApp() {
 
     // Translation support with proper fallbacks
     function getTranslations() {
-        if (window.multiLanguage && window.multiLanguage[language]) {
-            return window.multiLanguage[language];
-        }
-        
-        // Fallback translations based on language
+        // Force English when language is 'en', regardless of window.multiLanguage
         if (language === 'en') {
             return {
                 title: 'Advanced Retirement Planner',
@@ -221,15 +217,21 @@ function RetirementPlannerApp() {
                 detailed: 'Detailed View',
                 calculate: 'Calculate'
             };
-        } else {
-            return {
-                title: 'מחשבון פנסיה מתקדם',
-                subtitle: 'כלי מקצועי לתכנון פנסיה עם מעקב השקעות מקיף',
-                dashboard: 'לוח הבקרה',
-                detailed: 'מצב מפורט',
-                calculate: 'חשב'
-            };
         }
+        
+        // For Hebrew, try window.multiLanguage first, then fallback
+        if (window.multiLanguage && window.multiLanguage[language]) {
+            return window.multiLanguage[language];
+        }
+        
+        // Hebrew fallback
+        return {
+            title: 'מחשבון פנסיה מתקדם',
+            subtitle: 'כלי מקצועי לתכנון פנסיה עם מעקב השקעות מקיף',
+            dashboard: 'לוח הבקרה',
+            detailed: 'מצב מפורט',
+            calculate: 'חשב'
+        };
     }
     
     var t = getTranslations();
@@ -357,7 +359,7 @@ function RetirementPlannerApp() {
                 }, [
                     React.createElement('span', { key: 'icon' }, '🏠'),
                     ' ',
-                    t.dashboard || 'Dashboard'
+                    language === 'en' ? 'Dashboard' : (t.dashboard || 'Dashboard')
                 ]),
                 React.createElement('button', {
                     key: 'detailed', 
@@ -366,7 +368,7 @@ function RetirementPlannerApp() {
                 }, [
                     React.createElement('span', { key: 'icon' }, '📊'),
                     ' ',
-                    t.detailed || 'Detailed View'
+                    language === 'en' ? 'Detailed View' : (t.detailed || 'Detailed View')
                 ])
             ]),
 
@@ -544,7 +546,7 @@ function RetirementPlannerApp() {
                     }, React.createElement('button', {
                         onClick: handleCalculate,
                         className: 'btn-professional btn-primary'
-                    }, t.calculate || 'Calculate'))
+                    }, language === 'en' ? 'Calculate' : (t.calculate || 'Calculate')))
                 ]),
 
                 // Results Column
