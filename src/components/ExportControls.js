@@ -61,7 +61,7 @@ const ExportControls = ({
         }
     };
 
-    const t = content[language] || content.he;
+    const t = content[language] || content.en;
 
     // Handle image export
     const handleImageExport = async (format) => {

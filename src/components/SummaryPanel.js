@@ -89,7 +89,7 @@ const SummaryPanel = ({
         }
     };
 
-    const t = content[language] || content.he;
+    const t = content[language] || content.en;
 
     // Calculate derived values
     const yearsToRetirement = (inputs.retirementAge || 67) - (inputs.currentAge || 30);

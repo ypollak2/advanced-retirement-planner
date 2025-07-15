@@ -75,7 +75,7 @@ const Dashboard = ({
         }
     };
 
-    const t = content[language] || content.he;
+    const t = content[language] || content.en;
 
     // Load exchange rates
     React.useEffect(() => {

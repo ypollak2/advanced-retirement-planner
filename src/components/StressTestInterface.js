@@ -93,7 +93,7 @@ const StressTestInterface = ({
         }
     };
 
-    const t = content[language] || content.he;
+    const t = content[language] || content.en;
 
     // Initialize comparison data on component mount
     React.useEffect(() => {

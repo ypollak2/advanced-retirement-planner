@@ -66,7 +66,7 @@ const DynamicPartnerCharts = ({
         }
     };
 
-    const t = content[language] || content.he;
+    const t = content[language] || content.en;
 
     // Generate projection data for visualization
     const generateProjectionData = (partnerInputs, isPartner2 = false) => {

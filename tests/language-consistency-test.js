@@ -227,7 +227,39 @@ try {
     failedTests++;
 }
 
-// Test 6: Check for consistent currency formatting
+// Test 6: Check fallback logic in components
+console.log('\n🔄 Testing Component Fallback Logic...');
+
+const componentFallbackTests = [
+    { file: 'src/components/StressTestInterface.js', expected: 'content.en' },
+    { file: 'src/components/Dashboard.js', expected: 'content.en' },
+    { file: 'src/components/SummaryPanel.js', expected: 'content.en' },
+    { file: 'src/components/DynamicPartnerCharts.js', expected: 'content.en' },
+    { file: 'src/components/ExportControls.js', expected: 'content.en' }
+];
+
+componentFallbackTests.forEach(test => {
+    try {
+        const content = fs.readFileSync(test.file, 'utf8');
+        
+        // Check for correct fallback pattern
+        if (content.includes('content[language] || content.en')) {
+            console.log(`✅ PASS: ${test.file} - Falls back to English`);
+            passedTests++;
+        } else if (content.includes('content[language] || content.he')) {
+            console.log(`❌ FAIL: ${test.file} - Falls back to Hebrew instead of English`);
+            issues.push(`${test.file}: Change fallback from content.he to content.en`);
+            failedTests++;
+        } else {
+            console.log(`⚠️  SKIP: ${test.file} - No fallback pattern found`);
+        }
+    } catch (error) {
+        console.log(`❌ ERROR: ${test.file} - ${error.message}`);
+        failedTests++;
+    }
+});
+
+// Test 7: Check for consistent currency formatting
 console.log('\n💰 Testing Currency Formatting Consistency...');
 
 const currencyTests = [
