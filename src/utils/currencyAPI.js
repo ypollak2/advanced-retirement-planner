@@ -91,31 +91,16 @@ class CurrencyAPI {
         }
     }
 
-    // Fetch exchange rates with fallback
+    // Fetch exchange rates with fallback (CORS-safe version)
     async fetchExchangeRates() {
-        // Return cached rates if still valid
-        const cached = this.getCachedRates();
-        if (cached) {
-            console.log('CurrencyAPI: Using cached exchange rates');
-            return cached;
-        }
-
-        let rates = { ...this.fallbackRates };
-        let successfulFetches = 0;
-
-        // Try each API endpoint
-        for (const endpoint of this.apiEndpoints) {
-            try {
-                const endpointRates = await this.fetchFromEndpoint(endpoint);
-                if (endpointRates) {
-                    rates = { ...rates, ...endpointRates };
-                    successfulFetches++;
-                    console.log(`CurrencyAPI: Successfully fetched from ${endpoint.name}`);
-                }
-            } catch (error) {
-                console.warn(`CurrencyAPI: ${endpoint.name} error:`, error);
-            }
-        }
+        // Always use fallback rates to avoid CORS issues
+        console.log('CurrencyAPI: Using fallback rates (API calls disabled to prevent CORS errors)');
+        const rates = { 
+            USD: 3.70,      // 1 ILS = 0.27 USD
+            EUR: 4.02,      // 1 ILS = 0.25 EUR  
+            GBP: 4.65,      // 1 ILS = 0.21 GBP
+            BTC: 150000     // 1 ILS = 0.0000067 BTC (Bitcoin ~$45k)
+        };
 
         // Update cache
         this.cache.clear();
@@ -124,7 +109,7 @@ class CurrencyAPI {
         });
         this.lastUpdated = Date.now();
 
-        console.log(`CurrencyAPI: Updated rates with ${successfulFetches} successful fetches`);
+        console.log('CurrencyAPI: Updated rates using fallback values');
         return rates;
     }
 

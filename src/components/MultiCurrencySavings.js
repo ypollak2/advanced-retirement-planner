@@ -1,6 +1,6 @@
 // Multi-Currency Savings Display Component
 // Shows savings values in multiple currencies with real-time conversion
-// Created by Yali Pollak (יהלי פולק) - v5.3.2
+// Created by Yali Pollak (יהלי פולק) - v5.3.3
 
 function MultiCurrencySavings(props) {
     const amount = props.amount;
@@ -75,12 +75,12 @@ function MultiCurrencySavings(props) {
                 console.error('MultiCurrencySavings: Error loading rates:', err);
                 setError(err.message);
                 
-                // Use fallback rates
+                // Use fallback rates (1 ILS = X foreign currency)
                 setRates({
-                    USD: 3.70,
-                    EUR: 4.02,
-                    GBP: 4.65,
-                    BTC: 0.0000025
+                    USD: 3.70,      // 1 ILS = 0.27 USD
+                    EUR: 4.02,      // 1 ILS = 0.25 EUR  
+                    GBP: 4.65,      // 1 ILS = 0.21 GBP
+                    BTC: 150000     // 1 ILS = 0.0000067 BTC (Bitcoin ~$45k)
                 });
             } finally {
                 setIsLoading(false);
@@ -105,10 +105,17 @@ function MultiCurrencySavings(props) {
     // Format currency amount
     const formatCurrency = (amount, currency) => {
         const info = currencyInfo[currency];
-        if (!info) return `${amount.toFixed(2)} ${currency}`;
+        if (!info || !amount || isNaN(amount)) return `${currency} 0`;
 
         if (currency === 'BTC') {
-            return `${info.symbol}${amount.toFixed(6)}`;
+            // Special handling for Bitcoin - show appropriate decimal places
+            if (amount >= 1) {
+                return `${info.symbol}${amount.toFixed(2)}`;
+            } else if (amount >= 0.01) {
+                return `${info.symbol}${amount.toFixed(4)}`;
+            } else {
+                return `${info.symbol}${amount.toFixed(8)}`;
+            }
         }
 
         const formatter = new Intl.NumberFormat(language === 'he' ? 'he-IL' : 'en-US', {

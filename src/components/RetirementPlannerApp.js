@@ -1,5 +1,5 @@
 // Advanced Retirement Planner - Guided Intelligence UI Design
-// Created by Yali Pollak (יהלי פולק) - v5.3.2
+// Created by Yali Pollak (יהלי פולק) - v5.3.3
 
 function RetirementPlannerApp() {
     const [language, setLanguage] = React.useState('en');
@@ -232,7 +232,7 @@ function RetirementPlannerApp() {
         // Enhanced Professional Header
         React.createElement('header', {
             key: 'header',
-            className: 'professional-header-enhanced'
+            className: `professional-header-enhanced ${sidebarCollapsed ? 'sidebar-collapsed' : ''} ${language === 'he' ? 'rtl' : ''}`
         }, [
             // Header content wrapper
             React.createElement('div', {
@@ -262,7 +262,7 @@ function RetirementPlannerApp() {
                     React.createElement('div', {
                         key: 'version-display',
                         className: 'header-version'
-                    }, 'v5.3.2'),
+                    }, 'v5.3.3'),
                     
                     // Currency selector
                     React.createElement('select', {
@@ -456,7 +456,7 @@ function RetirementPlannerApp() {
                 React.createElement('span', {
                     key: 'version',
                     className: 'version'
-                }, 'v5.3.2'),
+                }, 'v5.3.3'),
                 ' • Created by ',
                 React.createElement('span', {
                     key: 'author',

@@ -96,10 +96,26 @@ body {
 .professional-header-enhanced {
   background: linear-gradient(135deg, var(--trust-blue) 0%, var(--stability-navy) 100%);
   color: var(--white);
-  padding: var(--spacing-xl) var(--spacing-lg);
+  padding: var(--spacing-lg) var(--spacing-lg);
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-xl);
+  margin-left: 320px;
+  transition: margin-left 0.3s ease;
+}
+
+/* Header layout for sidebar states */
+.professional-header-enhanced.sidebar-collapsed {
+  margin-left: 60px;
+}
+
+.professional-header-enhanced.rtl {
+  margin-left: 0;
+  margin-right: 320px;
+}
+
+.professional-header-enhanced.rtl.sidebar-collapsed {
+  margin-right: 60px;
 }
 
 .professional-header-enhanced::before {
@@ -194,6 +210,8 @@ body {
 @media (max-width: 768px) {
   .professional-header-enhanced {
     padding: var(--spacing-lg) var(--spacing-md);
+    margin-left: 0 !important;
+    margin-right: 0 !important;
   }
   
   .header-content-wrapper {
@@ -1579,6 +1597,8 @@ textarea {
   padding: var(--spacing-lg);
   overflow-y: auto;
   background: var(--gray-50);
+  min-height: 0; /* Important for flexbox scrolling */
+  max-height: calc(100vh - 200px); /* Ensure proper height */
 }
 
 .permanent-side-panel .tab-content::-webkit-scrollbar {
@@ -1804,6 +1824,8 @@ textarea {
 .main-content-with-sidebar {
   margin-left: 320px;
   transition: margin-left 0.3s ease;
+  min-height: 100vh;
+  position: relative;
 }
 
 .main-content-with-sidebar.sidebar-collapsed {

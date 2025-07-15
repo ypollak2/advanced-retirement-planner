@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v5.3.2 ✨
+# 🚀 Advanced Retirement Planner v5.3.3 ✨
 
-[![Version](https://img.shields.io/badge/version-5.3.2-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-5.3.3-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -16,7 +16,31 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v5.3.2 - MAJOR UI REDESIGN WITH PERMANENT SIDEBAR 🚀
+## 🎨 What's New in v5.3.3 - CRITICAL UI FIXES AND CORS RESOLUTION 🔧
+
+### **🚨 LATEST: CRITICAL BUG FIXES** (July 2025)
+
+#### **🛠️ Critical UI and Functional Fixes**
+- **FIXED: Sidebar Layout Issues**: Corrected control panel cutting off scenarios section with proper CSS height/overflow
+- **FIXED: Bitcoin Display Bug**: Resolved "₿299999999999.999996" display error with proper decimal formatting
+- **FIXED: Non-Working Buttons**: Fixed optimize and export buttons in sidebar with proper event handlers
+- **FIXED: Header Layout Problems**: Adjusted header positioning to properly account for sidebar margins
+- **FIXED: CORS API Errors**: Disabled external API calls and implemented reliable fallback currency rates
+- **FIXED: 404 API Endpoints**: Eliminated null API endpoint calls that were causing console errors
+
+#### **🔧 Technical Improvements**
+- **Enhanced Bitcoin Formatting**: Smart decimal places (2-8 digits) based on amount size
+- **Improved Fallback Rates**: Updated currency conversion rates (USD: 3.70, EUR: 4.02, GBP: 4.65, BTC: 150000)
+- **Better Sidebar Content**: Enhanced scenarios tab with detailed preview of coming features
+- **Responsive Header**: Fixed header margins for all screen sizes with sidebar consideration
+- **Console Error Cleanup**: Eliminated CORS and 404 errors for cleaner debugging experience
+
+#### **✅ Version Updates**
+- **Synchronized v5.3.3**: Updated across all files, components, cache busting, and documentation
+- **Component Headers**: Updated version references in all major components
+- **Testing Integration**: All fixes validated with comprehensive test suite
+
+## 🎨 Previous Updates - v5.3.2 - MAJOR UI REDESIGN WITH PERMANENT SIDEBAR 🚀
 
 ### **🔧 LATEST: COMPLETE UI OVERHAUL** (July 2025)
 

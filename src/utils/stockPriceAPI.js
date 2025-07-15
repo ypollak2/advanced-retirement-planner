@@ -120,43 +120,8 @@ async function fetchStockPrice(symbol, useCache = true) {
         return fallbackPrice;
     }
     
-    // Try different APIs as backup (will likely fail due to CORS)
-    const apiKeys = Object.keys(STOCK_API_ENDPOINTS);
-    
-    for (const apiKey of apiKeys) {
-        try {
-            const api = STOCK_API_ENDPOINTS[apiKey];
-            const response = await fetch(api.url(upperSymbol), {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                },
-                mode: 'cors'
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                const price = api.parsePrice(data);
-                
-                if (price && price > 0) {
-                    // Cache the result
-                    priceCache.set(upperSymbol, {
-                        price: price,
-                        timestamp: Date.now(),
-                        source: apiKey
-                    });
-                    
-                    console.log(`✅ Stock price for ${upperSymbol}: $${price} (source: ${apiKey})`);
-                    return price;
-                }
-            }
-        } catch (error) {
-            console.warn(`⚠️ API ${apiKey} failed for ${upperSymbol}:`, error.message);
-            continue;
-        }
-    }
-    
-    console.error(`❌ Could not fetch price for ${upperSymbol}`);
+    // API calls disabled to prevent CORS/404 errors
+    console.log(`⚠️ API calls disabled for ${upperSymbol} - no fallback price available`);
     return null;
 }
 

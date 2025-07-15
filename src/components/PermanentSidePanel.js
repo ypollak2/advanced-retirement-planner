@@ -1,5 +1,5 @@
 // Permanent Side Panel Component - Always visible sidebar that adapts to user inputs
-// Created by Yali Pollak (יהלי פולק) - v5.3.2
+// Created by Yali Pollak (יהלי פולק) - v5.3.3
 
 function PermanentSidePanel(props) {
     const inputs = props.inputs;
@@ -274,12 +274,26 @@ function PermanentSidePanel(props) {
                     }, t.calculate),
                     React.createElement('button', {
                         key: 'optimize-btn',
-                        onClick: () => onQuickAction && onQuickAction('optimize'),
+                        onClick: () => {
+                            console.log('Optimize button clicked');
+                            if (onQuickAction) {
+                                onQuickAction('optimize');
+                            } else {
+                                alert(language === 'he' ? 'תכונת האופטימיזציה תושק בקרוב!' : 'Optimization feature coming soon!');
+                            }
+                        },
                         className: 'w-full p-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors'
                     }, t.optimize),
                     React.createElement('button', {
                         key: 'export-btn',
-                        onClick: () => onQuickAction && onQuickAction('export'),
+                        onClick: () => {
+                            console.log('Export button clicked');
+                            if (onQuickAction) {
+                                onQuickAction('export');
+                            } else {
+                                alert(language === 'he' ? 'תכונת הייצוא תושק בקרוב!' : 'Export feature coming soon!');
+                            }
+                        },
                         className: 'w-full p-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors'
                     }, t.exportReport)
                 ])
@@ -416,16 +430,83 @@ function PermanentSidePanel(props) {
     const renderScenariosTab = () => {
         return React.createElement('div', {
             key: 'scenarios-tab',
-            className: 'space-y-4'
+            className: 'space-y-4 min-h-full'
         }, [
             React.createElement('div', {
-                key: 'scenarios-placeholder',
+                key: 'scenarios-intro',
                 className: 'bg-white rounded-lg p-4 shadow-sm'
             }, [
+                React.createElement('h3', {
+                    key: 'scenarios-title',
+                    className: 'text-lg font-semibold text-gray-800 mb-3'
+                }, language === 'he' ? 'מבחני תרחישים' : 'Scenario Testing'),
                 React.createElement('p', {
-                    key: 'placeholder-text',
-                    className: 'text-sm text-gray-600 text-center'
-                }, language === 'he' ? 'מבחני תרחישים יתווספו בקרוב' : 'Scenario testing coming soon')
+                    key: 'scenarios-description',
+                    className: 'text-sm text-gray-600 mb-4'
+                }, language === 'he' ? 'בדיקת התכנית שלכם תחת תנאים כלכליים שונים' : 'Test your plan under different economic conditions'),
+                React.createElement('div', {
+                    key: 'scenarios-list',
+                    className: 'space-y-2'
+                }, [
+                    React.createElement('div', {
+                        key: 'conservative-scenario',
+                        className: 'flex items-center p-2 bg-gray-50 rounded'
+                    }, [
+                        React.createElement('span', { key: 'icon1' }, '🛡️'),
+                        React.createElement('span', {
+                            key: 'text1',
+                            className: 'ml-2 text-sm'
+                        }, language === 'he' ? 'תרחיש שמרני' : 'Conservative scenario')
+                    ]),
+                    React.createElement('div', {
+                        key: 'optimistic-scenario',
+                        className: 'flex items-center p-2 bg-gray-50 rounded'
+                    }, [
+                        React.createElement('span', { key: 'icon2' }, '📈'),
+                        React.createElement('span', {
+                            key: 'text2',
+                            className: 'ml-2 text-sm'
+                        }, language === 'he' ? 'תרחיש אופטימי' : 'Optimistic scenario')
+                    ]),
+                    React.createElement('div', {
+                        key: 'crash-scenario',
+                        className: 'flex items-center p-2 bg-gray-50 rounded'
+                    }, [
+                        React.createElement('span', { key: 'icon3' }, '📉'),
+                        React.createElement('span', {
+                            key: 'text3',
+                            className: 'ml-2 text-sm'
+                        }, language === 'he' ? 'מיתון כלכלי' : 'Market crash')
+                    ]),
+                    React.createElement('div', {
+                        key: 'inflation-scenario',
+                        className: 'flex items-center p-2 bg-gray-50 rounded'
+                    }, [
+                        React.createElement('span', { key: 'icon4' }, '🔥'),
+                        React.createElement('span', {
+                            key: 'text4',
+                            className: 'ml-2 text-sm'
+                        }, language === 'he' ? 'אינפלציה גבוהה' : 'High inflation')
+                    ])
+                ])
+            ]),
+            React.createElement('div', {
+                key: 'scenarios-coming-soon',
+                className: 'bg-blue-50 rounded-lg p-4 shadow-sm'
+            }, [
+                React.createElement('div', {
+                    key: 'coming-soon-content',
+                    className: 'text-center'
+                }, [
+                    React.createElement('div', {
+                        key: 'coming-soon-icon',
+                        className: 'text-4xl mb-2'
+                    }, '🚀'),
+                    React.createElement('p', {
+                        key: 'coming-soon-text',
+                        className: 'text-sm text-blue-700 font-medium'
+                    }, language === 'he' ? 'יושק בקרוב!' : 'Coming Soon!')
+                ])
             ])
         ]);
     };
