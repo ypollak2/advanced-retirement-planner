@@ -126,7 +126,7 @@ function RetirementPlannerApp() {
     ]);
 
     // Translation support with proper fallbacks
-    const getTranslations = () => {
+    function getTranslations() {
         if (window.multiLanguage && window.multiLanguage[language]) {
             return window.multiLanguage[language];
         }
@@ -149,12 +149,12 @@ function RetirementPlannerApp() {
                 calculate: 'חשב'
             };
         }
-    };
+    }
     
     const t = getTranslations();
 
     // Calculate function with error handling
-    const handleCalculate = () => {
+    function handleCalculate() {
         try {
             if (window.calculateRetirement && workPeriods && workPeriods.length > 0) {
                 const result = window.calculateRetirement(inputs, workPeriods, [], []);
@@ -177,18 +177,18 @@ function RetirementPlannerApp() {
                 error: error.message
             });
         }
-    };
+    }
 
     // Handle section expansion from dashboard
-    const handleSectionExpand = (sectionId, isExpanded) => {
+    function handleSectionExpand(sectionId, isExpanded) {
         if (isExpanded) {
             setActiveSection(sectionId);
             setViewMode('detailed');
         }
-    };
+    }
 
     // Handle quick actions from sidebar
-    const handleQuickAction = (action) => {
+    function handleQuickAction(action) {
         switch(action) {
             case 'calculate':
                 handleCalculate();
@@ -204,102 +204,65 @@ function RetirementPlannerApp() {
             default:
                 console.log('Unknown action:', action);
         }
-    };
+    }
 
     // Handle input changes from sidebar
-    const handleInputChange = (field, value) => {
-        setInputs(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
+    function handleInputChange(field, value) {
+        setInputs(function(prev) {
+            var newInputs = {};
+            for (var key in prev) {
+                newInputs[key] = prev[key];
+            }
+            newInputs[field] = value;
+            return newInputs;
+        });
+    }
 
     return React.createElement('div', {
         className: 'min-h-screen',
         dir: language === 'he' ? 'rtl' : 'ltr'
     }, [
-        // Permanent Side Panel
-        window.PermanentSidePanel && React.createElement(window.PermanentSidePanel, {
-            key: 'permanent-sidebar',
-            inputs: inputs,
-            results: results,
-            workingCurrency: workingCurrency,
-            language: language,
-            formatCurrency: window.formatCurrency,
-            onInputChange: handleInputChange,
-            onQuickAction: handleQuickAction
-        }),
-        // Enhanced Professional Header
+        // Simplified Professional Header
         React.createElement('header', {
             key: 'header',
-            className: `professional-header-enhanced ${sidebarCollapsed ? 'sidebar-collapsed' : ''} ${language === 'he' ? 'rtl' : ''}`
+            className: 'professional-header-simple'
         }, [
-            // Header content wrapper
             React.createElement('div', {
                 key: 'header-content',
-                className: 'header-content-wrapper'
+                className: 'max-w-7xl mx-auto px-4 py-6 flex justify-between items-center'
             }, [
-                // Left side - Title and subtitle
+                // Title section
                 React.createElement('div', {
-                    key: 'title-section',
-                    className: 'header-title-section'
+                    key: 'title-section'
                 }, [
                     React.createElement('h1', {
                         key: 'title',
-                        className: 'header-title animate-fade-in-up'
+                        className: 'text-2xl font-bold text-white'
                     }, t.title),
                     React.createElement('p', {
                         key: 'subtitle',
-                        className: 'header-subtitle animate-fade-in-up'
+                        className: 'text-blue-100 text-sm'
                     }, t.subtitle)
                 ]),
                 
-                // Right side - Language toggle and version
+                // Simple controls
                 React.createElement('div', {
                     key: 'header-controls',
-                    className: 'header-controls'
+                    className: 'flex items-center gap-4'
                 }, [
-                    React.createElement('div', {
-                        key: 'version-display',
-                        className: 'header-version'
-                    }, 'v5.3.3'),
-                    
-                    // Currency selector
-                    React.createElement('select', {
-                        key: 'currency-selector',
-                        value: workingCurrency,
-                        onChange: (e) => setWorkingCurrency(e.target.value),
-                        className: 'currency-selector'
-                    }, [
-                        React.createElement('option', { key: 'ils', value: 'ILS' }, '₪ ILS'),
-                        React.createElement('option', { key: 'usd', value: 'USD' }, '$ USD'),
-                        React.createElement('option', { key: 'eur', value: 'EUR' }, '€ EUR'),
-                        React.createElement('option', { key: 'gbp', value: 'GBP' }, '£ GBP'),
-                        React.createElement('option', { key: 'btc', value: 'BTC' }, '₿ BTC')
-                    ]),
-                    
                     React.createElement('button', {
                         key: 'language-toggle',
-                        onClick: () => setLanguage(language === 'he' ? 'en' : 'he'),
-                        className: 'language-toggle-btn'
-                    }, [
-                        React.createElement('span', {
-                            key: 'flag',
-                            className: 'language-flag'
-                        }, language === 'he' ? '🇺🇸' : '🇮🇱'),
-                        React.createElement('span', {
-                            key: 'text',
-                            className: 'language-text'
-                        }, language === 'he' ? 'English' : 'עברית')
-                    ])
+                        onClick: function() { setLanguage(language === 'he' ? 'en' : 'he'); },
+                        className: 'px-3 py-1 bg-white/20 rounded-lg text-white hover:bg-white/30 transition-colors'
+                    }, language === 'he' ? 'English' : 'עברית')
                 ])
             ])
         ]),
 
-        // Main Container with Dashboard-Centric Design
+        // Main Container with Integrated Control Panel
         React.createElement('div', {
             key: 'container',
-            className: `main-content-with-sidebar ${sidebarCollapsed ? 'sidebar-collapsed' : ''} ${language === 'he' ? 'rtl' : ''} max-w-7xl mx-auto px-4 py-8`
+            className: 'max-w-7xl mx-auto px-4 py-8'
         }, [
             // View Mode Toggle
             React.createElement('div', {
@@ -308,7 +271,7 @@ function RetirementPlannerApp() {
             }, [
                 React.createElement('button', {
                     key: 'dashboard',
-                    onClick: () => setViewMode('dashboard'),
+                    onClick: function() { setViewMode('dashboard'); },
                     className: `professional-tab ${viewMode === 'dashboard' ? 'active' : ''}`
                 }, [
                     React.createElement('span', { key: 'icon' }, '🏠'),
@@ -317,7 +280,7 @@ function RetirementPlannerApp() {
                 ]),
                 React.createElement('button', {
                     key: 'detailed', 
-                    onClick: () => setViewMode('detailed'),
+                    onClick: function() { setViewMode('detailed'); },
                     className: `professional-tab ${viewMode === 'detailed' ? 'active' : ''}`
                 }, [
                     React.createElement('span', { key: 'icon' }, '📊'),
@@ -326,32 +289,121 @@ function RetirementPlannerApp() {
                 ])
             ]),
 
-            // Dashboard View
+            // Dashboard View with Integrated Control Panel
             viewMode === 'dashboard' && React.createElement('div', {
-                key: 'dashboard-view'
+                key: 'dashboard-view',
+                className: 'grid grid-cols-1 lg:grid-cols-4 gap-6'
             }, [
-                // Dashboard Component
-                window.Dashboard && React.createElement(window.Dashboard, {
-                    key: 'dashboard',
-                    inputs: inputs,
-                    results: results,
-                    language: language,
-                    formatCurrency: window.formatCurrency,
-                    onSectionExpand: handleSectionExpand
-                }),
-                
-                // Quick Calculate Button for Dashboard
-                !results && React.createElement('div', {
-                    key: 'quick-calculate',
-                    className: 'text-center mt-8'
-                }, React.createElement('button', {
-                    onClick: handleCalculate,
-                    className: 'btn-professional btn-primary btn-large'
+                // Integrated Control Panel (left side)
+                React.createElement('div', {
+                    key: 'control-panel',
+                    className: 'lg:col-span-1 space-y-6'
                 }, [
-                    React.createElement('span', { key: 'icon' }, '🚀'),
-                    ' ',
-                    t.calculate || 'חשב את התכנית שלי'
-                ]))
+                    // Quick Stats Card
+                    React.createElement('div', {
+                        key: 'quick-stats',
+                        className: 'bg-white rounded-xl p-6 shadow-sm border border-gray-200'
+                    }, [
+                        React.createElement('h3', {
+                            key: 'stats-title',
+                            className: 'text-lg font-semibold text-gray-800 mb-4'
+                        }, language === 'he' ? 'סטטיסטיקות מהירות' : 'Quick Stats'),
+                        React.createElement('div', {
+                            key: 'stats-grid',
+                            className: 'space-y-3'
+                        }, [
+                            React.createElement('div', {
+                                key: 'age-stat',
+                                className: 'flex justify-between'
+                            }, [
+                                React.createElement('span', {
+                                    key: 'age-label',
+                                    className: 'text-gray-600'
+                                }, language === 'he' ? 'גיל נוכחי' : 'Current Age'),
+                                React.createElement('span', {
+                                    key: 'age-value',
+                                    className: 'font-semibold text-blue-600'
+                                }, inputs?.currentAge || 30)
+                            ]),
+                            React.createElement('div', {
+                                key: 'retirement-stat',
+                                className: 'flex justify-between'
+                            }, [
+                                React.createElement('span', {
+                                    key: 'retirement-label',
+                                    className: 'text-gray-600'
+                                }, language === 'he' ? 'גיל פרישה' : 'Retirement Age'),
+                                React.createElement('span', {
+                                    key: 'retirement-value',
+                                    className: 'font-semibold text-green-600'
+                                }, inputs?.retirementAge || 67)
+                            ]),
+                            React.createElement('div', {
+                                key: 'savings-stat',
+                                className: 'flex justify-between'
+                            }, [
+                                React.createElement('span', {
+                                    key: 'savings-label',
+                                    className: 'text-gray-600'
+                                }, language === 'he' ? 'חיסכון נוכחי' : 'Current Savings'),
+                                React.createElement('span', {
+                                    key: 'savings-value',
+                                    className: 'font-semibold text-purple-600'
+                                }, window.formatCurrency ? window.formatCurrency(inputs?.currentSavings || 0) : `₪${(inputs?.currentSavings || 0).toLocaleString()}`)
+                            ])
+                        ])
+                    ]),
+                    
+                    // Quick Actions Card
+                    React.createElement('div', {
+                        key: 'quick-actions',
+                        className: 'bg-white rounded-xl p-6 shadow-sm border border-gray-200'
+                    }, [
+                        React.createElement('h3', {
+                            key: 'actions-title',
+                            className: 'text-lg font-semibold text-gray-800 mb-4'
+                        }, language === 'he' ? 'פעולות מהירות' : 'Quick Actions'),
+                        React.createElement('div', {
+                            key: 'actions-buttons',
+                            className: 'space-y-3'
+                        }, [
+                            React.createElement('button', {
+                                key: 'calculate-btn',
+                                onClick: handleCalculate,
+                                className: 'w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium'
+                            }, [
+                                React.createElement('span', { key: 'icon' }, '🚀'),
+                                ' ',
+                                language === 'he' ? 'חשב תכנית' : 'Calculate Plan'
+                            ]),
+                            React.createElement('button', {
+                                key: 'detailed-btn',
+                                onClick: function() { setViewMode('detailed'); },
+                                className: 'w-full px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium'
+                            }, [
+                                React.createElement('span', { key: 'icon' }, '📊'),
+                                ' ',
+                                language === 'he' ? 'מצב מפורט' : 'Detailed View'
+                            ])
+                        ])
+                    ])
+                ]),
+                
+                // Main Dashboard Content (right side)
+                React.createElement('div', {
+                    key: 'dashboard-content',
+                    className: 'lg:col-span-3'
+                }, [
+                    // Dashboard Component
+                    window.Dashboard && React.createElement(window.Dashboard, {
+                        key: 'dashboard',
+                        inputs: inputs,
+                        results: results,
+                        language: language,
+                        formatCurrency: window.formatCurrency,
+                        onSectionExpand: handleSectionExpand
+                    })
+                ])
             ]),
 
             // Detailed View
@@ -371,9 +423,9 @@ function RetirementPlannerApp() {
                         setInputs,
                         language,
                         t,
-                        Calculator: () => React.createElement('span', {}, '📊'),
-                        PiggyBank: () => React.createElement('span', {}, '🏛️'),
-                        DollarSign: () => React.createElement('span', {}, '💰')
+                        Calculator: function() { return React.createElement('span', {}, '📊'); },
+                        PiggyBank: function() { return React.createElement('span', {}, '🏛️'); },
+                        DollarSign: function() { return React.createElement('span', {}, '💰'); }
                     }),
                     
                     activeSection === 'investments' && window.AdvancedInputs && React.createElement(window.AdvancedInputs, {
@@ -382,14 +434,14 @@ function RetirementPlannerApp() {
                         setInputs,
                         language,
                         t,
-                        Settings: () => React.createElement('span', {}, '⚙️'),
-                        PiggyBank: () => React.createElement('span', {}, '🏛️'),
-                        DollarSign: () => React.createElement('span', {}, '💰'),
-                        TrendingUp: () => React.createElement('span', {}, '📈'),
-                        Building: () => React.createElement('span', {}, '🏢'),
-                        Globe: () => React.createElement('span', {}, '🌍'),
-                        Plus: () => React.createElement('span', {}, '➕'),
-                        Trash2: () => React.createElement('span', {}, '🗑️')
+                        Settings: function() { return React.createElement('span', {}, '⚙️'); },
+                        PiggyBank: function() { return React.createElement('span', {}, '🏛️'); },
+                        DollarSign: function() { return React.createElement('span', {}, '💰'); },
+                        TrendingUp: function() { return React.createElement('span', {}, '📈'); },
+                        Building: function() { return React.createElement('span', {}, '🏢'); },
+                        Globe: function() { return React.createElement('span', {}, '🌍'); },
+                        Plus: function() { return React.createElement('span', {}, '➕'); },
+                        Trash2: function() { return React.createElement('span', {}, '🗑️'); }
                     }),
                     
                     // Default to basic form if no specific section
@@ -399,9 +451,9 @@ function RetirementPlannerApp() {
                         setInputs,
                         language,
                         t,
-                        Calculator: () => React.createElement('span', {}, '📊'),
-                        PiggyBank: () => React.createElement('span', {}, '🏛️'),
-                        DollarSign: () => React.createElement('span', {}, '💰')
+                        Calculator: function() { return React.createElement('span', {}, '📊'); },
+                        PiggyBank: function() { return React.createElement('span', {}, '🏛️'); },
+                        DollarSign: function() { return React.createElement('span', {}, '💰'); }
                     }),
                     
                     // Calculate Button
@@ -430,14 +482,14 @@ function RetirementPlannerApp() {
                     showChart: false,
                     chartData: [],
                     claudeInsights: null,
-                    exportRetirementSummary: () => {},
-                    exportAsImage: () => {},
-                    PiggyBank: () => React.createElement('span', {}, '🏛️'),
-                    Calculator: () => React.createElement('span', {}, '📊'),
-                    DollarSign: () => React.createElement('span', {}, '💰'),
-                    Target: () => React.createElement('span', {}, '🎯'),
-                    AlertCircle: () => React.createElement('span', {}, '⚠️'),
-                    TrendingUp: () => React.createElement('span', {}, '📈'),
+                    exportRetirementSummary: function() {},
+                    exportAsImage: function() {},
+                    PiggyBank: function() { return React.createElement('span', {}, '🏛️'); },
+                    Calculator: function() { return React.createElement('span', {}, '📊'); },
+                    DollarSign: function() { return React.createElement('span', {}, '💰'); },
+                    Target: function() { return React.createElement('span', {}, '🎯'); },
+                    AlertCircle: function() { return React.createElement('span', {}, '⚠️'); },
+                    TrendingUp: function() { return React.createElement('span', {}, '📈'); },
                     SimpleChart: window.SimpleChart,
                     ReadinessScore: window.ReadinessScore
                 }))
