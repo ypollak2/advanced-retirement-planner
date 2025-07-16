@@ -1,52 +1,11 @@
 // Stock Price API Integration for RSU Tracking
 // Created by Yali Pollak (יהלי פולק) - v5.3.1
 
-// Multiple API endpoints for stock price fetching with fallbacks
+// API endpoints are disabled to prevent CORS/security issues
+// Using fallback prices instead for stock price data
 const STOCK_API_ENDPOINTS = {
-    // Alpha Vantage (requires API key - demo mode)
-    alphaVantage: {
-        url: (symbol) => `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=demo`,
-        parsePrice: (data) => {
-            if (data && data['Global Quote'] && data['Global Quote']['05. price']) {
-                return parseFloat(data['Global Quote']['05. price']);
-            }
-            return null;
-        }
-    },
-    
-    // Yahoo Finance (via unofficial API)
-    yahooFinance: {
-        url: (symbol) => `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`,
-        parsePrice: (data) => {
-            if (data && data.chart && data.chart.result && data.chart.result[0] && 
-                data.chart.result[0].meta && data.chart.result[0].meta.regularMarketPrice) {
-                return parseFloat(data.chart.result[0].meta.regularMarketPrice);
-            }
-            return null;
-        }
-    },
-    
-    // Finnhub (requires API key - demo mode)
-    finnhub: {
-        url: (symbol) => `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=demo`,
-        parsePrice: (data) => {
-            if (data && data.c) {
-                return parseFloat(data.c);
-            }
-            return null;
-        }
-    },
-    
-    // IEX Cloud (requires API key - demo mode)
-    iexCloud: {
-        url: (symbol) => `https://cloud.iexapis.com/stable/stock/${symbol}/quote?token=demo`,
-        parsePrice: (data) => {
-            if (data && data.latestPrice) {
-                return parseFloat(data.latestPrice);
-            }
-            return null;
-        }
-    }
+    // Note: External API calls disabled for security and CORS compliance
+    // All stock prices use fallback data below
 };
 
 // Fallback stock prices for major tech companies (updated manually)
