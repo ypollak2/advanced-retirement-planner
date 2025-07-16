@@ -59,21 +59,21 @@ const ResultsPanel = ({
     // Error handling wrapper with currency support
     const safeFormatValue = (value, formatter = null) => {
         try {
+            const currencySymbol = getCurrencySymbol(workingCurrency);
+            
             if (value == null || isNaN(value)) {
-                const symbol = getCurrencySymbol(workingCurrency);
-                return `${symbol}0`;
+                return `${currencySymbol}0`;
             }
             
             if (formatter && typeof formatter === 'function') {
                 return formatter(value);
             }
             
-            const symbol = getCurrencySymbol(workingCurrency);
-            return `${symbol}${value.toLocaleString()}`;
+            return `${currencySymbol}${value.toLocaleString()}`;
         } catch (error) {
             console.error('RetirementResultsPanel: Error formatting value:', error);
-            const symbol = getCurrencySymbol(workingCurrency);
-            return `${symbol}0`;
+            const fallbackSymbol = getCurrencySymbol(workingCurrency);
+            return `${fallbackSymbol}0`;
         }
     };
     
