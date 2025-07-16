@@ -1,4 +1,18 @@
-const BasicInputs = ({ inputs, setInputs, language, t, Calculator, PiggyBank, DollarSign }) => {
+const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', Calculator, PiggyBank, DollarSign }) => {
+    // Currency symbol helper
+    const getCurrencySymbol = (currency) => {
+        const symbols = {
+            'ILS': '₪',
+            'USD': '$',
+            'EUR': '€',
+            'GBP': '£',
+            'BTC': '₿',
+            'ETH': 'Ξ'
+        };
+        return symbols[currency] || '₪';
+    };
+    
+    const currencySymbol = getCurrencySymbol(workingCurrency);
         return React.createElement('div', { className: "space-y-6" }, [
             // Basic Data Section
             React.createElement('div', { 
@@ -119,7 +133,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, Calculator, PiggyBank, Do
                                         React.createElement('label', { 
                                             key: 'partner1-salary-label',
                                             className: "block text-sm font-medium text-gray-700 mb-1" 
-                                        }, language === 'he' ? 'משכורת חודשית (₪)' : 'Monthly Salary (₪)'),
+                                        }, language === 'he' ? `משכורת חודשית (${currencySymbol})` : `Monthly Salary (${currencySymbol})`),
                                         React.createElement('input', {
                                             key: 'partner1-salary-input',
                                             type: 'number',
@@ -160,7 +174,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, Calculator, PiggyBank, Do
                                         React.createElement('label', { 
                                             key: 'partner1-current-savings-label',
                                             className: "block text-sm font-medium text-gray-700 mb-1" 
-                                        }, language === 'he' ? 'חיסכון קיים (₪)' : 'Current Savings (₪)'),
+                                        }, language === 'he' ? `חיסכון קיים (${currencySymbol})` : `Current Savings (${currencySymbol})`),
                                         React.createElement('input', {
                                             key: 'partner1-current-savings-input',
                                             type: 'number',
@@ -212,7 +226,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, Calculator, PiggyBank, Do
                                         React.createElement('label', { 
                                             key: 'partner2-salary-label',
                                             className: "block text-sm font-medium text-gray-700 mb-1" 
-                                        }, language === 'he' ? 'משכורת חודשית (₪)' : 'Monthly Salary (₪)'),
+                                        }, language === 'he' ? `משכורת חודשית (${currencySymbol})` : `Monthly Salary (${currencySymbol})`),
                                         React.createElement('input', {
                                             key: 'partner2-salary-input',
                                             type: 'number',
@@ -253,7 +267,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, Calculator, PiggyBank, Do
                                         React.createElement('label', { 
                                             key: 'partner2-current-savings-label',
                                             className: "block text-sm font-medium text-gray-700 mb-1" 
-                                        }, language === 'he' ? 'חיסכון קיים (₪)' : 'Current Savings (₪)'),
+                                        }, language === 'he' ? `חיסכון קיים (${currencySymbol})` : `Current Savings (${currencySymbol})`),
                                         React.createElement('input', {
                                             key: 'partner2-current-savings-input',
                                             type: 'number',
@@ -320,7 +334,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, Calculator, PiggyBank, Do
                             React.createElement('label', { 
                                 key: 'savings-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, language === 'he' ? "חיסכון נוכחי בפנסיה (₪)" : "Current Pension Savings (₪)"),
+                            }, language === 'he' ? `חיסכון נוכחי בפנסיה (${currencySymbol})` : `Current Pension Savings (${currencySymbol})`),
                             React.createElement('input', {
                                 key: 'current-savings-input',
                                 type: 'number',
@@ -333,7 +347,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, Calculator, PiggyBank, Do
                             React.createElement('label', { 
                                 key: 'training-fund-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, language === 'he' ? "קרן השתלמות נוכחית (₪)" : "Current Training Fund (₪)"),
+                            }, language === 'he' ? `קרן השתלמות נוכחית (${currencySymbol})` : `Current Training Fund (${currencySymbol})`),
                             React.createElement('input', {
                                 key: 'training-fund-input',
                                 type: 'number',
@@ -351,7 +365,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, Calculator, PiggyBank, Do
                             React.createElement('label', { 
                                 key: 'salary-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, language === 'he' ? "משכורת חודשית (₪)" : "Monthly Salary (₪)"),
+                            }, language === 'he' ? `משכורת חודשית (${currencySymbol})` : `Monthly Salary (${currencySymbol})`),
                             React.createElement('input', {
                                 key: 'monthly-salary-input',
                                 type: 'number',
@@ -381,7 +395,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, Calculator, PiggyBank, Do
                             React.createElement('label', { 
                                 key: 'training-contribution-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, language === 'he' ? "הפקדה חודשית לקרן השתלמות (₪)" : "Monthly Training Fund Contribution (₪)"),
+                            }, language === 'he' ? `הפקדה חודשית לקרן השתלמות (${currencySymbol})` : `Monthly Training Fund Contribution (${currencySymbol})`),
                             React.createElement('input', {
                                 key: 'training-contribution-display',
                                 type: 'number',

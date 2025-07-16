@@ -251,6 +251,42 @@ const CurrencySelector = ({
                 ])
             ]);
         })),
+        
+        // Currency explanation info panel
+        React.createElement('div', {
+            key: 'explanation',
+            className: 'currency-explanation'
+        }, [
+            React.createElement('div', {
+                key: 'info-panel',
+                className: 'bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4'
+            }, [
+                React.createElement('div', {
+                    key: 'info-header',
+                    className: 'flex items-center mb-2'
+                }, [
+                    React.createElement('span', { key: 'icon', className: 'text-blue-600 mr-2' }, '💱'),
+                    React.createElement('h4', {
+                        key: 'title',
+                        className: 'text-sm font-semibold text-blue-800'
+                    }, language === 'he' ? 'מידע על המרת מטבע' : 'Currency Conversion Info')
+                ]),
+                React.createElement('div', {
+                    key: 'info-content',
+                    className: 'text-xs text-blue-700 space-y-1'
+                }, [
+                    React.createElement('p', { key: 'line1' }, language === 'he' ? 
+                        'כל הערכים מוצגים במטבע שנבחר לאחר המרה משקלים.' :
+                        'All values are displayed in the selected currency after conversion from Israeli Shekels.'),
+                    React.createElement('p', { key: 'line2' }, language === 'he' ? 
+                        'שערי החליפין מתעדכנים בזמן אמת כל 5 דקות.' :
+                        'Exchange rates are updated in real-time every 5 minutes.'),
+                    React.createElement('p', { key: 'line3' }, language === 'he' ? 
+                        'החישובים מבוצעים בשקלים ולאחר מכן מומרים למטבע הנבחר.' :
+                        'Calculations are performed in Israeli Shekels and then converted to the selected currency.')
+                ])
+            ])
+        ]),
 
         // Refresh button
         React.createElement('div', {

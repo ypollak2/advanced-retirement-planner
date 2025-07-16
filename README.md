@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v5.3.3 ✨
+# 🚀 Advanced Retirement Planner v5.3.4 ✨
 
-[![Version](https://img.shields.io/badge/version-5.3.3-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-5.3.4-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -16,7 +16,33 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v5.3.3 - CRITICAL UI FIXES AND CORS RESOLUTION 🔧
+## 🎨 What's New in v5.3.4 - MULTI-CURRENCY INTEGRATION 💱
+
+### **🌍 LATEST: COMPLETE CURRENCY SUPPORT** (July 2025)
+
+#### **💱 Multi-Currency Integration**
+- **Dynamic Currency Selection**: Choose from ILS (₪), USD ($), EUR (€), GBP (£), BTC (₿), ETH (Ξ)
+- **Real-Time Conversion**: All values automatically convert when currency is changed
+- **Smart Form Labels**: Form labels update to show selected currency symbol instead of hardcoded ₪
+- **Currency Explanation**: Added informative panel explaining how currency conversion works
+- **Async Value Display**: Created CurrencyValue component for seamless currency conversion
+
+#### **🔧 Technical Implementation**
+- **Enhanced BasicInputs**: Updated 9+ form labels to use dynamic currency symbols
+- **Improved ResultsPanel**: Added currency conversion logic for all displayed values
+- **Updated ReadinessScore**: Currency-aware calculations with proper conversion
+- **Enhanced CurrencySelector**: Added user education panel about conversion rates
+- **Automatic Recalculation**: Results update automatically when currency changes
+
+#### **✅ Supported Currencies**
+- **🇮🇱 ILS (₪)** - Israeli Shekel (base currency for calculations)
+- **🇺🇸 USD ($)** - US Dollar with real-time conversion
+- **🇪🇺 EUR (€)** - Euro with fallback rates
+- **🇬🇧 GBP (£)** - British Pound with conversion
+- **₿ BTC** - Bitcoin with 6-decimal precision
+- **Ξ ETH** - Ethereum with crypto formatting
+
+## 🎨 Previous Updates - v5.3.3 - CRITICAL UI FIXES AND CORS RESOLUTION 🔧
 
 ### **🚨 LATEST: CRITICAL BUG FIXES** (July 2025)
 

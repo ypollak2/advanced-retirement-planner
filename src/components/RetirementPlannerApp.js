@@ -1,5 +1,5 @@
 // Advanced Retirement Planner - Guided Intelligence UI Design
-// Created by Yali Pollak (יהלי פולק) - v5.3.3
+// Created by Yali Pollak (יהלי פולק) - v5.3.4
 
 function RetirementPlannerApp() {
     var languageState = React.useState('en');
@@ -235,6 +235,19 @@ function RetirementPlannerApp() {
     }
     
     var t = getTranslations();
+    
+    // Currency symbol helper
+    function getCurrencySymbol(currency) {
+        var symbols = {
+            'ILS': '₪',
+            'USD': '$',
+            'EUR': '€',
+            'GBP': '£',
+            'BTC': '₿',
+            'ETH': 'Ξ'
+        };
+        return symbols[currency] || '₪';
+    }
 
     // Calculate function with error handling
     function handleCalculate() {
@@ -299,6 +312,18 @@ function RetirementPlannerApp() {
             newInputs[field] = value;
             return newInputs;
         });
+    }
+    
+    // Handle currency change with conversion
+    function handleCurrencyChange(newCurrency) {
+        if (newCurrency === workingCurrency) return;
+        
+        setWorkingCurrency(newCurrency);
+        
+        // Force recalculation with new currency
+        if (results) {
+            setTimeout(handleCalculate, 100);
+        }
     }
 
     return React.createElement('div', {
@@ -432,7 +457,7 @@ function RetirementPlannerApp() {
                                 React.createElement('span', {
                                     key: 'savings-value',
                                     className: 'font-semibold text-purple-600'
-                                }, window.formatCurrency ? window.formatCurrency(inputs?.currentSavings || 0) : '₪' + (inputs?.currentSavings || 0).toLocaleString())
+                                }, window.formatCurrency ? window.formatCurrency(inputs?.currentSavings || 0, workingCurrency) : getCurrencySymbol(workingCurrency) + (inputs?.currentSavings || 0).toLocaleString())
                             ])
                         ])
                     ]),
@@ -449,7 +474,7 @@ function RetirementPlannerApp() {
                         window.CurrencySelector && React.createElement(window.CurrencySelector, {
                             key: 'currency-selector-component',
                             selectedCurrency: workingCurrency,
-                            onCurrencyChange: setWorkingCurrency,
+                            onCurrencyChange: handleCurrencyChange,
                             language: language,
                             compact: true,
                             showRates: false
@@ -502,6 +527,7 @@ function RetirementPlannerApp() {
                         inputs: inputs,
                         results: results,
                         language: language,
+                        workingCurrency: workingCurrency,
                         formatCurrency: window.formatCurrency,
                         onSectionExpand: handleSectionExpand
                     })
@@ -525,6 +551,7 @@ function RetirementPlannerApp() {
                         setInputs,
                         language,
                         t,
+                        workingCurrency: workingCurrency,
                         Calculator: function() { return React.createElement('span', {}, '📊'); },
                         PiggyBank: function() { return React.createElement('span', {}, '🏛️'); },
                         DollarSign: function() { return React.createElement('span', {}, '💰'); }
@@ -536,6 +563,7 @@ function RetirementPlannerApp() {
                         setInputs,
                         language,
                         t,
+                        workingCurrency: workingCurrency,
                         Settings: function() { return React.createElement('span', {}, '⚙️'); },
                         PiggyBank: function() { return React.createElement('span', {}, '🏛️'); },
                         DollarSign: function() { return React.createElement('span', {}, '💰'); },
@@ -553,6 +581,7 @@ function RetirementPlannerApp() {
                         setInputs,
                         language,
                         t,
+                        workingCurrency: workingCurrency,
                         Calculator: function() { return React.createElement('span', {}, '📊'); },
                         PiggyBank: function() { return React.createElement('span', {}, '🏛️'); },
                         DollarSign: function() { return React.createElement('span', {}, '💰'); }
@@ -611,7 +640,7 @@ function RetirementPlannerApp() {
                 React.createElement('span', {
                     key: 'version',
                     className: 'version'
-                }, 'v5.3.3'),
+                }, 'v5.3.4'),
                 ' • Created by ',
                 React.createElement('span', {
                     key: 'author',

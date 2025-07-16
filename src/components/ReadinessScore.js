@@ -7,8 +7,21 @@ const ReadinessScore = ({
     currentSavings, 
     monthlyContribution, 
     targetRetirementIncome, 
+    workingCurrency = 'ILS',
     language = 'en' 
 }) => {
+    // Currency symbol helper
+    const getCurrencySymbol = (currency) => {
+        const symbols = {
+            'ILS': '₪',
+            'USD': '$',
+            'EUR': '€',
+            'GBP': '£',
+            'BTC': '₿',
+            'ETH': 'Ξ'
+        };
+        return symbols[currency] || '₪';
+    };
     const [score, setScore] = React.useState(0);
     const [scoreDetails, setScoreDetails] = React.useState({});
     const [recommendations, setRecommendations] = React.useState([]);
@@ -79,14 +92,37 @@ const ReadinessScore = ({
 
     // Calculate retirement readiness score
     React.useEffect(() => {
-        const calculateReadinessScore = () => {
+        const calculateReadinessScore = async () => {
             const yearsToRetirement = retirementAge - currentAge;
             const monthlySavings = monthlyContribution || 0;
             const currentTotal = currentSavings || 0;
             const targetMonthlyIncome = targetRetirementIncome || 0;
             
+            // Convert values to ILS for calculation if needed
+            let currentTotalILS = currentTotal;
+            let monthlySavingsILS = monthlySavings;
+            let targetMonthlyIncomeILS = targetMonthlyIncome;
+            
+            if (workingCurrency !== 'ILS' && window.currencyAPI) {
+                try {
+                    currentTotalILS = await window.currencyAPI.convertAmount(currentTotal, workingCurrency, 'ILS');
+                    monthlySavingsILS = await window.currencyAPI.convertAmount(monthlySavings, workingCurrency, 'ILS');
+                    targetMonthlyIncomeILS = await window.currencyAPI.convertAmount(targetMonthlyIncome, workingCurrency, 'ILS');
+                } catch (error) {
+                    console.warn('Currency conversion failed in ReadinessScore:', error);
+                    // Use fallback conversion
+                    const fallbackRates = {
+                        'USD': 3.7, 'EUR': 4.0, 'GBP': 4.6, 'BTC': 150000, 'ETH': 10000
+                    };
+                    const rate = fallbackRates[workingCurrency] || 1;
+                    currentTotalILS = currentTotal * rate;
+                    monthlySavingsILS = monthlySavings * rate;
+                    targetMonthlyIncomeILS = targetMonthlyIncome * rate;
+                }
+            }
+            
             // Estimated retirement savings needed (25x annual expenses rule)
-            const targetRetirementSavings = targetMonthlyIncome * 12 * 25;
+            const targetRetirementSavings = targetMonthlyIncomeILS * 12 * 25;
             
             // Projected savings at retirement (simple compound interest at 7% annually)
             const annualReturn = 0.07;
@@ -94,19 +130,19 @@ const ReadinessScore = ({
             const totalMonths = yearsToRetirement * 12;
             
             // Future value of current savings
-            const futureCurrentSavings = currentTotal * Math.pow(1 + annualReturn, yearsToRetirement);
+            const futureCurrentSavings = currentTotalILS * Math.pow(1 + annualReturn, yearsToRetirement);
             
             // Future value of monthly contributions
-            const futureContributions = monthlySavings * 
+            const futureContributions = monthlySavingsILS * 
                 (Math.pow(1 + monthlyReturn, totalMonths) - 1) / monthlyReturn;
             
             const projectedTotalSavings = futureCurrentSavings + futureContributions;
             
             // Calculate score factors
             const factors = {
-                savingsRate: calculateSavingsRateScore(monthlySavings, targetMonthlyIncome),
+                savingsRate: calculateSavingsRateScore(monthlySavingsILS, targetMonthlyIncomeILS),
                 timeHorizon: calculateTimeHorizonScore(yearsToRetirement),
-                currentSavings: calculateCurrentSavingsScore(currentTotal, currentAge),
+                currentSavings: calculateCurrentSavingsScore(currentTotalILS, currentAge),
                 retirementGoal: calculateRetirementGoalScore(projectedTotalSavings, targetRetirementSavings),
                 riskManagement: calculateRiskScore(currentAge, yearsToRetirement)
             };
@@ -146,7 +182,7 @@ const ReadinessScore = ({
         if (currentAge && retirementAge && retirementAge > currentAge) {
             calculateReadinessScore();
         }
-    }, [currentAge, retirementAge, currentSavings, monthlyContribution, targetRetirementIncome]);
+    }, [currentAge, retirementAge, currentSavings, monthlyContribution, targetRetirementIncome, workingCurrency]);
 
     // Helper functions for score calculation
     const calculateSavingsRateScore = (monthlySavings, targetIncome) => {

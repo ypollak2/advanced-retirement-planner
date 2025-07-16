@@ -56,8 +56,35 @@ const ResultsPanel = ({
         return symbols[currency] || '₪';
     };
 
+    // Convert amount from ILS to working currency
+    const convertToWorkingCurrency = async (amount) => {
+        if (!amount || workingCurrency === 'ILS') return amount;
+        
+        try {
+            if (window.currencyAPI && window.currencyAPI.convertAmount) {
+                const converted = await window.currencyAPI.convertAmount(amount, 'ILS', workingCurrency);
+                return converted;
+            }
+            
+            // Fallback conversion rates if API not available
+            const fallbackRates = {
+                'USD': 0.27,
+                'EUR': 0.25,
+                'GBP': 0.22,
+                'BTC': 0.0000067,
+                'ETH': 0.0001
+            };
+            
+            const rate = fallbackRates[workingCurrency];
+            return rate ? amount * rate : amount;
+        } catch (error) {
+            console.error('Currency conversion error:', error);
+            return amount;
+        }
+    };
+    
     // Error handling wrapper with currency support
-    const safeFormatValue = (value, formatter = null) => {
+    const safeFormatValue = async (value, formatter = null) => {
         try {
             const currencySymbol = getCurrencySymbol(workingCurrency);
             
@@ -65,11 +92,19 @@ const ResultsPanel = ({
                 return `${currencySymbol}0`;
             }
             
+            // Convert value to working currency
+            const convertedValue = await convertToWorkingCurrency(value);
+            
             if (formatter && typeof formatter === 'function') {
-                return formatter(value);
+                return formatter(convertedValue, workingCurrency);
             }
             
-            return `${currencySymbol}${value.toLocaleString()}`;
+            // Format based on currency type
+            if (workingCurrency === 'BTC' || workingCurrency === 'ETH') {
+                return `${currencySymbol}${convertedValue.toFixed(6)}`;
+            }
+            
+            return `${currencySymbol}${Math.round(convertedValue).toLocaleString()}`;
         } catch (error) {
             console.error('RetirementResultsPanel: Error formatting value:', error);
             const fallbackSymbol = getCurrencySymbol(workingCurrency);
@@ -108,6 +143,7 @@ const ResultsPanel = ({
             currentSavings: inputs?.currentSavings || 50000,
             monthlyContribution: (inputs?.monthlyContribution || 0) + (inputs?.trainingFundMonthly || 0),
             targetRetirementIncome: inputs?.currentMonthlyExpenses || effectiveResults.monthlyIncome || 15000,
+            workingCurrency: workingCurrency,
             language: language
         }),
         
@@ -132,7 +168,12 @@ const ResultsPanel = ({
                         React.createElement('div', { 
                             key: 'value',
                             className: "text-2xl font-bold text-green-600"
-                        }, safeFormatValue(effectiveResults.totalSavings, formatCurrency))
+                        }, React.createElement(CurrencyValue, { 
+                            key: 'total-savings-value',
+                            value: effectiveResults.totalSavings, 
+                            currency: workingCurrency,
+                            formatter: formatCurrency
+                        }))
                     ]),
                     React.createElement('div', { key: 'monthly' }, [
                         React.createElement('div', { 
@@ -142,7 +183,12 @@ const ResultsPanel = ({
                         React.createElement('div', { 
                             key: 'value',
                             className: "text-2xl font-bold text-blue-600"
-                        }, safeFormatValue(effectiveResults.monthlyIncome, formatCurrency))
+                        }, React.createElement(CurrencyValue, { 
+                            key: 'monthly-income-value',
+                            value: effectiveResults.monthlyIncome, 
+                            currency: workingCurrency,
+                            formatter: formatCurrency
+                        }))
                     ])
                 ])
             ])
@@ -189,5 +235,68 @@ const ResultsPanel = ({
     ]);
 };
 
+// Currency Value Component for async conversion
+const CurrencyValue = ({ value, currency, formatter }) => {
+    const [displayValue, setDisplayValue] = React.useState('Loading...');
+    
+    React.useEffect(() => {
+        const formatValue = async () => {
+            try {
+                const symbols = {
+                    'ILS': '₪',
+                    'USD': '$',
+                    'EUR': '€',
+                    'GBP': '£',
+                    'BTC': '₿',
+                    'ETH': 'Ξ'
+                };
+                
+                const currencySymbol = symbols[currency] || '₪';
+                
+                if (!value || isNaN(value)) {
+                    setDisplayValue(`${currencySymbol}0`);
+                    return;
+                }
+                
+                // Convert from ILS to target currency
+                let convertedValue = value;
+                
+                if (currency !== 'ILS' && window.currencyAPI) {
+                    try {
+                        convertedValue = await window.currencyAPI.convertAmount(value, 'ILS', currency);
+                    } catch (error) {
+                        console.warn('Currency conversion failed, using fallback:', error);
+                        // Fallback conversion rates
+                        const fallbackRates = {
+                            'USD': 0.27,
+                            'EUR': 0.25, 
+                            'GBP': 0.22,
+                            'BTC': 0.0000067,
+                            'ETH': 0.0001
+                        };
+                        const rate = fallbackRates[currency];
+                        convertedValue = rate ? value * rate : value;
+                    }
+                }
+                
+                // Format based on currency type
+                if (currency === 'BTC' || currency === 'ETH') {
+                    setDisplayValue(`${currencySymbol}${convertedValue.toFixed(6)}`);
+                } else {
+                    setDisplayValue(`${currencySymbol}${Math.round(convertedValue).toLocaleString()}`);
+                }
+            } catch (error) {
+                console.error('CurrencyValue formatting error:', error);
+                setDisplayValue('Error');
+            }
+        };
+        
+        formatValue();
+    }, [value, currency]);
+    
+    return displayValue;
+};
+
 // Export to window for global access
 window.ResultsPanel = ResultsPanel;
+window.CurrencyValue = CurrencyValue;
