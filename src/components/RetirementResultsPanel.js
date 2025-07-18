@@ -238,63 +238,36 @@ const ResultsPanel = ({
     ]);
 };
 
-// Currency Value Component for async conversion
+// Currency Value Component for async conversion - reuses existing safeFormatValue function
 const CurrencyValue = ({ value, currency, formatter }) => {
     const [displayValue, setDisplayValue] = React.useState('Loading...');
     
     React.useEffect(() => {
-        const formatValue = async () => {
+        const formatAndConvert = async () => {
             try {
-                const symbols = {
-                    'ILS': '₪',
-                    'USD': '$',
-                    'EUR': '€',
-                    'GBP': '£',
-                    'BTC': '₿',
-                    'ETH': 'Ξ'
+                // Convert from ILS to target currency using existing function
+                const targetCurrencyValue = convertToWorkingCurrency(value, currency);
+                
+                // Create a custom formatter for this currency
+                const currencyFormatter = (val) => {
+                    const targetCurrencySymbol = getCurrencySymbol(currency);
+                    if (currency === 'BTC' || currency === 'ETH') {
+                        return `${targetCurrencySymbol}${val.toFixed(6)}`;
+                    } else {
+                        return `${targetCurrencySymbol}${Math.round(val).toLocaleString()}`;
+                    }
                 };
                 
-                const currencySymbol = symbols[currency] || '₪';
-                
-                if (!value || isNaN(value)) {
-                    setDisplayValue(`${currencySymbol}0`);
-                    return;
-                }
-                
-                // Convert from ILS to target currency
-                let convertedValue = value;
-                
-                if (currency !== 'ILS' && window.currencyAPI) {
-                    try {
-                        convertedValue = await window.currencyAPI.convertAmount(value, 'ILS', currency);
-                    } catch (error) {
-                        console.warn('Currency conversion failed, using fallback:', error);
-                        // Fallback conversion rates
-                        const fallbackRates = {
-                            'USD': 0.27,
-                            'EUR': 0.25, 
-                            'GBP': 0.22,
-                            'BTC': 0.0000067,
-                            'ETH': 0.0001
-                        };
-                        const rate = fallbackRates[currency];
-                        convertedValue = rate ? value * rate : value;
-                    }
-                }
-                
-                // Format based on currency type
-                if (currency === 'BTC' || currency === 'ETH') {
-                    setDisplayValue(`${currencySymbol}${convertedValue.toFixed(6)}`);
-                } else {
-                    setDisplayValue(`${currencySymbol}${Math.round(convertedValue).toLocaleString()}`);
-                }
+                // Use the existing safeFormatValue with the converted value
+                const result = await safeFormatValue(targetCurrencyValue, currencyFormatter);
+                setDisplayValue(result);
             } catch (error) {
                 console.error('CurrencyValue formatting error:', error);
                 setDisplayValue('Error');
             }
         };
         
-        formatValue();
+        formatAndConvert();
     }, [value, currency]);
     
     return displayValue;

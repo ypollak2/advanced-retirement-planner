@@ -1,5 +1,5 @@
 // Stock Price API Integration for RSU Tracking
-// Created by Yali Pollak (יהלי פולק) - v5.3.1
+// Created by Yali Pollak (יהלי פולק) - v5.3.5
 
 // API endpoints are disabled to prevent CORS/security issues
 // Using fallback prices instead for stock price data

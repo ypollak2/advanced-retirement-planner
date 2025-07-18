@@ -10,6 +10,7 @@ const Dashboard = ({
     workingCurrency = 'ILS'
 }) => {
     const [exchangeRates, setExchangeRates] = React.useState({});
+    const [selectedCurrency, setSelectedCurrency] = React.useState(workingCurrency || 'ILS');
     const [expandedSections, setExpandedSections] = React.useState({
         pension: false,
         investments: false,

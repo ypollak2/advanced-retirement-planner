@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v5.3.4 ✨
+# 🚀 Advanced Retirement Planner v5.3.5 ✨
 
-[![Version](https://img.shields.io/badge/version-5.3.4-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-5.3.5-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -16,7 +16,7 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v5.3.4 - MULTI-CURRENCY INTEGRATION 💱
+## 🎨 What's New in v5.3.5 - MULTI-CURRENCY INTEGRATION 💱
 
 ### **🌍 LATEST: COMPLETE CURRENCY SUPPORT** (July 2025)
 
