@@ -1,5 +1,5 @@
 // Currency Selector Component - Live exchange rates with visual indicators
-// Created by Yali Pollak (יהלי פולק) - v5.3.1
+// Created by Yali Pollak (יהלי פולק)
 
 const CurrencySelector = ({ 
     selectedCurrency = 'ILS',

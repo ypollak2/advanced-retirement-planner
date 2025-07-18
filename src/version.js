@@ -1,9 +1,9 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "5.3.3",
-    build: "2025-07-15",
-    commit: "v5.3.3-critical-ui-fixes-and-cors-resolution",
-    description: "Critical UI fixes: sidebar layout, Bitcoin display, button functionality, header positioning, CORS API resolution, and 404 error elimination"
+    number: "5.3.4",
+    build: "2025-07-18",
+    commit: "v5.3.4-comprehensive-currency-integration-fixes",
+    description: "Comprehensive currency integration fixes: resolved all hardcoded currency symbols in charts, graphs, summary panels, and stress test scenarios"
 };
 
 // Export version for use in other modules

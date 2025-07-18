@@ -201,7 +201,8 @@ const ResultsPanel = ({
             results: effectiveResults,
             partnerResults: partnerResults,
             language: language,
-            formatCurrency: formatCurrency
+            formatCurrency: formatCurrency,
+            workingCurrency: workingCurrency
         }),
         
         // Summary Panel
@@ -211,7 +212,8 @@ const ResultsPanel = ({
             results: effectiveResults,
             partnerResults: partnerResults,
             language: language,
-            formatCurrency: formatCurrency
+            formatCurrency: formatCurrency,
+            workingCurrency: workingCurrency
         }),
         
         // Stress Test Interface
@@ -221,7 +223,8 @@ const ResultsPanel = ({
             workPeriods: workPeriods,
             results: effectiveResults,
             language: language,
-            formatCurrency: formatCurrency
+            formatCurrency: formatCurrency,
+            workingCurrency: workingCurrency
         }),
         
         // Export Controls

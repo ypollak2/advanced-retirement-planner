@@ -1,5 +1,5 @@
 // Dynamic Partner Charts Component - Real-time visualization for couples planning
-// Created by Yali Pollak (יהלי פולק) - v5.3.1
+// Created by Yali Pollak (יהלי פולק)
 
 const DynamicPartnerCharts = ({ 
     inputs, 
@@ -7,7 +7,8 @@ const DynamicPartnerCharts = ({
     partnerResults, 
     stressTestResults,
     language = 'en',
-    formatCurrency
+    formatCurrency,
+    workingCurrency = 'ILS'
 }) => {
     const [chartView, setChartView] = React.useState('combined');
     const [isUpdating, setIsUpdating] = React.useState(false);
@@ -26,7 +27,7 @@ const DynamicPartnerCharts = ({
             nominalValue: 'ערך נומינלי',
             realValue: 'ערך ריאלי (מותאם לאינפלציה)',
             age: 'גיל',
-            amount: 'סכום (₪)',
+            amount: `סכום (${workingCurrency === 'ILS' ? '₪' : workingCurrency})`,
             instructions: {
                 title: 'הוראות שימוש בגרפים',
                 description: 'הגרפים מציגים תחזיות חיסכון לטווח הארוך עבור תכנון פנסיה זוגי.',
@@ -50,7 +51,7 @@ const DynamicPartnerCharts = ({
             nominalValue: 'Nominal Value',
             realValue: 'Real Value (inflation-adjusted)',
             age: 'Age',
-            amount: 'Amount (₪)',
+            amount: `Amount (${workingCurrency === 'ILS' ? '₪' : workingCurrency})`,
             instructions: {
                 title: 'Chart Usage Instructions',
                 description: 'These charts display long-term savings projections for couples retirement planning.',
@@ -257,7 +258,12 @@ const DynamicPartnerCharts = ({
                         },
                         ticks: {
                             callback: function(value) {
-                                return `₪${(value / 1000000).toFixed(1)}M`;
+                                const getCurrencySymbol = (currency) => {
+                                    const symbols = { 'ILS': '₪', 'USD': '$', 'EUR': '€', 'GBP': '£', 'BTC': '₿', 'ETH': 'Ξ' };
+                                    return symbols[currency] || '₪';
+                                };
+                                const symbol = getCurrencySymbol(workingCurrency);
+                                return `${symbol}${(value / 1000000).toFixed(1)}M`;
                             }
                         }
                     }

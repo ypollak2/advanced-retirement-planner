@@ -1,12 +1,13 @@
 // Stress Test Interface Component - Advanced scenario testing for retirement planning
-// Created by Yali Pollak (יהלי פולק) - v5.3.1
+// Created by Yali Pollak (יהלי פולק)
 
 const StressTestInterface = ({ 
     inputs, 
     workPeriods,
     results,
     language = 'en',
-    formatCurrency
+    formatCurrency,
+    workingCurrency = 'ILS'
 }) => {
     const [activeScenario, setActiveScenario] = React.useState('baseline');
     const [customScenario, setCustomScenario] = React.useState('');
@@ -365,7 +366,7 @@ const StressTestInterface = ({
                     React.createElement('div', {
                         key: 'savings-value',
                         className: 'text-2xl font-bold text-green-600'
-                    }, formatCurrency ? formatCurrency(stressTestResults.totalSavings) : `₪${stressTestResults.totalSavings?.toLocaleString()}`)
+                    }, formatCurrency ? formatCurrency(stressTestResults.totalSavings, workingCurrency) : `₪${stressTestResults.totalSavings?.toLocaleString()}`)
                 ]),
                 React.createElement('div', {
                     key: 'monthly-income',
@@ -378,7 +379,7 @@ const StressTestInterface = ({
                     React.createElement('div', {
                         key: 'income-value',
                         className: 'text-2xl font-bold text-blue-600'
-                    }, formatCurrency ? formatCurrency(stressTestResults.monthlyIncome) : `₪${stressTestResults.monthlyIncome?.toLocaleString()}`)
+                    }, formatCurrency ? formatCurrency(stressTestResults.monthlyIncome, workingCurrency) : `₪${stressTestResults.monthlyIncome?.toLocaleString()}`)
                 ])
             ])
         ]),
@@ -438,11 +439,11 @@ const StressTestInterface = ({
                             React.createElement('td', {
                                 key: 'savings',
                                 className: 'px-4 py-3 text-sm text-gray-600'
-                            }, formatCurrency ? formatCurrency(scenario.data.results?.totalSavings) : `₪${scenario.data.results?.totalSavings?.toLocaleString()}`),
+                            }, formatCurrency ? formatCurrency(scenario.data.results?.totalSavings, workingCurrency) : `₪${scenario.data.results?.totalSavings?.toLocaleString()}`),
                             React.createElement('td', {
                                 key: 'income',
                                 className: 'px-4 py-3 text-sm text-gray-600'
-                            }, formatCurrency ? formatCurrency(scenario.data.results?.monthlyIncome) : `₪${scenario.data.results?.monthlyIncome?.toLocaleString()}`),
+                            }, formatCurrency ? formatCurrency(scenario.data.results?.monthlyIncome, workingCurrency) : `₪${scenario.data.results?.monthlyIncome?.toLocaleString()}`),
                             React.createElement('td', {
                                 key: 'difference',
                                 className: `px-4 py-3 text-sm font-medium ${

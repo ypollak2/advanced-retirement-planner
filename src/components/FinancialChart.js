@@ -1,6 +1,6 @@
 // FinancialChart.js - Chart component using Chart.js with partner data support
 
-const SimpleChart = ({ data, type = 'line', language = 'en', partnerData = null, chartView = 'combined' }) => {
+const SimpleChart = ({ data, type = 'line', language = 'en', partnerData = null, chartView = 'combined', workingCurrency = 'ILS' }) => {
     const chartRef = React.useRef(null);
     const chartInstance = React.useRef(null);
     
@@ -184,12 +184,17 @@ const SimpleChart = ({ data, type = 'line', language = 'en', partnerData = null,
                                 callback: function(value) {
                                     if (data[0] && data[0].pensionSavings !== undefined) {
                                         // Accumulation chart - show currency
+                                        const getCurrencySymbol = (currency) => {
+                                            const symbols = { 'ILS': '₪', 'USD': '$', 'EUR': '€', 'GBP': '£', 'BTC': '₿', 'ETH': 'Ξ' };
+                                            return symbols[currency] || '₪';
+                                        };
+                                        const symbol = getCurrencySymbol(workingCurrency);
                                         if (value >= 1000000) {
-                                            return '₪' + (value / 1000000).toFixed(1) + 'M';
+                                            return symbol + (value / 1000000).toFixed(1) + 'M';
                                         } else if (value >= 1000) {
-                                            return '₪' + (value / 1000).toFixed(0) + 'K';
+                                            return symbol + (value / 1000).toFixed(0) + 'K';
                                         } else {
-                                            return '₪' + value.toFixed(0);
+                                            return symbol + value.toFixed(0);
                                         }
                                     } else {
                                         // Index chart - show percentage
@@ -234,12 +239,17 @@ const SimpleChart = ({ data, type = 'line', language = 'en', partnerData = null,
                                         if (data[0] && data[0].pensionSavings !== undefined) {
                                             // Currency formatting for accumulation chart
                                             const value = context.parsed.y;
+                                            const getCurrencySymbol = (currency) => {
+                                                const symbols = { 'ILS': '₪', 'USD': '$', 'EUR': '€', 'GBP': '£', 'BTC': '₿', 'ETH': 'Ξ' };
+                                                return symbols[currency] || '₪';
+                                            };
+                                            const symbol = getCurrencySymbol(workingCurrency);
                                             if (value >= 1000000) {
-                                                label += '₪' + (value / 1000000).toFixed(1) + 'M';
+                                                label += symbol + (value / 1000000).toFixed(1) + 'M';
                                             } else if (value >= 1000) {
-                                                label += '₪' + (value / 1000).toFixed(0) + 'K';
+                                                label += symbol + (value / 1000).toFixed(0) + 'K';
                                             } else {
-                                                label += '₪' + value.toLocaleString();
+                                                label += symbol + value.toLocaleString();
                                             }
                                         } else {
                                             label += context.parsed.y.toFixed(1) + '%';

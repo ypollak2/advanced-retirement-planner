@@ -1,5 +1,5 @@
 // Permanent Side Panel Component - Always visible sidebar that adapts to user inputs
-// Created by Yali Pollak (יהלי פולק) - v5.3.3
+// Created by Yali Pollak (יהלי פולק)
 
 function PermanentSidePanel(props) {
     const inputs = props.inputs;

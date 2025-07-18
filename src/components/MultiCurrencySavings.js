@@ -1,6 +1,6 @@
 // Multi-Currency Savings Display Component
 // Shows savings values in multiple currencies with real-time conversion
-// Created by Yali Pollak (יהלי פולק) - v5.3.3
+// Created by Yali Pollak (יהלי פולק)
 
 function MultiCurrencySavings(props) {
     const amount = props.amount;

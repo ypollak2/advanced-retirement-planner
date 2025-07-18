@@ -1,14 +1,14 @@
 // Dashboard Component - Guided Intelligence UI Design
-// Created by Yali Pollak (יהלי פולק) - v5.3.1
+// Created by Yali Pollak (יהלי פולק)
 
 const Dashboard = ({ 
     inputs, 
     results, 
     language = 'en',
     formatCurrency,
-    onSectionExpand
+    onSectionExpand,
+    workingCurrency = 'ILS'
 }) => {
-    const [selectedCurrency, setSelectedCurrency] = React.useState('ILS');
     const [exchangeRates, setExchangeRates] = React.useState({});
     const [expandedSections, setExpandedSections] = React.useState({
         pension: false,
@@ -621,7 +621,8 @@ const Dashboard = ({
                         ],
                         results: results,
                         language: language,
-                        formatCurrency: formatCurrency
+                        formatCurrency: formatCurrency,
+                        workingCurrency: workingCurrency
                     }) : 
                     (expandedSections.scenarios ? 'Scenario testing interface will be rendered here.' : null)
                 )

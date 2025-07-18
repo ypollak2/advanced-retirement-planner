@@ -2,7 +2,7 @@ const SavingsSummaryPanel = ({
         inputs, language, t, totalMonthlySalary, yearsToRetirement, 
         estimatedMonthlyIncome, projectedWithGrowth, buyingPowerToday, 
         monthlyTotal, avgNetReturn, exportToPNG, exportForAI, 
-        setShowChart, generateLLMAnalysis
+        setShowChart, generateLLMAnalysis, workingCurrency = 'ILS'
     }) => {
         const [exchangeRates, setExchangeRates] = React.useState({
             USD: 0.27, EUR: 0.25, GBP: 0.21, BTC: 0.000025, ETH: 0.0003
@@ -55,7 +55,9 @@ const SavingsSummaryPanel = ({
             Math.max((userAge - 22) * 8000, 25000);
         const totalSavings = safeCurrentPensionSavings + safeCurrentTrainingFundSavings;
         
-        const formatCurrency = (amount, symbol = '₪') => {
+        const formatCurrency = (amount, currency = workingCurrency) => {
+            const symbols = { 'ILS': '₪', 'USD': '$', 'EUR': '€', 'GBP': '£', 'BTC': '₿', 'ETH': 'Ξ' };
+            const symbol = symbols[currency] || '₪';
             // Safety check for invalid numbers
             if (!amount || isNaN(amount) || !isFinite(amount)) {
                 return `${symbol}0`;
@@ -93,7 +95,7 @@ const SavingsSummaryPanel = ({
                         React.createElement('span', { key: 'pension-trend', className: "text-xs text-green-600" }, '📈')
                     ]),
                     React.createElement('div', { className: "text-xl font-bold text-blue-800 wealth-amount" }, 
-                        formatCurrency(safeCurrentPensionSavings))
+                        formatCurrency(safeCurrentPensionSavings, workingCurrency))
                 ]),
                 
                 React.createElement('div', {
@@ -109,7 +111,7 @@ const SavingsSummaryPanel = ({
                         React.createElement('span', { key: 'training-trend', className: "text-xs text-green-600" }, '💪')
                     ]),
                     React.createElement('div', { className: "text-xl font-bold text-green-800 wealth-amount" }, 
-                        formatCurrency(safeCurrentTrainingFundSavings))
+                        formatCurrency(safeCurrentTrainingFundSavings, workingCurrency))
                 ]),
                 
                 React.createElement('div', {
@@ -119,7 +121,7 @@ const SavingsSummaryPanel = ({
                     React.createElement('div', { className: "text-sm text-purple-700 font-medium" }, 
                         language === 'he' ? 'סך הכל נוכחי' : 'Total Current'),
                     React.createElement('div', { className: "text-xl font-bold text-purple-800 wealth-amount" }, 
-                        formatCurrency(totalSavings))
+                        formatCurrency(totalSavings, workingCurrency))
                 ])
             ]),
             
@@ -141,13 +143,13 @@ const SavingsSummaryPanel = ({
                             React.createElement('div', { key: 'gross-label', className: "text-blue-600" }, 
                                 language === 'he' ? 'ברוטו:' : 'Gross:'),
                             React.createElement('div', { key: 'gross-amount', className: "font-bold" }, 
-                                formatCurrency(inputs.currentMonthlySalary || 15000))
+                                formatCurrency(inputs.currentMonthlySalary || 15000, workingCurrency))
                         ]),
                         React.createElement('div', { key: 'net' }, [
                             React.createElement('div', { key: 'net-label', className: "text-blue-600" }, 
                                 language === 'he' ? 'נטו:' : 'Net:'),
                             React.createElement('div', { key: 'net-amount', className: "font-bold text-blue-800" }, 
-                                formatCurrency(taxResult.netSalary))
+                                formatCurrency(taxResult.netSalary, workingCurrency))
                         ])
                     ]),
                     React.createElement('div', { key: 'tax-rate-info', className: "text-xs text-blue-600 mt-1" }, 
@@ -163,7 +165,7 @@ const SavingsSummaryPanel = ({
                 React.createElement('div', { className: "text-sm text-gray-700 font-medium mb-2" }, 
                     language === 'he' ? 'הפקדות חודשיות' : 'Monthly Contributions'),
                 React.createElement('div', { className: "text-base font-bold text-gray-800" }, 
-                    formatCurrency(monthlyTotal || (safeTotalMonthlySalary * 0.21)))
+                    formatCurrency(monthlyTotal || (safeTotalMonthlySalary * 0.21), workingCurrency))
             ]),
             
             // Projected at Retirement
@@ -174,7 +176,7 @@ const SavingsSummaryPanel = ({
                 React.createElement('div', { className: "text-sm text-yellow-700 font-medium" }, 
                     language === 'he' ? 'צפי בפרישה (אחרי דמי ניהול)' : 'Projected at Retirement (After Fees)'),
                 React.createElement('div', { className: "text-lg font-bold text-yellow-800" }, 
-                    formatCurrency(safeProjectedWithGrowth)),
+                    formatCurrency(safeProjectedWithGrowth, workingCurrency)),
                 React.createElement('div', { className: "text-xs text-yellow-600 mt-1" }, 
                     language === 'he' ? `תשואה נטו ממוצעת: ${safeAvgNetReturn.toFixed(1)}%` : `Avg Net Return: ${safeAvgNetReturn.toFixed(1)}%`)
             ]),
@@ -191,13 +193,13 @@ const SavingsSummaryPanel = ({
                         React.createElement('div', { className: "text-xs text-orange-600" }, 
                             language === 'he' ? 'סה״כ:' : 'Total:'),
                         React.createElement('div', { className: "text-base font-bold text-orange-800" }, 
-                            formatCurrency(safeBuyingPowerToday))
+                            formatCurrency(safeBuyingPowerToday, workingCurrency))
                     ]),
                     React.createElement('div', { key: 'monthly' }, [
                         React.createElement('div', { className: "text-xs text-orange-600" }, 
                             language === 'he' ? 'חודשי:' : 'Monthly:'),
                         React.createElement('div', { className: "text-base font-bold text-orange-800" }, 
-                            formatCurrency(safeBuyingPowerToday * (safeAvgNetReturn/100) / 12))
+                            formatCurrency(safeBuyingPowerToday * (safeAvgNetReturn/100) / 12, workingCurrency))
                     ])
                 ])
             ]),
@@ -266,7 +268,7 @@ const SavingsSummaryPanel = ({
                         React.createElement('div', { className: "text-xs text-gray-600" }, 
                             language === 'he' ? 'צבירה צפויה בגיל פרישה' : 'Projected Retirement Value'),
                         React.createElement('div', { className: "text-lg font-bold text-green-700 wealth-amount" }, 
-                            formatCurrency(projectedWithGrowth)),
+                            formatCurrency(projectedWithGrowth, workingCurrency)),
                         React.createElement('div', { className: "text-xs text-gray-500 mt-1" }, 
                             `${language === 'he' ? 'בעוד' : 'In'} ${yearsToRetirement} ${language === 'he' ? 'שנים' : 'years'}`)
                     ]),
@@ -278,7 +280,7 @@ const SavingsSummaryPanel = ({
                         React.createElement('div', { className: "text-xs text-gray-600" }, 
                             language === 'he' ? 'כוח קנייה (נכון להיום)' : 'Buying Power (Today\'s Value)'),
                         React.createElement('div', { className: "text-lg font-bold text-orange-700 wealth-amount" }, 
-                            formatCurrency(buyingPowerToday)),
+                            formatCurrency(buyingPowerToday, workingCurrency)),
                         React.createElement('div', { className: "text-xs text-gray-500 mt-1" }, 
                             `${language === 'he' ? 'לאחר אינפלציה של' : 'After'} ${(inputs.inflationRate || 3)}% ${language === 'he' ? '' : 'inflation'}`)
                     ]),
@@ -290,7 +292,7 @@ const SavingsSummaryPanel = ({
                         React.createElement('div', { className: "text-xs text-gray-600" }, 
                             language === 'he' ? 'הכנסה חודשית בפרישה' : 'Monthly Retirement Income'),
                         React.createElement('div', { className: "text-lg font-bold text-blue-700 wealth-amount" }, 
-                            formatCurrency(projectedWithGrowth * (safeAvgNetReturn/100) / 12)),
+                            formatCurrency(projectedWithGrowth * (safeAvgNetReturn/100) / 12, workingCurrency)),
                         React.createElement('div', { className: "text-xs text-gray-500 mt-1" }, 
                             `${(safeAvgNetReturn).toFixed(1)}% ${language === 'he' ? 'תשואה שנתית' : 'annual return'}`)
                     ])
@@ -403,9 +405,9 @@ const SavingsSummaryPanel = ({
                                 React.createElement('div', { key: 'years-remaining' }, 
                                     `${language === 'he' ? 'עוד' : 'Only'} ${(inputs.retirementAge || 67) - (inputs.currentAge || 30)} ${language === 'he' ? 'שנים עד הפרישה' : 'years until retirement'}`),
                                 React.createElement('div', { key: 'monthly-savings' }, 
-                                    `${language === 'he' ? 'חיסכון חודשי:' : 'Monthly savings:'} ${formatCurrency(monthlyTotal || (safeTotalMonthlySalary * 0.21))}`),
+                                    `${language === 'he' ? 'חיסכון חודשי:' : 'Monthly savings:'} ${formatCurrency(monthlyTotal || (safeTotalMonthlySalary * 0.21), workingCurrency)}`),
                                 React.createElement('div', { key: 'projected-total' }, 
-                                    `${language === 'he' ? 'צפי צבירה:' : 'Projected total:'} ${formatCurrency(safeProjectedWithGrowth)}`)
+                                    `${language === 'he' ? 'צפי צבירה:' : 'Projected total:'} ${formatCurrency(safeProjectedWithGrowth, workingCurrency)}`)
                             ])
                         ]),
                         

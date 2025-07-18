@@ -1,5 +1,5 @@
 // Summary Panel Component - Side panel with key financial summaries and insights
-// Created by Yali Pollak (יהלי פולק) - v5.3.1
+// Created by Yali Pollak (יהלי פולק)
 
 const SummaryPanel = ({ 
     inputs, 
@@ -7,7 +7,8 @@ const SummaryPanel = ({
     partnerResults,
     stressTestResults,
     language = 'en',
-    formatCurrency
+    formatCurrency,
+    workingCurrency = 'ILS'
 }) => {
     // Content translations
     const content = {
@@ -295,7 +296,7 @@ const SummaryPanel = ({
                     React.createElement('div', {
                         key: 'savings-nominal',
                         className: 'text-lg font-bold text-green-600'
-                    }, formatCurrency ? formatCurrency(results?.totalSavings) : `₪${results?.totalSavings?.toLocaleString()}`),
+                    }, formatCurrency ? formatCurrency(results?.totalSavings, workingCurrency) : `₪${results?.totalSavings?.toLocaleString()}`),
                     React.createElement('div', {
                         key: 'savings-real-label',
                         className: 'text-xs text-gray-500 mt-2'
@@ -303,7 +304,7 @@ const SummaryPanel = ({
                     React.createElement('div', {
                         key: 'savings-real',
                         className: 'text-sm font-semibold text-gray-700'
-                    }, formatCurrency ? formatCurrency(totalSavingsReal) : `₪${totalSavingsReal?.toLocaleString()}`),
+                    }, formatCurrency ? formatCurrency(totalSavingsReal, workingCurrency) : `₪${totalSavingsReal?.toLocaleString()}`),
                     
                     // Multi-currency display for total savings
                     results?.totalSavings && window.MultiCurrencySavings ? React.createElement('div', {
@@ -337,7 +338,7 @@ const SummaryPanel = ({
                     React.createElement('div', {
                         key: 'income-nominal',
                         className: 'text-lg font-bold text-blue-600'
-                    }, formatCurrency ? formatCurrency(results?.monthlyIncome) : `₪${results?.monthlyIncome?.toLocaleString()}`),
+                    }, formatCurrency ? formatCurrency(results?.monthlyIncome, workingCurrency) : `₪${results?.monthlyIncome?.toLocaleString()}`),
                     React.createElement('div', {
                         key: 'income-real-label',
                         className: 'text-xs text-gray-500 mt-2'
@@ -345,7 +346,7 @@ const SummaryPanel = ({
                     React.createElement('div', {
                         key: 'income-real',
                         className: 'text-sm font-semibold text-gray-700'
-                    }, formatCurrency ? formatCurrency(monthlyIncomeReal) : `₪${monthlyIncomeReal?.toLocaleString()}`)
+                    }, formatCurrency ? formatCurrency(monthlyIncomeReal, workingCurrency) : `₪${monthlyIncomeReal?.toLocaleString()}`)
                 ])
             ])
         ]),

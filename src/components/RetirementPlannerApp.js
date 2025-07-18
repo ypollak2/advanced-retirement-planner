@@ -248,6 +248,102 @@ function RetirementPlannerApp() {
         };
         return symbols[currency] || '₪';
     }
+    
+    // Currency Value Component for async conversion
+    function CurrencyValue(props) {
+        var value = props.value;
+        var currency = props.currency;
+        var formatter = props.formatter;
+        
+        var displayValueState = React.useState('Loading...');
+        var displayValue = displayValueState[0];
+        var setDisplayValue = displayValueState[1];
+        
+        React.useEffect(function() {
+            var formatValue = function() {
+                try {
+                    var symbols = {
+                        'ILS': '₪',
+                        'USD': '$',
+                        'EUR': '€',
+                        'GBP': '£',
+                        'BTC': '₿',
+                        'ETH': 'Ξ'
+                    };
+                    
+                    var currencySymbol = symbols[currency] || '₪';
+                    
+                    if (!value || isNaN(value)) {
+                        setDisplayValue(currencySymbol + '0');
+                        return;
+                    }
+                    
+                    // Convert from ILS to target currency
+                    var convertedValue = value;
+                    
+                    if (currency !== 'ILS') {
+                        // Fallback conversion rates (used if API fails or unavailable)
+                        var fallbackRates = {
+                            'USD': 0.27,
+                            'EUR': 0.25, 
+                            'GBP': 0.22,
+                            'BTC': 0.0000067,
+                            'ETH': 0.0001
+                        };
+                        
+                        if (window.currencyAPI) {
+                        console.log('CurrencyValue: Converting', value, 'from ILS to', currency);
+                        window.currencyAPI.convertAmount(value, 'ILS', currency).then(function(converted) {
+                            console.log('CurrencyValue: Conversion successful:', converted, currency);
+                            if (currency === 'BTC' || currency === 'ETH') {
+                                setDisplayValue(currencySymbol + converted.toFixed(6));
+                            } else {
+                                setDisplayValue(currencySymbol + Math.round(converted).toLocaleString());
+                            }
+                        }).catch(function(error) {
+                            console.warn('Currency conversion failed, using fallback rates for', currency, ':', error);
+                            var rate = fallbackRates[currency];
+                            convertedValue = rate ? value * rate : value;
+                            console.log('CurrencyValue: Using fallback rate', rate, 'converted value:', convertedValue);
+                            
+                            if (currency === 'BTC' || currency === 'ETH') {
+                                setDisplayValue(currencySymbol + convertedValue.toFixed(6));
+                            } else {
+                                setDisplayValue(currencySymbol + Math.round(convertedValue).toLocaleString());
+                            }
+                        });
+                        } else {
+                            // No API available, use fallback rates immediately
+                            console.log('CurrencyValue: No API available, using fallback rates for', currency);
+                            var rate = fallbackRates[currency];
+                            convertedValue = rate ? value * rate : value;
+                            console.log('CurrencyValue: Using fallback rate', rate, 'converted value:', convertedValue);
+                            
+                            if (currency === 'BTC' || currency === 'ETH') {
+                                setDisplayValue(currencySymbol + convertedValue.toFixed(6));
+                            } else {
+                                setDisplayValue(currencySymbol + Math.round(convertedValue).toLocaleString());
+                            }
+                        }
+                    } else {
+                        // ILS or no conversion needed
+                        if (currency === 'BTC' || currency === 'ETH') {
+                            setDisplayValue(currencySymbol + convertedValue.toFixed(6));
+                        } else {
+                            setDisplayValue(currencySymbol + Math.round(convertedValue).toLocaleString());
+                        }
+                    }
+                } catch (error) {
+                    console.error('CurrencyValue formatting error:', error);
+                    setDisplayValue('Error');
+                }
+            };
+            
+            formatValue();
+        }, [value, currency]);
+        
+        return displayValue;
+    }
 
     // Calculate function with error handling
     function handleCalculate() {
@@ -457,7 +553,11 @@ function RetirementPlannerApp() {
                                 React.createElement('span', {
                                     key: 'savings-value',
                                     className: 'font-semibold text-purple-600'
-                                }, window.formatCurrency ? window.formatCurrency(inputs?.currentSavings || 0, workingCurrency) : getCurrencySymbol(workingCurrency) + (inputs?.currentSavings || 0).toLocaleString())
+                                }, React.createElement(CurrencyValue, {
+                                    key: 'quick-stats-savings',
+                                    value: inputs?.currentSavings || 0,
+                                    currency: workingCurrency
+                                }))
                             ])
                         ])
                     ]),
@@ -640,7 +740,7 @@ function RetirementPlannerApp() {
                 React.createElement('span', {
                     key: 'version',
                     className: 'version'
-                }, 'v5.3.4'),
+                }, window.versionInfo ? `v${window.versionInfo.number}` : 'v5.3.4'),
                 ' • Created by ',
                 React.createElement('span', {
                     key: 'author',
