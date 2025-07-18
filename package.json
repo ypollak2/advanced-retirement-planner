@@ -68,7 +68,7 @@
     "gh-pages": "^6.0.0",
     "license-checker": "^25.0.1",
     "vite": "^5.4.10",
-    "puppeteer": "^22.0.0"
+    "puppeteer": "^24.12.1"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
