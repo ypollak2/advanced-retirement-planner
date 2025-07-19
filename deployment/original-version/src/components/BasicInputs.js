@@ -133,7 +133,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                                         React.createElement('label', { 
                                             key: 'partner1-salary-label',
                                             className: "block text-sm font-medium text-gray-700 mb-1" 
-                                        }, language === 'he' ? `משכורת חודשית (${currencySymbol})` : `Monthly Salary (${currencySymbol})`),
+                                        }, language === 'he' ? `משכורת חודשית - ברוטו (${currencySymbol})` : `Monthly Salary - Gross (${currencySymbol})`),
                                         React.createElement('input', {
                                             key: 'partner1-salary-input',
                                             type: 'number',
@@ -226,7 +226,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                                         React.createElement('label', { 
                                             key: 'partner2-salary-label',
                                             className: "block text-sm font-medium text-gray-700 mb-1" 
-                                        }, language === 'he' ? `משכורת חודשית (${currencySymbol})` : `Monthly Salary (${currencySymbol})`),
+                                        }, language === 'he' ? `משכורת חודשית - ברוטו (${currencySymbol})` : `Monthly Salary - Gross (${currencySymbol})`),
                                         React.createElement('input', {
                                             key: 'partner2-salary-input',
                                             type: 'number',
@@ -365,7 +365,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                             React.createElement('label', { 
                                 key: 'salary-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, language === 'he' ? `משכורת חודשית (${currencySymbol})` : `Monthly Salary (${currencySymbol})`),
+                            }, language === 'he' ? `משכורת חודשית - ברוטו (${currencySymbol})` : `Monthly Salary - Gross (${currencySymbol})`),
                             React.createElement('input', {
                                 key: 'monthly-salary-input',
                                 type: 'number',

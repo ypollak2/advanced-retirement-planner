@@ -1,11 +1,11 @@
 {
-  "version": "5.3.5",
+  "version": "5.3.6-beta",
   "name": "Advanced Retirement Planner",
   "description": "Professional-grade retirement planning with complete multi-currency integration",
   "author": "Yali Pollak (יהלי פולק)",
-  "lastUpdated": "2025-07-18T08:52:00.000Z",
-  "build": "2025-07-18",
-  "commit": "v5.3.5-bug-fixes-and-test-improvements",
+  "lastUpdated": "2025-01-19T21:15:00.000Z",
+  "build": "2025-01-19",
+  "commit": "v5.3.6-beta-stock-price-fixes-and-salary-clarifications",
   "features": [
     "Permanent side panel with tabbed navigation",
     "Enhanced chart breakdowns showing all savings components",
@@ -21,16 +21,14 @@
     "Multi-language support (Hebrew/English)"
   ],
   "majorChanges": [
-    "FIXED: Dashboard.js selectedCurrency undefined error resolved",
-    "FIXED: Duplicate function declarations in RetirementResultsPanel.js eliminated",
-    "FIXED: Component integration test suite updated for current architecture",
-    "FIXED: Test logic for duplicate detection improved with proper regex patterns",
-    "IMPROVED: CurrencyValue component now reuses existing helper functions",
-    "IMPROVED: Variable naming to prevent false duplicate detection",
-    "IMPROVED: Test suite now handles inline initialization patterns",
-    "ENHANCED: All 87 main tests and 69 component integration tests passing",
-    "ENHANCED: Test coverage at 100% with improved error detection",
-    "QUALITY: Code refactoring to eliminate redundancy and improve maintainability"
+    "FIXED: Google (GOOGL) stock price updated from $135.25 to accurate $183.00",
+    "ENHANCED: Real-time stock price API implementation using Yahoo Finance (CORS-free)",
+    "IMPROVED: Monthly Salary fields now clearly specify 'Gross' salary requirement",
+    "UPGRADED: Stock price system with graceful fallback from live API to updated hardcoded prices",
+    "ENHANCED: 5-minute caching system for API responses to prevent excessive calls",
+    "IMPROVED: Detailed logging shows whether stock prices are real-time or fallback",
+    "APPLIED: All changes consistent across both original and TypeScript versions",
+    "QUALITY: Enhanced user experience with accurate financial data"
   ],
   "urls": {
     "demo": "https://advanced-pension-planner.netlify.app/",

@@ -44,7 +44,7 @@
 
 ## 🎨 Previous Updates - v5.3.3 - CRITICAL UI FIXES AND CORS RESOLUTION 🔧
 
-### **🚨 LATEST: CRITICAL BUG FIXES** (July 2025)
+### **🚨 CRITICAL BUG FIXES** (July 2025)
 
 #### **🛠️ Critical UI and Functional Fixes**
 - **FIXED: Sidebar Layout Issues**: Corrected control panel cutting off scenarios section with proper CSS height/overflow

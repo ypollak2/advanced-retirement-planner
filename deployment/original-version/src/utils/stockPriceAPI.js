@@ -1,17 +1,20 @@
 // Stock Price API Integration for RSU Tracking
 // Created by Yali Pollak (יהלי פולק) - v5.3.5
 
-// API endpoints are disabled to prevent CORS/security issues
-// Using fallback prices instead for stock price data
+// CORS-free stock price API endpoints
 const STOCK_API_ENDPOINTS = {
-    // Note: External API calls disabled for security and CORS compliance
-    // All stock prices use fallback data below
+    // Alpha Vantage free tier (5 API calls per minute, 500 per day)
+    ALPHA_VANTAGE: 'https://www.alphavantage.co/query',
+    // Yahoo Finance alternative (CORS-free)
+    YAHOO_FINANCE: 'https://query1.finance.yahoo.com/v8/finance/chart',
+    // Finnhub.io (free tier - 60 calls per minute)
+    FINNHUB: 'https://finnhub.io/api/v1/quote'
 };
 
 // Fallback stock prices for major tech companies (updated manually)
 const FALLBACK_PRICES = {
     'AAPL': 175.50,   // Apple
-    'GOOGL': 135.25,  // Alphabet (Google)
+    'GOOGL': 183.00,  // Alphabet (Google)
     'MSFT': 375.80,   // Microsoft
     'AMZN': 145.30,   // Amazon
     'META': 315.20,   // Meta (Facebook)
@@ -50,6 +53,44 @@ const FALLBACK_PRICES = {
 const priceCache = new Map();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
+// Real-time stock price fetching function
+async function fetchRealTimePrice(symbol) {
+    try {
+        // Use Yahoo Finance API - it's CORS-free and doesn't require API key
+        const response = await fetch(`${STOCK_API_ENDPOINTS.YAHOO_FINANCE}/${symbol}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        // Extract current price from Yahoo Finance response
+        if (data?.chart?.result?.[0]?.meta?.regularMarketPrice) {
+            return parseFloat(data.chart.result[0].meta.regularMarketPrice);
+        }
+        
+        throw new Error('Invalid response format from Yahoo Finance');
+        
+    } catch (error) {
+        console.warn(`Failed to fetch real-time price for ${symbol}:`, error.message);
+        
+        // Try alternative Finnhub API as backup (requires free API key)
+        try {
+            // Note: This would require users to set up their own Finnhub API key
+            // For now, we'll just return null and fall back to hardcoded prices
+            return null;
+        } catch (backupError) {
+            return null;
+        }
+    }
+}
+
 // Main function to fetch stock price
 async function fetchStockPrice(symbol, useCache = true) {
     if (!symbol) return null;
@@ -64,7 +105,26 @@ async function fetchStockPrice(symbol, useCache = true) {
         }
     }
     
-    // Use fallback prices first due to CORS limitations
+    // Try to fetch real-time price from Yahoo Finance API (CORS-free)
+    try {
+        const realTimePrice = await fetchRealTimePrice(upperSymbol);
+        if (realTimePrice && realTimePrice > 0) {
+            console.log(`📈 Real-time price fetched for ${upperSymbol}: $${realTimePrice}`);
+            
+            // Cache real-time price
+            priceCache.set(upperSymbol, {
+                price: realTimePrice,
+                timestamp: Date.now(),
+                source: 'yahoo-finance'
+            });
+            
+            return realTimePrice;
+        }
+    } catch (error) {
+        console.warn(`⚠️ Failed to fetch real-time price for ${upperSymbol}:`, error.message);
+    }
+    
+    // Fallback to hardcoded prices if API fails
     if (FALLBACK_PRICES[upperSymbol]) {
         const fallbackPrice = FALLBACK_PRICES[upperSymbol];
         console.log(`📊 Using fallback price for ${upperSymbol}: $${fallbackPrice}`);
@@ -79,8 +139,7 @@ async function fetchStockPrice(symbol, useCache = true) {
         return fallbackPrice;
     }
     
-    // API calls disabled to prevent CORS/404 errors
-    console.log(`⚠️ API calls disabled for ${upperSymbol} - no fallback price available`);
+    console.log(`❌ No price data available for ${upperSymbol}`);
     return null;
 }
 
