@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Retirement Planner v5.3.6-beta</title>
+    <title>Advanced Retirement Planner v5.3.7</title>
     <meta name="description" content="Advanced retirement planning tool with comprehensive investment tracking">
     
     <!-- Tailwind CSS via CDN -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     
     <!-- Main Application Styles -->
-    <link rel="stylesheet" href="src/styles/main.css?v=5.3.6-beta">
+    <link rel="stylesheet" href="src/styles/main.css?v={{VERSION}}">
     
     <style>
         /* Version indicator - repositioned for better UX */
@@ -39,13 +39,43 @@
     </style>
 </head>
 <body>
-    <!-- Version indicator -->
-    <div class="version-indicator">
-        ✨ v5.3.6-beta
+    <!-- Version indicator (populated from version.json) -->
+    <div class="version-indicator" id="version-indicator">
+        ✨ Loading...
     </div>
     
     <div id="root" class="min-h-screen" role="main" aria-label="Retirement Planner Application"></div>
     
+    <!-- Centralized Version Management -->
+    <script>
+        // Load version from version.json and update all version-dependent elements
+        fetch('version.json')
+            .then(response => response.json())
+            .then(versionData => {
+                const version = versionData.version;
+                
+                // Update page title
+                document.title = `Advanced Retirement Planner v${version}`;
+                
+                // Update version indicator
+                const versionIndicator = document.getElementById('version-indicator');
+                if (versionIndicator) {
+                    versionIndicator.textContent = `✨ v${version}`;
+                }
+                
+                // Store version globally for other scripts
+                window.APP_VERSION = version;
+                
+                console.log(`📋 Version loaded: v${version}`);
+            })
+            .catch(error => {
+                console.warn('⚠️ Could not load version from version.json:', error);
+                // Fallback version
+                window.APP_VERSION = '5.3.7';
+                document.getElementById('version-indicator').textContent = '✨ v5.3.7';
+            });
+    </script>
+
     <!-- React & ReactDOM from CDN -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -54,38 +84,38 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Component Scripts -->
-    <script src="src/translations/multiLanguage.js?v=5.3.6-beta"></script>
-    <script src="src/data/marketConstants.js?v=5.3.6-beta"></script>
-    <script src="src/utils/retirementCalculations.js?v=5.3.6-beta"></script>
-    <script src="src/utils/chartDataGenerator.js?v=5.3.6-beta"></script>
-    <script src="src/utils/stockPriceAPI.js?v=5.3.6-beta"></script>
-    <script src="src/utils/exportFunctions.js?v=5.3.6-beta"></script>
-    <script src="src/utils/stressTestScenarios.js?v=5.3.6-beta"></script>
-    <script src="src/utils/currencyAPI.js?v=5.3.6-beta"></script>
+    <script src="src/translations/multiLanguage.js?v={{VERSION}}"></script>
+    <script src="src/data/marketConstants.js?v={{VERSION}}"></script>
+    <script src="src/utils/retirementCalculations.js?v={{VERSION}}"></script>
+    <script src="src/utils/chartDataGenerator.js?v={{VERSION}}"></script>
+    <script src="src/utils/stockPriceAPI.js?v={{VERSION}}"></script>
+    <script src="src/utils/exportFunctions.js?v={{VERSION}}"></script>
+    <script src="src/utils/stressTestScenarios.js?v={{VERSION}}"></script>
+    <script src="src/utils/currencyAPI.js?v={{VERSION}}"></script>
     
     <!-- Base Components (loaded first) -->
-    <script src="src/components/EnhancedRSUCompanySelector.js?v=5.3.6-beta"></script>
-    <script src="src/components/BottomLineSummary.js?v=5.3.6-beta"></script>
-    <script src="src/components/FinancialChart.js?v=5.3.6-beta"></script>
-    <script src="src/components/MultiCurrencySavings.js?v=5.3.6-beta"></script>
-    <script src="src/components/PermanentSidePanel.js?v=5.3.6-beta"></script>
+    <script src="src/components/EnhancedRSUCompanySelector.js?v={{VERSION}}"></script>
+    <script src="src/components/BottomLineSummary.js?v={{VERSION}}"></script>
+    <script src="src/components/FinancialChart.js?v={{VERSION}}"></script>
+    <script src="src/components/MultiCurrencySavings.js?v={{VERSION}}"></script>
+    <script src="src/components/PermanentSidePanel.js?v={{VERSION}}"></script>
     
     <!-- Main Components (depend on base components) -->
-    <script src="src/components/HelpTooltip.js?v=5.3.6-beta"></script>
-    <script src="src/components/ReadinessScore.js?v=5.3.6-beta"></script>
-    <script src="src/components/DynamicPartnerCharts.js?v=5.3.6-beta"></script>
-    <script src="src/components/ExportControls.js?v=5.3.6-beta"></script>
-    <script src="src/components/StressTestInterface.js?v=5.3.6-beta"></script>
-    <script src="src/components/SummaryPanel.js?v=5.3.6-beta"></script>
-    <script src="src/components/BasicInputs.js?v=5.3.6-beta"></script>
-    <script src="src/components/RetirementAdvancedForm.js?v=5.3.6-beta"></script>
-    <script src="src/components/RetirementResultsPanel.js?v=5.3.6-beta"></script>
-    <script src="src/components/SavingsSummaryPanel.js?v=5.3.6-beta"></script>
+    <script src="src/components/HelpTooltip.js?v={{VERSION}}"></script>
+    <script src="src/components/ReadinessScore.js?v={{VERSION}}"></script>
+    <script src="src/components/DynamicPartnerCharts.js?v={{VERSION}}"></script>
+    <script src="src/components/ExportControls.js?v={{VERSION}}"></script>
+    <script src="src/components/StressTestInterface.js?v={{VERSION}}"></script>
+    <script src="src/components/SummaryPanel.js?v={{VERSION}}"></script>
+    <script src="src/components/BasicInputs.js?v={{VERSION}}"></script>
+    <script src="src/components/RetirementAdvancedForm.js?v={{VERSION}}"></script>
+    <script src="src/components/RetirementResultsPanel.js?v={{VERSION}}"></script>
+    <script src="src/components/SavingsSummaryPanel.js?v={{VERSION}}"></script>
     
     <!-- Currency & Dashboard Components -->
-    <script src="src/components/CurrencySelector.js?v=5.3.6-beta"></script>
-    <script src="src/components/Dashboard.js?v=5.3.6-beta"></script>
-    <script src="src/components/RetirementPlannerApp.js?v=5.3.6-beta"></script>
+    <script src="src/components/CurrencySelector.js?v={{VERSION}}"></script>
+    <script src="src/components/Dashboard.js?v={{VERSION}}"></script>
+    <script src="src/components/RetirementPlannerApp.js?v={{VERSION}}"></script>
     
     <!-- Application Initialization -->
     <script>
@@ -113,13 +143,13 @@
                         if (ReactDOM.createRoot) {
                             const root = ReactDOM.createRoot(document.getElementById('root'));
                             root.render(React.createElement(window.RetirementPlannerApp));
-                            console.log('✅ Advanced Retirement Planner v5.3.5 initialized successfully');
+                            console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '5.3.7'} initialized successfully`);
                         } else if (ReactDOM.render) {
                             ReactDOM.render(
                                 React.createElement(window.RetirementPlannerApp),
                                 document.getElementById('root')
                             );
-                            console.log('✅ Advanced Retirement Planner v5.3.6-beta initialized (React 17 mode)');
+                            console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '5.3.7'} initialized (React 17 mode)`);
                         }
                     } else {
                         throw new Error('Required components not loaded');

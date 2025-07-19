@@ -146,7 +146,7 @@ const SummaryPanel = ({
     const diversificationScore = calculateDiversificationScore();
     
     // Calculate current savings rate
-    const currentSalary = inputs.currentSalary || 20000;
+    const currentSalary = inputs.currentMonthlySalary || inputs.currentSalary || 20000;
     const currentContributions = (inputs.monthlyContribution || 0) + (inputs.trainingFundMonthly || 0) + (inputs.personalPortfolioMonthly || 0);
     const currentSavingsRate = currentSalary > 0 ? (currentContributions / currentSalary) * 100 : 0;
     

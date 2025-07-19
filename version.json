@@ -1,11 +1,11 @@
 {
-  "version": "5.3.6-beta",
+  "version": "5.3.7",
   "name": "Advanced Retirement Planner",
   "description": "Professional-grade retirement planning with complete multi-currency integration",
   "author": "Yali Pollak (יהלי פולק)",
-  "lastUpdated": "2025-01-19T21:15:00.000Z",
-  "build": "2025-01-19",
-  "commit": "v5.3.6-beta-stock-price-fixes-and-salary-clarifications",
+  "lastUpdated": "2025-07-19T22:30:00.000Z",
+  "build": "2025-07-19",
+  "commit": "v5.3.7-critical-dashboard-calculation-fixes",
   "features": [
     "Permanent side panel with tabbed navigation",
     "Enhanced chart breakdowns showing all savings components",
@@ -21,14 +21,14 @@
     "Multi-language support (Hebrew/English)"
   ],
   "majorChanges": [
-    "FIXED: Google (GOOGL) stock price updated from $135.25 to accurate $183.00",
-    "ENHANCED: Real-time stock price API implementation using Yahoo Finance (CORS-free)",
-    "IMPROVED: Monthly Salary fields now clearly specify 'Gross' salary requirement",
-    "UPGRADED: Stock price system with graceful fallback from live API to updated hardcoded prices",
-    "ENHANCED: 5-minute caching system for API responses to prevent excessive calls",
-    "IMPROVED: Detailed logging shows whether stock prices are real-time or fallback",
-    "APPLIED: All changes consistent across both original and TypeScript versions",
-    "QUALITY: Enhanced user experience with accurate financial data"
+    "CRITICAL FIX: Monthly Income calculations no longer show NaN values",
+    "CRITICAL FIX: Monthly Income Real values now properly calculate inflation-adjusted amounts",
+    "CRITICAL FIX: Savings Rate calculation now works correctly with monthly salary inputs",
+    "CRITICAL FIX: Calculation Results panel no longer shows 'Error' for Total Savings and Monthly Pension Income",
+    "ENHANCED: Added missing monthlyIncome property to retirementCalculations return object",
+    "IMPROVED: SummaryPanel now correctly uses currentMonthlySalary for savings rate calculations",
+    "QUALITY: All dashboard display issues from screenshots have been resolved",
+    "STABILITY: Enhanced error handling and data validation across calculation components"
   ],
   "urls": {
     "demo": "https://advanced-pension-planner.netlify.app/",

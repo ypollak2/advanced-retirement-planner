@@ -337,6 +337,7 @@ window.calculateRetirement = (
         
         // Combined household results
         totalNetIncome: Math.round(totalNetIncome),
+        monthlyIncome: Math.round(totalNetIncome), // Add missing monthlyIncome property
         isJointPlanning: inputs.partnerPlanningEnabled,
         
         // Other calculations

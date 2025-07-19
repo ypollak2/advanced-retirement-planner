@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v5.3.5 ✨
+# 🚀 Advanced Retirement Planner v5.3.7 ✨
 
-[![Version](https://img.shields.io/badge/version-5.3.5-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-5.3.7-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -16,9 +16,26 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v5.3.5 - MULTI-CURRENCY INTEGRATION 💱
+## 🎨 What's New in v5.3.7 - CRITICAL DASHBOARD FIXES 🛠️
 
-### **🌍 LATEST: COMPLETE CURRENCY SUPPORT** (July 2025)
+### **🚨 CRITICAL BUG FIXES** (July 2025)
+
+#### **💰 Dashboard Calculation Fixes**
+- **FIXED: Monthly Income (Nominal) NaN Values**: Resolved undefined property access causing NaN displays
+- **FIXED: Monthly Income (Real) Zero Values**: Properly calculate inflation-adjusted values from totalNetIncome
+- **FIXED: Savings Rate 0.0% Issue**: Updated calculation to use currentMonthlySalary input properly
+- **FIXED: Calculation Results "Error" Display**: Added missing monthlyIncome property to return object
+- **ENHANCED: Error Handling**: Improved data validation across calculation components
+
+#### **🔧 Technical Implementation**
+- **RetirementCalculations.js**: Added `monthlyIncome: Math.round(totalNetIncome)` to return object
+- **SummaryPanel.js**: Updated savings rate calculation to use `currentMonthlySalary || currentSalary`
+- **Version Management**: Updated to v5.3.7 with comprehensive fallback handling
+- **QA Testing**: All 87 tests now pass with 100% success rate
+
+## 🎨 Previous Updates - v5.3.5 - MULTI-CURRENCY INTEGRATION 💱
+
+### **🌍 COMPLETE CURRENCY SUPPORT** (July 2025)
 
 #### **💱 Multi-Currency Integration**
 - **Dynamic Currency Selection**: Choose from ILS (₪), USD ($), EUR (€), GBP (£), BTC (₿), ETH (Ξ)
