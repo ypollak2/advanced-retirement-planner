@@ -18,6 +18,20 @@ function RetirementPlannerApp() {
     var activeSection = activeSectionState[0];
     var setActiveSection = activeSectionState[1];
     
+    // Step navigation state for wizard
+    var currentStepState = React.useState(1);
+    var currentStep = currentStepState[0];
+    var setCurrentStep = currentStepState[1];
+    
+    // Step navigation functions
+    function nextStep() {
+        setCurrentStep(function(prev) { return Math.min(prev + 1, 8); });
+    }
+    
+    function previousStep() {
+        setCurrentStep(function(prev) { return Math.max(prev - 1, 1); });
+    }
+    
     var workingCurrencyState = React.useState('ILS');
     var workingCurrency = workingCurrencyState[0];
     var setWorkingCurrency = workingCurrencyState[1];
@@ -565,14 +579,24 @@ function RetirementPlannerApp() {
                 ])
             ]),
             
-            // Wizard View
+            // Wizard View with WizardStepSalary, WizardStepSavings, WizardStepContributions, WizardStepFees integration
             viewMode === 'wizard' && window.RetirementWizard && React.createElement(window.RetirementWizard, {
                 key: 'wizard',
                 inputs: inputs,
                 setInputs: setInputs,
                 onComplete: handleWizardComplete,
                 language: language,
-                workingCurrency: workingCurrency
+                workingCurrency: workingCurrency,
+                // Wizard step components integration
+                WizardStepSalary: window.WizardStepSalary,
+                WizardStepSavings: window.WizardStepSavings,
+                WizardStepContributions: window.WizardStepContributions,
+                WizardStepFees: window.WizardStepFees,
+                // Step navigation integration
+                currentStep: currentStep,
+                nextStep: nextStep,
+                previousStep: previousStep,
+                setCurrentStep: setCurrentStep
             }),
 
             // Dashboard View with Integrated Control Panel

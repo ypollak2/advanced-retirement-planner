@@ -133,7 +133,13 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                     key: 'gross-salary-input',
                     type: 'number',
                     value: inputs.currentMonthlySalary || 15000,
-                    onChange: (e) => setInputs({...inputs, currentMonthlySalary: parseInt(e.target.value) || 0}),
+                    onChange: (e) => {
+                        const value = parseInt(e.target.value) || 0;
+                        setInputs({...inputs, currentMonthlySalary: value});
+                    },
+                    placeholder: "15000",
+                    min: "0",
+                    max: "500000",
                     className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 }),
                 React.createElement('p', { 
