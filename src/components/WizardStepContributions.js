@@ -20,10 +20,13 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
             partner1Contributions: 'הפקדות בן/בת זוג 1',
             partner2Contributions: 'הפקדות בן/בת זוג 2',
             trainingFundLimits: 'מגבלות קרן השתלמות',
-            salaryThreshold: 'סף משכורת (₪)',
-            belowThreshold: 'מתחת לסף (%)',
-            aboveThreshold: 'מעל הסף (%)',
+            salaryThreshold: 'סף משכורת לטבות מס (₪)',
+            belowThreshold: 'מתחת לסף - מוטב מס (%)',
+            aboveThreshold: 'מעל הסף - חייב במס (%)',
             currentSalaryStatus: 'סטטוס משכורת נוכחי',
+            taxBenefits: 'הטבות מס',
+            taxableIncome: 'הכנסה חייבת במס',
+            contribution2024: 'הפקדה לפי תקנות 2024',
             israel: 'ישראל',
             usa: 'ארה״ב',
             uk: 'בריטניה',
@@ -46,11 +49,14 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
             partnerContributions: 'Partner Contributions',
             partner1Contributions: 'Partner 1 Contributions',
             partner2Contributions: 'Partner 2 Contributions',
-            trainingFundLimits: 'Training Fund Limits',
-            salaryThreshold: 'Salary Threshold (₪)',
-            belowThreshold: 'Below Threshold (%)',
-            aboveThreshold: 'Above Threshold (%)',
+            trainingFundLimits: 'Training Fund Tax Limits',
+            salaryThreshold: 'Salary Threshold for Tax Benefits (₪)',
+            belowThreshold: 'Below Threshold - Tax Benefited (%)',
+            aboveThreshold: 'Above Threshold - Taxable (%)',
             currentSalaryStatus: 'Current Salary Status',
+            taxBenefits: 'Tax Benefits',
+            taxableIncome: 'Taxable Income',
+            contribution2024: 'Contribution per 2024 Regulations',
             israel: 'Israel',
             usa: 'United States',
             uk: 'United Kingdom',
@@ -69,12 +75,15 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
     const countryRates = {
         israel: { 
             pension: 17.5, 
-            trainingFund: 7.5,
+            trainingFund: 10.0, // Total: 7.5% employer + 2.5% employee
             employee: 7.0,
             employer: 10.5,
-            trainingFundThreshold: 45000, // Monthly salary threshold in ILS
-            trainingFundBelowThreshold: 7.5,
-            trainingFundAboveThreshold: 2.5
+            trainingFundThreshold: 15712, // Monthly salary threshold in ILS for 2024
+            trainingFundBelowThreshold: 10.0, // 7.5% employer + 2.5% employee = 10%
+            trainingFundAboveThreshold: 0, // Above threshold: taxed as income, no deduction
+            trainingFundEmployeeRate: 2.5,
+            trainingFundEmployerRate: 7.5,
+            maxMonthlyContribution: 1571 // Maximum monthly contribution for tax benefits (10% of 15,712)
         },
         usa: { 
             pension: 12.0, 
@@ -111,35 +120,64 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
     const selectedCountry = inputs.taxCountry || 'israel';
     const defaultRates = countryRates[selectedCountry] || countryRates.israel;
 
-    // Calculate effective training fund rate based on salary threshold
-    const calculateTrainingFundRate = (monthlySalary) => {
-        if (selectedCountry !== 'israel') return defaultRates.trainingFund;
+    // Calculate training fund contribution and tax treatment based on 2024 Israeli regulations
+    const calculateTrainingFundContribution = (monthlySalary) => {
+        if (selectedCountry !== 'israel') return {
+            totalContribution: monthlySalary * (defaultRates.trainingFund / 100),
+            taxDeductible: monthlySalary * (defaultRates.trainingFund / 100),
+            taxableAmount: 0,
+            effectiveRate: defaultRates.trainingFund
+        };
         
-        const threshold = defaultRates.trainingFundThreshold || 45000;
-        const belowRate = defaultRates.trainingFundBelowThreshold || 7.5;
-        const aboveRate = defaultRates.trainingFundAboveThreshold || 2.5;
+        const threshold = defaultRates.trainingFundThreshold || 15712;
+        const maxContribution = defaultRates.maxMonthlyContribution || 1571;
+        const rate = defaultRates.trainingFundBelowThreshold / 100 || 0.10;
+        
+        // Calculate total contribution (employer continues to contribute above threshold)
+        const totalContribution = monthlySalary * rate;
         
         if (monthlySalary <= threshold) {
-            return belowRate;
+            // Below threshold: full tax benefits
+            return {
+                totalContribution,
+                taxDeductible: totalContribution,
+                taxableAmount: 0,
+                effectiveRate: defaultRates.trainingFundBelowThreshold,
+                salaryStatus: 'below_threshold'
+            };
         } else {
-            // Blended rate: full rate up to threshold, reduced rate above
-            const belowThresholdAmount = threshold * (belowRate / 100);
-            const aboveThresholdAmount = (monthlySalary - threshold) * (aboveRate / 100);
-            return ((belowThresholdAmount + aboveThresholdAmount) / monthlySalary) * 100;
+            // Above threshold: only contribution up to threshold gets tax benefits
+            const taxDeductibleContribution = maxContribution;
+            const excessContribution = totalContribution - taxDeductibleContribution;
+            
+            return {
+                totalContribution,
+                taxDeductible: taxDeductibleContribution,
+                taxableAmount: excessContribution, // This amount is taxed as income
+                effectiveRate: (totalContribution / monthlySalary) * 100,
+                salaryStatus: 'above_threshold',
+                threshold: threshold,
+                excessSalary: monthlySalary - threshold
+            };
         }
     };
 
-    // Get salary status for display
+    // Get detailed salary status for display
     const getSalaryStatus = (monthlySalary) => {
         if (selectedCountry !== 'israel') return '';
-        const threshold = defaultRates.trainingFundThreshold || 45000;
-        if (monthlySalary <= threshold) {
-            return language === 'he' ? 'מתחת לסף - 7.5%' : 'Below threshold - 7.5%';
-        } else {
-            const effectiveRate = calculateTrainingFundRate(monthlySalary);
+        
+        const contribution = calculateTrainingFundContribution(monthlySalary);
+        const threshold = defaultRates.trainingFundThreshold || 15712;
+        
+        if (contribution.salaryStatus === 'below_threshold') {
             return language === 'he' ? 
-                `מעל הסף - ${effectiveRate.toFixed(1)}% ממוצע` : 
-                `Above threshold - ${effectiveRate.toFixed(1)}% average`;
+                `מתחת לסף (₪${threshold.toLocaleString()}) - 10% מוטב מס` : 
+                `Below threshold (₪${threshold.toLocaleString()}) - 10% tax-benefited`;
+        } else {
+            const taxableAmount = contribution.taxableAmount || 0;
+            return language === 'he' ? 
+                `מעל הסף - ₪${contribution.taxDeductible} מוטב מס, ₪${taxableAmount.toFixed(0)} חייב במס` : 
+                `Above threshold - ₪${contribution.taxDeductible} tax-benefited, ₪${taxableAmount.toFixed(0)} taxable`;
         }
     };
 

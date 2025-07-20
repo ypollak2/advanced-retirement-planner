@@ -16,9 +16,38 @@ class PensionCalculations {
         return monthlySalary * pensionRate;
     }
 
-    // Calculate monthly training fund contributions
-    calculateMonthlyTrainingFundContribution(monthlySalary, trainingFundRate = this.DEFAULT_TRAINING_FUND_RATE) {
-        return monthlySalary * trainingFundRate;
+    // Calculate monthly training fund contributions with 2024 Israeli tax regulations
+    calculateMonthlyTrainingFundContribution(monthlySalary, country = 'israel') {
+        if (country !== 'israel') {
+            return {
+                totalContribution: monthlySalary * this.DEFAULT_TRAINING_FUND_RATE,
+                taxDeductible: monthlySalary * this.DEFAULT_TRAINING_FUND_RATE,
+                taxableAmount: 0
+            };
+        }
+        
+        // 2024 Israeli regulations
+        const threshold = 15712; // Monthly salary threshold
+        const maxContribution = 1571; // Maximum monthly tax-benefited contribution
+        const rate = 0.10; // 10% total (7.5% employer + 2.5% employee)
+        
+        const totalContribution = monthlySalary * rate;
+        
+        if (monthlySalary <= threshold) {
+            return {
+                totalContribution,
+                taxDeductible: totalContribution,
+                taxableAmount: 0,
+                salaryStatus: 'below_threshold'
+            };
+        } else {
+            return {
+                totalContribution,
+                taxDeductible: maxContribution,
+                taxableAmount: totalContribution - maxContribution,
+                salaryStatus: 'above_threshold'
+            };
+        }
     }
 
     // Calculate net return after fees
@@ -66,7 +95,7 @@ class PensionCalculations {
         );
     }
 
-    // Calculate training fund projection
+    // Calculate training fund projection with proper tax treatment
     calculateTrainingFundProjection(inputs) {
         const currentAge = inputs.currentAge || 30;
         const retirementAge = inputs.retirementAge || 67;
@@ -74,18 +103,40 @@ class PensionCalculations {
         
         const currentSavings = inputs.currentTrainingFundSavings || 0;
         const monthlySalary = inputs.currentMonthlySalary || 15000;
-        const monthlyContribution = this.calculateMonthlyTrainingFundContribution(monthlySalary);
+        const contributionInfo = this.calculateMonthlyTrainingFundContribution(monthlySalary, inputs.taxCountry);
         
         const expectedReturn = (inputs.expectedReturn || 7) / 100;
         const fees = (inputs.trainingFundFees || 0.6) / 100;
         const netReturn = this.calculateNetReturn(expectedReturn, fees);
         
-        return this.calculateFutureValue(
+        // Calculate projections for both tax-deductible and taxable portions
+        const taxDeductibleProjection = this.calculateFutureValue(
             currentSavings, 
             netReturn, 
             yearsToRetirement, 
-            monthlyContribution
+            contributionInfo.taxDeductible || contributionInfo.totalContribution
         );
+        
+        // For amounts above threshold, factor in tax implications
+        let taxableProjection = 0;
+        if (contributionInfo.taxableAmount > 0) {
+            // Above-threshold contributions are subject to different tax treatment
+            const taxableReturn = netReturn * 0.75; // 25% tax on gains for above-threshold amounts
+            taxableProjection = this.calculateFutureValue(
+                0, 
+                taxableReturn, 
+                yearsToRetirement, 
+                contributionInfo.taxableAmount
+            );
+        }
+        
+        return {
+            total: taxDeductibleProjection + taxableProjection,
+            taxDeductible: taxDeductibleProjection,
+            taxable: taxableProjection,
+            monthlyContribution: contributionInfo.totalContribution,
+            salaryStatus: contributionInfo.salaryStatus
+        };
     }
 
     // Calculate combined projection for couples
