@@ -6,7 +6,7 @@ function RetirementPlannerApp() {
     var language = languageState[0];
     var setLanguage = languageState[1];
     
-    var viewModeState = React.useState('wizard');
+    var viewModeState = React.useState('dashboard');
     var viewMode = viewModeState[0];
     var setViewMode = viewModeState[1];
     
@@ -611,62 +611,73 @@ function RetirementPlannerApp() {
                     key: 'control-panel',
                     className: 'lg:col-span-1 space-y-6'
                 }, [
-                    // Quick Stats Card
+                    // Wizard Description Card  
                     React.createElement('div', {
-                        key: 'quick-stats',
-                        className: 'bg-white rounded-xl p-6 shadow-sm border border-gray-200'
+                        key: 'wizard-description',
+                        className: 'bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 shadow-sm border border-blue-200'
                     }, [
                         React.createElement('h3', {
-                            key: 'stats-title',
-                            className: 'text-lg font-semibold text-gray-800 mb-4'
-                        }, language === 'he' ? 'סטטיסטיקות מהירות' : 'Quick Stats'),
+                            key: 'wizard-title',
+                            className: 'text-lg font-semibold text-blue-800 mb-3 flex items-center'
+                        }, [
+                            React.createElement('span', {
+                                key: 'wizard-icon',
+                                className: 'mr-2 text-xl'
+                            }, '🧙‍♂️'),
+                            language === 'he' ? 'אשף תכנון פרישה' : 'Retirement Planning Wizard'
+                        ]),
+                        React.createElement('p', {
+                            key: 'wizard-description-text',
+                            className: 'text-blue-700 mb-4 text-sm leading-relaxed'
+                        }, language === 'he' ? 
+                            'האשף שלנו יאסוף את כל המידע הדרוש לחישוב מקיף של תכנית הפרישה שלך. תוכל לבחור בין תכנון אישי או זוגי, להזין פרטי משכורת וחיסכונות, ולקבל תחזית מפורטת לפרישה.' :
+                            'Our wizard will collect all the information needed for a comprehensive retirement plan calculation. Choose between individual or couple planning, enter salary and savings details, and get a detailed retirement projection.'
+                        ),
                         React.createElement('div', {
-                            key: 'stats-grid',
-                            className: 'space-y-3'
+                            key: 'wizard-benefits',
+                            className: 'space-y-2 mb-4'
                         }, [
                             React.createElement('div', {
-                                key: 'age-stat',
-                                className: 'flex justify-between'
+                                key: 'benefit-1',
+                                className: 'flex items-center text-sm text-blue-600'
                             }, [
                                 React.createElement('span', {
-                                    key: 'age-label',
-                                    className: 'text-gray-600'
-                                }, language === 'he' ? 'גיל נוכחי' : 'Current Age'),
-                                React.createElement('span', {
-                                    key: 'age-value',
-                                    className: 'font-semibold text-blue-600'
-                                }, inputs?.currentAge || 30)
+                                    key: 'check-1',
+                                    className: 'mr-2 text-green-500'
+                                }, '✓'),
+                                language === 'he' ? 'תכנון אישי או זוגי' : 'Individual or couple planning'
                             ]),
                             React.createElement('div', {
-                                key: 'retirement-stat',
-                                className: 'flex justify-between'
+                                key: 'benefit-2',
+                                className: 'flex items-center text-sm text-blue-600'
                             }, [
                                 React.createElement('span', {
-                                    key: 'retirement-label',
-                                    className: 'text-gray-600'
-                                }, language === 'he' ? 'גיל פרישה' : 'Retirement Age'),
-                                React.createElement('span', {
-                                    key: 'retirement-value',
-                                    className: 'font-semibold text-green-600'
-                                }, inputs?.retirementAge || 67)
+                                    key: 'check-2',
+                                    className: 'mr-2 text-green-500'
+                                }, '✓'),
+                                language === 'he' ? 'חישוב פנסיה וקרנות השתלמות' : 'Pension and training fund calculations'
                             ]),
                             React.createElement('div', {
-                                key: 'savings-stat',
-                                className: 'flex justify-between'
+                                key: 'benefit-3',
+                                className: 'flex items-center text-sm text-blue-600'
                             }, [
                                 React.createElement('span', {
-                                    key: 'savings-label',
-                                    className: 'text-gray-600'
-                                }, language === 'he' ? 'חיסכון נוכחי' : 'Current Savings'),
-                                React.createElement('span', {
-                                    key: 'savings-value',
-                                    className: 'font-semibold text-purple-600'
-                                }, React.createElement(CurrencyValue, {
-                                    key: 'quick-stats-savings',
-                                    value: inputs?.currentSavings || 0,
-                                    currency: workingCurrency
-                                }))
+                                    key: 'check-3',
+                                    className: 'mr-2 text-green-500'
+                                }, '✓'),
+                                language === 'he' ? 'תחזית תשואות וניתוח סיכונים' : 'Return projections and risk analysis'
                             ])
+                        ]),
+                        React.createElement('button', {
+                            key: 'start-wizard-btn',
+                            onClick: function() { setViewMode('wizard'); setCurrentStep(1); },
+                            className: 'w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center'
+                        }, [
+                            React.createElement('span', {
+                                key: 'start-icon',
+                                className: 'mr-2'
+                            }, '🚀'),
+                            language === 'he' ? 'התחל אשף תכנון' : 'Start Planning Wizard'
                         ])
                     ]),
                     
