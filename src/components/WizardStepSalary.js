@@ -154,8 +154,8 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
 
     // Using React.createElement pattern for component rendering
     return createElement('div', { className: "space-y-8" }, [
-        // Main Salary Section (show in all modes)
-        createElement('div', { key: 'main-salary-section' }, [
+        // Main Salary Section (hide in couple mode)
+        inputs.planningType !== 'couple' && createElement('div', { key: 'main-salary-section' }, [
             createElement('h3', { 
                 key: 'main-salary-title',
                 className: "text-xl font-semibold text-gray-700 mb-4 flex items-center" 
