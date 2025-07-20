@@ -148,29 +148,61 @@ const RetirementWizard = ({
 
         switch (currentStep) {
             case 1:
-                return React.createElement(window.WizardStepPersonal || 'div', stepProps, 
-                    'Personal Information Step - To be implemented');
+                if (window.WizardStepPersonal) {
+                    return React.createElement(window.WizardStepPersonal, stepProps);
+                } else {
+                    return React.createElement('div', { className: 'text-center p-8' }, 
+                        'Personal Information Step - To be implemented');
+                }
             case 2:
-                return React.createElement(window.WizardStepSalary || 'div', stepProps, 
-                    'Salary & Income Step - To be implemented');
+                if (window.WizardStepSalary) {
+                    return React.createElement(window.WizardStepSalary, stepProps);
+                } else {
+                    return React.createElement('div', { className: 'text-center p-8' }, 
+                        'Salary & Income Step - To be implemented');
+                }
             case 3:
-                return React.createElement(window.WizardStepSavings || 'div', stepProps, 
-                    'Current Savings Step - To be implemented');
+                if (window.WizardStepSavings) {
+                    return React.createElement(window.WizardStepSavings, stepProps);
+                } else {
+                    return React.createElement('div', { className: 'text-center p-8' }, 
+                        'Current Savings Step - To be implemented');
+                }
             case 4:
-                return React.createElement(window.WizardStepContributions || 'div', stepProps, 
-                    'Contribution Settings Step - To be implemented');
+                if (window.WizardStepContributions) {
+                    return React.createElement(window.WizardStepContributions, stepProps);
+                } else {
+                    return React.createElement('div', { className: 'text-center p-8' }, 
+                        'Contribution Settings Step - To be implemented');
+                }
             case 5:
-                return React.createElement(window.WizardStepFees || 'div', stepProps, 
-                    'Management Fees Step - To be implemented');
+                if (window.WizardStepFees) {
+                    return React.createElement(window.WizardStepFees, stepProps);
+                } else {
+                    return React.createElement('div', { className: 'text-center p-8' }, 
+                        'Management Fees Step - To be implemented');
+                }
             case 6:
-                return React.createElement(window.WizardStepInvestments || 'div', stepProps, 
-                    'Investment Preferences Step - To be implemented');
+                if (window.WizardStepInvestments) {
+                    return React.createElement(window.WizardStepInvestments, stepProps);
+                } else {
+                    return React.createElement('div', { className: 'text-center p-8' }, 
+                        'Investment Preferences Step - To be implemented');
+                }
             case 7:
-                return React.createElement(window.WizardStepGoals || 'div', stepProps, 
-                    'Retirement Goals Step - To be implemented');
+                if (window.WizardStepGoals) {
+                    return React.createElement(window.WizardStepGoals, stepProps);
+                } else {
+                    return React.createElement('div', { className: 'text-center p-8' }, 
+                        'Retirement Goals Step - To be implemented');
+                }
             case 8:
-                return React.createElement(window.WizardStepReview || 'div', stepProps, 
-                    'Review & Calculate Step - To be implemented');
+                if (window.WizardStepReview) {
+                    return React.createElement(window.WizardStepReview, stepProps);
+                } else {
+                    return React.createElement('div', { className: 'text-center p-8' }, 
+                        'Review & Calculate Step - To be implemented');
+                }
             default:
                 return React.createElement('div', { className: 'text-center p-8' }, 'Invalid step');
         }

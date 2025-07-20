@@ -1,347 +1,412 @@
-// WizardStepPersonal.js - Step 1: Personal Information
-// Collects age, retirement age, planning type (single/couple), and partner details
+// WizardStepPersonal.js - Personal Information step for retirement planning wizard
+// Handles age, retirement age, and planning type (single vs couple) selection
 
-const WizardStepPersonal = ({ inputs, setInputs, language = 'en' }) => {
-    // Validation state
-    const [validationErrors, setValidationErrors] = React.useState({});
-    
-    // Validation rules
-    const validateAge = (age) => {
-        if (!age || age < 18) return language === 'he' ? 'גיל מינימלי: 18' : 'Minimum age: 18';
-        if (age > 100) return language === 'he' ? 'גיל מקסימלי: 100' : 'Maximum age: 100';
-        return null;
-    };
-    
-    const validateRetirementAge = (retirementAge, currentAge) => {
-        if (!retirementAge) return null;
-        if (retirementAge <= currentAge) return language === 'he' ? 'גיל פרישה חייב להיות גבוה מהגיל הנוכחי' : 'Retirement age must be higher than current age';
-        if (retirementAge > 75) return language === 'he' ? 'גיל פרישה מקסימלי: 75' : 'Maximum retirement age: 75';
-        return null;
-    };
-    
-    const validateName = (name) => {
-        if (name && name.length < 2) return language === 'he' ? 'שם קצר מדי' : 'Name too short';
-        return null;
-    };
-    
-    // Real-time validation
-    const handleAgeChange = (age, field) => {
-        const error = validateAge(age);
-        setValidationErrors(prev => ({...prev, [field]: error}));
-        setInputs({...inputs, [field]: age});
-        
-        // Also validate retirement age when current age changes
-        if (field === 'currentAge') {
-            const retirementError = validateRetirementAge(inputs.retirementAge, age);
-            setValidationErrors(prev => ({...prev, retirementAge: retirementError}));
-        }
-    };
-    
-    const handleRetirementAgeChange = (retirementAge) => {
-        const error = validateRetirementAge(retirementAge, inputs.currentAge);
-        setValidationErrors(prev => ({...prev, retirementAge: error}));
-        setInputs({...inputs, retirementAge});
-    };
-    
-    const handleNameChange = (name, field) => {
-        const error = validateName(name);
-        setValidationErrors(prev => ({...prev, [field]: error}));
-        setInputs({...inputs, [field]: name});
-    };
-    
+const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) => {
     // Multi-language content
     const content = {
         he: {
-            planningType: 'סוג התכנון',
-            single: 'רווק/ה',
-            singleDesc: 'תכנון אישי',
-            couple: 'זוג',
-            coupleDesc: 'תכנון משותף',
+            title: 'פרטים אישיים',
+            subtitle: 'גיל, גיל פרישה וסוג תכנון',
             currentAge: 'גיל נוכחי',
             retirementAge: 'גיל פרישה',
-            partnerInfo: 'פרטי בני הזוג',
-            partner1: 'בן/בת זוג 1',
-            partner2: 'בן/בת זוג 2',
-            name: 'שם',
-            age: 'גיל',
-            enterName: 'הזן שם',
-            ageInfo: 'גילך הנוכחי קובע את אופק הזמן להשקעה',
-            retirementInfo: 'גיל הפרישה המתוכנן שלך',
-            coupleInfo: 'תכנון זוגי מאפשר אופטימיזציה משותפת של החיסכון והתשואות',
-            validInput: 'תקין',
-            invalidInput: 'שגיאה'
+            planningType: 'סוג תכנון',
+            planningModeLabel: 'בחר סוג תכנון:',
+            single: 'תכנון אישי',
+            couple: 'תכנון זוגי',
+            singleDescription: 'תכנון פרישה עבור אדם יחיד',
+            coupleDescription: 'תכנון פרישה עבור זוג (שני בני זוג)',
+            ageValidation: 'גיל חייב להיות בין 18 ל-100',
+            retirementAgeValidation: 'גיל פרישה חייב להיות גבוה מהגיל הנוכחי',
+            yourName: 'השם שלך',
+            partnerName: 'שם בן/בת הזוג',
+            yourAge: 'הגיל שלך',
+            partnerAge: 'גיל בן/בת הזוג',
+            yourRetirementAge: 'גיל הפרישה שלך',
+            partnerRetirementAge: 'גיל פרישה של בן/בת הזוג'
         },
         en: {
-            planningType: 'Planning Type',
-            single: 'Single',
-            singleDesc: 'Individual planning',
-            couple: 'Couple',
-            coupleDesc: 'Joint planning',
+            title: 'Personal Information',
+            subtitle: 'Age, retirement age, and planning type',
             currentAge: 'Current Age',
             retirementAge: 'Retirement Age',
-            partnerInfo: 'Partner Information',
-            partner1: 'Partner 1',
-            partner2: 'Partner 2',
-            name: 'Name',
-            age: 'Age',
-            enterName: 'Enter name',
-            ageInfo: 'Your current age determines your investment time horizon',
-            retirementInfo: 'Your planned retirement age',
-            coupleInfo: 'Joint planning enables shared optimization of savings and returns',
-            validInput: 'Valid',
-            invalidInput: 'Error'
+            planningType: 'Planning Type',
+            planningModeLabel: 'Choose planning type:',
+            single: 'Individual Planning',
+            couple: 'Couple Planning',
+            singleDescription: 'Retirement planning for one person',
+            coupleDescription: 'Retirement planning for a couple (two partners)',
+            ageValidation: 'Age must be between 18 and 100',
+            retirementAgeValidation: 'Retirement age must be higher than current age',
+            yourName: 'Your Name',
+            partnerName: 'Partner Name',
+            yourAge: 'Your Age',
+            partnerAge: 'Partner Age',
+            yourRetirementAge: 'Your Retirement Age',
+            partnerRetirementAge: 'Partner Retirement Age'
         }
     };
 
     const t = content[language];
-    
-    // Helper function for input styling based on validation
-    const getInputClassName = (fieldName, baseClassName) => {
-        const error = validationErrors[fieldName];
-        if (error) {
-            return `${baseClassName} border-red-500 focus:ring-red-500 focus:border-red-500`;
-        }
-        return `${baseClassName} border-gray-300 focus:ring-purple-500 focus:border-purple-500`;
+
+    // Determine if in couple mode
+    const isCoupleMode = inputs.planningType === 'couple';
+
+    // Handler for planning type change
+    const handlePlanningTypeChange = (type) => {
+        setInputs(prev => ({
+            ...prev,
+            planningType: type,
+            // Reset partner-specific fields when switching to single mode
+            ...(type === 'single' ? {
+                partnerName: '',
+                partnerAge: '',
+                partnerRetirementAge: '',
+                partner1Salary: 0,
+                partner2Salary: 0
+            } : {})
+        }));
     };
 
-    return React.createElement('div', { className: "space-y-8" }, [
+    // Validation functions
+    const isValidAge = (age) => age >= 18 && age <= 100;
+    const isValidRetirementAge = (retAge, currentAge) => retAge > currentAge && retAge <= 100;
+
+    return React.createElement('div', { 
+        className: "personal-info-step space-y-8" 
+    }, [
         // Planning Type Selection
-        React.createElement('div', { key: 'planning-type-section' }, [
-            React.createElement('h3', { 
+        React.createElement('div', {
+            key: 'planning-type-section',
+            className: "space-y-4"
+        }, [
+            React.createElement('h3', {
                 key: 'planning-type-title',
-                className: "text-xl font-semibold text-gray-700 mb-4 flex items-center" 
+                className: "text-xl font-semibold text-gray-800 mb-4"
+            }, t.planningModeLabel),
+            
+            React.createElement('div', {
+                key: 'planning-type-options',
+                className: "grid grid-cols-1 md:grid-cols-2 gap-4"
             }, [
-                React.createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '👤'),
-                t.planningType
-            ]),
-            React.createElement('div', { 
-                key: 'planning-type-buttons',
-                className: "grid grid-cols-2 gap-6" 
-            }, [
-                React.createElement('button', {
-                    key: 'single-planning',
-                    type: 'button',
-                    onClick: () => setInputs({...inputs, planningType: 'single'}),
-                    className: `p-6 rounded-xl border-2 transition-all text-center ${
-                        (inputs.planningType || 'single') === 'single' 
-                            ? 'border-purple-500 bg-purple-50 text-purple-700 shadow-lg transform scale-105' 
-                            : 'border-gray-200 bg-white hover:border-purple-300 hover:shadow-md'
+                // Single Planning Option
+                React.createElement('label', {
+                    key: 'single-option',
+                    className: `cursor-pointer border-2 rounded-lg p-6 transition-all duration-200 ${
+                        inputs.planningType === 'single' 
+                            ? 'border-blue-500 bg-blue-50' 
+                            : 'border-gray-300 hover:border-gray-400'
                     }`
                 }, [
-                    React.createElement('div', { key: 'single-icon', className: "text-3xl mb-2" }, '👤'),
-                    React.createElement('div', { key: 'single-title', className: "text-lg font-semibold mb-1" }, t.single),
-                    React.createElement('div', { key: 'single-desc', className: "text-sm opacity-75" }, t.singleDesc)
+                    React.createElement('input', {
+                        key: 'single-radio',
+                        type: 'radio',
+                        name: 'planningType',
+                        value: 'single',
+                        checked: inputs.planningType === 'single',
+                        onChange: () => handlePlanningTypeChange('single'),
+                        className: "sr-only"
+                    }),
+                    React.createElement('div', {
+                        key: 'single-content',
+                        className: "text-center"
+                    }, [
+                        React.createElement('div', {
+                            key: 'single-icon',
+                            className: "text-4xl mb-3"
+                        }, '👤'),
+                        React.createElement('h4', {
+                            key: 'single-title',
+                            className: "text-lg font-medium text-gray-800 mb-2"
+                        }, t.single),
+                        React.createElement('p', {
+                            key: 'single-desc',
+                            className: "text-sm text-gray-600"
+                        }, t.singleDescription)
+                    ])
                 ]),
-                React.createElement('button', {
-                    key: 'couple-planning',
-                    type: 'button',
-                    onClick: () => setInputs({...inputs, planningType: 'couple'}),
-                    className: `p-6 rounded-xl border-2 transition-all text-center ${
+                
+                // Couple Planning Option
+                React.createElement('label', {
+                    key: 'couple-option',
+                    className: `cursor-pointer border-2 rounded-lg p-6 transition-all duration-200 ${
                         inputs.planningType === 'couple' 
-                            ? 'border-purple-500 bg-purple-50 text-purple-700 shadow-lg transform scale-105' 
-                            : 'border-gray-200 bg-white hover:border-purple-300 hover:shadow-md'
+                            ? 'border-blue-500 bg-blue-50' 
+                            : 'border-gray-300 hover:border-gray-400'
                     }`
                 }, [
-                    React.createElement('div', { key: 'couple-icon', className: "text-3xl mb-2" }, '👥'),
-                    React.createElement('div', { key: 'couple-title', className: "text-lg font-semibold mb-1" }, t.couple),
-                    React.createElement('div', { key: 'couple-desc', className: "text-sm opacity-75" }, t.coupleDesc)
+                    React.createElement('input', {
+                        key: 'couple-radio',
+                        type: 'radio',
+                        name: 'planningType',
+                        value: 'couple',
+                        checked: inputs.planningType === 'couple',
+                        onChange: () => handlePlanningTypeChange('couple'),
+                        className: "sr-only"
+                    }),
+                    React.createElement('div', {
+                        key: 'couple-content',
+                        className: "text-center"
+                    }, [
+                        React.createElement('div', {
+                            key: 'couple-icon',
+                            className: "text-4xl mb-3"
+                        }, '👫'),
+                        React.createElement('h4', {
+                            key: 'couple-title',
+                            className: "text-lg font-medium text-gray-800 mb-2"
+                        }, t.couple),
+                        React.createElement('p', {
+                            key: 'couple-desc',
+                            className: "text-sm text-gray-600"
+                        }, t.coupleDescription)
+                    ])
                 ])
             ])
         ]),
 
-        // Age Information (only show in single mode)
-        inputs.planningType !== 'couple' && React.createElement('div', { 
-            key: 'age-section',
-            className: "grid grid-cols-1 md:grid-cols-2 gap-8" 
-        }, [
-            React.createElement('div', { key: 'current-age' }, [
-                React.createElement('label', { 
-                    key: 'current-age-label',
-                    className: "block text-lg font-medium text-gray-700 mb-2" 
-                }, t.currentAge),
-                React.createElement('input', {
-                    key: 'current-age-input',
-                    type: 'number',
-                    min: 18,
-                    max: 100,
-                    value: inputs.currentAge || 30,
-                    onChange: (e) => handleAgeChange(parseInt(e.target.value) || 0, 'currentAge'),
-                    className: getInputClassName('currentAge', "w-full p-4 text-xl border-2 rounded-lg focus:ring-2")
-                }),
-                validationErrors.currentAge && React.createElement('p', { 
-                    key: 'current-age-error',
-                    className: "mt-1 text-sm text-red-600 flex items-center" 
-                }, [
-                    React.createElement('span', { key: 'error-icon', className: "mr-1" }, '⚠️'),
-                    validationErrors.currentAge
-                ]),
-                React.createElement('p', { 
-                    key: 'current-age-help',
-                    className: "mt-2 text-sm text-gray-600" 
-                }, t.ageInfo)
-            ]),
-            React.createElement('div', { key: 'retirement-age' }, [
-                React.createElement('label', { 
-                    key: 'retirement-age-label',
-                    className: "block text-lg font-medium text-gray-700 mb-2" 
-                }, t.retirementAge),
-                React.createElement('input', {
-                    key: 'retirement-age-input',
-                    type: 'number',
-                    min: (inputs.currentAge || 18) + 1,
-                    max: 75,
-                    value: inputs.retirementAge || 67,
-                    onChange: (e) => handleRetirementAgeChange(parseInt(e.target.value) || 0),
-                    className: getInputClassName('retirementAge', "w-full p-4 text-xl border-2 rounded-lg focus:ring-2")
-                }),
-                validationErrors.retirementAge && React.createElement('p', { 
-                    key: 'retirement-age-error',
-                    className: "mt-1 text-sm text-red-600 flex items-center" 
-                }, [
-                    React.createElement('span', { key: 'error-icon', className: "mr-1" }, '⚠️'),
-                    validationErrors.retirementAge
-                ]),
-                React.createElement('p', { 
-                    key: 'retirement-age-help',
-                    className: "mt-2 text-sm text-gray-600" 
-                }, t.retirementInfo)
-            ])
-        ]),
-
-        // Partner Information (if couple selected)
-        inputs.planningType === 'couple' && React.createElement('div', { 
-            key: 'partner-section',
-            className: "bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl p-6 border border-pink-200" 
-        }, [
-            React.createElement('h3', { 
-                key: 'partner-title',
-                className: "text-xl font-semibold text-pink-700 mb-4 flex items-center" 
+        // Personal Information Forms
+        isCoupleMode ? 
+            // Couple Mode - Two Columns
+            React.createElement('div', {
+                key: 'couple-info',
+                className: "grid grid-cols-1 lg:grid-cols-2 gap-8"
             }, [
-                React.createElement('span', { key: 'partner-icon', className: "mr-3 text-2xl" }, '👫'),
-                t.partnerInfo
-            ]),
-            React.createElement('p', { 
-                key: 'partner-info-text',
-                className: "text-pink-600 mb-6" 
-            }, t.coupleInfo),
-            React.createElement('div', { 
-                key: 'partners-grid',
-                className: "grid grid-cols-1 md:grid-cols-2 gap-6" 
-            }, [
-                // Partner 1
-                React.createElement('div', { 
-                    key: 'partner1',
-                    className: "bg-white rounded-lg p-4 border border-pink-300" 
+                // Your Information
+                React.createElement('div', {
+                    key: 'your-info',
+                    className: "bg-blue-50 p-6 rounded-lg space-y-4"
                 }, [
-                    React.createElement('h4', { 
-                        key: 'partner1-title',
-                        className: "font-semibold text-pink-700 mb-4 text-lg" 
-                    }, inputs.partner1Name || t.partner1),
-                    React.createElement('div', { key: 'partner1-fields', className: "space-y-4" }, [
-                        React.createElement('div', { key: 'partner1-name' }, [
-                            React.createElement('label', { 
-                                key: 'partner1-name-label',
-                                className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, t.name),
-                            React.createElement('input', {
-                                key: 'partner1-name-input',
-                                type: 'text',
-                                value: inputs.partner1Name || '',
-                                onChange: (e) => setInputs({...inputs, partner1Name: e.target.value}),
-                                placeholder: t.enterName,
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
-                            })
-                        ]),
-                        React.createElement('div', { key: 'partner1-current-age' }, [
-                            React.createElement('label', { 
-                                key: 'partner1-current-age-label',
-                                className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, t.currentAge),
-                            React.createElement('input', {
-                                key: 'partner1-current-age-input',
-                                type: 'number',
-                                min: 18,
-                                max: 100,
-                                value: inputs.partner1Age || 30,
-                                onChange: (e) => setInputs({...inputs, partner1Age: parseInt(e.target.value) || 30, currentAge: parseInt(e.target.value) || 30}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
-                            })
-                        ]),
-                        React.createElement('div', { key: 'partner1-retirement-age' }, [
-                            React.createElement('label', { 
-                                key: 'partner1-retirement-age-label',
-                                className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, t.retirementAge),
-                            React.createElement('input', {
-                                key: 'partner1-retirement-age-input',
-                                type: 'number',
-                                min: (inputs.partner1Age || 18) + 1,
-                                max: 75,
-                                value: inputs.partner1RetirementAge || 67,
-                                onChange: (e) => setInputs({...inputs, partner1RetirementAge: parseInt(e.target.value) || 67, retirementAge: parseInt(e.target.value) || 67}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
-                            })
-                        ])
+                    React.createElement('h4', {
+                        key: 'your-title',
+                        className: "text-lg font-medium text-blue-800 mb-4 text-center"
+                    }, t.yourName),
+                    
+                    React.createElement('div', {
+                        key: 'your-name-field',
+                        className: "space-y-2"
+                    }, [
+                        React.createElement('label', {
+                            key: 'your-name-label',
+                            className: "block text-sm font-medium text-gray-700"
+                        }, t.yourName),
+                        React.createElement('input', {
+                            key: 'your-name-input',
+                            type: 'text',
+                            value: inputs.userName || '',
+                            onChange: (e) => setInputs(prev => ({ ...prev, userName: e.target.value })),
+                            className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                            placeholder: t.yourName
+                        })
+                    ]),
+                    
+                    React.createElement('div', {
+                        key: 'your-age-field',
+                        className: "space-y-2"
+                    }, [
+                        React.createElement('label', {
+                            key: 'your-age-label',
+                            className: "block text-sm font-medium text-gray-700"
+                        }, t.yourAge),
+                        React.createElement('input', {
+                            key: 'your-age-input',
+                            type: 'number',
+                            min: '18',
+                            max: '100',
+                            value: inputs.currentAge || '',
+                            onChange: (e) => setInputs(prev => ({ ...prev, currentAge: parseInt(e.target.value) || '' })),
+                            className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                inputs.currentAge && !isValidAge(inputs.currentAge) ? 'border-red-500' : 'border-gray-300'
+                            }`
+                        }),
+                        inputs.currentAge && !isValidAge(inputs.currentAge) && React.createElement('p', {
+                            key: 'your-age-error',
+                            className: "text-sm text-red-600"
+                        }, t.ageValidation)
+                    ]),
+                    
+                    React.createElement('div', {
+                        key: 'your-retirement-field',
+                        className: "space-y-2"
+                    }, [
+                        React.createElement('label', {
+                            key: 'your-retirement-label',
+                            className: "block text-sm font-medium text-gray-700"
+                        }, t.yourRetirementAge),
+                        React.createElement('input', {
+                            key: 'your-retirement-input',
+                            type: 'number',
+                            min: '50',
+                            max: '100',
+                            value: inputs.retirementAge || '',
+                            onChange: (e) => setInputs(prev => ({ ...prev, retirementAge: parseInt(e.target.value) || '' })),
+                            className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                inputs.retirementAge && !isValidRetirementAge(inputs.retirementAge, inputs.currentAge) ? 'border-red-500' : 'border-gray-300'
+                            }`
+                        }),
+                        inputs.retirementAge && !isValidRetirementAge(inputs.retirementAge, inputs.currentAge) && React.createElement('p', {
+                            key: 'your-retirement-error',
+                            className: "text-sm text-red-600"
+                        }, t.retirementAgeValidation)
                     ])
                 ]),
-                // Partner 2
-                React.createElement('div', { 
-                    key: 'partner2',
-                    className: "bg-white rounded-lg p-4 border border-pink-300" 
+                
+                // Partner Information
+                React.createElement('div', {
+                    key: 'partner-info',
+                    className: "bg-green-50 p-6 rounded-lg space-y-4"
                 }, [
-                    React.createElement('h4', { 
-                        key: 'partner2-title',
-                        className: "font-semibold text-pink-700 mb-4 text-lg" 
-                    }, inputs.partner2Name || t.partner2),
-                    React.createElement('div', { key: 'partner2-fields', className: "space-y-4" }, [
-                        React.createElement('div', { key: 'partner2-name' }, [
-                            React.createElement('label', { 
-                                key: 'partner2-name-label',
-                                className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, t.name),
-                            React.createElement('input', {
-                                key: 'partner2-name-input',
-                                type: 'text',
-                                value: inputs.partner2Name || '',
-                                onChange: (e) => setInputs({...inputs, partner2Name: e.target.value}),
-                                placeholder: t.enterName,
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
-                            })
-                        ]),
-                        React.createElement('div', { key: 'partner2-current-age' }, [
-                            React.createElement('label', { 
-                                key: 'partner2-current-age-label',
-                                className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, t.currentAge),
-                            React.createElement('input', {
-                                key: 'partner2-current-age-input',
-                                type: 'number',
-                                min: 18,
-                                max: 100,
-                                value: inputs.partner2Age || 30,
-                                onChange: (e) => setInputs({...inputs, partner2Age: parseInt(e.target.value) || 30}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
-                            })
-                        ]),
-                        React.createElement('div', { key: 'partner2-retirement-age' }, [
-                            React.createElement('label', { 
-                                key: 'partner2-retirement-age-label',
-                                className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, t.retirementAge),
-                            React.createElement('input', {
-                                key: 'partner2-retirement-age-input',
-                                type: 'number',
-                                min: (inputs.partner2Age || 18) + 1,
-                                max: 75,
-                                value: inputs.partner2RetirementAge || 67,
-                                onChange: (e) => setInputs({...inputs, partner2RetirementAge: parseInt(e.target.value) || 67}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
-                            })
-                        ])
+                    React.createElement('h4', {
+                        key: 'partner-title',
+                        className: "text-lg font-medium text-green-800 mb-4 text-center"
+                    }, t.partnerName),
+                    
+                    React.createElement('div', {
+                        key: 'partner-name-field',
+                        className: "space-y-2"
+                    }, [
+                        React.createElement('label', {
+                            key: 'partner-name-label',
+                            className: "block text-sm font-medium text-gray-700"
+                        }, t.partnerName),
+                        React.createElement('input', {
+                            key: 'partner-name-input',
+                            type: 'text',
+                            value: inputs.partnerName || '',
+                            onChange: (e) => setInputs(prev => ({ ...prev, partnerName: e.target.value })),
+                            className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500",
+                            placeholder: t.partnerName
+                        })
+                    ]),
+                    
+                    React.createElement('div', {
+                        key: 'partner-age-field',
+                        className: "space-y-2"
+                    }, [
+                        React.createElement('label', {
+                            key: 'partner-age-label',
+                            className: "block text-sm font-medium text-gray-700"
+                        }, t.partnerAge),
+                        React.createElement('input', {
+                            key: 'partner-age-input',
+                            type: 'number',
+                            min: '18',
+                            max: '100',
+                            value: inputs.partnerAge || '',
+                            onChange: (e) => setInputs(prev => ({ ...prev, partnerAge: parseInt(e.target.value) || '' })),
+                            className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                                inputs.partnerAge && !isValidAge(inputs.partnerAge) ? 'border-red-500' : 'border-gray-300'
+                            }`
+                        }),
+                        inputs.partnerAge && !isValidAge(inputs.partnerAge) && React.createElement('p', {
+                            key: 'partner-age-error',
+                            className: "text-sm text-red-600"
+                        }, t.ageValidation)
+                    ]),
+                    
+                    React.createElement('div', {
+                        key: 'partner-retirement-field',
+                        className: "space-y-2"
+                    }, [
+                        React.createElement('label', {
+                            key: 'partner-retirement-label',
+                            className: "block text-sm font-medium text-gray-700"
+                        }, t.partnerRetirementAge),
+                        React.createElement('input', {
+                            key: 'partner-retirement-input',
+                            type: 'number',
+                            min: '50',
+                            max: '100',
+                            value: inputs.partnerRetirementAge || '',
+                            onChange: (e) => setInputs(prev => ({ ...prev, partnerRetirementAge: parseInt(e.target.value) || '' })),
+                            className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                                inputs.partnerRetirementAge && !isValidRetirementAge(inputs.partnerRetirementAge, inputs.partnerAge) ? 'border-red-500' : 'border-gray-300'
+                            }`
+                        }),
+                        inputs.partnerRetirementAge && !isValidRetirementAge(inputs.partnerRetirementAge, inputs.partnerAge) && React.createElement('p', {
+                            key: 'partner-retirement-error',
+                            className: "text-sm text-red-600"
+                        }, t.retirementAgeValidation)
                     ])
                 ])
+            ]) :
+            // Single Mode - Single Column
+            React.createElement('div', {
+                key: 'single-info',
+                className: "max-w-md mx-auto bg-blue-50 p-6 rounded-lg space-y-4"
+            }, [
+                React.createElement('h4', {
+                    key: 'single-title',
+                    className: "text-lg font-medium text-blue-800 mb-4 text-center"
+                }, t.title),
+                
+                React.createElement('div', {
+                    key: 'name-field',
+                    className: "space-y-2"
+                }, [
+                    React.createElement('label', {
+                        key: 'name-label',
+                        className: "block text-sm font-medium text-gray-700"
+                    }, t.yourName),
+                    React.createElement('input', {
+                        key: 'name-input',
+                        type: 'text',
+                        value: inputs.userName || '',
+                        onChange: (e) => setInputs(prev => ({ ...prev, userName: e.target.value })),
+                        className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                        placeholder: t.yourName
+                    })
+                ]),
+                
+                React.createElement('div', {
+                    key: 'age-field',
+                    className: "space-y-2"
+                }, [
+                    React.createElement('label', {
+                        key: 'age-label',
+                        className: "block text-sm font-medium text-gray-700"
+                    }, t.currentAge),
+                    React.createElement('input', {
+                        key: 'age-input',
+                        type: 'number',
+                        min: '18',
+                        max: '100',
+                        value: inputs.currentAge || '',
+                        onChange: (e) => setInputs(prev => ({ ...prev, currentAge: parseInt(e.target.value) || '' })),
+                        className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            inputs.currentAge && !isValidAge(inputs.currentAge) ? 'border-red-500' : 'border-gray-300'
+                        }`
+                    }),
+                    inputs.currentAge && !isValidAge(inputs.currentAge) && React.createElement('p', {
+                        key: 'age-error',
+                        className: "text-sm text-red-600"
+                    }, t.ageValidation)
+                ]),
+                
+                React.createElement('div', {
+                    key: 'retirement-field',
+                    className: "space-y-2"
+                }, [
+                    React.createElement('label', {
+                        key: 'retirement-label',
+                        className: "block text-sm font-medium text-gray-700"
+                    }, t.retirementAge),
+                    React.createElement('input', {
+                        key: 'retirement-input',
+                        type: 'number',
+                        min: '50',
+                        max: '100',
+                        value: inputs.retirementAge || '',
+                        onChange: (e) => setInputs(prev => ({ ...prev, retirementAge: parseInt(e.target.value) || '' })),
+                        className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            inputs.retirementAge && !isValidRetirementAge(inputs.retirementAge, inputs.currentAge) ? 'border-red-500' : 'border-gray-300'
+                        }`
+                    }),
+                    inputs.retirementAge && !isValidRetirementAge(inputs.retirementAge, inputs.currentAge) && React.createElement('p', {
+                        key: 'retirement-error',
+                        className: "text-sm text-red-600"
+                    }, t.retirementAgeValidation)
+                ])
             ])
-        ])
     ]);
 };
 
