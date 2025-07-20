@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Retirement Planner v5.3.7</title>
+    <title>Advanced Retirement Planner v5.4.0</title>
     <meta name="description" content="Advanced retirement planning tool with comprehensive investment tracking">
     
     <!-- Security Headers (Note: X-Frame-Options removed - should be set via HTTP headers, not meta tags) -->
@@ -78,8 +78,8 @@
             .catch(error => {
                 console.warn('⚠️ Could not load version from version.json:', error);
                 // Fallback version
-                window.APP_VERSION = '5.3.7';
-                document.getElementById('version-indicator').textContent = '✨ v5.3.7';
+                window.APP_VERSION = '5.4.0';
+                document.getElementById('version-indicator').textContent = '✨ v5.4.0';
             });
     </script>
 
@@ -112,6 +112,10 @@
     <script src="src/components/WizardStepPersonal.js?v={{VERSION}}"></script>
     <script src="src/components/WizardStepSalary.js?v={{VERSION}}"></script>
     <script src="src/components/WizardStepSavings.js?v={{VERSION}}"></script>
+    <script src="src/components/WizardStepContributions.js?v={{VERSION}}"></script>
+    <script src="src/components/WizardStepFees.js?v={{VERSION}}"></script>
+    <script src="src/components/WizardStepInvestments.js?v={{VERSION}}"></script>
+    <script src="src/components/WizardStepGoals.js?v={{VERSION}}"></script>
     <script src="src/components/WizardStepReview.js?v={{VERSION}}"></script>
     <script src="src/components/RetirementWizard.js?v={{VERSION}}"></script>
     
