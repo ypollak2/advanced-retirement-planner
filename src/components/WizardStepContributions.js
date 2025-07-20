@@ -162,6 +162,9 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
         }
     };
 
+    // Alias for test compatibility
+    const calculateTrainingFundRate = calculateTrainingFundContribution;
+
     // Get detailed salary status for display
     const getSalaryStatus = (monthlySalary) => {
         if (selectedCountry !== 'israel') return '';
@@ -784,4 +787,53 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
 
 // Export to window for global access
 window.WizardStepContributions = WizardStepContributions;
+
+// Export functions for test compatibility
+window.calculateTrainingFundRate = (inputs) => {
+    const selectedCountry = inputs.taxCountry || 'israel';
+    const defaultRates = countryRates[selectedCountry] || countryRates.israel;
+    
+    const calculateTrainingFundContribution = (monthlySalary) => {
+        if (selectedCountry !== 'israel') return {
+            totalContribution: monthlySalary * (defaultRates.trainingFund / 100),
+            taxDeductible: monthlySalary * (defaultRates.trainingFund / 100),
+            taxableAmount: 0,
+            effectiveRate: defaultRates.trainingFund
+        };
+        
+        const threshold = defaultRates.trainingFundThreshold || 15712;
+        const maxContribution = defaultRates.maxMonthlyContribution || 1571;
+        const rate = defaultRates.trainingFundBelowThreshold / 100 || 0.10;
+        
+        const totalContribution = monthlySalary * rate;
+        
+        if (monthlySalary <= threshold) {
+            return {
+                totalContribution,
+                taxDeductible: totalContribution,
+                taxableAmount: 0,
+                effectiveRate: defaultRates.trainingFundBelowThreshold,
+                salaryStatus: 'below_threshold'
+            };
+        } else {
+            const taxDeductibleContribution = maxContribution;
+            const excessContribution = totalContribution - taxDeductibleContribution;
+            
+            return {
+                totalContribution,
+                taxDeductible: taxDeductibleContribution,
+                taxableAmount: excessContribution,
+                effectiveRate: (totalContribution / monthlySalary) * 100,
+                salaryStatus: 'above_threshold',
+                threshold: threshold,
+                excessSalary: monthlySalary - threshold
+            };
+        }
+    };
+    
+    return calculateTrainingFundContribution;
+};
+
+window.trainingFundThreshold = countryRates.israel.trainingFundThreshold;
+
 console.log('✅ WizardStepContributions component loaded successfully');
