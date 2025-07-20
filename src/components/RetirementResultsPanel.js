@@ -149,46 +149,82 @@ const ResultsPanel = ({
         
         React.createElement('div', { 
             key: 'results',
-            className: "glass-effect rounded-2xl shadow-xl p-6 border border-white/20 animate-fade-in"
+            className: "bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl shadow-2xl p-8 border-2 border-green-200 animate-fade-in-up transform hover:scale-105 transition-all duration-300"
         }, [
             React.createElement('h2', { 
                 key: 'title',
-                className: "text-2xl font-bold text-green-700 mb-6 flex items-center truncate-multiline truncate-2-lines"
+                className: "text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-blue-600 mb-8 flex items-center text-center justify-center"
             }, [
                 React.createElement(Calculator, { key: 'icon', className: "mr-2" }),
-                language === 'he' ? "תוצאות החישוב" : "Calculation Results"
+                (() => {
+                    const titleText = language === 'he' ? "תוצאות החישוב" : "Calculation Results";
+                    // Add title truncation logic for responsive design
+                    return titleText.length > 20 ? titleText.substring(0, 20) + '...' : titleText;
+                })()
             ]),
-            React.createElement('div', { key: 'content', className: "space-y-4" }, [
-                React.createElement('div', { key: 'grid', className: "grid grid-cols-2 gap-4" }, [
-                    React.createElement('div', { key: 'total' }, [
+            React.createElement('div', { key: 'content', className: "space-y-8" }, [
+                React.createElement('div', { key: 'grid', className: "grid grid-cols-1 md:grid-cols-2 gap-8" }, [
+                    React.createElement('div', { 
+                        key: 'total',
+                        className: "bg-white rounded-2xl p-6 shadow-lg border border-green-100 text-center transform hover:scale-105 transition-all duration-200"
+                    }, [
+                        React.createElement('div', { 
+                            key: 'icon-wrapper',
+                            className: "mx-auto w-16 h-16 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center mb-4"
+                        }, [
+                            React.createElement('span', {
+                                key: 'savings-icon',
+                                className: "text-white text-2xl"
+                            }, '💰')
+                        ]),
                         React.createElement('div', { 
                             key: 'label',
-                            className: "text-sm font-medium text-gray-700"
+                            className: "text-lg font-semibold text-gray-700 mb-2"
                         }, language === 'he' ? "סה\"כ צבירה בפרישה" : "Total Savings at Retirement"),
                         React.createElement('div', { 
                             key: 'value',
-                            className: "text-2xl font-bold text-green-600"
+                            className: "text-4xl font-extrabold text-green-600 mb-2"
                         }, React.createElement(CurrencyValue, { 
                             key: 'total-savings-value',
                             value: effectiveResults.totalSavings, 
                             currency: workingCurrency,
                             formatter: formatCurrency
-                        }))
+                        })),
+                        React.createElement('div', {
+                            key: 'subtitle',
+                            className: "text-sm text-gray-500 font-medium"
+                        }, language === 'he' ? '🎯 יעד הפרישה שלך' : '🎯 Your Retirement Goal')
                     ]),
-                    React.createElement('div', { key: 'monthly' }, [
+                    React.createElement('div', { 
+                        key: 'monthly',
+                        className: "bg-white rounded-2xl p-6 shadow-lg border border-blue-100 text-center transform hover:scale-105 transition-all duration-200"
+                    }, [
+                        React.createElement('div', { 
+                            key: 'icon-wrapper',
+                            className: "mx-auto w-16 h-16 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center mb-4"
+                        }, [
+                            React.createElement('span', {
+                                key: 'income-icon',
+                                className: "text-white text-2xl"
+                            }, '💵')
+                        ]),
                         React.createElement('div', { 
                             key: 'label',
-                            className: "text-sm font-medium text-gray-700"
+                            className: "text-lg font-semibold text-gray-700 mb-2"
                         }, language === 'he' ? "הכנסה חודשית מפנסיה" : "Monthly Pension Income"),
                         React.createElement('div', { 
                             key: 'value',
-                            className: "text-2xl font-bold text-blue-600"
+                            className: "text-4xl font-extrabold text-blue-600 mb-2"
                         }, React.createElement(CurrencyValue, { 
                             key: 'monthly-income-value',
                             value: effectiveResults.monthlyIncome, 
                             currency: workingCurrency,
                             formatter: formatCurrency
-                        }))
+                        })),
+                        React.createElement('div', {
+                            key: 'subtitle',
+                            className: "text-sm text-gray-500 font-medium"
+                        }, language === 'he' ? '📅 הכנסה חודשית קבועה' : '📅 Steady Monthly Income')
                     ])
                 ])
             ])
@@ -236,6 +272,34 @@ const ResultsPanel = ({
             language: language
         })
     ]);
+};
+
+// Helper functions for currency conversion and formatting
+const getCurrencySymbol = (currency) => {
+    const symbols = {
+        'ILS': '₪',
+        'USD': '$',
+        'EUR': '€',
+        'GBP': '£',
+        'BTC': '₿',
+        'ETH': 'Ξ'
+    };
+    return symbols[currency] || '₪';
+};
+
+const convertToWorkingCurrency = (value, targetCurrency) => {
+    // Simple conversion - in a real app, you'd use live exchange rates
+    const rates = {
+        'ILS': 1,
+        'USD': 0.27,
+        'EUR': 0.25,
+        'GBP': 0.21,
+        'BTC': 0.000007,
+        'ETH': 0.0001
+    };
+    
+    if (!value || isNaN(value)) return 0;
+    return value * (rates[targetCurrency] || 1);
 };
 
 // Currency Value Component for async conversion - reuses existing safeFormatValue function

@@ -333,66 +333,84 @@ window.calculateRetirement = (
     const targetMonthlyIncome = (finalSalary * inputs.targetReplacement) / 100;
     const achievesTarget = totalNetIncome >= targetMonthlyIncome;
 
+    // Helper function to safely round numbers and avoid NaN
+    const safeRound = (value) => {
+        if (isNaN(value) || !isFinite(value)) return 0;
+        return Math.round(value);
+    };
+
     return {
         // Individual results
-        totalSavings: Math.round(totalPensionSavings),
-        trainingFundValue: Math.round(totalTrainingFund),
-        personalPortfolioValue: Math.round(totalPersonalPortfolio),
-        cryptoValue: Math.round(totalCrypto),
-        realEstateValue: Math.round(totalRealEstate),
-        monthlyPension: Math.round(monthlyPension),
-        monthlyTrainingFundIncome: Math.round(monthlyTrainingFundIncome),
-        monthlyPersonalPortfolioIncome: Math.round(monthlyPersonalPortfolioIncome),
-        monthlyCryptoIncome: Math.round(monthlyCryptoIncome),
-        monthlyRealEstateIncome: Math.round(monthlyRealEstateIncome),
-        realEstateRentalIncome: Math.round(realEstateRentalIncome),
-        pensionTax: Math.round(pensionTax),
-        personalPortfolioTax: Math.round(personalPortfolioTax),
-        cryptoTax: Math.round(cryptoTax),
-        realEstateTax: Math.round(realEstateTax),
-        netPension: Math.round(netPension),
-        netTrainingFundIncome: Math.round(netTrainingFundIncome),
-        netPersonalPortfolioIncome: Math.round(netPersonalPortfolioIncome),
-        netCryptoIncome: Math.round(netCryptoIncome),
-        netRealEstateIncome: Math.round(netRealEstateIncome),
-        socialSecurity: socialSecurity,
-        individualNetIncome: Math.round(individualNetIncome),
+        totalSavings: safeRound(totalPensionSavings),
+        trainingFundValue: safeRound(totalTrainingFund),
+        personalPortfolioValue: safeRound(totalPersonalPortfolio),
+        cryptoValue: safeRound(totalCrypto),
+        realEstateValue: safeRound(totalRealEstate),
+        monthlyPension: safeRound(monthlyPension),
+        monthlyTrainingFundIncome: safeRound(monthlyTrainingFundIncome),
+        monthlyPersonalPortfolioIncome: safeRound(monthlyPersonalPortfolioIncome),
+        monthlyCryptoIncome: safeRound(monthlyCryptoIncome),
+        monthlyRealEstateIncome: safeRound(monthlyRealEstateIncome),
+        realEstateRentalIncome: safeRound(realEstateRentalIncome),
+        pensionTax: safeRound(pensionTax),
+        personalPortfolioTax: safeRound(personalPortfolioTax),
+        cryptoTax: safeRound(cryptoTax),
+        realEstateTax: safeRound(realEstateTax),
+        netPension: safeRound(netPension),
+        netTrainingFundIncome: safeRound(netTrainingFundIncome),
+        netPersonalPortfolioIncome: safeRound(netPersonalPortfolioIncome),
+        netCryptoIncome: safeRound(netCryptoIncome),
+        netRealEstateIncome: safeRound(netRealEstateIncome),
+        socialSecurity: socialSecurity || 0,
+        individualNetIncome: safeRound(individualNetIncome),
         
         // Partner results (if enabled)
         partnerResults: partnerResults,
-        partnerNetIncome: Math.round(partnerNetIncome),
-        partnerSocialSecurity: partnerSocialSecurity,
+        partnerNetIncome: safeRound(partnerNetIncome),
+        partnerSocialSecurity: partnerSocialSecurity || 0,
         
         // Additional income breakdown
-        annualBonusMonthly: Math.round(annualBonusMonthly),
-        quarterlyRSUMonthly: Math.round(quarterlyRSUMonthly),
-        freelanceIncome: Math.round(freelanceIncome),
-        additionalRentalIncome: Math.round(rentalIncome),
-        dividendIncome: Math.round(dividendIncome),
-        additionalIncomeTotal: Math.round(additionalIncomeTotal),
-        partnerAdditionalIncome: Math.round(partnerAdditionalIncome),
+        annualBonusMonthly: safeRound(annualBonusMonthly),
+        quarterlyRSUMonthly: safeRound(quarterlyRSUMonthly),
+        freelanceIncome: safeRound(freelanceIncome),
+        additionalRentalIncome: safeRound(rentalIncome),
+        dividendIncome: safeRound(dividendIncome),
+        additionalIncomeTotal: safeRound(additionalIncomeTotal),
+        partnerAdditionalIncome: safeRound(partnerAdditionalIncome),
         
         // Combined household results
-        totalNetIncome: Math.round(totalNetIncome),
-        monthlyIncome: Math.round(totalNetIncome), // Add missing monthlyIncome property
-        isJointPlanning: inputs.partnerPlanningEnabled,
+        totalNetIncome: safeRound(totalNetIncome),
+        monthlyIncome: safeRound(totalNetIncome), // Add missing monthlyIncome property
+        isJointPlanning: inputs.partnerPlanningEnabled || false,
         
         // Other calculations
-        periodResults,
-        lastCountry,
-        weightedTaxRate: Math.round(weightedTaxRate * 100),
-        inflationAdjustedIncome: Math.round(totalNetIncome / Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement)),
-        trainingFundNetReturn: trainingFundNetReturn,
-        pensionWeightedReturn: pensionWeightedReturn,
-        trainingFundWeightedReturn: trainingFundWeightedReturn,
-        futureMonthlyExpenses: Math.round(futureMonthlyExpenses),
-        remainingAfterExpenses: Math.round(remainingAfterExpenses),
-        remainingAfterExpensesInflationAdjusted: Math.round(remainingAfterExpenses / Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement)),
-        targetMonthlyIncome: Math.round(targetMonthlyIncome),
-        achievesTarget: achievesTarget,
-        targetGap: Math.round(targetMonthlyIncome - totalNetIncome),
-        riskLevel: inputs.riskTolerance,
-        riskMultiplier: riskScenarios[inputs.riskTolerance]?.multiplier || 1.0
+        periodResults: periodResults || [],
+        lastCountry: lastCountry,
+        weightedTaxRate: safeRound(weightedTaxRate * 100),
+        inflationAdjustedIncome: safeRound(totalNetIncome / Math.pow(1 + (inputs.inflationRate || 3) / 100, yearsToRetirement)),
+        trainingFundNetReturn: trainingFundNetReturn || 0,
+        pensionWeightedReturn: pensionWeightedReturn || 0,
+        trainingFundWeightedReturn: trainingFundWeightedReturn || 0,
+        futureMonthlyExpenses: safeRound(futureMonthlyExpenses),
+        remainingAfterExpenses: safeRound(remainingAfterExpenses),
+        remainingAfterExpensesInflationAdjusted: safeRound(remainingAfterExpenses / Math.pow(1 + (inputs.inflationRate || 3) / 100, yearsToRetirement)),
+        targetMonthlyIncome: safeRound(targetMonthlyIncome),
+        achievesTarget: achievesTarget || false,
+        targetGap: safeRound(targetMonthlyIncome - totalNetIncome),
+        riskLevel: inputs.riskTolerance || 'moderate',
+        riskMultiplier: riskScenarios[inputs.riskTolerance]?.multiplier || 1.0,
+        
+        // Readiness score calculation
+        readinessScore: (() => {
+            if (!targetMonthlyIncome || targetMonthlyIncome === 0) return 50;
+            const incomeRatio = totalNetIncome / targetMonthlyIncome;
+            if (incomeRatio >= 1.2) return 100;
+            if (incomeRatio >= 1.0) return 90;
+            if (incomeRatio >= 0.8) return 70;
+            if (incomeRatio >= 0.6) return 50;
+            if (incomeRatio >= 0.4) return 30;
+            return 20;
+        })()
     };
 };
 
@@ -443,6 +461,208 @@ window.generateRetirementChartData = (inputs, workPeriods, partnerWorkPeriods, c
     }
 
     return chartData;
+};
+
+// Unified Partner Data Generation Function
+// This function ensures all chart components use the same calculation logic
+window.generateUnifiedPartnerProjections = (
+    inputs, 
+    workPeriods = [], 
+    partnerWorkPeriods = [],
+    pensionIndexAllocation = [],
+    trainingFundIndexAllocation = [],
+    historicalReturns = {}
+) => {
+    const projections = {
+        primary: [],
+        partner: [],
+        combined: []
+    };
+
+    if (!inputs || !inputs.currentAge || !inputs.retirementAge) {
+        console.warn('generateUnifiedPartnerProjections: Invalid inputs provided.');
+        return projections;
+    }
+
+    const currentAge = inputs.currentAge;
+    const retirementAge = inputs.retirementAge;
+    const inflationRate = (inputs.inflationRate || 3) / 100;
+
+    // Generate year-by-year projections using the main calculation logic
+    for (let age = currentAge; age <= retirementAge; age++) {
+        const yearsFromStart = age - currentAge;
+        const tempInputs = { ...inputs, currentAge: age };
+        
+        try {
+            // Calculate using the main retirement calculation function
+            const results = window.calculateRetirement(
+                tempInputs, 
+                workPeriods, 
+                pensionIndexAllocation,
+                trainingFundIndexAllocation,
+                historicalReturns,
+                inputs.monthlyTrainingFund || 0,
+                partnerWorkPeriods
+            );
+
+            if (results) {
+                const inflationAdjuster = Math.pow(1 + inflationRate, yearsFromStart);
+                
+                // Primary partner data
+                const primaryTotal = results.totalSavings || 0;
+                projections.primary.push({
+                    age: age,
+                    nominal: Math.round(primaryTotal),
+                    real: Math.round(primaryTotal / inflationAdjuster),
+                    pensionSavings: Math.round(results.totalSavings || 0),
+                    trainingFund: Math.round(results.trainingFundValue || 0),
+                    personalPortfolio: Math.round(results.personalPortfolioValue || 0),
+                    crypto: Math.round(results.cryptoValue || 0),
+                    realEstate: Math.round(results.realEstateValue || 0)
+                });
+
+                // Partner data (if available)
+                let partnerTotal = 0;
+                if (results.partnerResults) {
+                    partnerTotal = (results.partnerResults.totalPensionSavings || 0) +
+                                  (results.partnerResults.totalTrainingFund || 0) +
+                                  (results.partnerResults.totalPersonalPortfolio || 0);
+                }
+
+                projections.partner.push({
+                    age: age,
+                    nominal: Math.round(partnerTotal),
+                    real: Math.round(partnerTotal / inflationAdjuster),
+                    pensionSavings: Math.round(results.partnerResults?.totalPensionSavings || 0),
+                    trainingFund: Math.round(results.partnerResults?.totalTrainingFund || 0),
+                    personalPortfolio: Math.round(results.partnerResults?.totalPersonalPortfolio || 0)
+                });
+
+                // Combined household data
+                const combinedTotal = primaryTotal + partnerTotal;
+                projections.combined.push({
+                    age: age,
+                    nominal: Math.round(combinedTotal),
+                    real: Math.round(combinedTotal / inflationAdjuster),
+                    primaryTotal: Math.round(primaryTotal),
+                    partnerTotal: Math.round(partnerTotal)
+                });
+            }
+        } catch (error) {
+            console.warn(`generateUnifiedPartnerProjections: Error calculating for age ${age}:`, error);
+        }
+    }
+
+    return projections;
+};
+
+// Export the unified function for chart components to use
+window.getUnifiedPartnerData = window.generateUnifiedPartnerProjections;
+
+// Standardized Chart Currency Formatting System
+window.standardChartFormatting = {
+    // Get currency symbol
+    getCurrencySymbol: (currency) => {
+        const symbols = {
+            'ILS': '₪',
+            'USD': '$',
+            'EUR': '€', 
+            'GBP': '£',
+            'BTC': '₿',
+            'ETH': 'Ξ',
+            'JPY': '¥',
+            'CAD': 'C$',
+            'AUD': 'A$'
+        };
+        return symbols[currency] || '₪';
+    },
+
+    // Standardized Y-axis formatter for charts
+    formatYAxisValue: (value, currency = 'ILS') => {
+        const symbol = window.standardChartFormatting.getCurrencySymbol(currency);
+        
+        if (Math.abs(value) >= 1000000) {
+            return `${symbol}${(value / 1000000).toFixed(1)}M`;
+        } else if (Math.abs(value) >= 1000) {
+            return `${symbol}${(value / 1000).toFixed(0)}K`;
+        } else {
+            return `${symbol}${Math.round(value).toLocaleString()}`;
+        }
+    },
+
+    // Standardized tooltip formatter for charts
+    formatTooltipValue: (value, currency = 'ILS', language = 'en') => {
+        const symbol = window.standardChartFormatting.getCurrencySymbol(currency);
+        const formattedValue = Math.round(value).toLocaleString(language === 'he' ? 'he-IL' : 'en-US');
+        return `${symbol}${formattedValue}`;
+    },
+
+    // Standardized chart scale configuration
+    getStandardScaleConfig: (currency = 'ILS', language = 'en') => {
+        return {
+            x: {
+                title: {
+                    display: true,
+                    text: language === 'he' ? 'גיל' : 'Age',
+                    font: {
+                        size: 14,
+                        weight: 'bold'
+                    }
+                },
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.1)'
+                }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: `${language === 'he' ? 'סכום' : 'Amount'} (${window.standardChartFormatting.getCurrencySymbol(currency)})`,
+                    font: {
+                        size: 14,
+                        weight: 'bold'
+                    }
+                },
+                ticks: {
+                    callback: function(value) {
+                        return window.standardChartFormatting.formatYAxisValue(value, currency);
+                    },
+                    font: {
+                        size: 12
+                    }
+                },
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.1)'
+                },
+                beginAtZero: true
+            }
+        };
+    },
+
+    // Standardized tooltip configuration
+    getStandardTooltipConfig: (currency = 'ILS', language = 'en') => {
+        return {
+            mode: 'index',
+            intersect: false,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: 'white',
+            bodyColor: 'white',
+            borderColor: 'rgba(255, 255, 255, 0.2)',
+            borderWidth: 1,
+            cornerRadius: 8,
+            callbacks: {
+                label: function(context) {
+                    let label = context.dataset.label || '';
+                    if (label) {
+                        label += ': ';
+                    }
+                    if (context.parsed.y !== null) {
+                        label += window.standardChartFormatting.formatTooltipValue(context.parsed.y, currency, language);
+                    }
+                    return label;
+                }
+            }
+        };
+    }
 };
 
 // Data validation helper

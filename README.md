@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v6.1.0 ✨
+# 🚀 Advanced Retirement Planner vpatch ✨
 
-[![Version](https://img.shields.io/badge/version-6.1.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-patch-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -16,7 +16,7 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v6.1.0 - 100% TEST SUCCESS & QUALITY PERFECTION ✨
+## 🎨 What's New in vpatch - 100% TEST SUCCESS & QUALITY PERFECTION ✨
 
 ### **🎉 PERFECT QUALITY MILESTONE** (July 2025)
 
@@ -67,7 +67,7 @@
 - **Inflation Impact Visualization**: Real vs nominal value comparisons with purchasing power loss calculations
 - **Partner Comparison Views**: Individual and combined financial projections with detailed breakdowns
 
-## 🎨 Previous Updates - v6.1.0 - CRITICAL DASHBOARD FIXES 🛠️
+## 🎨 Previous Updates - vpatch - CRITICAL DASHBOARD FIXES 🛠️
 
 ### **🚨 CRITICAL BUG FIXES** (July 2025)
 
@@ -81,10 +81,10 @@
 #### **🔧 Technical Implementation**
 - **RetirementCalculations.js**: Added `monthlyIncome: Math.round(totalNetIncome)` to return object
 - **SummaryPanel.js**: Updated savings rate calculation to use `currentMonthlySalary || currentSalary`
-- **Version Management**: Updated to v6.1.0 with comprehensive fallback handling
+- **Version Management**: Updated to vpatch with comprehensive fallback handling
 - **QA Testing**: All 87 tests now pass with 100% success rate
 
-## 🎨 Previous Updates - v6.1.0 - MULTI-CURRENCY INTEGRATION 💱
+## 🎨 Previous Updates - vpatch - MULTI-CURRENCY INTEGRATION 💱
 
 ### **🌍 COMPLETE CURRENCY SUPPORT** (July 2025)
 
@@ -177,7 +177,7 @@ All comprehensive documentation is available in our **[GitHub Wiki](https://gith
 - **[Security Features](https://github.com/ypollak2/advanced-retirement-planner/wiki/Security-Features)** - Security compliance
 - **[Recent Updates](https://github.com/ypollak2/advanced-retirement-planner/wiki/Recent-Updates)** - Latest changes
 
-### **v6.1.0 Partner Planning Features**
+### **vpatch Partner Planning Features**
 - **[Partner Planning Guide](https://github.com/ypollak2/advanced-retirement-planner/wiki/Partner-Planning)** - Comprehensive couple planning
 - **[Wizard Interface](https://github.com/ypollak2/advanced-retirement-planner/wiki/Wizard-Interface)** - Multi-step guided process
 - **[Country-Specific Rules](https://github.com/ypollak2/advanced-retirement-planner/wiki/Country-Rules)** - Pension contribution systems
@@ -246,7 +246,7 @@ advanced-retirement-planner/
 
 ## 🌍 Core Features
 
-### **👫 Advanced Partner Planning (v6.1.0)**
+### **👫 Advanced Partner Planning (vpatch)**
 - **Multi-Step Wizard**: Guided 8-step process for comprehensive couple financial planning
 - **Per-Partner Data**: Individual salary, savings, contribution rates, fees, and returns for each partner
 - **Sophisticated Income**: Annual bonuses, quarterly RSUs, freelance income, rental income, dividends
@@ -290,7 +290,7 @@ advanced-retirement-planner/
 
 ## 🧪 Enhanced Testing Suite
 
-Our v6.1.0 testing suite includes comprehensive validation for all partner planning features:
+Our vpatch testing suite includes comprehensive validation for all partner planning features:
 
 ### **Test Categories (116 total tests)**
 - **Core Functionality**: File structure, syntax, version management, HTML structure (30 tests)
@@ -303,7 +303,7 @@ Our v6.1.0 testing suite includes comprehensive validation for all partner plann
 
 ### **Success Metrics**
 - **100% Pass Rate**: Perfect 116 out of 116 tests passing ✨
-- **100% Partner Feature Coverage**: All new v6.1.0 features validated
+- **100% Partner Feature Coverage**: All new vpatch features validated
 - **100% Security Compliance**: Zero critical vulnerabilities  
 - **85.7% Accessibility**: ARIA labels and keyboard navigation
 - **92.8% UX Score**: Professional user experience validation

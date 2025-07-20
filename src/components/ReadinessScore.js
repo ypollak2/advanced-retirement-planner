@@ -300,8 +300,8 @@ const ReadinessScore = ({
     const category = getScoreCategory(score);
 
     return React.createElement('div', {
-        className: 'readiness-score bg-white rounded-lg shadow-lg p-6 border-r-4',
-        style: { borderRightColor: category.color },
+        className: 'readiness-score bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl shadow-2xl p-8 border-2 border-indigo-200 transform hover:scale-105 transition-all duration-300',
+        style: { borderLeftColor: category.color, borderLeftWidth: '6px' },
         role: 'region',
         'aria-label': t.title
     }, [
@@ -309,7 +309,7 @@ const ReadinessScore = ({
         React.createElement('div', { key: 'header', className: 'mb-6' }, [
             React.createElement('h3', {
                 key: 'title',
-                className: 'text-xl font-bold text-gray-800 mb-2'
+                className: 'text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-2 text-center'
             }, t.title),
             React.createElement('p', {
                 key: 'subtitle',
@@ -318,36 +318,36 @@ const ReadinessScore = ({
         ]),
 
         // Score Display
-        React.createElement('div', { key: 'score-display', className: 'flex items-center justify-center mb-6' }, [
+        React.createElement('div', { key: 'score-display', className: 'flex flex-col items-center justify-center mb-8' }, [
             React.createElement('div', {
                 key: 'score-circle',
-                className: 'relative w-32 h-32 rounded-full flex items-center justify-center',
+                className: 'relative w-40 h-40 rounded-full flex items-center justify-center mb-4 shadow-xl transform hover:rotate-12 transition-transform duration-500',
                 style: {
                     background: `conic-gradient(${category.color} ${score * 3.6}deg, #e5e7eb 0deg)`
                 }
             }, [
                 React.createElement('div', {
                     key: 'inner-circle',
-                    className: 'w-24 h-24 bg-white rounded-full flex flex-col items-center justify-center'
+                    className: 'w-32 h-32 bg-white rounded-full flex flex-col items-center justify-center shadow-inner'
                 }, [
                     React.createElement('span', {
                         key: 'score-number',
-                        className: 'text-3xl font-bold',
+                        className: 'text-5xl font-black animate-pulse',
                         style: { color: category.color }
                     }, score),
                     React.createElement('span', {
                         key: 'out-of',
-                        className: 'text-xs text-gray-500'
+                        className: 'text-sm text-gray-500 font-semibold'
                     }, t.outOf)
                 ])
             ]),
             React.createElement('div', {
                 key: 'score-category',
-                className: 'ml-6'
+                className: 'text-center'
             }, [
                 React.createElement('div', {
                     key: 'category-label',
-                    className: 'px-3 py-1 rounded-full text-sm font-semibold text-white',
+                    className: 'px-6 py-3 rounded-full text-lg font-bold text-white shadow-lg transform hover:scale-110 transition-transform duration-200',
                     style: { backgroundColor: category.color }
                 }, t.categories[category.key])
             ])

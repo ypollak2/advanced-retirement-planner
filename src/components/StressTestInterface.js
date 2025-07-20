@@ -443,7 +443,13 @@ const StressTestInterface = ({
                             React.createElement('td', {
                                 key: 'income',
                                 className: 'px-4 py-3 text-sm text-gray-600'
-                            }, formatCurrency ? formatCurrency(scenario.data.results?.monthlyIncome, workingCurrency) : `₪${scenario.data.results?.monthlyIncome?.toLocaleString()}`),
+                            }, (() => {
+                                const monthlyIncome = scenario.data.results?.monthlyIncome || 0;
+                                if (isNaN(monthlyIncome) || !isFinite(monthlyIncome)) {
+                                    return '₪0';
+                                }
+                                return formatCurrency ? formatCurrency(monthlyIncome, workingCurrency) : `₪${monthlyIncome.toLocaleString()}`;
+                            })()),
                             React.createElement('td', {
                                 key: 'difference',
                                 className: `px-4 py-3 text-sm font-medium ${

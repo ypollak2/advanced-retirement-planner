@@ -808,6 +808,21 @@ function RetirementPlannerApp() {
                     key: 'results',
                     className: 'space-y-6'
                 }, [
+                    // Claude AI Recommendations - Prominent Position
+                    results && window.ClaudeRecommendations && React.createElement('div', {
+                        key: 'prominent-claude-wrapper',
+                        className: 'bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-1 border-2 border-indigo-200 shadow-md'
+                    }, [
+                        React.createElement(window.ClaudeRecommendations, {
+                            key: 'prominent-claude-recommendations',
+                            inputs: inputs,
+                            results: results,
+                            partnerResults: null,
+                            language: language,
+                            workingCurrency: workingCurrency
+                        })
+                    ]),
+                    
                     // Main Results Panel
                     results && window.ResultsPanel && React.createElement(window.ResultsPanel, {
                         key: 'main-results',
@@ -833,16 +848,6 @@ function RetirementPlannerApp() {
                         TrendingUp: function() { return React.createElement('span', {}, '📈'); },
                         SimpleChart: window.SimpleChart,
                         ReadinessScore: window.ReadinessScore
-                    }),
-                    
-                    // Claude AI Recommendations
-                    results && window.ClaudeRecommendations && React.createElement(window.ClaudeRecommendations, {
-                        key: 'claude-recommendations',
-                        inputs: inputs,
-                        results: results,
-                        partnerResults: null,
-                        language: language,
-                        workingCurrency: workingCurrency
                     }),
                     
                     // Inflation Analysis

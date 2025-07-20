@@ -2,11 +2,49 @@
 // Per-partner risk assessment and investment strategy preferences
 
 const WizardStepRiskProfile = ({ inputs, setInputs, language = 'en' }) => {
+    // Add slider styling CSS if not already present
+    React.useEffect(() => {
+        if (!document.getElementById('risk-slider-styles')) {
+            const style = document.createElement('style');
+            style.id = 'risk-slider-styles';
+            style.textContent = `
+                .slider::-webkit-slider-thumb {
+                    appearance: none;
+                    height: 24px;
+                    width: 24px;
+                    border-radius: 50%;
+                    background: #ffffff;
+                    border: 3px solid #4f46e5;
+                    cursor: pointer;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                    transition: all 0.2s ease;
+                }
+                .slider::-webkit-slider-thumb:hover {
+                    transform: scale(1.2);
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                }
+                .slider::-moz-range-thumb {
+                    height: 24px;
+                    width: 24px;
+                    border-radius: 50%;
+                    background: #ffffff;
+                    border: 3px solid #4f46e5;
+                    cursor: pointer;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                    transition: all 0.2s ease;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }, []);
+
     const content = {
         he: {
             title: 'פרופיל סיכון והשקעות',
             subtitle: 'הגדרת רמת הסיכון והעדפות השקעה לכל בן זוג',
             riskLevels: 'רמות סיכון',
+            riskSlider: 'רמת סיכון (0% - 20%)',
+            riskSliderDescription: 'הזז את המחוון כדי להגדיר את רמת הסיכון המועדפת עליך',
             conservative: 'שמרני',
             moderate: 'מתון',
             aggressive: 'אגרסיבי',
@@ -39,6 +77,8 @@ const WizardStepRiskProfile = ({ inputs, setInputs, language = 'en' }) => {
             title: 'Risk Profile & Investment Strategy',
             subtitle: 'Define risk level and investment preferences for each partner',
             riskLevels: 'Risk Levels',
+            riskSlider: 'Risk Level (0% - 20%)',
+            riskSliderDescription: 'Move the slider to set your preferred risk level',
             conservative: 'Conservative',
             moderate: 'Moderate',
             aggressive: 'Aggressive',
@@ -71,6 +111,24 @@ const WizardStepRiskProfile = ({ inputs, setInputs, language = 'en' }) => {
 
     const t = content[language];
 
+    // Funny risk indicators for slider
+    const getRiskIndicator = (riskLevel) => {
+        if (riskLevel <= 3) return '😴 "Playing it safer than my grandmother\'s savings account"';
+        if (riskLevel <= 6) return '🛡️ "Conservative like wearing a helmet to check the mail"';
+        if (riskLevel <= 9) return '🚶 "Cautious like crossing the street twice"';
+        if (riskLevel <= 12) return '🎯 "Balanced like a yoga instructor on coffee"';
+        if (riskLevel <= 15) return '🎢 "Moderate thrills - like a kiddie rollercoaster"';
+        if (riskLevel <= 18) return '🚀 "Adventurous like ordering the mystery dish"';
+        return '🔥 "YOLO mode - like day trading with coffee money"';
+    };
+
+    // Convert percentage to risk level name
+    const getRiskLevelName = (riskLevel) => {
+        if (riskLevel <= 7) return 'conservative';
+        if (riskLevel <= 14) return 'moderate';
+        return 'aggressive';
+    };
+
     // Risk level configurations
     const riskLevels = {
         conservative: {
@@ -102,6 +160,20 @@ const WizardStepRiskProfile = ({ inputs, setInputs, language = 'en' }) => {
         setInputs({...inputs, [fieldKey]: value});
     };
 
+    // Helper function to update risk slider
+    const updateRiskSlider = (partner, percentage) => {
+        const riskLevelName = getRiskLevelName(percentage);
+        const partnerKey = partner === 'main' ? '' : `${partner}`;
+        const sliderKey = partnerKey ? `${partnerKey}RiskSlider` : 'riskSlider';
+        const levelKey = partnerKey ? `${partnerKey}RiskLevel` : 'riskLevel';
+        
+        setInputs({
+            ...inputs, 
+            [sliderKey]: percentage,
+            [levelKey]: riskLevelName
+        });
+    };
+
     return React.createElement('div', { className: "space-y-8" }, [
         // Main Risk Profile (if individual planning)
         inputs.planningType !== 'couple' && React.createElement('div', { key: 'main-risk-section' }, [
@@ -112,6 +184,55 @@ const WizardStepRiskProfile = ({ inputs, setInputs, language = 'en' }) => {
                 React.createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '⚖️'),
                 t.title
             ]),
+            
+            // Risk Slider Section
+            React.createElement('div', { 
+                key: 'main-risk-slider',
+                className: "bg-gradient-to-r from-green-50 via-yellow-50 to-red-50 rounded-xl p-6 border border-gray-200 mb-6" 
+            }, [
+                React.createElement('h4', { 
+                    key: 'slider-title',
+                    className: "text-lg font-semibold text-gray-700 mb-4" 
+                }, t.riskSlider),
+                React.createElement('p', { 
+                    key: 'slider-description',
+                    className: "text-sm text-gray-600 mb-4" 
+                }, t.riskSliderDescription),
+                
+                React.createElement('div', { key: 'slider-container', className: "space-y-4" }, [
+                    React.createElement('input', {
+                        key: 'risk-slider',
+                        type: 'range',
+                        min: '0',
+                        max: '20',
+                        step: '1',
+                        value: inputs.riskSlider || 10,
+                        onChange: (e) => updateRiskSlider('main', parseInt(e.target.value)),
+                        className: "w-full h-3 bg-gradient-to-r from-green-300 via-yellow-300 to-red-300 rounded-lg appearance-none cursor-pointer slider"
+                    }),
+                    
+                    React.createElement('div', { key: 'slider-labels', className: "flex justify-between text-xs text-gray-500" }, [
+                        React.createElement('span', { key: 'min-label' }, '0% (Ultra Safe)'),
+                        React.createElement('span', { key: 'mid-label' }, '10% (Balanced)'),
+                        React.createElement('span', { key: 'max-label' }, '20% (High Risk)')
+                    ]),
+                    
+                    React.createElement('div', { 
+                        key: 'current-risk',
+                        className: "text-center p-4 bg-white rounded-lg border border-gray-200" 
+                    }, [
+                        React.createElement('div', { 
+                            key: 'risk-percentage',
+                            className: "text-2xl font-bold text-blue-600 mb-2" 
+                        }, `${inputs.riskSlider || 10}%`),
+                        React.createElement('div', { 
+                            key: 'risk-indicator',
+                            className: "text-sm text-gray-600" 
+                        }, getRiskIndicator(inputs.riskSlider || 10))
+                    ])
+                ])
+            ]),
+
             React.createElement('div', { 
                 key: 'main-risk-grid',
                 className: "grid grid-cols-1 md:grid-cols-3 gap-6" 
@@ -240,94 +361,46 @@ const WizardStepRiskProfile = ({ inputs, setInputs, language = 'en' }) => {
                         className: "text-lg font-semibold text-pink-700 mb-4" 
                     }, inputs.partner1Name || t.partner1Risk),
                     
-                    React.createElement('div', { key: 'partner1-risk-options', className: "space-y-3" }, [
-                        // Conservative Option
-                        React.createElement('label', {
-                            key: 'p1-conservative',
-                            className: `flex items-center p-3 rounded-lg border cursor-pointer transition-all ${
-                                inputs.partner1RiskLevel === 'conservative' 
-                                    ? 'border-green-500 bg-green-50' 
-                                    : 'border-gray-200 bg-white hover:border-green-300'
-                            }`
-                        }, [
-                            React.createElement('input', {
-                                key: 'p1-conservative-radio',
-                                type: 'radio',
-                                name: 'partner1RiskLevel',
-                                value: 'conservative',
-                                checked: inputs.partner1RiskLevel === 'conservative',
-                                onChange: (e) => updateRiskProfile('partner1', 'riskLevel', e.target.value),
-                                className: "mr-3"
-                            }),
-                            React.createElement('div', { key: 'p1-conservative-content' }, [
-                                React.createElement('div', { 
-                                    key: 'p1-conservative-name',
-                                    className: "font-medium text-green-700" 
-                                }, t.conservative),
-                                React.createElement('div', { 
-                                    key: 'p1-conservative-desc',
-                                    className: "text-xs text-gray-600" 
-                                }, `Expected: 5.5% | Risk: Low`)
-                            ])
-                        ]),
+                    // Partner 1 Risk Slider
+                    React.createElement('div', { 
+                        key: 'partner1-risk-slider',
+                        className: "bg-gradient-to-r from-green-50 via-yellow-50 to-red-50 rounded-lg p-4 border border-gray-200 mb-4" 
+                    }, [
+                        React.createElement('h5', { 
+                            key: 'p1-slider-title',
+                            className: "text-sm font-semibold text-gray-700 mb-2" 
+                        }, t.riskSlider),
                         
-                        // Moderate Option
-                        React.createElement('label', {
-                            key: 'p1-moderate',
-                            className: `flex items-center p-3 rounded-lg border cursor-pointer transition-all ${
-                                inputs.partner1RiskLevel === 'moderate' 
-                                    ? 'border-blue-500 bg-blue-50' 
-                                    : 'border-gray-200 bg-white hover:border-blue-300'
-                            }`
-                        }, [
+                        React.createElement('div', { key: 'p1-slider-container', className: "space-y-3" }, [
                             React.createElement('input', {
-                                key: 'p1-moderate-radio',
-                                type: 'radio',
-                                name: 'partner1RiskLevel',
-                                value: 'moderate',
-                                checked: inputs.partner1RiskLevel === 'moderate',
-                                onChange: (e) => updateRiskProfile('partner1', 'riskLevel', e.target.value),
-                                className: "mr-3"
+                                key: 'p1-risk-slider',
+                                type: 'range',
+                                min: '0',
+                                max: '20',
+                                step: '1',
+                                value: inputs.partner1RiskSlider || 10,
+                                onChange: (e) => updateRiskSlider('partner1', parseInt(e.target.value)),
+                                className: "w-full h-2 bg-gradient-to-r from-green-300 via-yellow-300 to-red-300 rounded-lg appearance-none cursor-pointer"
                             }),
-                            React.createElement('div', { key: 'p1-moderate-content' }, [
+                            
+                            React.createElement('div', { key: 'p1-slider-labels', className: "flex justify-between text-xs text-gray-500" }, [
+                                React.createElement('span', { key: 'p1-min' }, '0%'),
+                                React.createElement('span', { key: 'p1-mid' }, '10%'),
+                                React.createElement('span', { key: 'p1-max' }, '20%')
+                            ]),
+                            
+                            React.createElement('div', { 
+                                key: 'p1-current-risk',
+                                className: "text-center p-3 bg-white rounded-lg border border-gray-200" 
+                            }, [
                                 React.createElement('div', { 
-                                    key: 'p1-moderate-name',
-                                    className: "font-medium text-blue-700" 
-                                }, t.moderate),
+                                    key: 'p1-risk-percentage',
+                                    className: "text-lg font-bold text-pink-600 mb-1" 
+                                }, `${inputs.partner1RiskSlider || 10}%`),
                                 React.createElement('div', { 
-                                    key: 'p1-moderate-desc',
+                                    key: 'p1-risk-indicator',
                                     className: "text-xs text-gray-600" 
-                                }, `Expected: 7.0% | Risk: Medium`)
-                            ])
-                        ]),
-                        
-                        // Aggressive Option
-                        React.createElement('label', {
-                            key: 'p1-aggressive',
-                            className: `flex items-center p-3 rounded-lg border cursor-pointer transition-all ${
-                                inputs.partner1RiskLevel === 'aggressive' 
-                                    ? 'border-red-500 bg-red-50' 
-                                    : 'border-gray-200 bg-white hover:border-red-300'
-                            }`
-                        }, [
-                            React.createElement('input', {
-                                key: 'p1-aggressive-radio',
-                                type: 'radio',
-                                name: 'partner1RiskLevel',
-                                value: 'aggressive',
-                                checked: inputs.partner1RiskLevel === 'aggressive',
-                                onChange: (e) => updateRiskProfile('partner1', 'riskLevel', e.target.value),
-                                className: "mr-3"
-                            }),
-                            React.createElement('div', { key: 'p1-aggressive-content' }, [
-                                React.createElement('div', { 
-                                    key: 'p1-aggressive-name',
-                                    className: "font-medium text-red-700" 
-                                }, t.aggressive),
-                                React.createElement('div', { 
-                                    key: 'p1-aggressive-desc',
-                                    className: "text-xs text-gray-600" 
-                                }, `Expected: 9.0% | Risk: High`)
+                                }, getRiskIndicator(inputs.partner1RiskSlider || 10))
                             ])
                         ])
                     ])
@@ -343,94 +416,46 @@ const WizardStepRiskProfile = ({ inputs, setInputs, language = 'en' }) => {
                         className: "text-lg font-semibold text-purple-700 mb-4" 
                     }, inputs.partner2Name || t.partner2Risk),
                     
-                    React.createElement('div', { key: 'partner2-risk-options', className: "space-y-3" }, [
-                        // Conservative Option
-                        React.createElement('label', {
-                            key: 'p2-conservative',
-                            className: `flex items-center p-3 rounded-lg border cursor-pointer transition-all ${
-                                inputs.partner2RiskLevel === 'conservative' 
-                                    ? 'border-green-500 bg-green-50' 
-                                    : 'border-gray-200 bg-white hover:border-green-300'
-                            }`
-                        }, [
-                            React.createElement('input', {
-                                key: 'p2-conservative-radio',
-                                type: 'radio',
-                                name: 'partner2RiskLevel',
-                                value: 'conservative',
-                                checked: inputs.partner2RiskLevel === 'conservative',
-                                onChange: (e) => updateRiskProfile('partner2', 'riskLevel', e.target.value),
-                                className: "mr-3"
-                            }),
-                            React.createElement('div', { key: 'p2-conservative-content' }, [
-                                React.createElement('div', { 
-                                    key: 'p2-conservative-name',
-                                    className: "font-medium text-green-700" 
-                                }, t.conservative),
-                                React.createElement('div', { 
-                                    key: 'p2-conservative-desc',
-                                    className: "text-xs text-gray-600" 
-                                }, `Expected: 5.5% | Risk: Low`)
-                            ])
-                        ]),
+                    // Partner 2 Risk Slider
+                    React.createElement('div', { 
+                        key: 'partner2-risk-slider',
+                        className: "bg-gradient-to-r from-green-50 via-yellow-50 to-red-50 rounded-lg p-4 border border-gray-200 mb-4" 
+                    }, [
+                        React.createElement('h5', { 
+                            key: 'p2-slider-title',
+                            className: "text-sm font-semibold text-gray-700 mb-2" 
+                        }, t.riskSlider),
                         
-                        // Moderate Option
-                        React.createElement('label', {
-                            key: 'p2-moderate',
-                            className: `flex items-center p-3 rounded-lg border cursor-pointer transition-all ${
-                                inputs.partner2RiskLevel === 'moderate' 
-                                    ? 'border-blue-500 bg-blue-50' 
-                                    : 'border-gray-200 bg-white hover:border-blue-300'
-                            }`
-                        }, [
+                        React.createElement('div', { key: 'p2-slider-container', className: "space-y-3" }, [
                             React.createElement('input', {
-                                key: 'p2-moderate-radio',
-                                type: 'radio',
-                                name: 'partner2RiskLevel',
-                                value: 'moderate',
-                                checked: inputs.partner2RiskLevel === 'moderate',
-                                onChange: (e) => updateRiskProfile('partner2', 'riskLevel', e.target.value),
-                                className: "mr-3"
+                                key: 'p2-risk-slider',
+                                type: 'range',
+                                min: '0',
+                                max: '20',
+                                step: '1',
+                                value: inputs.partner2RiskSlider || 10,
+                                onChange: (e) => updateRiskSlider('partner2', parseInt(e.target.value)),
+                                className: "w-full h-2 bg-gradient-to-r from-green-300 via-yellow-300 to-red-300 rounded-lg appearance-none cursor-pointer"
                             }),
-                            React.createElement('div', { key: 'p2-moderate-content' }, [
+                            
+                            React.createElement('div', { key: 'p2-slider-labels', className: "flex justify-between text-xs text-gray-500" }, [
+                                React.createElement('span', { key: 'p2-min' }, '0%'),
+                                React.createElement('span', { key: 'p2-mid' }, '10%'),
+                                React.createElement('span', { key: 'p2-max' }, '20%')
+                            ]),
+                            
+                            React.createElement('div', { 
+                                key: 'p2-current-risk',
+                                className: "text-center p-3 bg-white rounded-lg border border-gray-200" 
+                            }, [
                                 React.createElement('div', { 
-                                    key: 'p2-moderate-name',
-                                    className: "font-medium text-blue-700" 
-                                }, t.moderate),
+                                    key: 'p2-risk-percentage',
+                                    className: "text-lg font-bold text-purple-600 mb-1" 
+                                }, `${inputs.partner2RiskSlider || 10}%`),
                                 React.createElement('div', { 
-                                    key: 'p2-moderate-desc',
+                                    key: 'p2-risk-indicator',
                                     className: "text-xs text-gray-600" 
-                                }, `Expected: 7.0% | Risk: Medium`)
-                            ])
-                        ]),
-                        
-                        // Aggressive Option
-                        React.createElement('label', {
-                            key: 'p2-aggressive',
-                            className: `flex items-center p-3 rounded-lg border cursor-pointer transition-all ${
-                                inputs.partner2RiskLevel === 'aggressive' 
-                                    ? 'border-red-500 bg-red-50' 
-                                    : 'border-gray-200 bg-white hover:border-red-300'
-                            }`
-                        }, [
-                            React.createElement('input', {
-                                key: 'p2-aggressive-radio',
-                                type: 'radio',
-                                name: 'partner2RiskLevel',
-                                value: 'aggressive',
-                                checked: inputs.partner2RiskLevel === 'aggressive',
-                                onChange: (e) => updateRiskProfile('partner2', 'riskLevel', e.target.value),
-                                className: "mr-3"
-                            }),
-                            React.createElement('div', { key: 'p2-aggressive-content' }, [
-                                React.createElement('div', { 
-                                    key: 'p2-aggressive-name',
-                                    className: "font-medium text-red-700" 
-                                }, t.aggressive),
-                                React.createElement('div', { 
-                                    key: 'p2-aggressive-desc',
-                                    className: "text-xs text-gray-600" 
-                                }, `Expected: 9.0% | Risk: High`)
+                                }, getRiskIndicator(inputs.partner2RiskSlider || 10))
                             ])
                         ])
                     ])

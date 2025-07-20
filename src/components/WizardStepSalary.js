@@ -54,11 +54,18 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             netSalary: `משכורת נטו (${currencySymbol})`,
             salaryInfo: 'הזן את המשכורת הברוטו לפני מסים והפרשות. זה הסכום שמופיע בחוזה העבודה שלך',
             additionalIncome: 'הכנסות נוספות',
+            mainAdditionalIncome: 'הכנסות נוספות עיקריות',
+            partnerAdditionalIncome: 'הכנסות נוספות בני הזוג',
             freelanceIncome: `הכנסות מעבודה עצמאית (${currencySymbol})`,
             rentalIncome: `הכנסות מדירות להשכרה (${currencySymbol})`,
             dividendIncome: `דיבידנדים והכנסות השקעה (${currencySymbol})`,
             annualBonus: `בונוס שנתי (${currencySymbol})`,
             quarterlyRSU: `RSU רבעוני (${currencySymbol})`,
+            rsuFrequency: 'תדירות RSU',
+            rsuAmount: `סכום RSU (${currencySymbol})`,
+            monthly: 'חודשי',
+            quarterly: 'רבעוני',
+            yearly: 'שנתי',
             otherIncome: `הכנסות אחרות (${currencySymbol})`,
             partnerSalaries: 'משכורות בני הזוג',
             partner1Salary: 'משכורת ברוטו בן/בת זוג 1 (לפני מסים)',
@@ -73,11 +80,18 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             netSalary: `Net Salary (${currencySymbol})`,
             salaryInfo: 'Enter your gross salary before taxes and deductions. This is the amount in your employment contract',
             additionalIncome: 'Additional Income Sources',
+            mainAdditionalIncome: 'Main Additional Income',
+            partnerAdditionalIncome: 'Partner Additional Income',
             freelanceIncome: `Freelance Income (${currencySymbol})`,
             rentalIncome: `Rental Income (${currencySymbol})`,
             dividendIncome: `Dividends & Investment Income (${currencySymbol})`,
             annualBonus: `Annual Bonus (${currencySymbol})`,
             quarterlyRSU: `Quarterly RSU (${currencySymbol})`,
+            rsuFrequency: 'RSU Frequency',
+            rsuAmount: `RSU Amount (${currencySymbol})`,
+            monthly: 'Monthly',
+            quarterly: 'Quarterly', 
+            yearly: 'Yearly',
             otherIncome: `Other Income (${currencySymbol})`,
             partnerSalaries: 'Partner Salaries',
             partner1Salary: 'Partner 1 Gross Salary (Before Taxes)',
@@ -95,15 +109,39 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
         const mainSalary = inputs.currentMonthlySalary || 0;
         const partner1Salary = inputs.partner1Salary || 0;
         const partner2Salary = inputs.partner2Salary || 0;
+        
+        // Main person additional income
         const freelanceIncome = inputs.freelanceIncome || 0;
         const rentalIncome = inputs.rentalIncome || 0;
         const dividendIncome = inputs.dividendIncome || 0;
         const annualBonusMonthly = (inputs.annualBonus || 0) / 12; // Convert annual to monthly
-        const quarterlyRSUMonthly = (inputs.quarterlyRSU || 0) / 3; // Convert quarterly to monthly
+        // Handle RSU frequency conversion to monthly
+        let rsuMonthly = 0;
+        const rsuAmount = inputs.rsuAmount || inputs.quarterlyRSU || 0;
+        const rsuFrequency = inputs.rsuFrequency || 'quarterly';
+        
+        if (rsuFrequency === 'monthly') {
+            rsuMonthly = rsuAmount;
+        } else if (rsuFrequency === 'quarterly') {
+            rsuMonthly = rsuAmount / 3;
+        } else if (rsuFrequency === 'yearly') {
+            rsuMonthly = rsuAmount / 12;
+        }
+        
+        const quarterlyRSUMonthly = rsuMonthly; // For backward compatibility
         const otherIncome = inputs.otherIncome || 0;
+        
+        // Partner additional income (for couple planning)
+        const partnerFreelanceIncome = inputs.partnerFreelanceIncome || 0;
+        const partnerRentalIncome = inputs.partnerRentalIncome || 0;
+        const partnerDividendIncome = inputs.partnerDividendIncome || 0;
+        const partnerAnnualBonusMonthly = (inputs.partnerAnnualBonus || 0) / 12;
+        const partnerQuarterlyRSUMonthly = (inputs.partnerQuarterlyRSU || 0) / 3;
+        const partnerOtherIncome = inputs.partnerOtherIncome || 0;
 
-        return mainSalary + partner1Salary + partner2Salary + freelanceIncome + rentalIncome + 
-               dividendIncome + annualBonusMonthly + quarterlyRSUMonthly + otherIncome;
+        return mainSalary + partner1Salary + partner2Salary + 
+               freelanceIncome + rentalIncome + dividendIncome + annualBonusMonthly + quarterlyRSUMonthly + otherIncome +
+               partnerFreelanceIncome + partnerRentalIncome + partnerDividendIncome + partnerAnnualBonusMonthly + partnerQuarterlyRSUMonthly + partnerOtherIncome;
     };
 
     const formatCurrency = (amount) => {
@@ -212,8 +250,8 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             ])
         ]),
 
-        // Additional Income Sources
-        createElement('div', { key: 'additional-income-section' }, [
+        // Additional Income Sources - Single Planning
+        (!inputs.planningType || inputs.planningType === 'single') && createElement('div', { key: 'additional-income-section' }, [
             createElement('h3', { 
                 key: 'additional-income-title',
                 className: "text-xl font-semibold text-gray-700 mb-4 flex items-center" 
@@ -278,18 +316,34 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                     })
                 ]),
-                createElement('div', { key: 'quarterly-rsu' }, [
+                createElement('div', { key: 'rsu-section' }, [
                     createElement('label', { 
                         key: 'rsu-label',
                         className: "block text-sm font-medium text-gray-700 mb-2" 
-                    }, t.quarterlyRSU),
-                    createElement('input', {
-                        key: 'rsu-input',
-                        type: 'number',
-                        value: inputs.quarterlyRSU || 0,
-                        onChange: (e) => setInputs({...inputs, quarterlyRSU: parseInt(e.target.value) || 0}),
-                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                    })
+                    }, t.rsuAmount),
+                    createElement('div', { key: 'rsu-inputs', className: "grid grid-cols-2 gap-2" }, [
+                        createElement('input', {
+                            key: 'rsu-amount-input',
+                            type: 'number',
+                            value: inputs.rsuAmount || inputs.quarterlyRSU || 0,
+                            onChange: (e) => {
+                                const amount = parseInt(e.target.value) || 0;
+                                setInputs({...inputs, rsuAmount: amount, quarterlyRSU: amount});
+                            },
+                            placeholder: "Amount",
+                            className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        }),
+                        createElement('select', {
+                            key: 'rsu-frequency-select',
+                            value: inputs.rsuFrequency || 'quarterly',
+                            onChange: (e) => setInputs({...inputs, rsuFrequency: e.target.value}),
+                            className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        }, [
+                            createElement('option', { key: 'monthly-option', value: 'monthly' }, t.monthly),
+                            createElement('option', { key: 'quarterly-option', value: 'quarterly' }, t.quarterly),
+                            createElement('option', { key: 'yearly-option', value: 'yearly' }, t.yearly)
+                        ])
+                    ])
                 ]),
                 createElement('div', { key: 'other-income' }, [
                     createElement('label', { 
@@ -303,6 +357,205 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         onChange: (e) => setInputs({...inputs, otherIncome: parseInt(e.target.value) || 0}),
                         className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                     })
+                ])
+            ])
+        ]),
+
+        // Additional Income Sources - Couple Planning (Per Partner)
+        inputs.planningType === 'couple' && createElement('div', { key: 'couple-additional-income-section' }, [
+            createElement('h3', { 
+                key: 'couple-additional-income-title',
+                className: "text-xl font-semibold text-gray-700 mb-6 flex items-center" 
+            }, [
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '📈'),
+                t.additionalIncome,
+                createElement('span', { key: 'optional', className: "ml-2 text-sm text-gray-500 font-normal" }, `(${t.optional})`)
+            ]),
+            
+            createElement('div', { 
+                key: 'couple-additional-income-grid',
+                className: "grid grid-cols-1 lg:grid-cols-2 gap-8" 
+            }, [
+                // Main Person Additional Income
+                createElement('div', { 
+                    key: 'main-additional-income',
+                    className: "bg-blue-50 rounded-xl p-6 border border-blue-200" 
+                }, [
+                    createElement('h4', { 
+                        key: 'main-additional-title',
+                        className: "text-lg font-semibold text-blue-700 mb-4" 
+                    }, t.mainAdditionalIncome),
+                    createElement('div', { key: 'main-additional-fields', className: "space-y-4" }, [
+                        createElement('div', { key: 'main-freelance' }, [
+                            createElement('label', { 
+                                key: 'main-freelance-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.freelanceIncome),
+                            createElement('input', {
+                                key: 'main-freelance-input',
+                                type: 'number',
+                                value: inputs.freelanceIncome || 0,
+                                onChange: (e) => setInputs({...inputs, freelanceIncome: parseInt(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'main-rental' }, [
+                            createElement('label', { 
+                                key: 'main-rental-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.rentalIncome),
+                            createElement('input', {
+                                key: 'main-rental-input',
+                                type: 'number',
+                                value: inputs.rentalIncome || 0,
+                                onChange: (e) => setInputs({...inputs, rentalIncome: parseInt(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'main-dividend' }, [
+                            createElement('label', { 
+                                key: 'main-dividend-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.dividendIncome),
+                            createElement('input', {
+                                key: 'main-dividend-input',
+                                type: 'number',
+                                value: inputs.dividendIncome || 0,
+                                onChange: (e) => setInputs({...inputs, dividendIncome: parseInt(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'main-bonus' }, [
+                            createElement('label', { 
+                                key: 'main-bonus-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.annualBonus),
+                            createElement('input', {
+                                key: 'main-bonus-input',
+                                type: 'number',
+                                value: inputs.annualBonus || 0,
+                                onChange: (e) => setInputs({...inputs, annualBonus: parseInt(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'main-rsu' }, [
+                            createElement('label', { 
+                                key: 'main-rsu-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.quarterlyRSU),
+                            createElement('input', {
+                                key: 'main-rsu-input',
+                                type: 'number',
+                                value: inputs.quarterlyRSU || 0,
+                                onChange: (e) => setInputs({...inputs, quarterlyRSU: parseInt(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'main-other' }, [
+                            createElement('label', { 
+                                key: 'main-other-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.otherIncome),
+                            createElement('input', {
+                                key: 'main-other-input',
+                                type: 'number',
+                                value: inputs.otherIncome || 0,
+                                onChange: (e) => setInputs({...inputs, otherIncome: parseInt(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            })
+                        ])
+                    ])
+                ]),
+                
+                // Partner Additional Income
+                createElement('div', { 
+                    key: 'partner-additional-income',
+                    className: "bg-green-50 rounded-xl p-6 border border-green-200" 
+                }, [
+                    createElement('h4', { 
+                        key: 'partner-additional-title',
+                        className: "text-lg font-semibold text-green-700 mb-4" 
+                    }, t.partnerAdditionalIncome),
+                    createElement('div', { key: 'partner-additional-fields', className: "space-y-4" }, [
+                        createElement('div', { key: 'partner-freelance' }, [
+                            createElement('label', { 
+                                key: 'partner-freelance-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.freelanceIncome),
+                            createElement('input', {
+                                key: 'partner-freelance-input',
+                                type: 'number',
+                                value: inputs.partnerFreelanceIncome || 0,
+                                onChange: (e) => setInputs({...inputs, partnerFreelanceIncome: parseInt(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'partner-rental' }, [
+                            createElement('label', { 
+                                key: 'partner-rental-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.rentalIncome),
+                            createElement('input', {
+                                key: 'partner-rental-input',
+                                type: 'number',
+                                value: inputs.partnerRentalIncome || 0,
+                                onChange: (e) => setInputs({...inputs, partnerRentalIncome: parseInt(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'partner-dividend' }, [
+                            createElement('label', { 
+                                key: 'partner-dividend-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.dividendIncome),
+                            createElement('input', {
+                                key: 'partner-dividend-input',
+                                type: 'number',
+                                value: inputs.partnerDividendIncome || 0,
+                                onChange: (e) => setInputs({...inputs, partnerDividendIncome: parseInt(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'partner-bonus' }, [
+                            createElement('label', { 
+                                key: 'partner-bonus-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.annualBonus),
+                            createElement('input', {
+                                key: 'partner-bonus-input',
+                                type: 'number',
+                                value: inputs.partnerAnnualBonus || 0,
+                                onChange: (e) => setInputs({...inputs, partnerAnnualBonus: parseInt(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'partner-rsu' }, [
+                            createElement('label', { 
+                                key: 'partner-rsu-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.quarterlyRSU),
+                            createElement('input', {
+                                key: 'partner-rsu-input',
+                                type: 'number',
+                                value: inputs.partnerQuarterlyRSU || 0,
+                                onChange: (e) => setInputs({...inputs, partnerQuarterlyRSU: parseInt(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'partner-other' }, [
+                            createElement('label', { 
+                                key: 'partner-other-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.otherIncome),
+                            createElement('input', {
+                                key: 'partner-other-input',
+                                type: 'number',
+                                value: inputs.partnerOtherIncome || 0,
+                                onChange: (e) => setInputs({...inputs, partnerOtherIncome: parseInt(e.target.value) || 0}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            })
+                        ])
+                    ])
                 ])
             ])
         ]),

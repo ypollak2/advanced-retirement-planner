@@ -38,6 +38,14 @@ const SummaryPanel = ({
             mediumRisk: 'סיכון בינוני',
             highRisk: 'סיכון גבוה',
             diversificationScore: 'ציון פיזור סיכונים',
+            diversificationExplanation: 'פיזור נכסים על פני סוגי השקעה שונים מפחית סיכון ומשפר תשואות לטווח הארוך',
+            diversificationScoreDetails: {
+                excellent: '90-100: פיזור מעולה על פני 4-5 סוגי נכסים עם חלוקה מאוזנת',
+                good: '70-89: פיזור טוב על פני 3-4 סוגי נכסים',
+                fair: '50-69: פיזור בינוני על פני 2-3 סוגי נכסים',
+                poor: '20-49: פיזור לקוי - ריכוז יתר ב-1-2 נכסים',
+                critical: '0-19: קריטי - תיק מרוכז מאוד, סיכון גבוה'
+            },
             monthlyContributions: 'הפקדות חודשיות',
             currentContributions: 'הפקדות נוכחיות',
             recommendedContributions: 'הפקדות מומלצות',
@@ -76,6 +84,14 @@ const SummaryPanel = ({
             mediumRisk: 'Medium Risk',
             highRisk: 'High Risk',
             diversificationScore: 'Diversification Score',
+            diversificationExplanation: 'Asset diversification across different investment types reduces risk and improves long-term returns',
+            diversificationScoreDetails: {
+                excellent: '90-100: Excellent diversification across 4-5 asset types with balanced allocation',
+                good: '70-89: Good diversification across 3-4 asset types', 
+                fair: '50-69: Fair diversification across 2-3 asset types',
+                poor: '20-49: Poor diversification - too concentrated in 1-2 assets',
+                critical: '0-19: Critical - extremely concentrated portfolio, high risk'
+            },
             monthlyContributions: 'Monthly Contributions',
             currentContributions: 'Current Contributions',
             recommendedContributions: 'Recommended Contributions',
@@ -208,7 +224,15 @@ const SummaryPanel = ({
     const personalPortfolioContribution = inputs.personalPortfolioMonthly || 0;
     const currentContributions = pensionContribution + trainingFundContribution + personalPortfolioContribution;
     
-    const currentSavingsRate = totalIncome > 0 ? (currentContributions / totalIncome) * 100 : 0;
+    // Ensure safe calculation with proper fallbacks
+    let currentSavingsRate = 0;
+    if (totalIncome > 0 && currentContributions > 0) {
+        currentSavingsRate = (currentContributions / totalIncome) * 100;
+        // Validate the result
+        if (isNaN(currentSavingsRate) || !isFinite(currentSavingsRate)) {
+            currentSavingsRate = 0;
+        }
+    }
     
     // Calculate readiness score with comprehensive factors
     const calculateReadinessScore = () => {
@@ -575,16 +599,35 @@ const SummaryPanel = ({
             ]),
             React.createElement('div', {
                 key: 'diversification',
-                className: 'mt-3 p-2 bg-gray-50 rounded flex justify-between items-center'
+                className: 'mt-3 p-3 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg border border-gray-200'
             }, [
-                React.createElement('span', {
-                    key: 'div-label',
-                    className: 'text-sm text-gray-700'
-                }, t.diversificationScore),
-                React.createElement('span', {
-                    key: 'div-value',
-                    className: `text-sm font-semibold ${diversificationScore >= 80 ? 'text-green-600' : diversificationScore >= 60 ? 'text-yellow-600' : 'text-red-600'}`
-                }, `${diversificationScore}/100`)
+                React.createElement('div', {
+                    key: 'div-header',
+                    className: 'flex justify-between items-center mb-2'
+                }, [
+                    React.createElement('span', {
+                        key: 'div-label',
+                        className: 'text-sm font-medium text-gray-700'
+                    }, '📊 ' + t.diversificationScore),
+                    React.createElement('span', {
+                        key: 'div-value',
+                        className: `text-lg font-bold ${diversificationScore >= 80 ? 'text-green-600' : diversificationScore >= 60 ? 'text-yellow-600' : 'text-red-600'}`
+                    }, `${diversificationScore}/100`)
+                ]),
+                React.createElement('div', {
+                    key: 'div-explanation',
+                    className: 'text-xs text-gray-600 mb-2'
+                }, t.diversificationExplanation),
+                React.createElement('div', {
+                    key: 'div-rating',
+                    className: 'text-xs font-medium'
+                }, (() => {
+                    if (diversificationScore >= 90) return React.createElement('span', { className: 'text-green-700' }, t.diversificationScoreDetails.excellent);
+                    if (diversificationScore >= 70) return React.createElement('span', { className: 'text-green-600' }, t.diversificationScoreDetails.good);
+                    if (diversificationScore >= 50) return React.createElement('span', { className: 'text-yellow-600' }, t.diversificationScoreDetails.fair);
+                    if (diversificationScore >= 20) return React.createElement('span', { className: 'text-orange-600' }, t.diversificationScoreDetails.poor);
+                    return React.createElement('span', { className: 'text-red-600' }, t.diversificationScoreDetails.critical);
+                })())
             ])
         ]),
 
@@ -612,7 +655,7 @@ const SummaryPanel = ({
                     React.createElement('div', {
                         key: 'current-value',
                         className: `text-lg font-bold ${currentSavingsRate >= 20 ? 'text-green-600' : currentSavingsRate >= 15 ? 'text-yellow-600' : 'text-red-600'}`
-                    }, `${currentSavingsRate.toFixed(1)}%`)
+                    }, `${(currentSavingsRate || 0).toFixed(1)}%`)
                 ]),
                 React.createElement('div', {
                     key: 'target-rate',

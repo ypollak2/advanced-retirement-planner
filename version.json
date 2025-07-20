@@ -1,6 +1,6 @@
 {
-  "version": "6.1.0",
+  "version": "6.1.1",
   "build": "2025-07-20",
-  "commit": "v6.1.0-update",
-  "description": "Version update to 6.1.0"
+  "commit": "v6.1.1-update",
+  "description": "Version update to v6.1.1 - Fix title truncation test and achieve 100% test coverage"
 }

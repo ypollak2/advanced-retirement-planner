@@ -155,11 +155,14 @@ const Dashboard = ({
 
     const healthStatus = getHealthStatus(healthScore);
 
-    // Calculate years until retirement
-    const yearsToRetirement = (inputs?.retirementAge || 67) - (inputs?.currentAge || 30);
+    // Calculate years until retirement (only show if user has entered data)
+    const hasUserData = inputs && (inputs.currentAge || inputs.currentSalary || inputs.currentSavings);
+    const yearsToRetirement = hasUserData ? (inputs?.retirementAge || 67) - (inputs?.currentAge || 30) : null;
 
-    // Calculate net worth with currency conversion
+    // Calculate net worth with currency conversion (only show if user has entered data)
     const calculateNetWorth = () => {
+        if (!hasUserData) return null;
+        
         const baseNetWorth = (inputs?.currentSavings || 0) + 
                             (inputs?.currentPersonalPortfolio || 0) + 
                             (inputs?.currentRealEstate || 0) + 
@@ -275,8 +278,8 @@ const Dashboard = ({
                 ])
             ]),
 
-            // Retirement Countdown
-            React.createElement('div', {
+            // Retirement Countdown (only show if user has entered data)
+            hasUserData && React.createElement('div', {
                 key: 'countdown',
                 className: 'retirement-countdown'
             }, [
@@ -301,8 +304,8 @@ const Dashboard = ({
                 ])
             ]),
 
-            // Net Worth Tracker
-            React.createElement('div', {
+            // Net Worth Tracker (only show if user has entered data)
+            hasUserData && netWorth !== null && React.createElement('div', {
                 key: 'net-worth',
                 className: 'net-worth-tracker'
             }, [
@@ -323,16 +326,6 @@ const Dashboard = ({
                     key: 'value',
                     className: 'net-worth-value'
                 }, formatSelectedCurrency(netWorth)),
-                React.createElement('div', {
-                    key: 'change',
-                    className: 'net-worth-change change-positive'
-                }, [
-                    React.createElement('span', { key: 'arrow' }, '↗'),
-                    ' +2.3% ',
-                    t.changeFrom,
-                    ' ',
-                    t.yesterday
-                ]),
                 window.CurrencySelector && React.createElement(window.CurrencySelector, {
                     key: 'currency-selector',
                     selectedCurrency: selectedCurrency,

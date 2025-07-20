@@ -136,9 +136,30 @@ async function fetchStockPrice(symbol, useCache = true) {
         }
     }
     
-    // Try to fetch real-time price from Yahoo Finance API (CORS-free)
+    // For GitHub Pages deployment, use fallback prices immediately to avoid CORS issues
+    if (window.location.hostname.includes('github.io') || window.location.hostname.includes('githubusercontent.com')) {
+        const fallbackPrice = FALLBACK_PRICES[upperSymbol];
+        if (fallbackPrice) {
+            console.log(`📊 Using fallback price for ${upperSymbol}: $${fallbackPrice} (GitHub Pages mode)`);
+            
+            // Cache fallback price with shorter duration
+            priceCache.set(upperSymbol, {
+                price: fallbackPrice,
+                timestamp: Date.now(),
+                source: 'fallback-githubpages'
+            });
+            
+            return fallbackPrice;
+        }
+    }
+    
+    // Try to fetch real-time price from APIs (with timeout)
     try {
-        const realTimePrice = await fetchRealTimePrice(upperSymbol);
+        const realTimePrice = await Promise.race([
+            fetchRealTimePrice(upperSymbol),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000))
+        ]);
+        
         if (realTimePrice && realTimePrice > 0) {
             console.log(`📈 Real-time price fetched for ${upperSymbol}: $${realTimePrice}`);
             
@@ -146,7 +167,7 @@ async function fetchStockPrice(symbol, useCache = true) {
             priceCache.set(upperSymbol, {
                 price: realTimePrice,
                 timestamp: Date.now(),
-                source: 'yahoo-finance'
+                source: 'api'
             });
             
             return realTimePrice;

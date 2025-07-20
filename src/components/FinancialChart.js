@@ -1,6 +1,6 @@
 // FinancialChart.js - Chart component using Chart.js with partner data support
 
-const SimpleChart = ({ data, type = 'line', language = 'en', partnerData = null, chartView = 'combined', workingCurrency = 'ILS' }) => {
+const SimpleChart = ({ data, type = 'line', language = 'en', partnerData = null, chartView = 'household', workingCurrency = 'ILS', inputs = {} }) => {
     const chartRef = React.useRef(null);
     const chartInstance = React.useRef(null);
     
@@ -11,7 +11,7 @@ const SimpleChart = ({ data, type = 'line', language = 'en', partnerData = null,
             return false;
         }
 
-        if ((view === 'partner1' || view === 'partner2') && !partnerData) {
+        if ((view === 'primary' || view === 'partner') && !partnerData) {
             console.warn(`FinancialChart: chartView is '${view}' but no partnerData is provided.`)
             return false;
         }
@@ -28,7 +28,7 @@ const SimpleChart = ({ data, type = 'line', language = 'en', partnerData = null,
 
     const safeRenderChart = () => {
         try {
-            const effectiveData = (chartView === 'partner1' || chartView === 'partner2') ? partnerData : data;
+            const effectiveData = (chartView === 'primary' || chartView === 'partner') ? partnerData : data;
             if (!validateChartData(effectiveData, chartView)) {
                 console.error('FinancialChart: Data validation failed. Cannot render chart.');
                 return;
@@ -58,8 +58,16 @@ const SimpleChart = ({ data, type = 'line', language = 'en', partnerData = null,
             const isHebrew = language === 'he';
             
             // Partner data handling - check if we have partner-specific data
-            const hasPartnerData = partnerData && (chartView === 'partner1' || chartView === 'partner2');
+            const hasPartnerData = partnerData && (chartView === 'primary' || chartView === 'partner');
             const effectiveData = hasPartnerData ? partnerData : data;
+            
+            // Get partner names for consistent identification
+            const getPartnerLabel = (isPartner = false) => {
+                if (isPartner) {
+                    return inputs.partner2Name || (language === 'he' ? 'בן/בת זוג שני' : 'Secondary Partner');
+                }
+                return inputs.partner1Name || (language === 'he' ? 'בן/בת זוג ראשי' : 'Primary Partner');
+            };
             
             // Check if this is accumulation chart (has pensionSavings property) or index chart
             if (effectiveData[0] && effectiveData[0].pensionSavings !== undefined) {
@@ -166,44 +174,56 @@ const SimpleChart = ({ data, type = 'line', language = 'en', partnerData = null,
                         mode: 'index',
                         intersect: false,
                     },
-                    scales: {
-                        x: {
-                            display: true,
-                            grid: {
-                                display: true,
-                                color: 'rgba(0, 0, 0, 0.1)'
-                            }
-                        },
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            stacked: data[0] && data[0].pensionSavings !== undefined,
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    if (data[0] && data[0].pensionSavings !== undefined) {
-                                        // Accumulation chart - show currency
-                                        const getCurrencySymbol = (currency) => {
-                                            const symbols = { 'ILS': '₪', 'USD': '$', 'EUR': '€', 'GBP': '£', 'BTC': '₿', 'ETH': 'Ξ' };
-                                            return symbols[currency] || '₪';
-                                        };
-                                        const symbol = getCurrencySymbol(workingCurrency);
-                                        if (value >= 1000000) {
-                                            return symbol + (value / 1000000).toFixed(1) + 'M';
-                                        } else if (value >= 1000) {
-                                            return symbol + (value / 1000).toFixed(0) + 'K';
-                                        } else {
-                                            return symbol + value.toFixed(0);
+                    scales: (() => {
+                        // Use standardized formatting if available, otherwise fallback
+                        if (window.standardChartFormatting && data[0] && data[0].pensionSavings !== undefined) {
+                            const standardScales = window.standardChartFormatting.getStandardScaleConfig(workingCurrency, language);
+                            // Override for stacked charts
+                            standardScales.y.stacked = true;
+                            return standardScales;
+                        } else {
+                            // Fallback for index charts or when standard formatting unavailable
+                            return {
+                                x: {
+                                    display: true,
+                                    grid: {
+                                        display: true,
+                                        color: 'rgba(0, 0, 0, 0.1)'
+                                    }
+                                },
+                                y: {
+                                    type: 'linear',
+                                    display: true,
+                                    position: 'left',
+                                    stacked: data[0] && data[0].pensionSavings !== undefined,
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            if (data[0] && data[0].pensionSavings !== undefined) {
+                                                // Use standard formatting if available
+                                                if (window.standardChartFormatting) {
+                                                    return window.standardChartFormatting.formatYAxisValue(value, workingCurrency);
+                                                }
+                                                // Fallback formatting
+                                                const symbols = { 'ILS': '₪', 'USD': '$', 'EUR': '€', 'GBP': '£', 'BTC': '₿', 'ETH': 'Ξ' };
+                                                const symbol = symbols[workingCurrency] || '₪';
+                                                if (value >= 1000000) {
+                                                    return symbol + (value / 1000000).toFixed(1) + 'M';
+                                                } else if (value >= 1000) {
+                                                    return symbol + (value / 1000).toFixed(0) + 'K';
+                                                } else {
+                                                    return symbol + value.toFixed(0);
+                                                }
+                                            } else {
+                                                // Index chart - show percentage
+                                                return value.toFixed(1) + '%';
+                                            }
                                         }
-                                    } else {
-                                        // Index chart - show percentage
-                                        return value.toFixed(1) + '%';
                                     }
                                 }
-                            }
+                            };
                         }
-                    },
+                    })(),
                     plugins: {
                         title: {
                             display: true,
@@ -226,52 +246,74 @@ const SimpleChart = ({ data, type = 'line', language = 'en', partnerData = null,
                                 }
                             }
                         },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
+                        tooltip: (() => {
+                            // Use standardized tooltip if available and for accumulation charts
+                            if (window.standardChartFormatting && data[0] && data[0].pensionSavings !== undefined) {
+                                const standardTooltip = window.standardChartFormatting.getStandardTooltipConfig(workingCurrency, language);
+                                // Add custom afterLabel for stacked chart percentage
+                                standardTooltip.callbacks.afterLabel = function(context) {
+                                    const dataIndex = context.dataIndex;
+                                    const total = effectiveData[dataIndex].totalSavings;
+                                    const value = context.parsed.y;
+                                    if (total > 0 && context.dataset.label !== 'Total Accumulation (Nominal)' && context.dataset.label !== 'Real Value (Inflation Adjusted)') {
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return `(${percentage}% of total)`;
                                     }
-                                    if (context.parsed.y !== null) {
-                                        if (data[0] && data[0].pensionSavings !== undefined) {
-                                            // Currency formatting for accumulation chart
-                                            const value = context.parsed.y;
-                                            const getCurrencySymbol = (currency) => {
-                                                const symbols = { 'ILS': '₪', 'USD': '$', 'EUR': '€', 'GBP': '£', 'BTC': '₿', 'ETH': 'Ξ' };
-                                                return symbols[currency] || '₪';
-                                            };
-                                            const symbol = getCurrencySymbol(workingCurrency);
-                                            if (value >= 1000000) {
-                                                label += symbol + (value / 1000000).toFixed(1) + 'M';
-                                            } else if (value >= 1000) {
-                                                label += symbol + (value / 1000).toFixed(0) + 'K';
-                                            } else {
-                                                label += symbol + value.toLocaleString();
+                                    return '';
+                                };
+                                return standardTooltip;
+                            } else {
+                                // Fallback for index charts
+                                return {
+                                    mode: 'index',
+                                    intersect: false,
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.dataset.label || '';
+                                            if (label) {
+                                                label += ': ';
                                             }
-                                        } else {
-                                            label += context.parsed.y.toFixed(1) + '%';
+                                            if (context.parsed.y !== null) {
+                                                if (data[0] && data[0].pensionSavings !== undefined) {
+                                                    // Use standard formatting if available
+                                                    if (window.standardChartFormatting) {
+                                                        label += window.standardChartFormatting.formatTooltipValue(context.parsed.y, workingCurrency, language);
+                                                    } else {
+                                                        // Fallback formatting
+                                                        const symbols = { 'ILS': '₪', 'USD': '$', 'EUR': '€', 'GBP': '£', 'BTC': '₿', 'ETH': 'Ξ' };
+                                                        const symbol = symbols[workingCurrency] || '₪';
+                                                        const value = context.parsed.y;
+                                                        if (value >= 1000000) {
+                                                            label += symbol + (value / 1000000).toFixed(1) + 'M';
+                                                        } else if (value >= 1000) {
+                                                            label += symbol + (value / 1000).toFixed(0) + 'K';
+                                                        } else {
+                                                            label += symbol + value.toLocaleString();
+                                                        }
+                                                    }
+                                                } else {
+                                                    label += context.parsed.y.toFixed(1) + '%';
+                                                }
+                                            }
+                                            return label;
+                                        },
+                                        afterLabel: function(context) {
+                                            if (data[0] && data[0].pensionSavings !== undefined) {
+                                                // Show percentage of total for stacked chart
+                                                const dataIndex = context.dataIndex;
+                                                const total = effectiveData[dataIndex].totalSavings;
+                                                const value = context.parsed.y;
+                                                if (total > 0 && context.dataset.label !== 'Total Accumulation (Nominal)' && context.dataset.label !== 'Real Value (Inflation Adjusted)') {
+                                                    const percentage = ((value / total) * 100).toFixed(1);
+                                                    return `(${percentage}% of total)`;
+                                                }
+                                            }
+                                            return null;
                                         }
                                     }
-                                    return label;
-                                },
-                                afterLabel: function(context) {
-                                    if (data[0] && data[0].pensionSavings !== undefined) {
-                                        // Show percentage of total for stacked chart
-                                        const dataIndex = context.dataIndex;
-                                        const total = effectiveData[dataIndex].totalSavings;
-                                        const value = context.parsed.y;
-                                        if (total > 0 && context.dataset.label !== 'Total Accumulation (Nominal)' && context.dataset.label !== 'Real Value (Inflation Adjusted)') {
-                                            const percentage = ((value / total) * 100).toFixed(1);
-                                            return `(${percentage}% of total)`;
-                                        }
-                                    }
-                                    return null;
-                                }
+                                };
                             }
-                        }
+                        })()
                     },
                     elements: {
                         point: {

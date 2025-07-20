@@ -10,7 +10,7 @@ const DynamicPartnerCharts = ({
     formatCurrency,
     workingCurrency = 'ILS'
 }) => {
-    const [chartView, setChartView] = React.useState('combined');
+    const [chartView, setChartView] = React.useState('household');
     const [isUpdating, setIsUpdating] = React.useState(false);
     const chartRef = React.useRef(null);
     const chartInstance = React.useRef(null);
@@ -20,10 +20,10 @@ const DynamicPartnerCharts = ({
         he: {
             title: 'תחזיות חיסכון דינמיות',
             subtitle: 'מעקב אחר התקדמות החיסכון לפנסיה',
-            combined: 'משולב',
-            partner1: 'בן/בת זוג 1',
-            partner2: 'בן/בת זוג 2',
-            individual: 'אישי',
+            household: 'סך הכל משקי בית',
+            comparison: 'השוואת בני זוג',
+            partner1: inputs.partner1Name || 'בן/בת זוג ראשי',
+            partner2: inputs.partner2Name || 'בן/בת זוג שני',
             nominalValue: 'ערך נומינלי',
             realValue: 'ערך ריאלי (מותאם לאינפלציה)',
             age: 'גיל',
@@ -33,8 +33,11 @@ const DynamicPartnerCharts = ({
                 description: 'הגרפים מציגים תחזיות חיסכון לטווח הארוך עבור תכנון פנסיה זוגי.',
                 tips: [
                     'השתמש בכפתורי התצוגה כדי לעבור בין תצוגות שונות',
-                    'הגרף המשולב מציג את סך החיסכון של שני בני הזוג',
-                    'תצוגה אישית מציגה את החיסכון של כל בן זוג בנפרד',
+                    'תצוגת משקי הבית מציגה את סך החיסכון המשולב של שני בני הזוג יחד',
+                    'תצוגת השוואה מציגה את החיסכון של כל בן זוג בנפרד לצורך השוואה',
+                    'הקו הכחול מציג ערכים נומינליים (לא מותאמים לאינפלציה)',
+                    'הקו הירוק מציג ערכים ריאליים (מותאמים לאינפלציה)',
+                    'הקו הצהוב המקווקו מציג את השפעת האינפלציה על החיסכון הראשוני',
                     'הקו הכחול מציג את הערך הנומינלי (ללא התחשבות באינפלציה)',
                     'הקו הירוק מציג את הערך הריאלי (מותאם לאינפלציה)',
                     'הגרפים מתעדכנים באופן אוטומטי כאשר משנים נתונים'
@@ -44,10 +47,10 @@ const DynamicPartnerCharts = ({
         en: {
             title: 'Dynamic Savings Projections',
             subtitle: 'Track retirement savings progress over time',
-            combined: 'Combined',
-            partner1: 'Partner 1',
-            partner2: 'Partner 2', 
-            individual: 'Individual',
+            household: 'Household Total',
+            comparison: 'Partner Comparison',
+            partner1: inputs.partner1Name || 'Primary Partner',
+            partner2: inputs.partner2Name || 'Secondary Partner',
             nominalValue: 'Nominal Value',
             realValue: 'Real Value (inflation-adjusted)',
             age: 'Age',
@@ -57,8 +60,11 @@ const DynamicPartnerCharts = ({
                 description: 'These charts display long-term savings projections for couples retirement planning.',
                 tips: [
                     'Use the view buttons to switch between different chart perspectives',
-                    'Combined view shows total savings for both partners',
-                    'Individual view displays each partner\'s savings separately',
+                    'Household view shows combined total savings of both partners together',
+                    'Comparison view shows each partner\'s savings separately for comparison',
+                    'Blue line shows nominal values (not adjusted for inflation)',
+                    'Green line shows real values (adjusted for inflation)',
+                    'Yellow dashed line shows inflation impact on initial savings',
                     'Blue line shows nominal value (without inflation adjustment)',
                     'Green line shows real value (adjusted for inflation)',
                     'Charts update automatically when you change input data'
@@ -69,48 +75,32 @@ const DynamicPartnerCharts = ({
 
     const t = content[language] || content.en;
 
-    // Generate projection data for visualization
-    const generateProjectionData = (partnerInputs, isPartner2 = false) => {
-        const currentAge = partnerInputs?.currentAge || (isPartner2 ? inputs.partnerCurrentAge : inputs.currentAge) || 30;
-        const retirementAge = partnerInputs?.retirementAge || (isPartner2 ? inputs.partnerRetirementAge : inputs.retirementAge) || 67;
-        const currentSavings = partnerInputs?.currentSavings || (isPartner2 ? inputs.partnerCurrentSavings : inputs.currentSavings) || 50000;
-        const currentSalary = partnerInputs?.currentSalary || (isPartner2 ? inputs.partnerCurrentSalary : inputs.currentSalary) || 20000;
-        const savingsRate = 0.125; // 12.5% default savings rate
-        const annualReturn = 0.07; // 7% annual return
-        const inflationRate = (inputs?.inflationRate || 3) / 100;
-        
-        const data = [];
-        let nominalValue = currentSavings;
-        
-        for (let age = currentAge; age <= retirementAge; age++) {
-            const realValue = nominalValue / Math.pow(1 + inflationRate, age - currentAge);
-            data.push({
-                age: age,
-                nominal: Math.round(nominalValue),
-                real: Math.round(realValue)
-            });
-            
-            // Add annual contributions and growth
-            const annualContribution = currentSalary * savingsRate * 12;
-            nominalValue = (nominalValue + annualContribution) * (1 + annualReturn);
+    // Use unified partner data generation from retirementCalculations.js
+    const getUnifiedProjectionData = () => {
+        if (!window.generateUnifiedPartnerProjections) {
+            console.warn('DynamicPartnerCharts: Unified partner projection function not available');
+            return { primary: [], partner: [], combined: [] };
         }
-        
-        return data;
+
+        try {
+            return window.generateUnifiedPartnerProjections(
+                inputs,
+                [], // workPeriods - would need to be passed as prop if needed
+                [], // partnerWorkPeriods - would need to be passed as prop if needed
+                [], // pensionIndexAllocation - would need to be passed as prop if needed
+                [], // trainingFundIndexAllocation - would need to be passed as prop if needed
+                {} // historicalReturns - would need to be passed as prop if needed
+            );
+        } catch (error) {
+            console.warn('DynamicPartnerCharts: Error generating unified projections:', error);
+            return { primary: [], partner: [], combined: [] };
+        }
     };
 
-    // Generate combined data for couples
-    const generateCombinedData = () => {
-        const partner1Data = generateProjectionData(inputs, false);
-        const partner2Data = generateProjectionData(inputs, true);
-        
-        return partner1Data.map((p1Point, index) => {
-            const p2Point = partner2Data[index] || { nominal: 0, real: 0 };
-            return {
-                age: p1Point.age,
-                nominal: p1Point.nominal + p2Point.nominal,
-                real: p1Point.real + p2Point.real
-            };
-        });
+    // Get unified data and format for chart display
+    const getChartData = (dataType) => {
+        const unifiedData = getUnifiedProjectionData();
+        return unifiedData[dataType] || [];
     };
 
     // Chart rendering with real-time updates
@@ -129,9 +119,17 @@ const DynamicPartnerCharts = ({
         let datasets = [];
         let chartData = [];
 
-        // Determine what data to show based on chartView
-        if (chartView === 'combined' && inputs.planningType === 'couple') {
-            chartData = generateCombinedData();
+        // Determine what data to show based on chartView using unified data
+        if (chartView === 'household' && inputs.planningType === 'couple') {
+            chartData = getChartData('combined');
+            
+            // Generate inflation baseline for comparison
+            const inflationBaseline = chartData.map(d => {
+                const yearsFromStart = d.age - chartData[0].age;
+                const inflationRate = (inputs?.inflationRate || 3) / 100;
+                return chartData[0].nominal * Math.pow(1 + inflationRate, yearsFromStart);
+            });
+            
             datasets = [{
                 label: t.nominalValue,
                 data: chartData.map(d => d.nominal),
@@ -148,15 +146,24 @@ const DynamicPartnerCharts = ({
                 fill: false,
                 tension: 0.4,
                 borderWidth: 3
+            }, {
+                label: language === 'he' ? 'השפעת האינפלציה' : 'Inflation Impact',
+                data: inflationBaseline,
+                borderColor: '#F59E0B',
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                fill: false,
+                tension: 0.4,
+                borderWidth: 2,
+                borderDash: [10, 5]
             }];
-        } else if (chartView === 'individual' && inputs.planningType === 'couple') {
-            const partner1Data = generateProjectionData(inputs, false);
-            const partner2Data = generateProjectionData(inputs, true);
-            chartData = partner1Data; // Use partner1 ages for x-axis
+        } else if (chartView === 'comparison' && inputs.planningType === 'couple') {
+            const primaryData = getChartData('primary');
+            const partnerData = getChartData('partner');
+            chartData = primaryData; // Use primary partner ages for x-axis
             
             datasets = [{
                 label: `${t.partner1} - ${t.nominalValue}`,
-                data: partner1Data.map(d => d.nominal),
+                data: primaryData.map(d => d.nominal),
                 borderColor: '#3B82F6',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 fill: false,
@@ -164,7 +171,7 @@ const DynamicPartnerCharts = ({
                 borderWidth: 2
             }, {
                 label: `${t.partner1} - ${t.realValue}`,
-                data: partner1Data.map(d => d.real),
+                data: primaryData.map(d => d.real),
                 borderColor: '#1E40AF',
                 backgroundColor: 'rgba(30, 64, 175, 0.1)',
                 fill: false,
@@ -173,7 +180,7 @@ const DynamicPartnerCharts = ({
                 borderDash: [5, 5]
             }, {
                 label: `${t.partner2} - ${t.nominalValue}`,
-                data: partner2Data.map(d => d.nominal),
+                data: partnerData.map(d => d.nominal),
                 borderColor: '#10B981',
                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
                 fill: false,
@@ -181,7 +188,7 @@ const DynamicPartnerCharts = ({
                 borderWidth: 2
             }, {
                 label: `${t.partner2} - ${t.realValue}`,
-                data: partner2Data.map(d => d.real),
+                data: partnerData.map(d => d.real),
                 borderColor: '#047857',
                 backgroundColor: 'rgba(4, 120, 87, 0.1)',
                 fill: false,
@@ -190,8 +197,8 @@ const DynamicPartnerCharts = ({
                 borderDash: [5, 5]
             }];
         } else {
-            // Single person view
-            chartData = generateProjectionData(inputs, false);
+            // Single person view using unified primary data
+            chartData = getChartData('primary');
             datasets = [{
                 label: t.nominalValue,
                 data: chartData.map(d => d.nominal),
@@ -244,26 +251,27 @@ const DynamicPartnerCharts = ({
                         }
                     }
                 },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: t.age
-                        }
+                scales: window.standardChartFormatting ? 
+                    window.standardChartFormatting.getStandardScaleConfig(workingCurrency, language) : 
+                    {
+                        x: { title: { display: true, text: t.age } },
+                        y: { title: { display: true, text: t.amount } }
                     },
-                    y: {
-                        title: {
-                            display: true,
-                            text: t.amount
+                plugins: {
+                    tooltip: window.standardChartFormatting ? 
+                        window.standardChartFormatting.getStandardTooltipConfig(workingCurrency, language) :
+                        {
+                            mode: 'index',
+                            intersect: false
                         },
-                        ticks: {
-                            callback: function(value) {
-                                const getCurrencySymbol = (currency) => {
-                                    const symbols = { 'ILS': '₪', 'USD': '$', 'EUR': '€', 'GBP': '£', 'BTC': '₿', 'ETH': 'Ξ' };
-                                    return symbols[currency] || '₪';
-                                };
-                                const symbol = getCurrencySymbol(workingCurrency);
-                                return `${symbol}${(value / 1000000).toFixed(1)}M`;
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 15,
+                            font: {
+                                size: 12
                             }
                         }
                     }
@@ -289,22 +297,83 @@ const DynamicPartnerCharts = ({
     return React.createElement('div', {
         className: 'professional-card animate-fade-in-up'
     }, [
-        // Instructions Section
+        // Dynamic Chart Explanation Based on Current View
         React.createElement('div', {
-            key: 'instructions',
-            className: 'section-instructions'
+            key: 'chart-explanation',
+            className: 'bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mb-6 border border-blue-200'
         }, [
-            React.createElement('h4', {
-                key: 'instructions-title'
-            }, t.instructions.title),
-            React.createElement('p', {
-                key: 'instructions-desc'
-            }, t.instructions.description),
-            React.createElement('ul', {
-                key: 'instructions-tips'
-            }, t.instructions.tips.map((tip, index) =>
-                React.createElement('li', { key: index }, tip)
-            ))
+            React.createElement('div', {
+                key: 'explanation-header',
+                className: 'flex items-center mb-3'
+            }, [
+                React.createElement('span', {
+                    key: 'info-icon',
+                    className: 'text-2xl mr-2'
+                }, '💡'),
+                React.createElement('h4', {
+                    key: 'explanation-title',
+                    className: 'text-lg font-semibold text-blue-800'
+                }, language === 'he' ? 'הסבר על התצוגה הנוכחית' : 'Current View Explanation')
+            ]),
+            React.createElement('div', {
+                key: 'explanation-content',
+                className: 'text-sm text-blue-700'
+            }, (() => {
+                if (chartView === 'household' && inputs.planningType === 'couple') {
+                    return language === 'he' ? 
+                        'תצוגת משקי הבית מציגה את סך החיסכון המשולב של שני בני הזוג. זהו הסכום הכולל שיהיה זמין למשק הבית בפרישה. הקו הכחול מציג ערכים נומינליים (המספרים בפועל), הקו הירוק מציג ערכים ריאליים (מותאמי אינפלציה), והקו הצהוב המקווקו מציג את השפעת האינפלציה על החיסכון הראשוני.' :
+                        'Household view shows the combined savings of both partners. This is the total amount available to your household at retirement. The blue line shows nominal values (actual numbers), the green line shows real values (inflation-adjusted), and the yellow dashed line shows inflation impact on initial savings.';
+                } else if (chartView === 'comparison' && inputs.planningType === 'couple') {
+                    return language === 'he' ?
+                        'תצוגת השוואה מציגה את החיסכון של כל בן זוג בנפרד. זה מאפשר לראות את התרומה של כל אחד ולזהות פערים או הזדמנויות לשיפור. קווים מלאים מציגים ערכים נומינליים וקווים מקווקווים מציגים ערכים ריאליים.' :
+                        'Comparison view shows each partner\'s savings separately. This allows you to see each person\'s contribution and identify gaps or improvement opportunities. Solid lines show nominal values and dashed lines show real values.';
+                } else {
+                    return language === 'he' ?
+                        'תצוגת יחיד מציגה את חיסכון הפרט. הקו הכחול מציג ערכים נומינליים (המספרים בפועל) והקו הירוק מציג ערכים ריאליים המותאמים לאינפלציה לאורך זמן.' :
+                        'Single view shows individual retirement savings. The blue line shows nominal values (actual numbers) and the green line shows real values adjusted for inflation over time.';
+                }
+            })())
+        ]),
+
+        // Instructions Section (collapsed by default)
+        React.createElement('details', {
+            key: 'instructions',
+            className: 'section-instructions mb-6'
+        }, [
+            React.createElement('summary', {
+                key: 'instructions-summary',
+                className: 'cursor-pointer text-lg font-semibold text-gray-700 hover:text-blue-600 transition-colors'
+            }, [
+                React.createElement('span', { key: 'icon' }, '📋 '),
+                t.instructions.title
+            ]),
+            React.createElement('div', {
+                key: 'instructions-content',
+                className: 'mt-3 p-4 bg-gray-50 rounded-lg'
+            }, [
+                React.createElement('p', {
+                    key: 'instructions-desc',
+                    className: 'mb-3 text-gray-700'
+                }, t.instructions.description),
+                React.createElement('ul', {
+                    key: 'instructions-tips',
+                    className: 'space-y-2'
+                }, t.instructions.tips.map((tip, index) =>
+                    React.createElement('li', { 
+                        key: index,
+                        className: 'flex items-start'
+                    }, [
+                        React.createElement('span', {
+                            key: 'bullet',
+                            className: 'text-blue-500 mr-2 mt-1 text-sm'
+                        }, '•'),
+                        React.createElement('span', {
+                            key: 'text',
+                            className: 'text-gray-600 text-sm'
+                        }, tip)
+                    ])
+                ))
+            ])
         ]),
 
         // Header with title and view controls
@@ -325,15 +394,29 @@ const DynamicPartnerCharts = ({
                 className: 'flex gap-2'
             }, [
                 React.createElement('button', {
-                    key: 'combined',
-                    onClick: () => setChartView('combined'),
-                    className: `btn-professional ${chartView === 'combined' ? 'btn-primary' : 'btn-outline'} text-sm`
-                }, t.combined),
+                    key: 'household',
+                    onClick: () => setChartView('household'),
+                    className: `btn-professional ${chartView === 'household' ? 'btn-primary' : 'btn-outline'} text-sm relative group`,
+                    title: language === 'he' ? 'הצג את סך החיסכון המשולב של שני בני הזוג' : 'Show combined household savings'
+                }, [
+                    t.household,
+                    React.createElement('div', {
+                        key: 'household-tooltip',
+                        className: 'absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-10'
+                    }, language === 'he' ? '💰 סך החיסכון המשולב' : '💰 Combined Total Savings')
+                ]),
                 React.createElement('button', {
-                    key: 'individual',
-                    onClick: () => setChartView('individual'),
-                    className: `btn-professional ${chartView === 'individual' ? 'btn-primary' : 'btn-outline'} text-sm`
-                }, t.individual)
+                    key: 'comparison',
+                    onClick: () => setChartView('comparison'),
+                    className: `btn-professional ${chartView === 'comparison' ? 'btn-primary' : 'btn-outline'} text-sm relative group`,
+                    title: language === 'he' ? 'השווה בין החיסכון של כל בן זוג בנפרד' : 'Compare each partner\'s savings separately'
+                }, [
+                    t.comparison,
+                    React.createElement('div', {
+                        key: 'comparison-tooltip',
+                        className: 'absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-10'
+                    }, language === 'he' ? '📊 השוואה בין בני הזוג' : '📊 Partner-by-Partner Comparison')
+                ])
             ])
         ]),
 
