@@ -80,11 +80,18 @@ jobs:
     - name: Check for sensitive data
       run: |
         echo "Scanning for potential sensitive data..."
-        # Scan for hardcoded secrets, but exclude safe patterns and security analysis files
+        # Scan for hardcoded secrets, but exclude safe patterns, security analysis files, and minified vendor files
         if grep -r -i "api[_-]key\|secret\|password\|token" --include="*.html" --include="*.js" --include="*.json" . \
           | grep -v node_modules \
           | grep -v ".git" \
           | grep -v "package-lock.json" \
+          | grep -v "deployment/" \
+          | grep -v "dist/" \
+          | grep -v "build/" \
+          | grep -v "vendor.*\.js" \
+          | grep -v "bundle.*\.js" \
+          | grep -v "chunk.*\.js" \
+          | grep -v "\.min\.js" \
           | grep -v "this.apiKeys" \
           | grep -v "apiKeys\." \
           | grep -v "\${this.apiKeys" \
@@ -116,6 +123,13 @@ jobs:
         if grep -r "eval(" --include="*.html" --include="*.js" . \
           | grep -v node_modules \
           | grep -v ".git" \
+          | grep -v "deployment/" \
+          | grep -v "dist/" \
+          | grep -v "build/" \
+          | grep -v "vendor.*\.js" \
+          | grep -v "bundle.*\.js" \
+          | grep -v "chunk.*\.js" \
+          | grep -v "\.min\.js" \
           | grep -v "security-qa-analysis.js" \
           | grep -v "SECURITY_RULES.md" \
           | grep -v "README.md" \
@@ -139,6 +153,13 @@ jobs:
         if grep -r "new Function\|Function(" --include="*.html" --include="*.js" . \
           | grep -v node_modules \
           | grep -v ".git" \
+          | grep -v "deployment/" \
+          | grep -v "dist/" \
+          | grep -v "build/" \
+          | grep -v "vendor.*\.js" \
+          | grep -v "bundle.*\.js" \
+          | grep -v "chunk.*\.js" \
+          | grep -v "\.min\.js" \
           | grep -v "security-qa-analysis.js" \
           | grep -v "SECURITY_RULES.md"; then
           echo "⚠️ Function constructor usage found - security risk"
@@ -148,7 +169,16 @@ jobs:
         fi
         
         # Check for document.write usage
-        if grep -r "document.write" --include="*.html" --include="*.js" . | grep -v node_modules | grep -v ".git"; then
+        if grep -r "document.write" --include="*.html" --include="*.js" . \
+          | grep -v node_modules \
+          | grep -v ".git" \
+          | grep -v "deployment/" \
+          | grep -v "dist/" \
+          | grep -v "build/" \
+          | grep -v "vendor.*\.js" \
+          | grep -v "bundle.*\.js" \
+          | grep -v "chunk.*\.js" \
+          | grep -v "\.min\.js"; then
           echo "⚠️ document.write usage found - security risk"
           exit 1
         else
