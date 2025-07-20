@@ -2,6 +2,31 @@
 // Collects monthly salary and additional income sources
 
 const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency = 'ILS' }) => {
+    // Validation state for salary inputs
+    const [validationErrors, setValidationErrors] = React.useState({});
+    
+    // Salary validation rules
+    const validateSalary = (salary) => {
+        if (salary < 0) return language === 'he' ? 'משכורת לא יכולה להיות שלילית' : 'Salary cannot be negative';
+        if (salary > 500000) return language === 'he' ? 'משכורת גבוהה מדי (מקסימום 500,000)' : 'Salary too high (max 500,000)';
+        return null;
+    };
+    
+    const handleSalaryChange = (salary, field) => {
+        const error = validateSalary(salary);
+        setValidationErrors(prev => ({...prev, [field]: error}));
+        setInputs({...inputs, [field]: salary});
+    };
+    
+    // Helper function for input styling
+    const getInputClassName = (fieldName, baseClassName) => {
+        const error = validationErrors[fieldName];
+        if (error) {
+            return `${baseClassName} border-red-500 focus:ring-red-500 focus:border-red-500`;
+        }
+        return `${baseClassName} border-gray-300 focus:ring-blue-500 focus:border-blue-500`;
+    };
+
     // Currency symbol helper
     const getCurrencySymbol = (currency) => {
         const symbols = {

@@ -77,18 +77,62 @@ const RetirementWizard = ({
         }
     };
 
-    // Step validation - basic validation for now, can be enhanced per step
+    // Enhanced step validation with realistic business rules
     const isCurrentStepValid = () => {
         switch (currentStep) {
-            case 1: return inputs.currentAge && inputs.retirementAge;
-            case 2: return inputs.currentMonthlySalary || inputs.partner1Salary || inputs.partner2Salary;
-            case 3: return true; // Optional step
-            case 4: return true; // Will have country-specific validation
-            case 5: return true; // Optional step
-            case 6: return true; // Optional step  
-            case 7: return true; // Optional step
-            case 8: return true; // Review step
-            default: return true;
+            case 1: 
+                // Personal Information validation
+                const currentAge = inputs.currentAge || 0;
+                const retirementAge = inputs.retirementAge || 0;
+                return currentAge >= 18 && currentAge <= 100 && 
+                       retirementAge > currentAge && retirementAge <= 75;
+            
+            case 2: 
+                // Salary validation - at least one income source
+                const mainSalary = inputs.currentMonthlySalary || 0;
+                const partner1Salary = inputs.partner1Salary || 0;
+                const partner2Salary = inputs.partner2Salary || 0;
+                const totalSalary = mainSalary + partner1Salary + partner2Salary;
+                return totalSalary > 0 && totalSalary <= 1000000; // Reasonable upper limit
+            
+            case 3: 
+                // Savings validation - non-negative values
+                return (inputs.currentSavings || 0) >= 0 && 
+                       (inputs.currentTrainingFundSavings || 0) >= 0;
+            
+            case 4: 
+                // Contribution validation - reasonable percentage ranges
+                const pensionRate = inputs.pensionContributionRate || 0;
+                const trainingRate = inputs.trainingFundContributionRate || 0;
+                return pensionRate >= 0 && pensionRate <= 30 && 
+                       trainingRate >= 0 && trainingRate <= 15;
+            
+            case 5: 
+                // Fees validation - reasonable fee ranges
+                const contribFees = inputs.contributionFees || 0;
+                const accumFees = inputs.accumulationFees || 0;
+                return contribFees >= 0 && contribFees <= 5 && 
+                       accumFees >= 0 && accumFees <= 3;
+            
+            case 6: 
+                // Investment validation - reasonable return expectations
+                const expectedReturn = inputs.expectedReturn || 0;
+                const inflationRate = inputs.inflationRate || 0;
+                return expectedReturn >= 0 && expectedReturn <= 20 && 
+                       inflationRate >= 0 && inflationRate <= 15;
+            
+            case 7: 
+                // Goals validation - positive values
+                return (inputs.retirementGoal || 0) > 0 && 
+                       (inputs.currentMonthlyExpenses || 0) > 0;
+            
+            case 8: 
+                // Review step - check if we have minimum required data
+                return inputs.currentAge && inputs.retirementAge && 
+                       (inputs.currentMonthlySalary || inputs.partner1Salary || inputs.partner2Salary);
+            
+            default: 
+                return true;
         }
     };
 

@@ -2,6 +2,53 @@
 // Collects age, retirement age, planning type (single/couple), and partner details
 
 const WizardStepPersonal = ({ inputs, setInputs, language = 'en' }) => {
+    // Validation state
+    const [validationErrors, setValidationErrors] = React.useState({});
+    
+    // Validation rules
+    const validateAge = (age) => {
+        if (!age || age < 18) return language === 'he' ? 'גיל מינימלי: 18' : 'Minimum age: 18';
+        if (age > 100) return language === 'he' ? 'גיל מקסימלי: 100' : 'Maximum age: 100';
+        return null;
+    };
+    
+    const validateRetirementAge = (retirementAge, currentAge) => {
+        if (!retirementAge) return null;
+        if (retirementAge <= currentAge) return language === 'he' ? 'גיל פרישה חייב להיות גבוה מהגיל הנוכחי' : 'Retirement age must be higher than current age';
+        if (retirementAge > 75) return language === 'he' ? 'גיל פרישה מקסימלי: 75' : 'Maximum retirement age: 75';
+        return null;
+    };
+    
+    const validateName = (name) => {
+        if (name && name.length < 2) return language === 'he' ? 'שם קצר מדי' : 'Name too short';
+        return null;
+    };
+    
+    // Real-time validation
+    const handleAgeChange = (age, field) => {
+        const error = validateAge(age);
+        setValidationErrors(prev => ({...prev, [field]: error}));
+        setInputs({...inputs, [field]: age});
+        
+        // Also validate retirement age when current age changes
+        if (field === 'currentAge') {
+            const retirementError = validateRetirementAge(inputs.retirementAge, age);
+            setValidationErrors(prev => ({...prev, retirementAge: retirementError}));
+        }
+    };
+    
+    const handleRetirementAgeChange = (retirementAge) => {
+        const error = validateRetirementAge(retirementAge, inputs.currentAge);
+        setValidationErrors(prev => ({...prev, retirementAge: error}));
+        setInputs({...inputs, retirementAge});
+    };
+    
+    const handleNameChange = (name, field) => {
+        const error = validateName(name);
+        setValidationErrors(prev => ({...prev, [field]: error}));
+        setInputs({...inputs, [field]: name});
+    };
+    
     // Multi-language content
     const content = {
         he: {
@@ -20,7 +67,9 @@ const WizardStepPersonal = ({ inputs, setInputs, language = 'en' }) => {
             enterName: 'הזן שם',
             ageInfo: 'גילך הנוכחי קובע את אופק הזמן להשקעה',
             retirementInfo: 'גיל הפרישה המתוכנן שלך',
-            coupleInfo: 'תכנון זוגי מאפשר אופטימיזציה משותפת של החיסכון והתשואות'
+            coupleInfo: 'תכנון זוגי מאפשר אופטימיזציה משותפת של החיסכון והתשואות',
+            validInput: 'תקין',
+            invalidInput: 'שגיאה'
         },
         en: {
             planningType: 'Planning Type',
@@ -38,11 +87,22 @@ const WizardStepPersonal = ({ inputs, setInputs, language = 'en' }) => {
             enterName: 'Enter name',
             ageInfo: 'Your current age determines your investment time horizon',
             retirementInfo: 'Your planned retirement age',
-            coupleInfo: 'Joint planning enables shared optimization of savings and returns'
+            coupleInfo: 'Joint planning enables shared optimization of savings and returns',
+            validInput: 'Valid',
+            invalidInput: 'Error'
         }
     };
 
     const t = content[language];
+    
+    // Helper function for input styling based on validation
+    const getInputClassName = (fieldName, baseClassName) => {
+        const error = validationErrors[fieldName];
+        if (error) {
+            return `${baseClassName} border-red-500 focus:ring-red-500 focus:border-red-500`;
+        }
+        return `${baseClassName} border-gray-300 focus:ring-purple-500 focus:border-purple-500`;
+    };
 
     return React.createElement('div', { className: "space-y-8" }, [
         // Planning Type Selection
@@ -102,10 +162,19 @@ const WizardStepPersonal = ({ inputs, setInputs, language = 'en' }) => {
                 React.createElement('input', {
                     key: 'current-age-input',
                     type: 'number',
+                    min: 18,
+                    max: 100,
                     value: inputs.currentAge || 30,
-                    onChange: (e) => setInputs({...inputs, currentAge: parseInt(e.target.value) || 30}),
-                    className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    onChange: (e) => handleAgeChange(parseInt(e.target.value) || 0, 'currentAge'),
+                    className: getInputClassName('currentAge', "w-full p-4 text-xl border-2 rounded-lg focus:ring-2")
                 }),
+                validationErrors.currentAge && React.createElement('p', { 
+                    key: 'current-age-error',
+                    className: "mt-1 text-sm text-red-600 flex items-center" 
+                }, [
+                    React.createElement('span', { key: 'error-icon', className: "mr-1" }, '⚠️'),
+                    validationErrors.currentAge
+                ]),
                 React.createElement('p', { 
                     key: 'current-age-help',
                     className: "mt-2 text-sm text-gray-600" 
@@ -119,10 +188,19 @@ const WizardStepPersonal = ({ inputs, setInputs, language = 'en' }) => {
                 React.createElement('input', {
                     key: 'retirement-age-input',
                     type: 'number',
+                    min: (inputs.currentAge || 18) + 1,
+                    max: 75,
                     value: inputs.retirementAge || 67,
-                    onChange: (e) => setInputs({...inputs, retirementAge: parseInt(e.target.value) || 67}),
-                    className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    onChange: (e) => handleRetirementAgeChange(parseInt(e.target.value) || 0),
+                    className: getInputClassName('retirementAge', "w-full p-4 text-xl border-2 rounded-lg focus:ring-2")
                 }),
+                validationErrors.retirementAge && React.createElement('p', { 
+                    key: 'retirement-age-error',
+                    className: "mt-1 text-sm text-red-600 flex items-center" 
+                }, [
+                    React.createElement('span', { key: 'error-icon', className: "mr-1" }, '⚠️'),
+                    validationErrors.retirementAge
+                ]),
                 React.createElement('p', { 
                     key: 'retirement-age-help',
                     className: "mt-2 text-sm text-gray-600" 
