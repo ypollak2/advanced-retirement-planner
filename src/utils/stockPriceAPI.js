@@ -59,9 +59,147 @@ const FALLBACK_PRICES = {
     'ESTC': 85.30     // Elastic
 };
 
-// Cache for API responses (5 minutes)
+// Advanced caching system with TTL and refresh strategies
 const priceCache = new Map();
+const refreshingCache = new Set(); // Track symbols being refreshed
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const STALE_WHILE_REVALIDATE_DURATION = 15 * 60 * 1000; // 15 minutes
+const LOCALSTORAGE_DURATION = 24 * 60 * 60 * 1000; // 24 hours for localStorage
+const MAX_CACHE_SIZE = 100; // Prevent memory leaks
+const LOCALSTORAGE_KEY = 'stockPriceCache_v2';
+
+// Cache entry structure with metadata
+class CacheEntry {
+    constructor(price, source = 'api') {
+        this.price = price;
+        this.timestamp = Date.now();
+        this.source = source;
+        this.accessCount = 1;
+        this.lastAccessed = Date.now();
+    }
+    
+    isExpired() {
+        return Date.now() - this.timestamp > CACHE_DURATION;
+    }
+    
+    isStale() {
+        return Date.now() - this.timestamp > STALE_WHILE_REVALIDATE_DURATION;
+    }
+    
+    touch() {
+        this.accessCount++;
+        this.lastAccessed = Date.now();
+    }
+}
+
+// LocalStorage cache management
+function loadFromLocalStorage() {
+    try {
+        const stored = localStorage.getItem(LOCALSTORAGE_KEY);
+        if (!stored) return;
+        
+        const data = JSON.parse(stored);
+        let loadedCount = 0;
+        
+        for (const [symbol, entryData] of Object.entries(data)) {
+            const age = Date.now() - entryData.timestamp;
+            if (age < LOCALSTORAGE_DURATION) {
+                const entry = new CacheEntry(entryData.price, entryData.source + '-localStorage');
+                entry.timestamp = entryData.timestamp; // Preserve original timestamp
+                priceCache.set(symbol, entry);
+                loadedCount++;
+            }
+        }
+        
+        if (loadedCount > 0) {
+            console.log(`📱 Loaded ${loadedCount} stock prices from localStorage`);
+        }
+    } catch (error) {
+        console.warn('Failed to load from localStorage:', error);
+    }
+}
+
+function saveToLocalStorage() {
+    try {
+        const data = {};
+        for (const [symbol, entry] of priceCache.entries()) {
+            // Only save API-sourced data to localStorage
+            if (entry.source.includes('api') || entry.source.includes('fallback')) {
+                data[symbol] = {
+                    price: entry.price,
+                    timestamp: entry.timestamp,
+                    source: entry.source.replace('-localStorage', '') // Remove localStorage suffix
+                };
+            }
+        }
+        
+        localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(data));
+    } catch (error) {
+        console.warn('Failed to save to localStorage:', error);
+    }
+}
+
+// LRU cache management
+function evictLeastUsed() {
+    if (priceCache.size <= MAX_CACHE_SIZE) return;
+    
+    let leastUsed = null;
+    let leastUsedKey = null;
+    
+    for (const [key, entry] of priceCache.entries()) {
+        if (!leastUsed || entry.lastAccessed < leastUsed.lastAccessed) {
+            leastUsed = entry;
+            leastUsedKey = key;
+        }
+    }
+    
+    if (leastUsedKey) {
+        priceCache.delete(leastUsedKey);
+        console.log(`🗑️ Evicted ${leastUsedKey} from cache (LRU)`);
+    }
+    
+    // Save to localStorage after eviction
+    saveToLocalStorage();
+}
+
+// Initialize cache from localStorage on load
+loadFromLocalStorage();
+
+// Online/Offline status management
+let isOnline = navigator.onLine;
+let offlineQueue = [];
+
+window.addEventListener('online', () => {
+    isOnline = true;
+    console.log('🌐 App back online - processing queued requests');
+    processOfflineQueue();
+});
+
+window.addEventListener('offline', () => {
+    isOnline = false;
+    console.log('📱 App went offline - using cached data');
+});
+
+async function processOfflineQueue() {
+    if (offlineQueue.length === 0) return;
+    
+    console.log(`🔄 Processing ${offlineQueue.length} queued stock price requests...`);
+    const queueCopy = [...offlineQueue];
+    offlineQueue = [];
+    
+    for (const symbol of queueCopy) {
+        try {
+            await fetchStockPrice(symbol, false); // Force fresh fetch
+        } catch (error) {
+            console.log(`Failed to refresh ${symbol}:`, error.message);
+        }
+    }
+}
+
+// Enhanced offline detection
+function isAppOnline() {
+    return navigator.onLine && isOnline;
+}
 
 // Real-time stock price fetching function
 async function fetchRealTimePrice(symbol) {
@@ -122,18 +260,48 @@ async function fetchRealTimePrice(symbol) {
     }
 }
 
-// Main function to fetch stock price
+// Background refresh function for stale-while-revalidate
+async function backgroundRefresh(symbol) {
+    if (refreshingCache.has(symbol)) return; // Already refreshing
+    
+    refreshingCache.add(symbol);
+    try {
+        console.log(`🔄 Background refreshing ${symbol}...`);
+        const freshPrice = await fetchRealTimePrice(symbol);
+        if (freshPrice) {
+            const entry = new CacheEntry(freshPrice, 'api-background');
+            priceCache.set(symbol, entry);
+            evictLeastUsed();
+            saveToLocalStorage();
+            console.log(`✅ Background refresh complete for ${symbol}: $${freshPrice}`);
+        }
+    } catch (error) {
+        console.log(`❌ Background refresh failed for ${symbol}:`, error.message);
+    } finally {
+        refreshingCache.delete(symbol);
+    }
+}
+
+// Main function to fetch stock price with stale-while-revalidate
 async function fetchStockPrice(symbol, useCache = true) {
     if (!symbol) return null;
     
     const upperSymbol = symbol.toUpperCase();
     
-    // Check cache first
+    // Check cache first (stale-while-revalidate pattern)
     if (useCache && priceCache.has(upperSymbol)) {
         const cached = priceCache.get(upperSymbol);
-        if (Date.now() - cached.timestamp < CACHE_DURATION) {
+        cached.touch(); // Update access tracking
+        
+        if (!cached.isExpired()) {
+            // Fresh cache hit
+            return cached.price;
+        } else if (!cached.isStale()) {
+            // Stale but not too old - return stale data and refresh in background
+            backgroundRefresh(upperSymbol);
             return cached.price;
         }
+        // If too stale, fall through to fresh fetch
     }
     
     // For GitHub Pages deployment, use fallback prices immediately to avoid CORS issues
@@ -142,15 +310,31 @@ async function fetchStockPrice(symbol, useCache = true) {
         if (fallbackPrice) {
             console.log(`📊 Using fallback price for ${upperSymbol}: $${fallbackPrice} (GitHub Pages mode)`);
             
-            // Cache fallback price with shorter duration
-            priceCache.set(upperSymbol, {
-                price: fallbackPrice,
-                timestamp: Date.now(),
-                source: 'fallback-githubpages'
-            });
+            // Cache fallback price
+            const entry = new CacheEntry(fallbackPrice, 'fallback-githubpages');
+            priceCache.set(upperSymbol, entry);
+            evictLeastUsed();
             
             return fallbackPrice;
         }
+    }
+    
+    // Check if we're offline and handle gracefully
+    if (!isAppOnline()) {
+        console.log('📱 App is offline, using cached/fallback data for', upperSymbol);
+        
+        // Add to offline queue for later processing
+        if (!offlineQueue.includes(upperSymbol)) {
+            offlineQueue.push(upperSymbol);
+        }
+        
+        const fallbackPrice = FALLBACK_PRICES[upperSymbol];
+        if (fallbackPrice) {
+            const entry = new CacheEntry(fallbackPrice, 'fallback-offline');
+            priceCache.set(upperSymbol, entry);
+            return fallbackPrice;
+        }
+        return null;
     }
     
     // Try to fetch real-time price from APIs (with timeout)
@@ -164,11 +348,10 @@ async function fetchStockPrice(symbol, useCache = true) {
             console.log(`📈 Real-time price fetched for ${upperSymbol}: $${realTimePrice}`);
             
             // Cache real-time price
-            priceCache.set(upperSymbol, {
-                price: realTimePrice,
-                timestamp: Date.now(),
-                source: 'api'
-            });
+            const entry = new CacheEntry(realTimePrice, 'api');
+            priceCache.set(upperSymbol, entry);
+            evictLeastUsed();
+            saveToLocalStorage();
             
             return realTimePrice;
         }
@@ -182,11 +365,9 @@ async function fetchStockPrice(symbol, useCache = true) {
         console.log(`📊 Using fallback price for ${upperSymbol}: $${fallbackPrice}`);
         
         // Cache fallback price
-        priceCache.set(upperSymbol, {
-            price: fallbackPrice,
-            timestamp: Date.now(),
-            source: 'fallback'
-        });
+        const entry = new CacheEntry(fallbackPrice, 'fallback');
+        priceCache.set(upperSymbol, entry);
+        evictLeastUsed();
         
         return fallbackPrice;
     }

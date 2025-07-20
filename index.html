@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Retirement Planner v6.1.1</title>
+    <title>Advanced Retirement Planner v6.2.0</title>
     <meta name="description" content="Advanced retirement planning tool with comprehensive investment tracking">
     
     <!-- Security Headers (Note: X-Frame-Options removed - should be set via HTTP headers, not meta tags) -->
@@ -107,36 +107,22 @@
     <script src="src/components/MultiCurrencySavings.js?v={{VERSION}}"></script>
     <script src="src/components/PermanentSidePanel.js?v={{VERSION}}"></script>
     
-    <!-- Wizard Components -->
-    <script src="src/components/WizardStep.js?v={{VERSION}}"></script>
-    <script src="src/components/WizardStepPersonal.js?v={{VERSION}}"></script>
-    <script src="src/components/WizardStepSalary.js?v={{VERSION}}"></script>
-    <script src="src/components/WizardStepSavings.js?v={{VERSION}}"></script>
-    <script src="src/components/WizardStepContributions.js?v={{VERSION}}"></script>
-    <script src="src/components/WizardStepFees.js?v={{VERSION}}"></script>
-    <script src="src/components/WizardStepRiskProfile.js?v={{VERSION}}"></script>
-    <script src="src/components/WizardStepInheritance.js?v={{VERSION}}"></script>
-    <script src="src/components/WizardStepInvestments.js?v={{VERSION}}"></script>
-    <script src="src/components/WizardStepGoals.js?v={{VERSION}}"></script>
-    <script src="src/components/WizardStepReview.js?v={{VERSION}}"></script>
+    <!-- Core Wizard Components (lazy-loaded on demand) -->
     <script src="src/components/RetirementWizard.js?v={{VERSION}}"></script>
     
-    <!-- Main Components (depend on base components) -->
+    <!-- Core Components (loaded immediately) -->
     <script src="src/components/HelpTooltip.js?v={{VERSION}}"></script>
     <script src="src/components/ReadinessScore.js?v={{VERSION}}"></script>
-    <script src="src/components/DynamicPartnerCharts.js?v={{VERSION}}"></script>
-    <script src="src/components/ExportControls.js?v={{VERSION}}"></script>
-    <script src="src/components/StressTestInterface.js?v={{VERSION}}"></script>
-    <script src="src/components/ClaudeRecommendations.js?v={{VERSION}}"></script>
-    <script src="src/components/InflationAnalysis.js?v={{VERSION}}"></script>
-    <script src="src/components/SummaryPanel.js?v={{VERSION}}"></script>
     <script src="src/components/BasicInputs.js?v={{VERSION}}"></script>
-    <script src="src/components/RetirementAdvancedForm.js?v={{VERSION}}"></script>
-    <script src="src/components/RetirementResultsPanel.js?v={{VERSION}}"></script>
+    
+    <!-- Dashboard Components (lazy-loaded as needed) -->
     <script src="src/components/SavingsSummaryPanel.js?v={{VERSION}}"></script>
     
     <!-- Currency & Dashboard Components -->
     <script src="src/components/CurrencySelector.js?v={{VERSION}}"></script>
+    <script src="src/utils/performanceMonitor.js?v={{VERSION}}"></script>
+    <script src="src/utils/dynamicLoader.js?v={{VERSION}}"></script>
+    <script src="src/components/LazyComponent.js?v={{VERSION}}"></script>
     <script src="src/components/Dashboard.js?v={{VERSION}}"></script>
     <script src="src/components/RetirementPlannerApp.js?v={{VERSION}}"></script>
     
@@ -191,6 +177,38 @@
                 `;
             }
         });
+
+        // Service Worker Registration for Offline Support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    console.log('📦 Service Worker registered successfully:', registration.scope);
+                    
+                    // Listen for updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('🔄 New service worker available - refresh to update');
+                                // Optionally show user notification about update
+                            }
+                        });
+                    });
+                    
+                    // Send stock symbols to cache for offline use
+                    if (registration.active) {
+                        const commonStocks = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META', 'TSLA', 'NVDA'];
+                        registration.active.postMessage({
+                            type: 'CACHE_STOCK_PRICES',
+                            symbols: commonStocks
+                        });
+                    }
+                } catch (error) {
+                    console.log('Service Worker registration failed:', error);
+                }
+            });
+        }
     </script>
 
 </body>

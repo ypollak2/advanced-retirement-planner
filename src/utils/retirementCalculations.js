@@ -83,6 +83,10 @@ window.calculateRetirement = (
     
     // Calculate pension savings from work periods
     for (const period of sortedPeriods) {
+        if (!period || !period.country || !countryData[period.country]) {
+            console.warn('Invalid work period or country data:', period);
+            continue;
+        }
         const country = countryData[period.country];
         const periodYears = Math.max(0, Math.min(period.endAge, inputs.retirementAge) - Math.max(period.startAge, inputs.currentAge));
         
@@ -253,6 +257,10 @@ window.calculateRetirement = (
     let totalWeight = 0;
     
     for (const result of periodResults) {
+        if (!result || !result.country || !countryData[result.country]) {
+            console.warn('Invalid period result or country data:', result);
+            continue;
+        }
         const country = countryData[result.country];
         weightedTaxRate += country.pensionTax * result.growth;
         totalWeight += result.growth;
@@ -261,15 +269,27 @@ window.calculateRetirement = (
     if (totalWeight > 0) {
         weightedTaxRate = weightedTaxRate / totalWeight;
     } else {
-        weightedTaxRate = countryData[workPeriods[0].country].pensionTax;
+        // Fallback to default tax rate if no valid work periods
+        if (workPeriods.length > 0 && workPeriods[0] && workPeriods[0].country && countryData[workPeriods[0].country]) {
+            weightedTaxRate = countryData[workPeriods[0].country].pensionTax;
+        } else {
+            weightedTaxRate = 0.25; // Default 25% tax rate
+        }
     }
     
     const pensionTax = monthlyPension * weightedTaxRate;
     const netPension = monthlyPension - pensionTax;
     const netTrainingFundIncome = monthlyTrainingFundIncome;
     
-    const lastCountry = countryData[sortedPeriods[sortedPeriods.length - 1].country];
-    const socialSecurity = lastCountry.socialSecurity;
+    // Get social security from last valid country or default
+    let socialSecurity = 0;
+    if (sortedPeriods.length > 0) {
+        const lastPeriod = sortedPeriods[sortedPeriods.length - 1];
+        if (lastPeriod && lastPeriod.country && countryData[lastPeriod.country]) {
+            const lastCountry = countryData[lastPeriod.country];
+            socialSecurity = lastCountry.socialSecurity;
+        }
+    }
     
     // Calculate partner income (if applicable)
     let partnerNetIncome = 0;

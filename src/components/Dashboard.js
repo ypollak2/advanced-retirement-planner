@@ -23,15 +23,12 @@ const Dashboard = ({
         he: {
             dashboard: 'לוח הבקרה הפיננסי',
             healthMeter: 'מד בריאות פיננסית',
-            retirementCountdown: 'ספירה לאחור לפרישה',
             netWorth: 'שווי נטו',
             quickActions: 'פעולות מהירות',
             planPension: 'תכנן פנסיה',
             manageInvestments: 'נהל השקעות',
             partnerPlanning: 'תכנון משותף',
             testScenarios: 'בדוק תרחישים',
-            years: 'שנים',
-            untilRetirement: 'עד הפרישה',
             excellent: 'מעולה',
             good: 'טוב',
             needsWork: 'זקוק לשיפור',
@@ -50,15 +47,12 @@ const Dashboard = ({
         en: {
             dashboard: 'Financial Dashboard',
             healthMeter: 'Financial Health Meter',
-            retirementCountdown: 'Retirement Countdown',
             netWorth: 'Net Worth',
             quickActions: 'Quick Actions',
             planPension: 'Plan Pension',
             manageInvestments: 'Manage Investments',
             partnerPlanning: 'Partner Planning',
             testScenarios: 'Test Scenarios',
-            years: 'years',
-            untilRetirement: 'until retirement',
             excellent: 'Excellent',
             good: 'Good',
             needsWork: 'Needs Work',
@@ -155,9 +149,7 @@ const Dashboard = ({
 
     const healthStatus = getHealthStatus(healthScore);
 
-    // Calculate years until retirement (only show if user has entered data)
     const hasUserData = inputs && (inputs.currentAge || inputs.currentSalary || inputs.currentSavings);
-    const yearsToRetirement = hasUserData ? (inputs?.retirementAge || 67) - (inputs?.currentAge || 30) : null;
 
     // Calculate net worth with currency conversion (only show if user has entered data)
     const calculateNetWorth = () => {

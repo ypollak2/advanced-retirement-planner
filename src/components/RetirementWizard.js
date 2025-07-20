@@ -5,6 +5,7 @@ const RetirementWizard = ({
     inputs, 
     setInputs, 
     onComplete, 
+    onReturnToDashboard,
     language = 'en',
     workingCurrency = 'ILS' 
 }) => {
@@ -183,6 +184,21 @@ const RetirementWizard = ({
             key: 'wizard-header',
             className: "text-center mb-8" 
         }, [
+            // Return to Dashboard button
+            onReturnToDashboard && React.createElement('div', {
+                key: 'dashboard-nav',
+                className: "flex justify-between items-center mb-6"
+            }, [
+                React.createElement('button', {
+                    key: 'return-button',
+                    onClick: onReturnToDashboard,
+                    className: "flex items-center px-4 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                }, [
+                    React.createElement('span', { key: 'arrow', className: "mr-2" }, '←'),
+                    React.createElement('span', { key: 'text' }, language === 'he' ? 'חזרה ללוח הבקרה' : 'Return to Dashboard')
+                ]),
+                React.createElement('div', { key: 'spacer' }) // Empty div for spacing
+            ]),
             React.createElement('h1', { 
                 key: 'wizard-title',
                 className: "text-4xl font-bold text-gray-800 mb-4" 

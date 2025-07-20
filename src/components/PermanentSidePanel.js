@@ -140,60 +140,6 @@ function PermanentSidePanel(props) {
             key: 'overview-tab',
             className: 'space-y-4'
         }, [
-            // Quick Stats
-            React.createElement('div', {
-                key: 'quick-stats',
-                className: 'bg-white rounded-lg p-4 shadow-sm'
-            }, [
-                React.createElement('h3', {
-                    key: 'stats-title',
-                    className: 'text-lg font-semibold text-gray-800 mb-3'
-                }, t.quickStats),
-                React.createElement('div', {
-                    key: 'stats-grid',
-                    className: 'grid grid-cols-2 gap-3'
-                }, [
-                    React.createElement('div', {
-                        key: 'age-stat',
-                        className: 'text-center p-2 bg-blue-50 rounded'
-                    }, [
-                        React.createElement('div', {
-                            key: 'age-value',
-                            className: 'text-2xl font-bold text-blue-600'
-                        }, inputs?.currentAge || 30),
-                        React.createElement('div', {
-                            key: 'age-label',
-                            className: 'text-xs text-gray-600'
-                        }, t.currentAge)
-                    ]),
-                    React.createElement('div', {
-                        key: 'retirement-stat',
-                        className: 'text-center p-2 bg-green-50 rounded'
-                    }, [
-                        React.createElement('div', {
-                            key: 'retirement-value',
-                            className: 'text-2xl font-bold text-green-600'
-                        }, inputs?.retirementAge || 67),
-                        React.createElement('div', {
-                            key: 'retirement-label',
-                            className: 'text-xs text-gray-600'
-                        }, t.retirementAge)
-                    ]),
-                    React.createElement('div', {
-                        key: 'years-stat',
-                        className: 'text-center p-2 bg-orange-50 rounded col-span-2'
-                    }, [
-                        React.createElement('div', {
-                            key: 'years-value',
-                            className: 'text-3xl font-bold text-orange-600'
-                        }, yearsToRetirement),
-                        React.createElement('div', {
-                            key: 'years-label',
-                            className: 'text-xs text-gray-600'
-                        }, t.yearsToRetirement)
-                    ])
-                ])
-            ]),
 
             // Readiness Score
             React.createElement('div', {

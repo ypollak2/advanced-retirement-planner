@@ -482,8 +482,8 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
             ])
         ]),
 
-        // Training Fund Limits (Israel only, single mode only)
-        selectedCountry === 'israel' && (!inputs.planningType || inputs.planningType === 'single') && createElement('div', { key: 'training-fund-limits-section' }, [
+        // Training Fund Limits (Israel only, all modes)
+        selectedCountry === 'israel' && createElement('div', { key: 'training-fund-limits-section' }, [
             createElement('h3', { 
                 key: 'training-fund-limits-title',
                 className: "text-xl font-semibold text-gray-700 mb-4 flex items-center" 
