@@ -145,20 +145,67 @@ const SummaryPanel = ({
     
     const diversificationScore = calculateDiversificationScore();
     
-    // Calculate current savings rate
+    // Calculate current savings rate with proper field mapping
     const currentSalary = inputs.currentMonthlySalary || inputs.currentSalary || 20000;
-    const currentContributions = (inputs.monthlyContribution || 0) + (inputs.trainingFundMonthly || 0) + (inputs.personalPortfolioMonthly || 0);
-    const currentSavingsRate = currentSalary > 0 ? (currentContributions / currentSalary) * 100 : 0;
     
-    // Calculate readiness score
+    // Calculate total income including all sources
+    let totalIncome = currentSalary;
+    if (inputs.planningType === 'couple') {
+        totalIncome += (inputs.partner1Salary || 0) + (inputs.partner2Salary || 0);
+    }
+    totalIncome += (inputs.freelanceIncome || 0) + (inputs.rentalIncome || 0) + 
+                   (inputs.dividendIncome || 0) + 
+                   ((inputs.annualBonus || 0) / 12) + // Convert annual to monthly
+                   ((inputs.quarterlyRSU || 0) / 3) + // Convert quarterly to monthly
+                   (inputs.otherIncome || 0);
+    
+    // Calculate total contributions (pension + training fund + personal investments)
+    const pensionContribution = totalIncome * 0.175; // Default 17.5% pension
+    const trainingFundContribution = totalIncome * 0.075; // Default 7.5% training fund
+    const personalPortfolioContribution = inputs.personalPortfolioMonthly || 0;
+    const currentContributions = pensionContribution + trainingFundContribution + personalPortfolioContribution;
+    
+    const currentSavingsRate = totalIncome > 0 ? (currentContributions / totalIncome) * 100 : 0;
+    
+    // Calculate readiness score with comprehensive factors
     const calculateReadinessScore = () => {
         if (!results?.readinessScore) {
-            // Simple calculation based on available data
-            const savingsScore = Math.min((currentSavingsRate / 20) * 100, 100); // Target 20% savings rate
-            const diversificationPenalty = diversificationScore < 60 ? -20 : 0;
-            const agePenalty = yearsToRetirement < 20 ? -10 : 0;
+            let score = 0;
             
-            return Math.max(savingsScore + diversificationPenalty + agePenalty, 0);
+            // Factor 1: Savings Rate (40 points)
+            const savingsRateScore = Math.min((currentSavingsRate / 25) * 40, 40); // Target 25% savings rate
+            score += savingsRateScore;
+            
+            // Factor 2: Current Savings Adequacy (25 points)
+            const targetSavings = totalIncome * 12 * (inputs.currentAge - 22); // Rule of thumb: 1x annual income per working year
+            const currentTotalSavings = (inputs.currentSavings || 0) + 
+                                      (inputs.currentTrainingFund || 0) + 
+                                      (inputs.currentPersonalPortfolio || 0);
+            const savingsAdequacyScore = Math.min((currentTotalSavings / targetSavings) * 25, 25);
+            score += savingsAdequacyScore;
+            
+            // Factor 3: Time Horizon (20 points)
+            const timeScore = yearsToRetirement >= 30 ? 20 : 
+                            yearsToRetirement >= 20 ? 15 : 
+                            yearsToRetirement >= 10 ? 10 : 5;
+            score += timeScore;
+            
+            // Factor 4: Diversification (10 points)
+            const diversificationBonus = diversificationScore >= 80 ? 10 : 
+                                       diversificationScore >= 60 ? 7 : 
+                                       diversificationScore >= 40 ? 4 : 0;
+            score += diversificationBonus;
+            
+            // Factor 5: Income Replacement Ratio (5 points)
+            if (results?.monthlyIncome && totalIncome > 0) {
+                const replacementRatio = (results.monthlyIncome / totalIncome) * 100;
+                const replacementScore = replacementRatio >= 80 ? 5 : 
+                                       replacementRatio >= 70 ? 4 : 
+                                       replacementRatio >= 60 ? 2 : 0;
+                score += replacementScore;
+            }
+            
+            return Math.round(Math.max(Math.min(score, 100), 0));
         }
         return results.readinessScore;
     };

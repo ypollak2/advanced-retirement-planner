@@ -349,18 +349,70 @@ function RetirementPlannerApp() {
         return displayValue;
     }
 
-    // Calculate function with error handling
+    // Calculate function with error handling and wizard data sync
     function handleCalculate() {
         try {
-            if (window.calculateRetirement && workPeriods && workPeriods.length > 0) {
-                var result = window.calculateRetirement(inputs, workPeriods, [], []);
+            if (window.calculateRetirement) {
+                // Sync wizard data with workPeriods
+                var updatedWorkPeriods = [...workPeriods];
+                
+                if (updatedWorkPeriods.length > 0) {
+                    // Update the work period with wizard-collected salary data
+                    var mainSalary = inputs.currentMonthlySalary || inputs.currentSalary || 20000;
+                    var totalIncome = mainSalary;
+                    
+                    // Add partner salaries if couple planning
+                    if (inputs.planningType === 'couple') {
+                        totalIncome += (inputs.partner1Salary || 0) + (inputs.partner2Salary || 0);
+                    }
+                    
+                    // Add additional income sources
+                    totalIncome += (inputs.freelanceIncome || 0) + 
+                                  (inputs.rentalIncome || 0) + 
+                                  (inputs.dividendIncome || 0) + 
+                                  ((inputs.annualBonus || 0) / 12) + // Convert annual to monthly
+                                  ((inputs.quarterlyRSU || 0) / 3) + // Convert quarterly to monthly
+                                  (inputs.otherIncome || 0);
+                    
+                    updatedWorkPeriods[0] = {
+                        ...updatedWorkPeriods[0],
+                        salary: totalIncome,
+                        monthlyContribution: Math.round(totalIncome * 0.175), // Default 17.5% pension contribution
+                        monthlyTrainingFund: Math.round(totalIncome * 0.075) // Default 7.5% training fund
+                    };
+                    
+                    // Update work periods state
+                    setWorkPeriods(updatedWorkPeriods);
+                }
+                
+                // Update inputs with calculated total income for the calculation
+                var updatedInputs = {
+                    ...inputs,
+                    currentSalary: updatedWorkPeriods[0]?.salary || inputs.currentMonthlySalary || 20000
+                };
+                
+                console.log('Calculate: Using updated inputs:', updatedInputs);
+                console.log('Calculate: Using updated work periods:', updatedWorkPeriods);
+                
+                var result = window.calculateRetirement(
+                    updatedInputs, 
+                    updatedWorkPeriods, 
+                    pensionIndexAllocation, 
+                    trainingFundIndexAllocation,
+                    historicalReturns,
+                    updatedWorkPeriods[0]?.monthlyTrainingFund || 500,
+                    partnerWorkPeriods
+                );
+                
+                console.log('Calculate: Result received:', result);
                 setResults(result);
             } else {
-                console.warn('Calculate: Missing calculateRetirement function or work periods');
+                console.warn('Calculate: Missing calculateRetirement function');
                 // Create a basic result structure for demo
+                var monthlyIncome = (inputs.currentMonthlySalary || inputs.currentSalary || 20000) * 0.8;
                 setResults({
                     totalSavings: (inputs.currentSavings || 0) * 2,
-                    monthlyIncome: (inputs.currentMonthlyExpenses || 10000) * 0.8,
+                    monthlyIncome: Math.round(monthlyIncome),
                     currentAge: inputs.currentAge || 30,
                     retirementAge: inputs.retirementAge || 67
                 });

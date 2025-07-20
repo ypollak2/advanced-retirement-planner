@@ -46,13 +46,15 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
     const content = {
         he: {
             mainSalary: 'משכורת חודשית עיקרית',
-            grossSalary: `משכורת ברוטו (${currencySymbol})`,
+            grossSalary: `משכורת ברוטו לפני מסים (${currencySymbol})`,
             netSalary: `משכורת נטו (${currencySymbol})`,
-            salaryInfo: 'המשכורת הברוטו כוללת את כל ההפרשות לפנסיה ולביטוחים',
+            salaryInfo: 'הזן את המשכורת הברוטו לפני מסים והפרשות. זה הסכום שמופיע בחוזה העבודה שלך',
             additionalIncome: 'הכנסות נוספות',
             freelanceIncome: `הכנסות מעבודה עצמאית (${currencySymbol})`,
             rentalIncome: `הכנסות מדירות להשכרה (${currencySymbol})`,
             dividendIncome: `דיבידנדים והכנסות השקעה (${currencySymbol})`,
+            annualBonus: `בונוס שנתי (${currencySymbol})`,
+            quarterlyRSU: `RSU רבעוני (${currencySymbol})`,
             otherIncome: `הכנסות אחרות (${currencySymbol})`,
             partnerSalaries: 'משכורות בני הזוג',
             partner1Salary: 'משכורת בן/בת זוג 1',
@@ -63,13 +65,15 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
         },
         en: {
             mainSalary: 'Main Monthly Salary',
-            grossSalary: `Gross Salary (${currencySymbol})`,
+            grossSalary: `Gross Salary Before Taxes (${currencySymbol})`,
             netSalary: `Net Salary (${currencySymbol})`,
-            salaryInfo: 'Gross salary includes all pension and insurance contributions',
+            salaryInfo: 'Enter your gross salary before taxes and deductions. This is the amount in your employment contract',
             additionalIncome: 'Additional Income Sources',
             freelanceIncome: `Freelance Income (${currencySymbol})`,
             rentalIncome: `Rental Income (${currencySymbol})`,
             dividendIncome: `Dividends & Investment Income (${currencySymbol})`,
+            annualBonus: `Annual Bonus (${currencySymbol})`,
+            quarterlyRSU: `Quarterly RSU (${currencySymbol})`,
             otherIncome: `Other Income (${currencySymbol})`,
             partnerSalaries: 'Partner Salaries',
             partner1Salary: 'Partner 1 Salary',
@@ -90,9 +94,12 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
         const freelanceIncome = inputs.freelanceIncome || 0;
         const rentalIncome = inputs.rentalIncome || 0;
         const dividendIncome = inputs.dividendIncome || 0;
+        const annualBonusMonthly = (inputs.annualBonus || 0) / 12; // Convert annual to monthly
+        const quarterlyRSUMonthly = (inputs.quarterlyRSU || 0) / 3; // Convert quarterly to monthly
         const otherIncome = inputs.otherIncome || 0;
 
-        return mainSalary + partner1Salary + partner2Salary + freelanceIncome + rentalIncome + dividendIncome + otherIncome;
+        return mainSalary + partner1Salary + partner2Salary + freelanceIncome + rentalIncome + 
+               dividendIncome + annualBonusMonthly + quarterlyRSUMonthly + otherIncome;
     };
 
     const formatCurrency = (amount) => {
@@ -104,8 +111,8 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
     };
 
     return React.createElement('div', { className: "space-y-8" }, [
-        // Main Salary Section
-        inputs.planningType !== 'couple' && React.createElement('div', { key: 'main-salary-section' }, [
+        // Main Salary Section (only show for single planning)
+        (!inputs.planningType || inputs.planningType === 'single') && React.createElement('div', { key: 'main-salary-section' }, [
             React.createElement('h3', { 
                 key: 'main-salary-title',
                 className: "text-xl font-semibold text-gray-700 mb-4 flex items-center" 
@@ -195,7 +202,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             ]),
             React.createElement('div', { 
                 key: 'additional-income-grid',
-                className: "grid grid-cols-1 md:grid-cols-2 gap-6" 
+                className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
             }, [
                 React.createElement('div', { key: 'freelance-income' }, [
                     React.createElement('label', { 
@@ -233,6 +240,32 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         type: 'number',
                         value: inputs.dividendIncome || 0,
                         onChange: (e) => setInputs({...inputs, dividendIncome: parseInt(e.target.value) || 0}),
+                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    })
+                ]),
+                React.createElement('div', { key: 'annual-bonus' }, [
+                    React.createElement('label', { 
+                        key: 'bonus-label',
+                        className: "block text-sm font-medium text-gray-700 mb-2" 
+                    }, t.annualBonus),
+                    React.createElement('input', {
+                        key: 'bonus-input',
+                        type: 'number',
+                        value: inputs.annualBonus || 0,
+                        onChange: (e) => setInputs({...inputs, annualBonus: parseInt(e.target.value) || 0}),
+                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    })
+                ]),
+                React.createElement('div', { key: 'quarterly-rsu' }, [
+                    React.createElement('label', { 
+                        key: 'rsu-label',
+                        className: "block text-sm font-medium text-gray-700 mb-2" 
+                    }, t.quarterlyRSU),
+                    React.createElement('input', {
+                        key: 'rsu-input',
+                        type: 'number',
+                        value: inputs.quarterlyRSU || 0,
+                        onChange: (e) => setInputs({...inputs, quarterlyRSU: parseInt(e.target.value) || 0}),
                         className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                     })
                 ]),
