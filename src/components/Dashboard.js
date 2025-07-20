@@ -1,5 +1,6 @@
-// Dashboard Component - Guided Intelligence UI Design
+// Dashboard Component - Guided Intelligence UI Design  
 // Created by Yali Pollak (יהלי פולק)
+// Enhanced with real-time validation workflow - v6.2.0
 
 const Dashboard = ({ 
     inputs, 
@@ -302,37 +303,6 @@ const Dashboard = ({
                     compact: true,
                     showRates: false
                 })
-            ]),
-
-                        }, '👥'),
-                        React.createElement('div', {
-                            key: 'title',
-                            className: 'quick-action-title'
-                        }, t.partnerPlanning),
-                        React.createElement('div', {
-                            key: 'desc',
-                            className: 'quick-action-description'
-                        }, 'Joint financial planning tools')
-                    ]),
-                    React.createElement('div', {
-                        key: 'scenarios',
-                        className: 'quick-action-card',
-                        onClick: () => toggleSection('scenarios')
-                    }, [
-                        React.createElement('div', {
-                            key: 'icon',
-                            className: 'quick-action-icon action-scenario'
-                        }, '🧪'),
-                        React.createElement('div', {
-                            key: 'title',
-                            className: 'quick-action-title'
-                        }, t.testScenarios),
-                        React.createElement('div', {
-                            key: 'desc',
-                            className: 'quick-action-description'
-                        }, 'Stress test different economic scenarios')
-                    ])
-                ])
             ])
         ]),
 

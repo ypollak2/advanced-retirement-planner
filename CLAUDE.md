@@ -1,0 +1,245 @@
+# Claude Code Development Standards for Advanced Retirement Planner
+
+## Mandatory Pre-Work Validation Protocol
+
+**ALWAYS run before making ANY code changes:**
+
+```bash
+npm run validate:pre-work
+```
+
+This command ensures:
+- ✅ All JavaScript files have valid syntax
+- ✅ No browser compatibility issues
+- ✅ All 116 tests pass
+- ✅ System is ready for development
+
+## Real-Time Validation Workflow
+
+### Before Editing Files:
+```bash
+# Validate specific file before editing
+node -c src/components/ComponentName.js
+```
+
+### After Editing Files:
+```bash
+# Validate the edited file immediately
+node -c src/components/ComponentName.js
+
+# Quick validation of all changes
+npm run validate:quick
+```
+
+## Validation Commands Reference
+
+| Command | Purpose | When to Use |
+|---------|---------|-------------|
+| `npm run validate:pre-work` | Complete pre-work validation | Before starting any coding session |
+| `npm run validate:quick` | Fast syntax + browser + orphans | After making changes |
+| `npm run validate:syntax` | JavaScript syntax only | Quick syntax verification |
+| `npm run validate:browser` | Browser compatibility | Check ES6/module issues |
+| `npm run validate:orphans` | Orphaned code detection | Find broken code patterns |
+| `npm run qa:syntax` | Full enhanced QA | Complete validation suite |
+| `npm test` | Functionality tests | Verify application works |
+
+### **NEW: Granular Validation Modes (Phase 2)**
+
+| Command | Purpose | When to Use |
+|---------|---------|-------------|
+| `npm run validate:dev` | Development mode validation | During active development |
+| `npm run validate:file` | Single file validation | After editing specific files |
+| `npm run validate:granular` | Quick granular checks | Fast development feedback |
+| `npm run validate:syntax-only` | Pure syntax validation | Ultra-fast syntax checks |
+
+### **Advanced Validation Modes**
+
+```bash
+# Single file validation
+node scripts/pre-commit-enhanced.js file src/components/ComponentName.js
+
+# Development mode (syntax + browser + orphans)
+node scripts/pre-commit-enhanced.js development
+
+# Syntax only mode (fastest)
+node scripts/pre-commit-enhanced.js syntax-only
+
+# Quick mode (essential checks)
+node scripts/pre-commit-enhanced.js quick
+
+# Full validation (all checks)
+node scripts/pre-commit-enhanced.js full
+```
+
+### **Development File Watcher (Phase 2)**
+
+For continuous development with real-time validation:
+
+```bash
+# Start development watcher (validates files as you edit them)
+npm run dev:watch
+```
+
+Features:
+- **Real-time validation** as files change
+- **Debounced validation** (1-second delay to avoid spam)
+- **Color-coded output** for quick visual feedback
+- **Statistics tracking** (success rate, total validations)
+- **Browser compatibility checks** for component files
+- **Graceful error handling** and auto-restart
+
+Use this during active development for immediate feedback on syntax and compatibility issues.
+
+### **Test-Driven Development Workflow (Phase 2)**
+
+```bash
+# Generate test for new feature
+npm run test:generate:feature "feature-name" "ComponentName"
+
+# Generate regression test for bug fix  
+npm run test:generate:regression "bug-description" "filename"
+
+# Run generated tests
+node tests/feature-name-test.js
+node tests/regression-bug-description-test.js
+```
+
+### **Pre-Push Validation (Phase 2)**
+
+**Before every push, run:**
+```bash
+npm run validate:pre-push
+```
+
+This validates:
+- ✅ Version consistency across all files
+- ✅ Documentation updates (README, CLAUDE.md)
+- ✅ Complete QA test suite (100% pass required)
+- ✅ Git status and branch validation
+- ✅ Pre-push checklist compliance
+
+**Only push if validation passes 100%!**
+
+## CRITICAL REQUIREMENT: Test-After-Implementation
+
+**⚠️ MANDATORY: Every fix or new feature MUST get tests added to the QA process afterward**
+
+This means:
+1. **Implement the fix/feature**
+2. **Write tests** to verify the fix/feature works correctly  
+3. **Add regression tests** to prevent the issue from reoccurring
+4. **Update QA process** to include the new test coverage
+
+**Never consider a task complete without adding appropriate tests!**
+
+## CRITICAL REQUIREMENT: Pre-Push Protocol
+
+**⚠️ MANDATORY: Every push MUST follow this exact sequence:**
+
+1. **Version bump** (package.json, version.json, src/version.js, index.html)
+2. **Update README** and related documentation
+3. **Full QA testing** - ALL tests must pass 100%
+4. **Only if 100% pass** → then push
+
+**Never push without completing ALL steps in order!**
+
+## Mandatory Workflow Steps
+
+### 1. Session Start Protocol
+```bash
+# Check git status
+git status
+
+# Validate current state
+npm run validate:pre-work
+
+# Result: ✅ Ready to start coding
+```
+
+### 2. File Editing Protocol
+```bash
+# Before editing
+node -c [filename]
+
+# Make changes using Edit/MultiEdit tools
+
+# Immediately after editing
+node -c [filename]
+
+# If multiple files changed
+npm run validate:quick
+```
+
+### 3. Pre-Commit Protocol
+```bash
+# Before suggesting commits
+npm run qa:syntax
+npm test
+npm run qa:deployment
+```
+
+## Error Prevention Patterns
+
+### Common Issues to Watch For:
+1. **Orphaned React.createElement calls** - Missing parent elements
+2. **ES6 modules in browser files** - Use window.ComponentName instead
+3. **Missing function declarations** - Orphaned try-catch blocks
+4. **Syntax errors in large files** - Always validate after editing
+
+### Quick Fixes:
+- **Syntax Error**: Run `node -c filename` to identify exact line
+- **Orphaned Code**: Check for incomplete React.createElement structures
+- **Browser Issues**: Avoid `export default` in browser-loaded files
+
+## Project-Specific Knowledge
+
+### Architecture Notes:
+- Uses React.createElement (not JSX)
+- Components exported to window for browser access
+- Service worker at /sw.js for offline functionality
+- Multi-layer caching: memory + localStorage + service worker
+
+### Critical Files:
+- `src/components/Dashboard.js` - Main dashboard (watch for orphaned Quick Actions)
+- `src/components/RetirementPlannerApp.js` - Main app component
+- `src/utils/retirementCalculations.js` - Core calculations
+- `tests/runtime-test.js` - Runtime browser tests (watch for orphaned try blocks)
+
+### Known Patterns:
+- React.createElement chains can create orphaned code
+- Partner data requires null checks for country property
+- Version consistency across: package.json, version.json, src/version.js, index.html
+
+## Success Metrics
+
+### Immediate Goals:
+- ✅ Zero syntax errors in commits
+- ✅ 100% test pass rate before deployment
+- ✅ Sub-30 second validation cycles
+
+### Validation Results (as of v6.2.0):
+- JavaScript files: 67 files ✅ syntax validated
+- Test suite: 116/116 tests passing ✅
+- Deployment: Both GitHub Pages & Netlify operational ✅
+- Service worker: Functional ✅
+
+## Emergency Protocols
+
+### If Validation Fails:
+1. **Don't proceed with changes**
+2. Fix validation errors first
+3. Re-run validation
+4. Only continue when all checks pass
+
+### If Tests Fail:
+1. **Don't suggest commits/deployments**
+2. Identify failing test
+3. Fix underlying issue
+4. Re-run full test suite
+5. Confirm 100% pass rate
+
+---
+
+**Last Updated**: v6.2.0 - July 20, 2025
+**Validation System**: Enhanced pre-commit QA implemented
+**Status**: All systems operational ✅

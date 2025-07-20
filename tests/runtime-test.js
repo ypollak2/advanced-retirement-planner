@@ -285,6 +285,8 @@ class RuntimeTestSuite {
             return false;
         }
     }
+
+    async testFIRECalculator() {
         try {
             // Click on the "FIRE" tab
             await this.page.click('#fire-tab');
@@ -299,6 +301,8 @@ class RuntimeTestSuite {
             return false;
         }
     }
+
+    async testAnalysisEngine() {
         try {
             // Click on the "Analysis" tab
             await this.page.click('#analysis-tab');
@@ -313,6 +317,8 @@ class RuntimeTestSuite {
             return false;
         }
     }
+
+    async testAdvancedPortfolio() {
         try {
             // Click on the "Advanced" tab
             await this.page.click('#advanced-tab');
@@ -327,6 +333,8 @@ class RuntimeTestSuite {
             return false;
         }
     }
+
+    async testFormFunctionality() {
         try {
             // Fill in the form
             await this.page.type('#current-age', '30');
@@ -348,6 +356,8 @@ class RuntimeTestSuite {
             return false;
         }
     }
+
+    async testTutorial() {
         try {
             // Click on the "Take a Tour" button
             await this.page.click('#take-tour-button');
@@ -362,6 +372,8 @@ class RuntimeTestSuite {
             return false;
         }
     }
+
+    async testWelcomeMessage() {
         try {
             // Check if the welcome message is displayed
             const welcomeBanner = await this.page.$('#welcome-banner');

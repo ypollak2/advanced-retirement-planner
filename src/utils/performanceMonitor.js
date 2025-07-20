@@ -386,5 +386,3 @@ window.recordAPICall = (endpoint, duration, success) => performanceMonitor.recor
 window.getPerformanceInfo = () => performanceMonitor.getRealTimeInfo();
 
 console.log('📊 Performance Monitor initialized');
-
-export default performanceMonitor;

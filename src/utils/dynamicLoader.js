@@ -274,5 +274,3 @@ window.loadComponent = (componentName, priority) =>
 window.COMPONENT_PATHS = COMPONENT_PATHS;
 
 console.log('📦 Dynamic Component Loader initialized');
-
-export default componentLoader;

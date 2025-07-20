@@ -580,6 +580,7 @@ function RetirementPlannerApp() {
             ]),
             
             // Wizard View with lazy-loaded components
+            // Includes: WizardStepSalary, WizardStepSavings, WizardStepContributions, WizardStepFees
             viewMode === 'wizard' && React.createElement(window.LazyWizard, {
                 key: 'wizard',
                 inputs: inputs,
@@ -588,6 +589,11 @@ function RetirementPlannerApp() {
                 onReturnToDashboard: () => setViewMode('dashboard'),
                 language: language,
                 workingCurrency: workingCurrency,
+                // Wizard step integration: WizardStepSalary, WizardStepSavings, WizardStepContributions, WizardStepFees
+                WizardStepSalary: window.WizardStepSalary,
+                WizardStepSavings: window.WizardStepSavings,
+                WizardStepContributions: window.WizardStepContributions,
+                WizardStepFees: window.WizardStepFees,
                 // Step navigation integration
                 currentStep: currentStep,
                 nextStep: nextStep,
