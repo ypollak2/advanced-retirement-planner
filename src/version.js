@@ -1,9 +1,9 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "6.2.0",
+    number: "6.1.1",
     build: "2025-07-20",
-    commit: "v6.2.0-dashboard-fixes-chart-analysis",
-    description: "Dashboard improvements with conditional display, removed confusing indicators, and comprehensive chart analysis for partner data clarity"
+    commit: "v6.1.1-update",
+    description: "Fix title truncation test and achieve 100% test coverage"
 };
 
 // Export version for use in other modules

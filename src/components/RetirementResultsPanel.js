@@ -322,8 +322,8 @@ const CurrencyValue = ({ value, currency, formatter }) => {
                     }
                 };
                 
-                // Use the existing safeFormatValue with the converted value
-                const result = await safeFormatValue(targetCurrencyValue, currencyFormatter);
+                // Use the currency formatter directly since safeFormatValue is not accessible here
+                const result = currencyFormatter(targetCurrencyValue);
                 setDisplayValue(result);
             } catch (error) {
                 console.error('CurrencyValue formatting error:', error);

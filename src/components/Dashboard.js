@@ -278,31 +278,6 @@ const Dashboard = ({
                 ])
             ]),
 
-            // Retirement Countdown (only show if user has entered data)
-            hasUserData && React.createElement('div', {
-                key: 'countdown',
-                className: 'retirement-countdown'
-            }, [
-                React.createElement('div', {
-                    key: 'countdown-main'
-                }, [
-                    React.createElement('div', {
-                        key: 'years',
-                        className: 'countdown-years'
-                    }, yearsToRetirement),
-                    React.createElement('div', {
-                        key: 'label',
-                        className: 'countdown-label'
-                    }, `${t.years} ${t.untilRetirement}`)
-                ]),
-                React.createElement('div', {
-                    key: 'details',
-                    className: 'countdown-details'
-                }, [
-                    React.createElement('div', { key: 'current' }, `${t.currentAge}: ${inputs?.currentAge || 30}`),
-                    React.createElement('div', { key: 'target' }, `${t.targetAge}: ${inputs?.retirementAge || 67}`)
-                ])
-            ]),
 
             // Net Worth Tracker (only show if user has entered data)
             hasUserData && netWorth !== null && React.createElement('div', {
@@ -337,66 +312,6 @@ const Dashboard = ({
                 })
             ]),
 
-            // Quick Actions Grid
-            React.createElement('div', {
-                key: 'quick-actions'
-            }, [
-                React.createElement('h3', {
-                    key: 'actions-title',
-                    className: 'section-title mb-4'
-                }, [
-                    React.createElement('span', { key: 'icon' }, '⚡'),
-                    ' ',
-                    t.quickActions
-                ]),
-                React.createElement('div', {
-                    key: 'actions-grid',
-                    className: 'quick-actions-grid'
-                }, [
-                    React.createElement('div', {
-                        key: 'pension',
-                        className: 'quick-action-card',
-                        onClick: () => toggleSection('pension')
-                    }, [
-                        React.createElement('div', {
-                            key: 'icon',
-                            className: 'quick-action-icon action-pension'
-                        }, '🏛️'),
-                        React.createElement('div', {
-                            key: 'title',
-                            className: 'quick-action-title'
-                        }, t.planPension),
-                        React.createElement('div', {
-                            key: 'desc',
-                            className: 'quick-action-description'
-                        }, 'Set up and optimize pension planning')
-                    ]),
-                    React.createElement('div', {
-                        key: 'investments',
-                        className: 'quick-action-card',
-                        onClick: () => toggleSection('investments')
-                    }, [
-                        React.createElement('div', {
-                            key: 'icon',
-                            className: 'quick-action-icon action-investment'
-                        }, '📈'),
-                        React.createElement('div', {
-                            key: 'title',
-                            className: 'quick-action-title'
-                        }, t.manageInvestments),
-                        React.createElement('div', {
-                            key: 'desc',
-                            className: 'quick-action-description'
-                        }, 'Portfolio management and tracking')
-                    ]),
-                    React.createElement('div', {
-                        key: 'partner',
-                        className: 'quick-action-card',
-                        onClick: () => toggleSection('partner')
-                    }, [
-                        React.createElement('div', {
-                            key: 'icon',
-                            className: 'quick-action-icon action-partner'
                         }, '👥'),
                         React.createElement('div', {
                             key: 'title',
