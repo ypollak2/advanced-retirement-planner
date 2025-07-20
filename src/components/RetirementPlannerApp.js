@@ -570,12 +570,12 @@ function RetirementPlannerApp() {
                 ]),
                 React.createElement('button', {
                     key: 'wizard', 
-                    onClick: function() { setViewMode('wizard'); setWizardCompleted(false); },
+                    onClick: function() { setViewMode('wizard'); setWizardCompleted(false); setCurrentStep(1); },
                     className: 'professional-tab' + (viewMode === 'wizard' ? ' active' : '')
                 }, [
                     React.createElement('span', { key: 'icon' }, '🧙‍♂️'),
                     ' ',
-                    language === 'en' ? 'Restart Wizard' : 'אשף מחדש'
+                    language === 'en' ? 'Planning Wizard' : 'אשף תכנון'
                 ])
             ]),
             
