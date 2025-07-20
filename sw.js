@@ -7,17 +7,17 @@ const DYNAMIC_CACHE_NAME = 'retirement-planner-dynamic-v6.2.0';
 
 // Files to cache immediately on install
 const STATIC_ASSETS = [
-    '/',
-    '/index.html',
-    '/src/components/RetirementPlannerApp.js',
-    '/src/components/RetirementWizard.js',
-    '/src/components/Dashboard.js',
-    '/src/components/PermanentSidePanel.js',
-    '/src/utils/retirementCalculations.js',
-    '/src/utils/stockPriceAPI.js',
-    '/src/utils/currencyAPI.js',
-    '/src/data/marketConstants.js',
-    '/config/cors-proxy-solution.js'
+    './',
+    './index.html',
+    './src/components/RetirementPlannerApp.js',
+    './src/components/RetirementWizard.js',
+    './src/components/Dashboard.js',
+    './src/components/PermanentSidePanel.js',
+    './src/utils/retirementCalculations.js',
+    './src/utils/stockPriceAPI.js',
+    './src/utils/currencyAPI.js',
+    './src/data/marketConstants.js',
+    './config/cors-proxy-solution.js'
 ];
 
 // API patterns that should be cached dynamically
