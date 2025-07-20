@@ -286,17 +286,19 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
             ])
         ]),
 
-        // Contribution Rates - Single Planning
-        (!inputs.planningType || inputs.planningType === 'single') && createElement('div', { key: 'single-rates-section' }, [
+        // Unified Contribution Settings Section (adapts to planning type)
+        createElement('div', { key: 'contribution-settings-section' }, [
             createElement('h3', { 
-                key: 'single-rates-title',
+                key: 'contribution-title',
                 className: "text-xl font-semibold text-gray-700 mb-6 flex items-center" 
             }, [
                 createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💰'),
                 t.contributionSettings
             ]),
-            createElement('div', { 
-                key: 'single-rates-grid',
+
+            // Single Planning Layout
+            (!inputs.planningType || inputs.planningType === 'single') && createElement('div', { 
+                key: 'single-layout',
                 className: "grid grid-cols-1 md:grid-cols-2 gap-6" 
             }, [
                 // Employee Pension Contribution
@@ -345,10 +347,10 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                     }, `${t.defaultRates}: ${defaultRates.employer}%`)
                 ]),
                 
-                // Training Fund Contribution
+                // Training Fund Contribution (Israel only)
                 selectedCountry === 'israel' && createElement('div', { 
                     key: 'training-fund-contribution',
-                    className: "bg-yellow-50 rounded-xl p-6 border border-yellow-200" 
+                    className: "bg-yellow-50 rounded-xl p-6 border border-yellow-200 md:col-span-2" 
                 }, [
                     createElement('label', { 
                         key: 'training-fund-label',
@@ -367,33 +369,23 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         className: "mt-2 text-sm text-yellow-600" 
                     }, `${t.defaultRates}: ${defaultRates.trainingFund}%`)
                 ])
-            ])
-        ]),
-
-        // Contribution Rates - Couple Planning (Per Partner)
-        inputs.planningType === 'couple' && createElement('div', { key: 'couple-rates-section' }, [
-            createElement('h3', { 
-                key: 'couple-rates-title',
-                className: "text-xl font-semibold text-gray-700 mb-6 flex items-center" 
-            }, [
-                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💰'),
-                t.contributionSettings
             ]),
-            
-            createElement('div', { 
-                key: 'couple-rates-grid',
+
+            // Couple Planning Layout
+            inputs.planningType === 'couple' && createElement('div', { 
+                key: 'couple-layout',
                 className: "grid grid-cols-1 lg:grid-cols-2 gap-8" 
             }, [
-                // Main Person Contribution Rates
+                // Main Person Contributions
                 createElement('div', { 
-                    key: 'main-contribution-rates',
+                    key: 'main-contributions',
                     className: "bg-blue-50 rounded-xl p-6 border border-blue-200" 
                 }, [
                     createElement('h4', { 
-                        key: 'main-contribution-title',
+                        key: 'main-title',
                         className: "text-lg font-semibold text-blue-700 mb-4" 
-                    }, language === 'he' ? 'הפקדות עיקריות' : 'Main Person Contributions'),
-                    createElement('div', { key: 'main-contribution-fields', className: "space-y-4" }, [
+                    }, inputs.userName || (language === 'he' ? 'הפקדות עיקריות' : 'Main Person Contributions')),
+                    createElement('div', { key: 'main-fields', className: "space-y-4" }, [
                         createElement('div', { key: 'main-employee' }, [
                             createElement('label', { 
                                 key: 'main-employee-label',
@@ -451,16 +443,16 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                     ])
                 ]),
                 
-                // Partner Contribution Rates (using existing partner contribution fields)
+                // Partner Contributions
                 createElement('div', { 
-                    key: 'partner-contribution-rates',
+                    key: 'partner-contributions',
                     className: "bg-green-50 rounded-xl p-6 border border-green-200" 
                 }, [
                     createElement('h4', { 
-                        key: 'partner-contribution-title',
+                        key: 'partner-title',
                         className: "text-lg font-semibold text-green-700 mb-4" 
-                    }, language === 'he' ? 'הפקדות בן/בת זוג' : 'Partner Contributions'),
-                    createElement('div', { key: 'partner-contribution-fields', className: "space-y-4" }, [
+                    }, inputs.partnerName || (language === 'he' ? 'הפקדות בן/בת זוג' : 'Partner Contributions')),
+                    createElement('div', { key: 'partner-fields', className: "space-y-4" }, [
                         createElement('div', { key: 'partner-employee' }, [
                             createElement('label', { 
                                 key: 'partner-employee-label',

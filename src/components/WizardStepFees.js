@@ -46,18 +46,20 @@ const WizardStepFees = ({ inputs, setInputs, language = 'en' }) => {
 
     // Using React.createElement pattern for component rendering
     return createElement('div', { className: "space-y-8" }, [
-        // Main Fees Section (show in all modes)
-        createElement('div', { key: 'main-fees-section' }, [
+        // Single Planning - Fees & Returns Section
+        (!inputs.planningType || inputs.planningType === 'single') && createElement('div', { key: 'single-fees-section' }, [
             createElement('h3', { 
-                key: 'fees-title',
+                key: 'single-fees-title',
                 className: "text-xl font-semibold text-gray-700 mb-6 flex items-center" 
             }, [
                 createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💰'),
                 t.title
             ]),
+            
+            // Management Fees
             createElement('div', { 
-                key: 'main-fees-grid',
-                className: "grid grid-cols-1 md:grid-cols-3 gap-6" 
+                key: 'single-fees-grid',
+                className: "grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" 
             }, [
                 createElement('div', { 
                     key: 'contribution-fees',
@@ -110,20 +112,18 @@ const WizardStepFees = ({ inputs, setInputs, language = 'en' }) => {
                         className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
                     })
                 ])
-            ])
-        ]),
+            ]),
 
-        // Expected Returns Section (show in all modes)
-        createElement('div', { key: 'returns-section' }, [
+            // Expected Returns
             createElement('h3', { 
-                key: 'returns-title',
+                key: 'single-returns-title',
                 className: "text-xl font-semibold text-gray-700 mb-6 flex items-center" 
             }, [
                 createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '📈'),
                 t.expectedReturns
             ]),
             createElement('div', { 
-                key: 'returns-grid',
+                key: 'single-returns-grid',
                 className: "grid grid-cols-1 md:grid-cols-3 gap-6" 
             }, [
                 createElement('div', { 
