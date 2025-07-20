@@ -78,8 +78,8 @@
             .catch(error => {
                 console.warn('⚠️ Could not load version from version.json:', error);
                 // Fallback version
-                window.APP_VERSION = '6.1.0';
-                document.getElementById('version-indicator').textContent = '✨ v6.1.0';
+                window.APP_VERSION = '6.2.0';
+                document.getElementById('version-indicator').textContent = '✨ v6.2.0';
             });
     </script>
 
@@ -107,7 +107,11 @@
     <script src="src/components/MultiCurrencySavings.js?v={{VERSION}}"></script>
     <script src="src/components/PermanentSidePanel.js?v={{VERSION}}"></script>
     
-    <!-- Core Wizard Components (lazy-loaded on demand) -->
+    <!-- Core Wizard Components -->
+    <script src="src/components/WizardStepSalary.js?v={{VERSION}}"></script>
+    <script src="src/components/WizardStepSavings.js?v={{VERSION}}"></script>
+    <script src="src/components/WizardStepContributions.js?v={{VERSION}}"></script>
+    <script src="src/components/WizardStepFees.js?v={{VERSION}}"></script>
     <script src="src/components/RetirementWizard.js?v={{VERSION}}"></script>
     
     <!-- Core Components (loaded immediately) -->

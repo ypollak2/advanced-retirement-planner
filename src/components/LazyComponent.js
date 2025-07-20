@@ -104,6 +104,20 @@ const LazyWizard = (props) => {
             'WizardStepFees'
         ];
 
+        // Check if ComponentLoader is available
+        if (!window.ComponentLoader) {
+            console.warn('ComponentLoader not available, using synchronous loading');
+            const steps = {};
+            stepComponents.forEach((stepName) => {
+                if (window[stepName]) {
+                    steps[stepName] = window[stepName];
+                }
+            });
+            setWizardSteps(steps);
+            setLoadingSteps(false);
+            return;
+        }
+
         Promise.all(
             stepComponents.map(async (stepName) => {
                 try {
@@ -114,7 +128,8 @@ const LazyWizard = (props) => {
                     return { name: stepName, component };
                 } catch (error) {
                     console.error(`Failed to load ${stepName}:`, error);
-                    return { name: stepName, component: null };
+                    // Fallback to global window object if available
+                    return { name: stepName, component: window[stepName] || null };
                 }
             })
         ).then((results) => {

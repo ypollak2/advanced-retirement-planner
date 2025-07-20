@@ -1,9 +1,9 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "6.1.1",
+    number: "6.2.0",
     build: "2025-07-20",
-    commit: "v6.1.1-update",
-    description: "Fix title truncation test and achieve 100% test coverage"
+    commit: "v6.2.0-performance-revolution",
+    description: "Major Performance & Optimization Revolution with advanced caching, service worker, and code splitting"
 };
 
 // Export version for use in other modules
