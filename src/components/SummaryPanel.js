@@ -104,43 +104,86 @@ const SummaryPanel = ({
     // Calculate purchasing power loss
     const purchasingPowerLoss = ((1 - (1 / inflationFactor)) * 100);
     
-    // Calculate portfolio breakdown
+    // Calculate enhanced portfolio breakdown with partner planning support
     const calculatePortfolioBreakdown = () => {
-        const pension = (inputs.currentSavings || 0);
-        const training = (inputs.currentTrainingFund || 0);
-        const personal = (inputs.currentPersonalPortfolio || 0);
-        const realEstate = (inputs.currentRealEstate || 0);
-        const crypto = (inputs.currentCrypto || 0);
+        // Individual assets
+        const pension = parseFloat(inputs.currentSavings || 0);
+        const training = parseFloat(inputs.currentTrainingFund || 0);
+        const personal = parseFloat(inputs.currentPersonalPortfolio || 0);
+        const realEstate = parseFloat(inputs.currentRealEstate || 0);
+        const crypto = parseFloat(inputs.currentCrypto || 0);
         
-        const total = pension + training + personal + realEstate + crypto;
+        // Partner assets (if couple planning)
+        let partnerAssets = 0;
+        if (inputs.planningType === 'couple') {
+            const partner1Pension = parseFloat(inputs.partner1PensionSavings || 0);
+            const partner1Training = parseFloat(inputs.partner1TrainingFund || 0);
+            const partner1Personal = parseFloat(inputs.partner1PersonalPortfolio || 0);
+            const partner1RealEstate = parseFloat(inputs.partner1RealEstate || 0);
+            const partner1Crypto = parseFloat(inputs.partner1Crypto || 0);
+            
+            const partner2Pension = parseFloat(inputs.partner2PensionSavings || 0);
+            const partner2Training = parseFloat(inputs.partner2TrainingFund || 0);
+            const partner2Personal = parseFloat(inputs.partner2PersonalPortfolio || 0);
+            const partner2RealEstate = parseFloat(inputs.partner2RealEstate || 0);
+            const partner2Crypto = parseFloat(inputs.partner2Crypto || 0);
+            
+            partnerAssets = partner1Pension + partner1Training + partner1Personal + partner1RealEstate + partner1Crypto +
+                           partner2Pension + partner2Training + partner2Personal + partner2RealEstate + partner2Crypto;
+        }
+        
+        // Use results data if available for more accurate calculations
+        const resultsPension = results?.totalSavings || pension;
+        const resultsTraining = results?.trainingFundValue || training;
+        const resultsPersonal = results?.personalPortfolioValue || personal;
+        const resultsRealEstate = results?.realEstateValue || realEstate;
+        const resultsCrypto = results?.cryptoValue || crypto;
+        
+        const total = resultsPension + resultsTraining + resultsPersonal + resultsRealEstate + resultsCrypto + partnerAssets;
         
         if (total === 0) return null;
         
         return {
-            pension: (pension / total) * 100,
-            training: (training / total) * 100,
-            personal: (personal / total) * 100,
-            realEstate: (realEstate / total) * 100,
-            crypto: (crypto / total) * 100
+            pension: (resultsPension / total) * 100,
+            training: (resultsTraining / total) * 100,
+            personal: (resultsPersonal / total) * 100,
+            realEstate: (resultsRealEstate / total) * 100,
+            crypto: (resultsCrypto / total) * 100,
+            partnerAssets: (partnerAssets / total) * 100,
+            total: total
         };
     };
     
     const portfolioBreakdown = calculatePortfolioBreakdown();
     
-    // Calculate diversification score
+    // Calculate enhanced diversification score
     const calculateDiversificationScore = () => {
         if (!portfolioBreakdown) return 0;
         
-        const values = Object.values(portfolioBreakdown);
-        const nonZeroValues = values.filter(v => v > 0);
+        // Exclude total and partnerAssets from the score calculation as they are summaries
+        const assetCategories = ['pension', 'training', 'personal', 'realEstate', 'crypto'];
+        const categoryValues = assetCategories.map(cat => portfolioBreakdown[cat] || 0);
+        const nonZeroValues = categoryValues.filter(v => v > 0);
+        const maxConcentration = Math.max(...categoryValues);
         
-        if (nonZeroValues.length <= 1) return 20; // Poor diversification
-        if (nonZeroValues.length === 2) return 40;
-        if (nonZeroValues.length === 3) return 60;
-        if (nonZeroValues.length === 4) return 80;
-        if (nonZeroValues.length === 5) return 100; // Excellent diversification
+        // Base score on number of asset classes
+        let baseScore = 0;
+        if (nonZeroValues.length <= 1) baseScore = 20; // Poor diversification
+        else if (nonZeroValues.length === 2) baseScore = 40;
+        else if (nonZeroValues.length === 3) baseScore = 60;
+        else if (nonZeroValues.length === 4) baseScore = 80;
+        else if (nonZeroValues.length === 5) baseScore = 100; // Excellent diversification
         
-        return 50;
+        // Penalty for over-concentration (any single asset > 70%)
+        if (maxConcentration > 70) baseScore = Math.max(baseScore - 20, 10);
+        else if (maxConcentration > 50) baseScore = Math.max(baseScore - 10, 20);
+        
+        // Bonus for partner planning (better diversification across partners)
+        if (inputs.planningType === 'couple' && portfolioBreakdown.partnerAssets > 0) {
+            baseScore = Math.min(baseScore + 10, 100);
+        }
+        
+        return Math.round(baseScore);
     };
     
     const diversificationScore = calculateDiversificationScore();
@@ -515,6 +558,19 @@ const SummaryPanel = ({
                         key: 'crypto-value',
                         className: 'text-sm font-semibold text-indigo-800'
                     }, `${portfolioBreakdown.crypto.toFixed(1)}%`)
+                ]),
+                portfolioBreakdown.partnerAssets > 0 && React.createElement('div', {
+                    key: 'partner-assets',
+                    className: 'flex justify-between items-center p-2 bg-pink-50 rounded border-2 border-pink-200'
+                }, [
+                    React.createElement('span', {
+                        key: 'partner-label',
+                        className: 'text-sm text-pink-700 font-medium'
+                    }, language === 'he' ? '👫 נכסי בני הזוג' : '👫 Partner Assets'),
+                    React.createElement('span', {
+                        key: 'partner-value',
+                        className: 'text-sm font-bold text-pink-800'
+                    }, `${portfolioBreakdown.partnerAssets.toFixed(1)}%`)
                 ])
             ]),
             React.createElement('div', {

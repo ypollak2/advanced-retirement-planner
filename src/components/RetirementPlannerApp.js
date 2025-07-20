@@ -1,5 +1,5 @@
 // Advanced Retirement Planner - Guided Intelligence UI Design
-// Created by Yali Pollak (יהלי פולק) - v5.3.5
+// Created by Yali Pollak (יהלי פולק) - v6.0.0
 
 function RetirementPlannerApp() {
     var languageState = React.useState('en');
@@ -783,30 +783,53 @@ function RetirementPlannerApp() {
                 React.createElement('div', {
                     key: 'results',
                     className: 'space-y-6'
-                }, results && window.ResultsPanel && React.createElement(window.ResultsPanel, {
-                    results,
-                    inputs: inputs,
-                    workPeriods: workPeriods || [],
-                    language,
-                    t,
-                    workingCurrency: workingCurrency,
-                    formatCurrency: window.formatCurrency,
-                    convertCurrency: window.convertCurrency,
-                    generateChartData: window.generateChartData,
-                    showChart: false,
-                    chartData: [],
-                    claudeInsights: null,
-                    exportRetirementSummary: function() {},
-                    exportAsImage: function() {},
-                    PiggyBank: function() { return React.createElement('span', {}, '🏛️'); },
-                    Calculator: function() { return React.createElement('span', {}, '📊'); },
-                    DollarSign: function() { return React.createElement('span', {}, '💰'); },
-                    Target: function() { return React.createElement('span', {}, '🎯'); },
-                    AlertCircle: function() { return React.createElement('span', {}, '⚠️'); },
-                    TrendingUp: function() { return React.createElement('span', {}, '📈'); },
-                    SimpleChart: window.SimpleChart,
-                    ReadinessScore: window.ReadinessScore
-                }))
+                }, [
+                    // Main Results Panel
+                    results && window.ResultsPanel && React.createElement(window.ResultsPanel, {
+                        key: 'main-results',
+                        results,
+                        inputs: inputs,
+                        workPeriods: workPeriods || [],
+                        language,
+                        t,
+                        workingCurrency: workingCurrency,
+                        formatCurrency: window.formatCurrency,
+                        convertCurrency: window.convertCurrency,
+                        generateChartData: window.generateChartData,
+                        showChart: false,
+                        chartData: [],
+                        claudeInsights: null,
+                        exportRetirementSummary: function() {},
+                        exportAsImage: function() {},
+                        PiggyBank: function() { return React.createElement('span', {}, '🏛️'); },
+                        Calculator: function() { return React.createElement('span', {}, '📊'); },
+                        DollarSign: function() { return React.createElement('span', {}, '💰'); },
+                        Target: function() { return React.createElement('span', {}, '🎯'); },
+                        AlertCircle: function() { return React.createElement('span', {}, '⚠️'); },
+                        TrendingUp: function() { return React.createElement('span', {}, '📈'); },
+                        SimpleChart: window.SimpleChart,
+                        ReadinessScore: window.ReadinessScore
+                    }),
+                    
+                    // Claude AI Recommendations
+                    results && window.ClaudeRecommendations && React.createElement(window.ClaudeRecommendations, {
+                        key: 'claude-recommendations',
+                        inputs: inputs,
+                        results: results,
+                        partnerResults: null,
+                        language: language,
+                        workingCurrency: workingCurrency
+                    }),
+                    
+                    // Inflation Analysis
+                    results && window.InflationAnalysis && React.createElement(window.InflationAnalysis, {
+                        key: 'inflation-analysis',
+                        inputs: inputs,
+                        results: results,
+                        language: language,
+                        workingCurrency: workingCurrency
+                    })
+                ])
             ])
         ]),
 
@@ -822,7 +845,7 @@ function RetirementPlannerApp() {
                 React.createElement('span', {
                     key: 'version',
                     className: 'version'
-                }, window.versionInfo ? `v${window.versionInfo.number}` : 'v5.3.5'),
+                }, window.versionInfo ? `v${window.versionInfo.number}` : 'v6.0.0'),
                 ' • Created by ',
                 React.createElement('span', {
                     key: 'author',

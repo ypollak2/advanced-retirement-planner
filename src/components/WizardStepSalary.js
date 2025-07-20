@@ -13,9 +13,10 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
     };
     
     const handleSalaryChange = (salary, field) => {
-        const error = validateSalary(salary);
+        const numericSalary = parseFloat(salary) || 0; // Add default value handling
+        const error = validateSalary(numericSalary);
         setValidationErrors(prev => ({...prev, [field]: error}));
-        setInputs({...inputs, [field]: salary});
+        setInputs({...inputs, [field]: numericSalary});
     };
     
     // Helper function for input styling

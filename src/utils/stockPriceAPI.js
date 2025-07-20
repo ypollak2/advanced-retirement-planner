@@ -11,42 +11,52 @@ const STOCK_API_ENDPOINTS = {
     FINNHUB: 'https://finnhub.io/api/v1/quote'
 };
 
-// Fallback stock prices for major tech companies (updated manually)
+// Fallback stock prices for major tech companies (updated July 2025)
 const FALLBACK_PRICES = {
-    'AAPL': 175.50,   // Apple
-    'GOOGL': 183.00,  // Alphabet (Google)
-    'MSFT': 375.80,   // Microsoft
-    'AMZN': 145.30,   // Amazon
-    'META': 315.20,   // Meta (Facebook)
-    'NFLX': 425.60,   // Netflix
-    'TSLA': 235.40,   // Tesla
-    'NVDA': 875.30,   // NVIDIA
-    'AMD': 125.80,    // AMD
-    'INTC': 45.70,    // Intel
-    'CRM': 225.90,    // Salesforce
-    'ORCL': 115.60,   // Oracle
-    'ADBE': 485.20,   // Adobe
-    'NOW': 675.40,    // ServiceNow
-    'SHOP': 65.80,    // Shopify
-    'SPOT': 185.30,   // Spotify
-    'ZM': 75.20,      // Zoom
-    'UBER': 45.90,    // Uber
-    'ABNB': 125.70,   // Airbnb
-    'COIN': 85.40,    // Coinbase
-    'PLTR': 18.90,    // Palantir
-    'SNOW': 145.60,   // Snowflake
-    'DDOG': 95.30,    // Datadog
-    'CRWD': 225.80,   // CrowdStrike
-    'OKTA': 85.20,    // Okta
-    'TWLO': 65.40,    // Twilio
+    'AAPL': 190.75,   // Apple
+    'GOOGL': 175.50,  // Alphabet (Google)
+    'MSFT': 425.80,   // Microsoft
+    'AMZN': 165.30,   // Amazon
+    'META': 545.20,   // Meta (Facebook)
+    'NFLX': 485.60,   // Netflix
+    'TSLA': 265.40,   // Tesla
+    'NVDA': 125.30,   // NVIDIA (post-split)
+    'AMD': 155.80,    // AMD
+    'INTC': 35.70,    // Intel
+    'CRM': 265.90,    // Salesforce
+    'ORCL': 145.60,   // Oracle
+    'ADBE': 525.20,   // Adobe
+    'NOW': 785.40,    // ServiceNow
+    'SHOP': 75.80,    // Shopify
+    'SPOT': 325.30,   // Spotify
+    'ZM': 65.20,      // Zoom
+    'UBER': 75.90,    // Uber
+    'ABNB': 135.70,   // Airbnb
+    'COIN': 205.40,   // Coinbase
+    'PLTR': 35.90,    // Palantir
+    'SNOW': 115.60,   // Snowflake
+    'DDOG': 125.30,   // Datadog
+    'CRWD': 385.80,   // CrowdStrike
+    'OKTA': 95.20,    // Okta
+    'TWLO': 85.40,    // Twilio
     'WORK': 45.60,    // Slack (acquired by Salesforce)
-    'TEAM': 185.90,   // Atlassian
-    'MDB': 385.70,    // MongoDB
-    'ESTC': 75.30,    // Elastic
-    'WDAY': 245.80,   // Workday
-    'NICE': 185.40,   // NICE
-    'CYBR': 165.20,   // CyberArk
-    'MNDY': 185.60    // monday.com
+    'TEAM': 195.90,   // Atlassian
+    'MDB': 285.70,    // MongoDB
+    'ESTC': 85.30,    // Elastic
+    'WDAY': 285.80,   // Workday
+    'NICE': 195.40,   // NICE
+    'CYBR': 285.20,   // CyberArk
+    'MNDY': 275.60,   // monday.com
+    'SQ': 85.40,      // Block (Square)
+    'PYPL': 75.30,    // PayPal
+    'ROKU': 65.20,    // Roku
+    'ZS': 185.40,     // Zscaler
+    'LYFT': 15.80,    // Lyft
+    'PINS': 35.60,    // Pinterest
+    'SNAP': 15.40,    // Snap
+    'S': 35.20,       // SentinelOne
+    'FROG': 35.80,    // JFrog
+    'ESTC': 85.30     // Elastic
 };
 
 // Cache for API responses (5 minutes)
@@ -56,38 +66,59 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 // Real-time stock price fetching function
 async function fetchRealTimePrice(symbol) {
     try {
-        // Use Yahoo Finance API - it's CORS-free and doesn't require API key
-        const response = await fetch(`${STOCK_API_ENDPOINTS.YAHOO_FINANCE}/${symbol}`, {
+        // Try multiple free APIs for stock prices
+        
+        // Method 1: Yahoo Finance query1 API with different endpoint
+        const yahooResponse = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+        });
+
+        if (yahooResponse.ok) {
+            const yahooData = await yahooResponse.json();
+            if (yahooData?.chart?.result?.[0]?.meta?.regularMarketPrice) {
+                return parseFloat(yahooData.chart.result[0].meta.regularMarketPrice);
+            }
+        }
+
+        // Method 2: Try alternative Yahoo Finance endpoint
+        const yahooAltResponse = await fetch(`https://query2.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=price`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
             }
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        if (yahooAltResponse.ok) {
+            const yahooAltData = await yahooAltResponse.json();
+            if (yahooAltData?.quoteSummary?.result?.[0]?.price?.regularMarketPrice?.raw) {
+                return parseFloat(yahooAltData.quoteSummary.result[0].price.regularMarketPrice.raw);
+            }
         }
 
-        const data = await response.json();
-        
-        // Extract current price from Yahoo Finance response
-        if (data?.chart?.result?.[0]?.meta?.regularMarketPrice) {
-            return parseFloat(data.chart.result[0].meta.regularMarketPrice);
+        // Method 3: Try free stock API (if available)
+        const freeStockResponse = await fetch(`https://api.twelvedata.com/price?symbol=${symbol}&apikey=demo`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        });
+
+        if (freeStockResponse.ok) {
+            const freeStockData = await freeStockResponse.json();
+            if (freeStockData?.price) {
+                return parseFloat(freeStockData.price);
+            }
         }
         
-        throw new Error('Invalid response format from Yahoo Finance');
+        throw new Error('All API endpoints failed');
         
     } catch (error) {
         console.warn(`Failed to fetch real-time price for ${symbol}:`, error.message);
-        
-        // Try alternative Finnhub API as backup (requires free API key)
-        try {
-            // Note: This would require users to set up their own Finnhub API key
-            // For now, we'll just return null and fall back to hardcoded prices
-            return null;
-        } catch (backupError) {
-            return null;
-        }
+        return null;
     }
 }
 

@@ -1,9 +1,9 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "5.3.5",
-    build: "2025-07-18",
-    commit: "v5.3.5-bug-fixes-and-test-improvements",
-    description: "Bug fixes and test improvements: resolved Dashboard selectedCurrency error, eliminated duplicate functions, and improved test suite architecture"
+    number: "6.0.0",
+    build: "2025-07-20",
+    commit: "v6.0.0-major-partner-planning-overhaul",
+    description: "Major partner planning overhaul with comprehensive wizard interface, AI recommendations, inflation analysis, risk profiles, and inheritance planning"
 };
 
 // Export version for use in other modules

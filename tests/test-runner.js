@@ -691,6 +691,330 @@ function testCSSStyleConsistency() {
     }
 }
 
+// Test 14: Partner Planning Features UI Tests
+function testPartnerPlanningFeatures() {
+    console.log('\n👫 Testing Partner Planning Features...');
+    
+    try {
+        // Test WizardStepSalary for partner data collection
+        if (fs.existsSync('src/components/WizardStepSalary.js')) {
+            const salaryContent = fs.readFileSync('src/components/WizardStepSalary.js', 'utf8');
+            
+            // Check for partner name inputs
+            const hasPartnerNames = salaryContent.includes('partner1Name') && salaryContent.includes('partner2Name');
+            logTest('WizardStepSalary: Partner name inputs', hasPartnerNames);
+            
+            // Check for partner salary fields
+            const hasPartnerSalaries = salaryContent.includes('partner1Salary') && salaryContent.includes('partner2Salary');
+            logTest('WizardStepSalary: Partner salary fields', hasPartnerSalaries);
+            
+            // Check for bonus and RSU fields
+            const hasBonusRSU = salaryContent.includes('annualBonus') && salaryContent.includes('quarterlyRSU');
+            logTest('WizardStepSalary: Bonus and RSU fields', hasBonusRSU);
+            
+            // Check for couple vs individual conditional rendering
+            const hasCoupleConditional = salaryContent.includes("planningType === 'couple'");
+            logTest('WizardStepSalary: Couple conditional rendering', hasCoupleConditional);
+            
+        } else {
+            logTest('WizardStepSalary file exists', false, 'Missing WizardStepSalary.js');
+        }
+        
+        // Test WizardStepSavings for detailed partner savings breakdown
+        if (fs.existsSync('src/components/WizardStepSavings.js')) {
+            const savingsContent = fs.readFileSync('src/components/WizardStepSavings.js', 'utf8');
+            
+            // Check for partner savings categories
+            const hasPartnerSavingsBreakdown = savingsContent.includes('partner1CurrentPension') && 
+                                             savingsContent.includes('partner2CurrentPension') &&
+                                             savingsContent.includes('partner1PersonalPortfolio') &&
+                                             savingsContent.includes('partner2PersonalPortfolio');
+            logTest('WizardStepSavings: Partner savings breakdown', hasPartnerSavingsBreakdown);
+            
+            // Check for investment category separation
+            const hasInvestmentCategories = savingsContent.includes('realEstateValue') && 
+                                          savingsContent.includes('cryptoValue') &&
+                                          savingsContent.includes('savingsAccountValue');
+            logTest('WizardStepSavings: Investment categories', hasInvestmentCategories);
+            
+            // Check for total calculation logic
+            const hasTotalCalculation = savingsContent.includes('calculateTotalSavings');
+            logTest('WizardStepSavings: Total calculation logic', hasTotalCalculation);
+            
+        } else {
+            logTest('WizardStepSavings file exists', false, 'Missing WizardStepSavings.js');
+        }
+        
+        // Test WizardStepContributions for country-specific rules
+        if (fs.existsSync('src/components/WizardStepContributions.js')) {
+            const contributionsContent = fs.readFileSync('src/components/WizardStepContributions.js', 'utf8');
+            
+            // Check for training fund threshold logic
+            const hasThresholdLogic = contributionsContent.includes('calculateTrainingFundRate') &&
+                                    contributionsContent.includes('trainingFundThreshold');
+            logTest('WizardStepContributions: Training fund threshold logic', hasThresholdLogic);
+            
+            // Check for country-specific rates
+            const hasCountryRates = contributionsContent.includes('countryRates') &&
+                                  contributionsContent.includes('israel') &&
+                                  contributionsContent.includes('usa') &&
+                                  contributionsContent.includes('uk');
+            logTest('WizardStepContributions: Country-specific rates', hasCountryRates);
+            
+            // Check for employee/employer breakdown
+            const hasEmployerEmployeeBreakdown = contributionsContent.includes('employeeContribution') &&
+                                               contributionsContent.includes('employerMatching');
+            logTest('WizardStepContributions: Employee/employer breakdown', hasEmployerEmployeeBreakdown);
+            
+            // Check for partner contribution rates
+            const hasPartnerContributions = contributionsContent.includes('partner1EmployeeRate') &&
+                                          contributionsContent.includes('partner2EmployeeRate');
+            logTest('WizardStepContributions: Partner contribution rates', hasPartnerContributions);
+            
+        } else {
+            logTest('WizardStepContributions file exists', false, 'Missing WizardStepContributions.js');
+        }
+        
+        // Test WizardStepFees for per-partner fee structures
+        if (fs.existsSync('src/components/WizardStepFees.js')) {
+            const feesContent = fs.readFileSync('src/components/WizardStepFees.js', 'utf8');
+            
+            // Check for partner fee sections
+            const hasPartnerFees = feesContent.includes('partner1ContributionFees') &&
+                                 feesContent.includes('partner2ContributionFees') &&
+                                 feesContent.includes('partner1AccumulationFees') &&
+                                 feesContent.includes('partner2AccumulationFees');
+            logTest('WizardStepFees: Partner fee structures', hasPartnerFees);
+            
+            // Check for partner return rates
+            const hasPartnerReturns = feesContent.includes('partner1PensionReturn') &&
+                                    feesContent.includes('partner2PensionReturn') &&
+                                    feesContent.includes('partner1PersonalPortfolioReturn') &&
+                                    feesContent.includes('partner2PersonalPortfolioReturn');
+            logTest('WizardStepFees: Partner return rates', hasPartnerReturns);
+            
+            // Check for 4-section layout (main fees, expected returns, partner fees, partner returns)
+            const hasFourSections = feesContent.includes('main-fees-section') &&
+                                  feesContent.includes('returns-section') &&
+                                  feesContent.includes('partner-fees-section') &&
+                                  feesContent.includes('partner-returns-section');
+            logTest('WizardStepFees: Four-section layout', hasFourSections);
+            
+        } else {
+            logTest('WizardStepFees file exists', false, 'Missing WizardStepFees.js');
+        }
+        
+    } catch (error) {
+        logTest('Partner planning features testing', false, `Error: ${error.message}`);
+    }
+}
+
+// Test 15: Enhanced Calculation Logic Tests
+function testEnhancedCalculationLogic() {
+    console.log('\n🧮 Testing Enhanced Calculation Logic...');
+    
+    try {
+        // Test SummaryPanel for improved calculations
+        if (fs.existsSync('src/components/SummaryPanel.js')) {
+            const summaryContent = fs.readFileSync('src/components/SummaryPanel.js', 'utf8');
+            
+            // Check for comprehensive total income calculation
+            const hasTotalIncomeCalculation = summaryContent.includes('totalIncome += (inputs.freelanceIncome') &&
+                                            summaryContent.includes('inputs.annualBonus') &&
+                                            summaryContent.includes('inputs.quarterlyRSU');
+            logTest('SummaryPanel: Comprehensive income calculation', hasTotalIncomeCalculation);
+            
+            // Check for savings rate calculation with proper field mapping
+            const hasSavingsRateLogic = summaryContent.includes('currentSavingsRate') &&
+                                      summaryContent.includes('currentContributions / totalIncome');
+            logTest('SummaryPanel: Savings rate calculation', hasSavingsRateLogic);
+            
+            // Check for enhanced readiness score with 5 factors
+            const hasEnhancedReadinessScore = summaryContent.includes('Factor 1:') &&
+                                            summaryContent.includes('Factor 2:') &&
+                                            summaryContent.includes('Factor 3:') &&
+                                            summaryContent.includes('Factor 4:') &&
+                                            summaryContent.includes('Factor 5:');
+            logTest('SummaryPanel: 5-factor readiness score', hasEnhancedReadinessScore);
+            
+            // Check for real vs nominal value calculations
+            const hasRealNominalValues = summaryContent.includes('inflationFactor') &&
+                                       summaryContent.includes('totalSavingsReal') &&
+                                       summaryContent.includes('monthlyIncomeReal');
+            logTest('SummaryPanel: Real vs nominal calculations', hasRealNominalValues);
+            
+        } else {
+            logTest('SummaryPanel file exists', false, 'Missing SummaryPanel.js');
+        }
+        
+        // Test retirementCalculations for monthlyIncome fix
+        if (fs.existsSync('src/utils/retirementCalculations.js')) {
+            const calcContent = fs.readFileSync('src/utils/retirementCalculations.js', 'utf8');
+            
+            // Check for monthlyIncome property in return object
+            const hasMonthlyIncomeProperty = calcContent.includes('monthlyIncome:') &&
+                                           calcContent.includes('totalNetIncome');
+            logTest('retirementCalculations: monthlyIncome property fix', hasMonthlyIncomeProperty);
+            
+            // Check for comprehensive input handling
+            const hasComprehensiveInputs = calcContent.includes('currentSalary') ||
+                                         calcContent.includes('currentMonthlySalary');
+            logTest('retirementCalculations: Input handling', hasComprehensiveInputs);
+            
+        } else {
+            logTest('retirementCalculations file exists', false, 'Missing retirementCalculations.js');
+        }
+        
+    } catch (error) {
+        logTest('Enhanced calculation logic testing', false, `Error: ${error.message}`);
+    }
+}
+
+// Test 16: Multi-Step Wizard UI/UX Tests
+function testMultiStepWizardUX() {
+    console.log('\n🎯 Testing Multi-Step Wizard UI/UX...');
+    
+    try {
+        // Check main app for wizard integration
+        if (fs.existsSync('src/components/RetirementPlannerApp.js')) {
+            const appContent = fs.readFileSync('src/components/RetirementPlannerApp.js', 'utf8');
+            
+            // Check for wizard step components
+            const hasWizardSteps = appContent.includes('WizardStepSalary') &&
+                                 appContent.includes('WizardStepSavings') &&
+                                 appContent.includes('WizardStepContributions') &&
+                                 appContent.includes('WizardStepFees');
+            logTest('RetirementPlannerApp: Wizard step integration', hasWizardSteps);
+            
+            // Check for step navigation
+            const hasStepNavigation = appContent.includes('currentStep') ||
+                                    appContent.includes('nextStep') ||
+                                    appContent.includes('step navigation');
+            logTest('RetirementPlannerApp: Step navigation', hasStepNavigation);
+            
+            // Check for input state management
+            const hasInputStateManagement = appContent.includes('inputs') && appContent.includes('setInputs');
+            logTest('RetirementPlannerApp: Input state management', hasInputStateManagement);
+            
+        } else {
+            logTest('RetirementPlannerApp file exists', false, 'Missing RetirementPlannerApp.js');
+        }
+        
+        // Test for consistent component exports
+        const wizardComponents = [
+            'src/components/WizardStepSalary.js',
+            'src/components/WizardStepSavings.js',
+            'src/components/WizardStepContributions.js',
+            'src/components/WizardStepFees.js'
+        ];
+        
+        let exportedComponents = 0;
+        wizardComponents.forEach(componentFile => {
+            if (fs.existsSync(componentFile)) {
+                const content = fs.readFileSync(componentFile, 'utf8');
+                if (content.includes('window.') && content.includes('= ')) {
+                    exportedComponents++;
+                }
+            }
+        });
+        
+        logTest('Wizard components: Window exports', exportedComponents === wizardComponents.length,
+            `${exportedComponents}/${wizardComponents.length} components properly exported`);
+        
+        // Test for React.createElement usage consistency
+        let reactCreateElementUsage = 0;
+        wizardComponents.forEach(componentFile => {
+            if (fs.existsSync(componentFile)) {
+                const content = fs.readFileSync(componentFile, 'utf8');
+                if (content.includes('React.createElement') && !content.includes('createElement(')) {
+                    reactCreateElementUsage++;
+                }
+            }
+        });
+        
+        logTest('Wizard components: React.createElement usage', reactCreateElementUsage === wizardComponents.length,
+            `${reactCreateElementUsage}/${wizardComponents.length} components use React.createElement correctly`);
+        
+    } catch (error) {
+        logTest('Multi-step wizard UI/UX testing', false, `Error: ${error.message}`);
+    }
+}
+
+// Test 17: Data Validation and Error Handling
+function testDataValidationAndErrorHandling() {
+    console.log('\n🛡️ Testing Data Validation and Error Handling...');
+    
+    try {
+        const componentFiles = [
+            'src/components/WizardStepSalary.js',
+            'src/components/WizardStepSavings.js',
+            'src/components/WizardStepContributions.js',
+            'src/components/WizardStepFees.js',
+            'src/components/SummaryPanel.js'
+        ];
+        
+        let componentsWithValidation = 0;
+        let componentsWithErrorHandling = 0;
+        
+        componentFiles.forEach(file => {
+            if (fs.existsSync(file)) {
+                const content = fs.readFileSync(file, 'utf8');
+                
+                // Check for input validation
+                const hasValidation = content.includes('parseFloat') || 
+                                    content.includes('parseInt') ||
+                                    content.includes('|| 0') ||
+                                    content.includes('|| \'\'');
+                if (hasValidation) componentsWithValidation++;
+                
+                // Check for error handling
+                const hasErrorHandling = content.includes('try') || 
+                                       content.includes('catch') ||
+                                       content.includes('isNaN') ||
+                                       content.includes('isValid');
+                if (hasErrorHandling) componentsWithErrorHandling++;
+            }
+        });
+        
+        logTest('Components: Input validation', componentsWithValidation >= 4,
+            `${componentsWithValidation}/${componentFiles.length} components have input validation`);
+        
+        logTest('Components: Error handling', componentsWithErrorHandling >= 2,
+            `${componentsWithErrorHandling}/${componentFiles.length} components have error handling`);
+        
+        // Test for consistent default value handling
+        if (fs.existsSync('src/components/WizardStepSalary.js')) {
+            const salaryContent = fs.readFileSync('src/components/WizardStepSalary.js', 'utf8');
+            const hasDefaultValues = salaryContent.includes('|| 0') && salaryContent.includes('value=');
+            logTest('WizardStepSalary: Default value handling', hasDefaultValues);
+        }
+        
+        // Test for number input type enforcement
+        const wizardFiles = [
+            'src/components/WizardStepSalary.js',
+            'src/components/WizardStepSavings.js',
+            'src/components/WizardStepContributions.js',
+            'src/components/WizardStepFees.js'
+        ];
+        
+        let filesWithNumberInputs = 0;
+        wizardFiles.forEach(file => {
+            if (fs.existsSync(file)) {
+                const content = fs.readFileSync(file, 'utf8');
+                if (content.includes('type: \'number\'')) {
+                    filesWithNumberInputs++;
+                }
+            }
+        });
+        
+        logTest('Wizard components: Number input types', filesWithNumberInputs === wizardFiles.length,
+            `${filesWithNumberInputs}/${wizardFiles.length} components use number inputs`);
+        
+    } catch (error) {
+        logTest('Data validation and error handling testing', false, `Error: ${error.message}`);
+    }
+}
+
 // Main test execution
 async function runAllTests() {
     console.log('Starting automated test suite...\n');
@@ -711,6 +1035,12 @@ async function runAllTests() {
     testLayoutResponsiveness();
     testGitHubActions();
     testCSSStyleConsistency();
+    
+    // Partner Planning Feature Tests (v6.0.0)
+    testPartnerPlanningFeatures();
+    testEnhancedCalculationLogic();
+    testMultiStepWizardUX();
+    testDataValidationAndErrorHandling();
     
     // Summary
     console.log('\n📊 Test Summary');

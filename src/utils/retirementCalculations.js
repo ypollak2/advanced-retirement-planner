@@ -291,8 +291,36 @@ window.calculateRetirement = (
         partnerNetIncome = partnerNetPension + partnerNetTrainingFund + partnerNetPersonalPortfolio + partnerSocialSecurity;
     }
     
-    const individualNetIncome = netPension + netTrainingFundIncome + socialSecurity + netPersonalPortfolioIncome + netCryptoIncome + netRealEstateIncome;
-    const totalNetIncome = individualNetIncome + partnerNetIncome;
+    // Calculate additional income sources from wizard inputs
+    const currentSalary = inputs.currentMonthlySalary || inputs.currentSalary || 0;
+    const annualBonusMonthly = (parseFloat(inputs.annualBonus) || 0) / 12;
+    const quarterlyRSUMonthly = (parseFloat(inputs.quarterlyRSU) || 0) / 3;
+    const freelanceIncome = parseFloat(inputs.freelanceIncome) || 0;
+    const rentalIncome = parseFloat(inputs.rentalIncome) || 0;
+    const dividendIncome = parseFloat(inputs.dividendIncome) || 0;
+    
+    // Partner additional income sources
+    let partnerAdditionalIncome = 0;
+    if (inputs.planningType === 'couple') {
+        const partner1AnnualBonusMonthly = (parseFloat(inputs.partner1AnnualBonus) || 0) / 12;
+        const partner1QuarterlyRSUMonthly = (parseFloat(inputs.partner1QuarterlyRSU) || 0) / 3;
+        const partner1FreelanceIncome = parseFloat(inputs.partner1FreelanceIncome) || 0;
+        const partner1RentalIncome = parseFloat(inputs.partner1RentalIncome) || 0;
+        const partner1DividendIncome = parseFloat(inputs.partner1DividendIncome) || 0;
+        
+        const partner2AnnualBonusMonthly = (parseFloat(inputs.partner2AnnualBonus) || 0) / 12;
+        const partner2QuarterlyRSUMonthly = (parseFloat(inputs.partner2QuarterlyRSU) || 0) / 3;
+        const partner2FreelanceIncome = parseFloat(inputs.partner2FreelanceIncome) || 0;
+        const partner2RentalIncome = parseFloat(inputs.partner2RentalIncome) || 0;
+        const partner2DividendIncome = parseFloat(inputs.partner2DividendIncome) || 0;
+        
+        partnerAdditionalIncome = partner1AnnualBonusMonthly + partner1QuarterlyRSUMonthly + partner1FreelanceIncome + partner1RentalIncome + partner1DividendIncome +
+                                 partner2AnnualBonusMonthly + partner2QuarterlyRSUMonthly + partner2FreelanceIncome + partner2RentalIncome + partner2DividendIncome;
+    }
+    
+    const additionalIncomeTotal = annualBonusMonthly + quarterlyRSUMonthly + freelanceIncome + rentalIncome + dividendIncome;
+    const individualNetIncome = netPension + netTrainingFundIncome + socialSecurity + netPersonalPortfolioIncome + netCryptoIncome + netRealEstateIncome + additionalIncomeTotal;
+    const totalNetIncome = individualNetIncome + partnerNetIncome + partnerAdditionalIncome;
     
     // Calculate expenses (joint if partner enabled, individual otherwise)
     const baseExpenses = inputs.partnerPlanningEnabled && inputs.jointMonthlyExpenses > 0 
@@ -334,6 +362,15 @@ window.calculateRetirement = (
         partnerResults: partnerResults,
         partnerNetIncome: Math.round(partnerNetIncome),
         partnerSocialSecurity: partnerSocialSecurity,
+        
+        // Additional income breakdown
+        annualBonusMonthly: Math.round(annualBonusMonthly),
+        quarterlyRSUMonthly: Math.round(quarterlyRSUMonthly),
+        freelanceIncome: Math.round(freelanceIncome),
+        additionalRentalIncome: Math.round(rentalIncome),
+        dividendIncome: Math.round(dividendIncome),
+        additionalIncomeTotal: Math.round(additionalIncomeTotal),
+        partnerAdditionalIncome: Math.round(partnerAdditionalIncome),
         
         // Combined household results
         totalNetIncome: Math.round(totalNetIncome),
