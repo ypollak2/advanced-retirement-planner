@@ -1,9 +1,9 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "6.2.0",
+    number: "6.2.1",
     build: "2025-07-20",
-    commit: "v6.2.0-performance-revolution",
-    description: "Major Performance & Optimization Revolution with advanced caching, service worker, and code splitting"
+    commit: "v6.2.1-couple-mode-fix",
+    description: "Fix couple mode salary display and force cache refresh"
 };
 
 // Export version for use in other modules

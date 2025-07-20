@@ -127,9 +127,10 @@ function validateVersionConsistency() {
             return match ? match[1] : null;
         },
         'index.html': () => {
+            // HTML title is now dynamic, use fallback version from script
             const content = fs.readFileSync('index.html', 'utf8');
-            const titleMatch = content.match(/<title>.*v([0-9.]+).*<\/title>/);
-            return titleMatch ? titleMatch[1] : null;
+            const fallbackMatch = content.match(/window\.APP_VERSION\s*=\s*['"]([^'"]+)['"]/);
+            return fallbackMatch ? fallbackMatch[1] : 'dynamic';
         }
     };
 
