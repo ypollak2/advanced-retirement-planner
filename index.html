@@ -78,8 +78,8 @@
             .catch(error => {
                 console.warn('⚠️ Could not load version from version.json:', error);
                 // Fallback version
-                window.APP_VERSION = '6.2.1';
-                document.getElementById('version-indicator').textContent = '✨ v6.2.1';
+                window.APP_VERSION = '6.3.0';
+                document.getElementById('version-indicator').textContent = '✨ v6.3.0';
             });
     </script>
 
@@ -99,6 +99,7 @@
     <script src="src/utils/exportFunctions.js?v={{VERSION}}"></script>
     <script src="src/utils/stressTestScenarios.js?v={{VERSION}}"></script>
     <script src="src/utils/currencyAPI.js?v={{VERSION}}"></script>
+    <script src="src/utils/IsraeliNationalInsurance.js?v={{VERSION}}"></script>
     
     <!-- Base Components (loaded first) -->
     <script src="src/components/EnhancedRSUCompanySelector.js?v={{VERSION}}"></script>
@@ -114,6 +115,9 @@
     <script src="src/components/WizardStepSavings.js?v={{VERSION}}"></script>
     <script src="src/components/WizardStepContributions.js?v={{VERSION}}"></script>
     <script src="src/components/WizardStepFees.js?v={{VERSION}}"></script>
+    <script src="src/components/WizardStepInvestments.js?v={{VERSION}}"></script>
+    <script src="src/components/WizardStepGoals.js?v={{VERSION}}"></script>
+    <script src="src/components/WizardStepReview.js?v={{VERSION}}"></script>
     <script src="src/components/RetirementWizard.js?v={{VERSION}}"></script>
     
     <!-- Core Components (loaded immediately) -->

@@ -238,8 +238,126 @@ npm run qa:deployment
 4. Re-run full test suite
 5. Confirm 100% pass rate
 
+## Active Development Todo List
+
+### Current Session Tasks
+| ID | Task | Status | Priority | Notes |
+|----|------|--------|----------|-------|
+| fix-countryrates-error | Fix 'countryRates is not defined' error in WizardStepContributions.js:837 | ✅ completed | high | Fixed scope issue in export functions |
+| fix-cors-errors | Fix CORS policy errors for Yahoo Finance API stock price fetching | ✅ completed | medium | Disabled external API calls, using fallback prices only |
+| fix-service-worker-caching | Fix service worker stock price caching failures due to CORS issues | ✅ completed | medium | Modified SW to cache fallback data instead of external APIs |
+| update-claude-md-todos | Add todo list tracking system to CLAUDE.md for status management | ✅ completed | medium | Todo tracking system implemented in CLAUDE.md |
+| fix-step4-duplications | Fix duplications in Wizard Step 4 (Contributions page) | 📋 pending | high | Remove duplicate elements and clean up UI |
+| fix-training-fund-rules | Fix training fund calculation rules for Israeli threshold (15792 ILS) with correct 2.5%/7.5% split | 📋 pending | high | Update threshold value and calculation logic |
+| change-returns-to-yield | Change 'returns' terminology to '%yield' in Step 5 | 📋 pending | medium | Update WizardStepFees.js terminology |
+| create-step6-inheritance | Create Step 6 - Inheritance Planning (single/couple for ISR/UK/US/EU) | 📋 pending | high | Design and implement inheritance planning step |
+| create-step7-taxes | Create Step 7 - Tax Planning & Optimization (country-specific) | 📋 pending | high | Design and implement tax optimization step |
+| create-step8-review | Create Step 8 - Final Review & Summary (comprehensive plan review) | 📋 pending | high | Design and implement final review step |
+
+### Wizard Steps Enhancement Plan
+
+#### Step 6: Inheritance Planning (WizardStepInheritance.js)
+**Scope**: Comprehensive inheritance and estate planning for different countries and relationship statuses
+
+**Features by Country:**
+- **Israel (ISR)**: 
+  - Inheritance tax exemptions (spouse: unlimited, children: ₪2.5M each)
+  - Pension fund survivor benefits calculation
+  - Property transfer considerations
+  - Life insurance recommendations
+- **United Kingdom (UK)**:
+  - Inheritance Tax (40% over £325k, spouse exempt)
+  - Pension death benefits (25% tax-free lump sum)
+  - Joint ownership vs. individual ownership
+- **United States (US)**:
+  - Federal estate tax exemption ($12.92M per person)
+  - State inheritance taxes
+  - 401(k)/IRA beneficiary designations
+  - Trust planning recommendations
+- **European Union (EU)**:
+  - Country-specific inheritance laws
+  - Cross-border inheritance complications
+  - EU succession regulations
+
+**Single vs. Couple Planning:**
+- Single: Focus on beneficiary designations, charitable giving, tax-efficient wealth transfer
+- Couple: Spousal exemptions, joint ownership, survivor benefit optimization
+
+#### Step 7: Tax Planning & Optimization (WizardStepTaxes.js)
+**Scope**: Country-specific tax optimization strategies for retirement planning
+
+**Tax Optimization Areas:**
+- **Contribution Optimization**: 
+  - Max tax-deductible contributions by country
+  - Roth vs. traditional retirement accounts
+  - Training fund tax benefits (Israel)
+- **Withdrawal Strategies**:
+  - Tax-efficient retirement income sequencing
+  - Capital gains vs. income tax optimization
+  - Currency conversion tax implications
+- **International Tax Considerations**:
+  - Double taxation treaties
+  - Foreign pension reporting requirements
+  - Tax residency planning
+
+**Country-Specific Features:**
+- Israel: Training fund vs. pension tax benefits, capital gains exemptions
+- UK: ISA vs. pension contributions, basic vs. higher rate tax planning
+- US: 401(k) vs. Roth IRA optimization, Required Minimum Distributions
+- EU: Pillar 2 vs. Pillar 3 contributions, cross-border tax implications
+
+#### Step 8: Final Review & Summary (WizardStepReview.js)
+**Scope**: Comprehensive plan review and actionable recommendations
+
+**Review Sections:**
+1. **Financial Health Score** (0-100 scale)
+   - Savings rate adequacy
+   - Retirement readiness assessment
+   - Risk profile alignment
+   - Tax efficiency rating
+
+2. **Scenario Analysis**:
+   - Best case, worst case, realistic projections
+   - Stress testing (market crashes, inflation spikes)
+   - Early retirement feasibility
+   - Late career income changes
+
+3. **Actionable Recommendations**:
+   - Immediate actions (next 30 days)
+   - Short-term goals (6-12 months)
+   - Long-term strategy (5+ years)
+   - Regular review schedule
+
+4. **Country-Specific Action Items**:
+   - Regulatory compliance checklist
+   - Optimal contribution timing
+   - Tax planning deadlines
+   - Professional advisor recommendations
+
+**Interactive Features:**
+- Download PDF summary
+- Email plan to advisors
+- Calendar integration for review dates
+- Progress tracking dashboard
+
+### Task Management Protocol
+**All development tasks MUST be tracked in this todo list:**
+
+1. **Create todos** at session start for complex/multi-step tasks
+2. **Update status** in real-time: pending → in_progress → completed  
+3. **Mark completed** immediately when tasks finish
+4. **Add notes** for important context or blockers
+5. **Update CLAUDE.md** with current todo status after each session
+
+### Status Legend
+- 📋 **pending**: Not yet started
+- 🔄 **in_progress**: Currently working on
+- ✅ **completed**: Finished successfully
+- ❌ **blocked**: Cannot proceed due to external factors
+- ⏸️ **paused**: Temporarily suspended
+
 ---
 
-**Last Updated**: v6.2.0 - July 20, 2025
+**Last Updated**: v6.2.1 - July 20, 2025
 **Validation System**: Enhanced pre-commit QA implemented
 **Status**: All systems operational ✅

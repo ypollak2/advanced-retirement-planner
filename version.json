@@ -1,6 +1,6 @@
 {
-  "version": "6.2.1",
+  "version": "6.3.0",
   "build": "2025-07-20",
-  "commit": "v6.2.1-couple-mode-fix",
-  "description": "Fix couple mode salary display and force cache refresh"
+  "commit": "v6.3.0-update",
+  "description": "Version update to 6.3.0"
 }

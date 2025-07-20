@@ -78,12 +78,12 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
             trainingFund: 10.0, // Total: 7.5% employer + 2.5% employee
             employee: 7.0,
             employer: 10.5,
-            trainingFundThreshold: 15712, // Monthly salary threshold in ILS for 2024
+            trainingFundThreshold: 15792, // Monthly salary threshold in ILS for 2024
             trainingFundBelowThreshold: 10.0, // 7.5% employer + 2.5% employee = 10%
             trainingFundAboveThreshold: 0, // Above threshold: taxed as income, no deduction
             trainingFundEmployeeRate: 2.5,
             trainingFundEmployerRate: 7.5,
-            maxMonthlyContribution: 1571 // Maximum monthly contribution for tax benefits (10% of 15,712)
+            maxMonthlyContribution: 1579 // Maximum monthly contribution for tax benefits (10% of 15,792)
         },
         usa: { 
             pension: 12.0, 
@@ -129,8 +129,8 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
             effectiveRate: defaultRates.trainingFund
         };
         
-        const threshold = defaultRates.trainingFundThreshold || 15712;
-        const maxContribution = defaultRates.maxMonthlyContribution || 1571;
+        const threshold = defaultRates.trainingFundThreshold || 15792;
+        const maxContribution = defaultRates.maxMonthlyContribution || 1579;
         const rate = defaultRates.trainingFundBelowThreshold / 100 || 0.10;
         
         // Calculate total contribution (employer continues to contribute above threshold)
@@ -170,7 +170,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
         if (selectedCountry !== 'israel') return '';
         
         const contribution = calculateTrainingFundContribution(monthlySalary);
-        const threshold = defaultRates.trainingFundThreshold || 15712;
+        const threshold = defaultRates.trainingFundThreshold || 15792;
         
         if (contribution.salaryStatus === 'below_threshold') {
             return language === 'he' ? 
@@ -788,52 +788,9 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
 // Export to window for global access
 window.WizardStepContributions = WizardStepContributions;
 
-// Export functions for test compatibility
-window.calculateTrainingFundRate = (inputs) => {
-    const selectedCountry = inputs.taxCountry || 'israel';
-    const defaultRates = countryRates[selectedCountry] || countryRates.israel;
-    
-    const calculateTrainingFundContribution = (monthlySalary) => {
-        if (selectedCountry !== 'israel') return {
-            totalContribution: monthlySalary * (defaultRates.trainingFund / 100),
-            taxDeductible: monthlySalary * (defaultRates.trainingFund / 100),
-            taxableAmount: 0,
-            effectiveRate: defaultRates.trainingFund
-        };
-        
-        const threshold = defaultRates.trainingFundThreshold || 15712;
-        const maxContribution = defaultRates.maxMonthlyContribution || 1571;
-        const rate = defaultRates.trainingFundBelowThreshold / 100 || 0.10;
-        
-        const totalContribution = monthlySalary * rate;
-        
-        if (monthlySalary <= threshold) {
-            return {
-                totalContribution,
-                taxDeductible: totalContribution,
-                taxableAmount: 0,
-                effectiveRate: defaultRates.trainingFundBelowThreshold,
-                salaryStatus: 'below_threshold'
-            };
-        } else {
-            const taxDeductibleContribution = maxContribution;
-            const excessContribution = totalContribution - taxDeductibleContribution;
-            
-            return {
-                totalContribution,
-                taxDeductible: taxDeductibleContribution,
-                taxableAmount: excessContribution,
-                effectiveRate: (totalContribution / monthlySalary) * 100,
-                salaryStatus: 'above_threshold',
-                threshold: threshold,
-                excessSalary: monthlySalary - threshold
-            };
-        }
-    };
-    
-    return calculateTrainingFundContribution;
-};
+// Export functions for test compatibility - use existing component functions
+window.calculateTrainingFundRate = calculateTrainingFundRate;
 
-window.trainingFundThreshold = countryRates.israel.trainingFundThreshold;
+window.trainingFundThreshold = 15792; // Israeli training fund threshold for 2024
 
 console.log('✅ WizardStepContributions component loaded successfully');

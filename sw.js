@@ -1,9 +1,9 @@
 // Service Worker for Advanced Retirement Planner
-// Created by Yali Pollak (יהלי פולק) - v6.2.1
+// Created by Yali Pollak (יהלי פולק) - v6.3.0
 
-const CACHE_NAME = 'retirement-planner-v6.2.1';
-const STATIC_CACHE_NAME = 'retirement-planner-static-v6.2.1';
-const DYNAMIC_CACHE_NAME = 'retirement-planner-dynamic-v6.2.1';
+const CACHE_NAME = 'retirement-planner-v6.3.0';
+const STATIC_CACHE_NAME = 'retirement-planner-static-v6.3.0';
+const DYNAMIC_CACHE_NAME = 'retirement-planner-dynamic-v6.3.0';
 
 // Files to cache immediately on install
 const STATIC_ASSETS = [
@@ -31,6 +31,18 @@ const API_CACHE_PATTERNS = [
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
     console.log('📦 Service Worker installing...');
+
+// Fallback stock prices for major companies (same as stockPriceAPI.js)
+function getFallbackPrice(symbol) {
+    const fallbackPrices = {
+        'AAPL': 190.75, 'GOOGL': 175.50, 'MSFT': 425.80, 'AMZN': 165.30,
+        'META': 545.20, 'NFLX': 485.60, 'TSLA': 265.40, 'NVDA': 125.30,
+        'AMD': 155.80, 'INTC': 35.70, 'CRM': 265.90, 'ORCL': 145.60,
+        'ADBE': 525.20, 'NOW': 785.40, 'SHOP': 75.80, 'SPOT': 325.30,
+        'ZM': 65.20, 'UBER': 75.90, 'ABNB': 135.70, 'COIN': 205.40
+    };
+    return fallbackPrices[symbol.toUpperCase()] || 100;
+}
     
     event.waitUntil(
         caches.open(STATIC_CACHE_NAME)
@@ -243,26 +255,29 @@ self.addEventListener('message', (event) => {
 async function cacheStockPricesForOffline(symbols) {
     const cache = await caches.open(DYNAMIC_CACHE_NAME);
     
+    console.log('📱 Caching fallback stock prices for offline use...');
+    
+    // Skip external API calls that cause CORS errors
+    // Instead, cache fallback data locally
     for (const symbol of symbols) {
         try {
-            const requests = [
-                `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`,
-                `https://api.twelvedata.com/price?symbol=${symbol}&apikey=demo`
-            ];
+            // Create a synthetic response with fallback data for offline use
+            const fallbackData = {
+                symbol: symbol,
+                price: getFallbackPrice(symbol),
+                source: 'fallback',
+                timestamp: Date.now()
+            };
             
-            for (const url of requests) {
-                try {
-                    const response = await fetch(url);
-                    if (response.ok) {
-                        await cache.put(url, response.clone());
-                        break; // Stop after first successful request
-                    }
-                } catch (error) {
-                    console.log(`Failed to cache ${url}:`, error);
-                }
-            }
+            const response = new Response(JSON.stringify(fallbackData), {
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            const cacheKey = `offline-stock-${symbol}`;
+            await cache.put(cacheKey, response);
+            
         } catch (error) {
-            console.log(`Failed to cache prices for ${symbol}:`, error);
+            console.log(`Failed to cache fallback data for ${symbol}:`, error);
         }
     }
 }

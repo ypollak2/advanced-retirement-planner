@@ -124,7 +124,7 @@ class TrainingFundTestSuite {
         }
     }
 
-    // Test 3: Ceiling Implementation (₪15,972)
+    // Test 3: Ceiling Implementation (₪15,792)
     async testTrainingFundCeiling() {
         try {
             // Set salary above ceiling
@@ -141,7 +141,7 @@ class TrainingFundTestSuite {
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             // Calculate expected value with ceiling
-            const expectedWithCeiling = 15972 * 0.10; // ₪1,597.20
+            const expectedWithCeiling = 15792 * 0.10; // ₪1,579.20
 
             // Get actual calculated value from UI
             const actualValue = await this.page.evaluate(() => {

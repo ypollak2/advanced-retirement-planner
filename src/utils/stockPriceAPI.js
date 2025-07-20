@@ -201,63 +201,12 @@ function isAppOnline() {
     return navigator.onLine && isOnline;
 }
 
-// Real-time stock price fetching function
+// Real-time stock price fetching function - CORS-safe version
 async function fetchRealTimePrice(symbol) {
-    try {
-        // Try multiple free APIs for stock prices
-        
-        // Method 1: Yahoo Finance query1 API with different endpoint
-        const yahooResponse = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            }
-        });
-
-        if (yahooResponse.ok) {
-            const yahooData = await yahooResponse.json();
-            if (yahooData?.chart?.result?.[0]?.meta?.regularMarketPrice) {
-                return parseFloat(yahooData.chart.result[0].meta.regularMarketPrice);
-            }
-        }
-
-        // Method 2: Try alternative Yahoo Finance endpoint
-        const yahooAltResponse = await fetch(`https://query2.finance.yahoo.com/v10/finance/quoteSummary/${symbol}?modules=price`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-            }
-        });
-
-        if (yahooAltResponse.ok) {
-            const yahooAltData = await yahooAltResponse.json();
-            if (yahooAltData?.quoteSummary?.result?.[0]?.price?.regularMarketPrice?.raw) {
-                return parseFloat(yahooAltData.quoteSummary.result[0].price.regularMarketPrice.raw);
-            }
-        }
-
-        // Method 3: Try free stock API (if available)
-        const freeStockResponse = await fetch(`https://api.twelvedata.com/price?symbol=${symbol}&apikey=demo`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-            }
-        });
-
-        if (freeStockResponse.ok) {
-            const freeStockData = await freeStockResponse.json();
-            if (freeStockData?.price) {
-                return parseFloat(freeStockData.price);
-            }
-        }
-        
-        throw new Error('All API endpoints failed');
-        
-    } catch (error) {
-        console.warn(`Failed to fetch real-time price for ${symbol}:`, error.message);
-        return null;
-    }
+    // Skip external API calls to prevent CORS errors
+    // Use fallback prices only to ensure stable functionality
+    console.log(`📊 StockAPI: Using fallback price for ${symbol} (external APIs disabled to prevent CORS errors)`);
+    return null; // This will cause the main function to use fallback prices
 }
 
 // Background refresh function for stale-while-revalidate

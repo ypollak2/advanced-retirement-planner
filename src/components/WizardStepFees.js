@@ -11,16 +11,16 @@ const WizardStepFees = ({ inputs, setInputs, language = 'en' }) => {
             contributionFees: 'דמי ניהול מהפקדות (%)',
             accumulationFees: 'דמי ניהול מצבירה (%)',
             trainingFundFees: 'דמי ניהול קרן השתלמות (%)',
-            expectedReturns: 'תשואות צפויות',
-            pensionReturn: 'תשואת פנסיה (%)',
-            trainingFundReturn: 'תשואת קרן השתלמות (%)',
-            personalPortfolioReturn: 'תשואת תיק אישי (%)',
+            expectedReturns: 'צפוי % תשואה',
+            pensionReturn: '% תשואת פנסיה',
+            trainingFundReturn: '% תשואת קרן השתלמות',
+            personalPortfolioReturn: '% תשואת תיק אישי',
             partnerFees: 'דמי ניהול בני הזוג',
             partner1Fees: 'דמי ניהול בן/בת זוג 1',
             partner2Fees: 'דמי ניהול בן/בת זוג 2',
-            partnerReturns: 'תשואות בני הזוג',
-            partner1Returns: 'תשואות בן/בת זוג 1',
-            partner2Returns: 'תשואות בן/בת זוג 2',
+            partnerReturns: '% תשואות בני הזוג',
+            partner1Returns: '% תשואות בן/בת זוג 1',
+            partner2Returns: '% תשואות בן/בת זוג 2',
             info: 'דמי הניהול משפיעים על התשואה הסופית של החיסכון'
         },
         en: {
@@ -28,16 +28,16 @@ const WizardStepFees = ({ inputs, setInputs, language = 'en' }) => {
             contributionFees: 'Management Fees on Contributions (%)',
             accumulationFees: 'Management Fees on Accumulation (%)',
             trainingFundFees: 'Training Fund Management Fees (%)',
-            expectedReturns: 'Expected Returns',
-            pensionReturn: 'Pension Return (%)',
-            trainingFundReturn: 'Training Fund Return (%)',
-            personalPortfolioReturn: 'Personal Portfolio Return (%)',
+            expectedReturns: 'Expected %yield',
+            pensionReturn: 'Pension %yield',
+            trainingFundReturn: 'Training Fund %yield',
+            personalPortfolioReturn: 'Personal Portfolio %yield',
             partnerFees: 'Partner Management Fees',
             partner1Fees: 'Partner 1 Fees',
             partner2Fees: 'Partner 2 Fees',
-            partnerReturns: 'Partner Returns',
-            partner1Returns: 'Partner 1 Returns',
-            partner2Returns: 'Partner 2 Returns',
+            partnerReturns: 'Partner %yield',
+            partner1Returns: 'Partner 1 %yield',
+            partner2Returns: 'Partner 2 %yield',
             info: 'Management fees affect the final returns on your savings'
         }
     };
@@ -116,7 +116,7 @@ const WizardStepFees = ({ inputs, setInputs, language = 'en' }) => {
 
         ]),
 
-        // Returns Section
+        // %yield Section
         (!inputs.planningType || inputs.planningType === 'single') && createElement('div', { key: 'returns-section' }, [
             createElement('h3', { 
                 key: 'returns-title',
@@ -308,7 +308,7 @@ const WizardStepFees = ({ inputs, setInputs, language = 'en' }) => {
             ])
         ]),
 
-        // Partner Returns Section (if couple)
+        // Partner %yield Section (if couple)
         inputs.planningType === 'couple' && createElement('div', { key: 'partner-returns-section' }, [
             createElement('h3', { 
                 key: 'partner-returns-title',
