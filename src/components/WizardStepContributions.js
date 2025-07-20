@@ -16,6 +16,11 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
             partnerContributions: 'הפקדות בני הזוג',
             partner1Contributions: 'הפקדות בן/בת זוג 1',
             partner2Contributions: 'הפקדות בן/בת זוג 2',
+            trainingFundLimits: 'מגבלות קרן השתלמות',
+            salaryThreshold: 'סף משכורת (₪)',
+            belowThreshold: 'מתחת לסף (%)',
+            aboveThreshold: 'מעל הסף (%)',
+            currentSalaryStatus: 'סטטוס משכורת נוכחי',
             israel: 'ישראל',
             usa: 'ארה״ב',
             uk: 'בריטניה',
@@ -38,6 +43,11 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
             partnerContributions: 'Partner Contributions',
             partner1Contributions: 'Partner 1 Contributions',
             partner2Contributions: 'Partner 2 Contributions',
+            trainingFundLimits: 'Training Fund Limits',
+            salaryThreshold: 'Salary Threshold (₪)',
+            belowThreshold: 'Below Threshold (%)',
+            aboveThreshold: 'Above Threshold (%)',
+            currentSalaryStatus: 'Current Salary Status',
             israel: 'Israel',
             usa: 'United States',
             uk: 'United Kingdom',
@@ -58,7 +68,10 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
             pension: 17.5, 
             trainingFund: 7.5,
             employee: 7.0,
-            employer: 10.5
+            employer: 10.5,
+            trainingFundThreshold: 45000, // Monthly salary threshold in ILS
+            trainingFundBelowThreshold: 7.5,
+            trainingFundAboveThreshold: 2.5
         },
         usa: { 
             pension: 12.0, 
@@ -94,6 +107,38 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
 
     const selectedCountry = inputs.taxCountry || 'israel';
     const defaultRates = countryRates[selectedCountry] || countryRates.israel;
+
+    // Calculate effective training fund rate based on salary threshold
+    const calculateTrainingFundRate = (monthlySalary) => {
+        if (selectedCountry !== 'israel') return defaultRates.trainingFund;
+        
+        const threshold = defaultRates.trainingFundThreshold || 45000;
+        const belowRate = defaultRates.trainingFundBelowThreshold || 7.5;
+        const aboveRate = defaultRates.trainingFundAboveThreshold || 2.5;
+        
+        if (monthlySalary <= threshold) {
+            return belowRate;
+        } else {
+            // Blended rate: full rate up to threshold, reduced rate above
+            const belowThresholdAmount = threshold * (belowRate / 100);
+            const aboveThresholdAmount = (monthlySalary - threshold) * (aboveRate / 100);
+            return ((belowThresholdAmount + aboveThresholdAmount) / monthlySalary) * 100;
+        }
+    };
+
+    // Get salary status for display
+    const getSalaryStatus = (monthlySalary) => {
+        if (selectedCountry !== 'israel') return '';
+        const threshold = defaultRates.trainingFundThreshold || 45000;
+        if (monthlySalary <= threshold) {
+            return language === 'he' ? 'מתחת לסף - 7.5%' : 'Below threshold - 7.5%';
+        } else {
+            const effectiveRate = calculateTrainingFundRate(monthlySalary);
+            return language === 'he' ? 
+                `מעל הסף - ${effectiveRate.toFixed(1)}% ממוצע` : 
+                `Above threshold - ${effectiveRate.toFixed(1)}% average`;
+        }
+    };
 
     const handleCountryChange = (country) => {
         const rates = countryRates[country];
@@ -258,6 +303,137 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         key: 'training-fund-help',
                         className: "mt-2 text-sm text-green-600" 
                     }, `${t.defaultRates}: ${defaultRates.trainingFund}%`)
+                ])
+            ])
+        ]),
+
+        // Training Fund Limits (Israel only)
+        selectedCountry === 'israel' && React.createElement('div', { key: 'training-fund-limits-section' }, [
+            React.createElement('h3', { 
+                key: 'training-fund-limits-title',
+                className: "text-xl font-semibold text-gray-700 mb-4 flex items-center" 
+            }, [
+                React.createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '📊'),
+                t.trainingFundLimits
+            ]),
+            React.createElement('div', { 
+                key: 'training-fund-limits-grid',
+                className: "grid grid-cols-1 md:grid-cols-3 gap-6" 
+            }, [
+                // Salary Threshold
+                React.createElement('div', { 
+                    key: 'salary-threshold',
+                    className: "bg-yellow-50 rounded-xl p-6 border border-yellow-200" 
+                }, [
+                    React.createElement('label', { 
+                        key: 'threshold-label',
+                        className: "block text-lg font-medium text-gray-700 mb-2" 
+                    }, t.salaryThreshold),
+                    React.createElement('input', {
+                        key: 'threshold-input',
+                        type: 'number',
+                        value: inputs.trainingFundThreshold || defaultRates.trainingFundThreshold,
+                        onChange: (e) => setInputs({...inputs, trainingFundThreshold: parseInt(e.target.value) || 0}),
+                        className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                    }),
+                    React.createElement('p', { 
+                        key: 'threshold-help',
+                        className: "mt-2 text-sm text-yellow-600" 
+                    }, `${language === 'he' ? 'ברירת מחדל' : 'Default'}: ₪${defaultRates.trainingFundThreshold?.toLocaleString()}`)
+                ]),
+                
+                // Below Threshold Rate
+                React.createElement('div', { 
+                    key: 'below-threshold-rate',
+                    className: "bg-green-50 rounded-xl p-6 border border-green-200" 
+                }, [
+                    React.createElement('label', { 
+                        key: 'below-label',
+                        className: "block text-lg font-medium text-gray-700 mb-2" 
+                    }, t.belowThreshold),
+                    React.createElement('input', {
+                        key: 'below-input',
+                        type: 'number',
+                        step: '0.1',
+                        value: inputs.trainingFundBelowThreshold || defaultRates.trainingFundBelowThreshold,
+                        onChange: (e) => setInputs({...inputs, trainingFundBelowThreshold: parseFloat(e.target.value) || 0}),
+                        className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    }),
+                    React.createElement('p', { 
+                        key: 'below-help',
+                        className: "mt-2 text-sm text-green-600" 
+                    }, `${language === 'he' ? 'ברירת מחדל' : 'Default'}: ${defaultRates.trainingFundBelowThreshold}%`)
+                ]),
+                
+                // Above Threshold Rate
+                React.createElement('div', { 
+                    key: 'above-threshold-rate',
+                    className: "bg-orange-50 rounded-xl p-6 border border-orange-200" 
+                }, [
+                    React.createElement('label', { 
+                        key: 'above-label',
+                        className: "block text-lg font-medium text-gray-700 mb-2" 
+                    }, t.aboveThreshold),
+                    React.createElement('input', {
+                        key: 'above-input',
+                        type: 'number',
+                        step: '0.1',
+                        value: inputs.trainingFundAboveThreshold || defaultRates.trainingFundAboveThreshold,
+                        onChange: (e) => setInputs({...inputs, trainingFundAboveThreshold: parseFloat(e.target.value) || 0}),
+                        className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    }),
+                    React.createElement('p', { 
+                        key: 'above-help',
+                        className: "mt-2 text-sm text-orange-600" 
+                    }, `${language === 'he' ? 'ברירת מחדל' : 'Default'}: ${defaultRates.trainingFundAboveThreshold}%`)
+                ])
+            ]),
+            
+            // Current Salary Status Display
+            (inputs.currentMonthlySalary || inputs.partner1Salary || inputs.partner2Salary) && React.createElement('div', { 
+                key: 'salary-status',
+                className: "mt-6 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-6 border border-blue-200" 
+            }, [
+                React.createElement('h4', { 
+                    key: 'status-title',
+                    className: "text-lg font-semibold text-blue-700 mb-4" 
+                }, t.currentSalaryStatus),
+                React.createElement('div', { 
+                    key: 'salary-status-grid',
+                    className: "space-y-3" 
+                }, [
+                    // Main salary status
+                    inputs.currentMonthlySalary && React.createElement('div', { 
+                        key: 'main-salary-status',
+                        className: "flex justify-between items-center p-3 bg-white rounded-lg" 
+                    }, [
+                        React.createElement('span', { key: 'main-label', className: "font-medium" }, 
+                            language === 'he' ? 'משכורת עיקרית' : 'Main Salary'),
+                        React.createElement('span', { key: 'main-status', className: "text-blue-600" }, 
+                            getSalaryStatus(inputs.currentMonthlySalary))
+                    ]),
+                    
+                    // Partner 1 salary status
+                    inputs.planningType === 'couple' && inputs.partner1Salary && React.createElement('div', { 
+                        key: 'partner1-salary-status',
+                        className: "flex justify-between items-center p-3 bg-white rounded-lg" 
+                    }, [
+                        React.createElement('span', { key: 'partner1-label', className: "font-medium" }, 
+                            inputs.partner1Name || (language === 'he' ? 'בן/בת זוג 1' : 'Partner 1')),
+                        React.createElement('span', { key: 'partner1-status', className: "text-pink-600" }, 
+                            getSalaryStatus(inputs.partner1Salary))
+                    ]),
+                    
+                    // Partner 2 salary status
+                    inputs.planningType === 'couple' && inputs.partner2Salary && React.createElement('div', { 
+                        key: 'partner2-salary-status',
+                        className: "flex justify-between items-center p-3 bg-white rounded-lg" 
+                    }, [
+                        React.createElement('span', { key: 'partner2-label', className: "font-medium" }, 
+                            inputs.partner2Name || (language === 'he' ? 'בן/בת זוג 2' : 'Partner 2')),
+                        React.createElement('span', { key: 'partner2-status', className: "text-purple-600" }, 
+                            getSalaryStatus(inputs.partner2Salary))
+                    ])
                 ])
             ])
         ]),
