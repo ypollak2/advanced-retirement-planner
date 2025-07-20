@@ -149,8 +149,8 @@ const WizardStepPersonal = ({ inputs, setInputs, language = 'en' }) => {
             ])
         ]),
 
-        // Age Information
-        React.createElement('div', { 
+        // Age Information (only show in single mode)
+        inputs.planningType !== 'couple' && React.createElement('div', { 
             key: 'age-section',
             className: "grid grid-cols-1 md:grid-cols-2 gap-8" 
         }, [
@@ -252,16 +252,33 @@ const WizardStepPersonal = ({ inputs, setInputs, language = 'en' }) => {
                                 className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
                             })
                         ]),
-                        React.createElement('div', { key: 'partner1-age' }, [
+                        React.createElement('div', { key: 'partner1-current-age' }, [
                             React.createElement('label', { 
-                                key: 'partner1-age-label',
+                                key: 'partner1-current-age-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, t.age),
+                            }, t.currentAge),
                             React.createElement('input', {
-                                key: 'partner1-age-input',
+                                key: 'partner1-current-age-input',
                                 type: 'number',
+                                min: 18,
+                                max: 100,
                                 value: inputs.partner1Age || 30,
-                                onChange: (e) => setInputs({...inputs, partner1Age: parseInt(e.target.value) || 30}),
+                                onChange: (e) => setInputs({...inputs, partner1Age: parseInt(e.target.value) || 30, currentAge: parseInt(e.target.value) || 30}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
+                            })
+                        ]),
+                        React.createElement('div', { key: 'partner1-retirement-age' }, [
+                            React.createElement('label', { 
+                                key: 'partner1-retirement-age-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.retirementAge),
+                            React.createElement('input', {
+                                key: 'partner1-retirement-age-input',
+                                type: 'number',
+                                min: (inputs.partner1Age || 18) + 1,
+                                max: 75,
+                                value: inputs.partner1RetirementAge || 67,
+                                onChange: (e) => setInputs({...inputs, partner1RetirementAge: parseInt(e.target.value) || 67, retirementAge: parseInt(e.target.value) || 67}),
                                 className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
                             })
                         ])
@@ -291,16 +308,33 @@ const WizardStepPersonal = ({ inputs, setInputs, language = 'en' }) => {
                                 className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
                             })
                         ]),
-                        React.createElement('div', { key: 'partner2-age' }, [
+                        React.createElement('div', { key: 'partner2-current-age' }, [
                             React.createElement('label', { 
-                                key: 'partner2-age-label',
+                                key: 'partner2-current-age-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, t.age),
+                            }, t.currentAge),
                             React.createElement('input', {
-                                key: 'partner2-age-input',
+                                key: 'partner2-current-age-input',
                                 type: 'number',
+                                min: 18,
+                                max: 100,
                                 value: inputs.partner2Age || 30,
                                 onChange: (e) => setInputs({...inputs, partner2Age: parseInt(e.target.value) || 30}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
+                            })
+                        ]),
+                        React.createElement('div', { key: 'partner2-retirement-age' }, [
+                            React.createElement('label', { 
+                                key: 'partner2-retirement-age-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.retirementAge),
+                            React.createElement('input', {
+                                key: 'partner2-retirement-age-input',
+                                type: 'number',
+                                min: (inputs.partner2Age || 18) + 1,
+                                max: 75,
+                                value: inputs.partner2RetirementAge || 67,
+                                onChange: (e) => setInputs({...inputs, partner2RetirementAge: parseInt(e.target.value) || 67}),
                                 className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
                             })
                         ])
