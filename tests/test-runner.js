@@ -926,7 +926,13 @@ function testMultiStepWizardUX() {
         wizardComponents.forEach(componentFile => {
             if (fs.existsSync(componentFile)) {
                 const content = fs.readFileSync(componentFile, 'utf8');
-                if (content.includes('React.createElement') && !content.includes('createElement(')) {
+                // Check for React.createElement presence and proper usage patterns
+                const hasReactCreateElement = content.includes('React.createElement');
+                const hasProperAssignment = content.includes('const createElement = React.createElement');
+                const hasDirectUsage = content.includes('React.createElement(');
+                
+                // Valid patterns: either direct React.createElement calls OR proper assignment
+                if (hasReactCreateElement && (hasProperAssignment || hasDirectUsage)) {
                     reactCreateElementUsage++;
                 }
             }
