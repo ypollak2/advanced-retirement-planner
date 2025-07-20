@@ -61,8 +61,8 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             quarterlyRSU: `RSU רבעוני (${currencySymbol})`,
             otherIncome: `הכנסות אחרות (${currencySymbol})`,
             partnerSalaries: 'משכורות בני הזוג',
-            partner1Salary: 'משכורת בן/בת זוג 1',
-            partner2Salary: 'משכורת בן/בת זוג 2',
+            partner1Salary: 'משכורת ברוטו בן/בת זוג 1 (לפני מסים)',
+            partner2Salary: 'משכורת ברוטו בן/בת זוג 2 (לפני מסים)',
             optional: 'אופציונלי',
             totalMonthlyIncome: 'סך הכנסה חודשית',
             incomeBreakdown: 'פירוט ההכנסות'
@@ -80,8 +80,8 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             quarterlyRSU: `Quarterly RSU (${currencySymbol})`,
             otherIncome: `Other Income (${currencySymbol})`,
             partnerSalaries: 'Partner Salaries',
-            partner1Salary: 'Partner 1 Salary',
-            partner2Salary: 'Partner 2 Salary',
+            partner1Salary: 'Partner 1 Gross Salary (Before Taxes)',
+            partner2Salary: 'Partner 2 Gross Salary (Before Taxes)',
             optional: 'Optional',
             totalMonthlyIncome: 'Total Monthly Income',
             incomeBreakdown: 'Income Breakdown'
@@ -116,14 +116,16 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
 
     // Using React.createElement pattern for component rendering
     return createElement('div', { className: "space-y-8" }, [
-        // Main Salary Section (only show for single planning)
-        (!inputs.planningType || inputs.planningType === 'single') && createElement('div', { key: 'main-salary-section' }, [
+        // Main Salary Section (always show, but adjust title for couple)
+        createElement('div', { key: 'main-salary-section' }, [
             createElement('h3', { 
                 key: 'main-salary-title',
                 className: "text-xl font-semibold text-gray-700 mb-4 flex items-center" 
             }, [
                 createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💰'),
-                t.mainSalary
+                inputs.planningType === 'couple' ? 
+                    (language === 'he' ? 'משכורת ברוטו עיקרית (לפני מסים)' : 'Main Gross Salary (Before Taxes)') : 
+                    t.mainSalary
             ]),
             createElement('div', { 
                 key: 'salary-input',
@@ -181,7 +183,11 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         value: inputs.partner1Salary || 0,
                         onChange: (e) => setInputs({...inputs, partner1Salary: parseInt(e.target.value) || 0}),
                         className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    })
+                    }),
+                    createElement('p', { 
+                        key: 'partner1-salary-help',
+                        className: "mt-2 text-sm text-blue-600" 
+                    }, language === 'he' ? 'הזן משכורת ברוטו לפני מסים והפרשות' : 'Enter gross salary before taxes and deductions')
                 ]),
                 createElement('div', { 
                     key: 'partner2-salary',
@@ -197,7 +203,11 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         value: inputs.partner2Salary || 0,
                         onChange: (e) => setInputs({...inputs, partner2Salary: parseInt(e.target.value) || 0}),
                         className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    })
+                    }),
+                    createElement('p', { 
+                        key: 'partner2-salary-help',
+                        className: "mt-2 text-sm text-blue-600" 
+                    }, language === 'he' ? 'הזן משכורת ברוטו לפני מסים והפרשות' : 'Enter gross salary before taxes and deductions')
                 ])
             ])
         ]),

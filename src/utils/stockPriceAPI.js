@@ -1,5 +1,5 @@
 // Stock Price API Integration for RSU Tracking
-// Created by Yali Pollak (יהלי פולק) - v5.3.5
+// Created by Yali Pollak (יהלי פולק) - v6.1.0
 
 // CORS-free stock price API endpoints
 const STOCK_API_ENDPOINTS = {
