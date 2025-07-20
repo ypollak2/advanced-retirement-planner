@@ -61,18 +61,35 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
 
     const t = content[language];
 
-    // Calculate total savings
+    // Calculate total savings with detailed partner breakdown
     const calculateTotalSavings = () => {
+        // Individual savings
         const pension = inputs.currentSavings || 0;
         const trainingFund = inputs.currentTrainingFundSavings || 0;
         const portfolio = inputs.personalPortfolioValue || 0;
         const realEstate = inputs.realEstateValue || 0;
         const crypto = inputs.cryptoValue || 0;
         const savings = inputs.savingsAccountValue || 0;
-        const partner1Savings = inputs.partner1CurrentSavings || 0;
-        const partner2Savings = inputs.partner2CurrentSavings || 0;
+        
+        // Partner 1 savings breakdown
+        const partner1Pension = inputs.partner1CurrentPension || 0;
+        const partner1TrainingFund = inputs.partner1CurrentTrainingFund || 0;
+        const partner1Portfolio = inputs.partner1PersonalPortfolio || 0;
+        const partner1RealEstate = inputs.partner1RealEstate || 0;
+        const partner1Crypto = inputs.partner1Crypto || 0;
+        
+        // Partner 2 savings breakdown
+        const partner2Pension = inputs.partner2CurrentPension || 0;
+        const partner2TrainingFund = inputs.partner2CurrentTrainingFund || 0;
+        const partner2Portfolio = inputs.partner2PersonalPortfolio || 0;
+        const partner2RealEstate = inputs.partner2RealEstate || 0;
+        const partner2Crypto = inputs.partner2Crypto || 0;
 
-        return pension + trainingFund + portfolio + realEstate + crypto + savings + partner1Savings + partner2Savings;
+        const individualTotal = pension + trainingFund + portfolio + realEstate + crypto + savings;
+        const partner1Total = partner1Pension + partner1TrainingFund + partner1Portfolio + partner1RealEstate + partner1Crypto;
+        const partner2Total = partner2Pension + partner2TrainingFund + partner2Portfolio + partner2RealEstate + partner2Crypto;
+
+        return individualTotal + partner1Total + partner2Total;
     };
 
     const formatCurrency = (amount) => {
@@ -215,7 +232,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             ])
         ]),
 
-        // Partner Savings (if couple)
+        // Partner Savings (if couple) - Detailed Breakdown
         inputs.planningType === 'couple' && React.createElement('div', { key: 'partner-savings-section' }, [
             React.createElement('h3', { 
                 key: 'partner-savings-title',
@@ -226,39 +243,174 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             ]),
             React.createElement('div', { 
                 key: 'partner-savings-grid',
-                className: "grid grid-cols-1 md:grid-cols-2 gap-6" 
+                className: "grid grid-cols-1 lg:grid-cols-2 gap-8" 
             }, [
+                // Partner 1 Detailed Savings
                 React.createElement('div', { 
-                    key: 'partner1-savings',
+                    key: 'partner1-detailed-savings',
                     className: "bg-pink-50 rounded-xl p-6 border border-pink-200" 
                 }, [
-                    React.createElement('label', { 
-                        key: 'partner1-savings-label',
-                        className: "block text-lg font-medium text-gray-700 mb-2" 
-                    }, `${inputs.partner1Name || t.partner1Savings} (${currencySymbol})`),
-                    React.createElement('input', {
-                        key: 'partner1-savings-input',
-                        type: 'number',
-                        value: inputs.partner1CurrentSavings || 0,
-                        onChange: (e) => setInputs({...inputs, partner1CurrentSavings: parseInt(e.target.value) || 0}),
-                        className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                    })
+                    React.createElement('h4', { 
+                        key: 'partner1-title',
+                        className: "text-lg font-semibold text-pink-700 mb-4" 
+                    }, inputs.partner1Name || t.partner1Savings),
+                    
+                    // Partner 1 Pension
+                    React.createElement('div', { key: 'partner1-pension', className: "mb-4" }, [
+                        React.createElement('label', { 
+                            key: 'partner1-pension-label',
+                            className: "block text-sm font-medium text-gray-700 mb-1" 
+                        }, `🏦 ${t.currentPension}`),
+                        React.createElement('input', {
+                            key: 'partner1-pension-input',
+                            type: 'number',
+                            value: inputs.partner1CurrentPension || 0,
+                            onChange: (e) => setInputs({...inputs, partner1CurrentPension: parseInt(e.target.value) || 0}),
+                            className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
+                        })
+                    ]),
+                    
+                    // Partner 1 Training Fund
+                    React.createElement('div', { key: 'partner1-training', className: "mb-4" }, [
+                        React.createElement('label', { 
+                            key: 'partner1-training-label',
+                            className: "block text-sm font-medium text-gray-700 mb-1" 
+                        }, `🎓 ${t.currentTrainingFund}`),
+                        React.createElement('input', {
+                            key: 'partner1-training-input',
+                            type: 'number',
+                            value: inputs.partner1CurrentTrainingFund || 0,
+                            onChange: (e) => setInputs({...inputs, partner1CurrentTrainingFund: parseInt(e.target.value) || 0}),
+                            className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
+                        })
+                    ]),
+                    
+                    // Partner 1 Investments
+                    React.createElement('div', { key: 'partner1-investments', className: "space-y-3" }, [
+                        React.createElement('div', { key: 'partner1-portfolio' }, [
+                            React.createElement('label', { 
+                                key: 'partner1-portfolio-label',
+                                className: "block text-xs font-medium text-gray-600 mb-1" 
+                            }, `📈 ${t.portfolioValue}`),
+                            React.createElement('input', {
+                                key: 'partner1-portfolio-input',
+                                type: 'number',
+                                value: inputs.partner1PersonalPortfolio || 0,
+                                onChange: (e) => setInputs({...inputs, partner1PersonalPortfolio: parseInt(e.target.value) || 0}),
+                                className: "w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-pink-500"
+                            })
+                        ]),
+                        React.createElement('div', { key: 'partner1-realestate' }, [
+                            React.createElement('label', { 
+                                key: 'partner1-realestate-label',
+                                className: "block text-xs font-medium text-gray-600 mb-1" 
+                            }, `🏠 ${t.realEstateValue}`),
+                            React.createElement('input', {
+                                key: 'partner1-realestate-input',
+                                type: 'number',
+                                value: inputs.partner1RealEstate || 0,
+                                onChange: (e) => setInputs({...inputs, partner1RealEstate: parseInt(e.target.value) || 0}),
+                                className: "w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-pink-500"
+                            })
+                        ]),
+                        React.createElement('div', { key: 'partner1-crypto' }, [
+                            React.createElement('label', { 
+                                key: 'partner1-crypto-label',
+                                className: "block text-xs font-medium text-gray-600 mb-1" 
+                            }, `₿ ${t.cryptoValue}`),
+                            React.createElement('input', {
+                                key: 'partner1-crypto-input',
+                                type: 'number',
+                                value: inputs.partner1Crypto || 0,
+                                onChange: (e) => setInputs({...inputs, partner1Crypto: parseInt(e.target.value) || 0}),
+                                className: "w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-pink-500"
+                            })
+                        ])
+                    ])
                 ]),
+                
+                // Partner 2 Detailed Savings
                 React.createElement('div', { 
-                    key: 'partner2-savings',
-                    className: "bg-pink-50 rounded-xl p-6 border border-pink-200" 
+                    key: 'partner2-detailed-savings',
+                    className: "bg-purple-50 rounded-xl p-6 border border-purple-200" 
                 }, [
-                    React.createElement('label', { 
-                        key: 'partner2-savings-label',
-                        className: "block text-lg font-medium text-gray-700 mb-2" 
-                    }, `${inputs.partner2Name || t.partner2Savings} (${currencySymbol})`),
-                    React.createElement('input', {
-                        key: 'partner2-savings-input',
-                        type: 'number',
-                        value: inputs.partner2CurrentSavings || 0,
-                        onChange: (e) => setInputs({...inputs, partner2CurrentSavings: parseInt(e.target.value) || 0}),
-                        className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                    })
+                    React.createElement('h4', { 
+                        key: 'partner2-title',
+                        className: "text-lg font-semibold text-purple-700 mb-4" 
+                    }, inputs.partner2Name || t.partner2Savings),
+                    
+                    // Partner 2 Pension
+                    React.createElement('div', { key: 'partner2-pension', className: "mb-4" }, [
+                        React.createElement('label', { 
+                            key: 'partner2-pension-label',
+                            className: "block text-sm font-medium text-gray-700 mb-1" 
+                        }, `🏦 ${t.currentPension}`),
+                        React.createElement('input', {
+                            key: 'partner2-pension-input',
+                            type: 'number',
+                            value: inputs.partner2CurrentPension || 0,
+                            onChange: (e) => setInputs({...inputs, partner2CurrentPension: parseInt(e.target.value) || 0}),
+                            className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                        })
+                    ]),
+                    
+                    // Partner 2 Training Fund
+                    React.createElement('div', { key: 'partner2-training', className: "mb-4" }, [
+                        React.createElement('label', { 
+                            key: 'partner2-training-label',
+                            className: "block text-sm font-medium text-gray-700 mb-1" 
+                        }, `🎓 ${t.currentTrainingFund}`),
+                        React.createElement('input', {
+                            key: 'partner2-training-input',
+                            type: 'number',
+                            value: inputs.partner2CurrentTrainingFund || 0,
+                            onChange: (e) => setInputs({...inputs, partner2CurrentTrainingFund: parseInt(e.target.value) || 0}),
+                            className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                        })
+                    ]),
+                    
+                    // Partner 2 Investments
+                    React.createElement('div', { key: 'partner2-investments', className: "space-y-3" }, [
+                        React.createElement('div', { key: 'partner2-portfolio' }, [
+                            React.createElement('label', { 
+                                key: 'partner2-portfolio-label',
+                                className: "block text-xs font-medium text-gray-600 mb-1" 
+                            }, `📈 ${t.portfolioValue}`),
+                            React.createElement('input', {
+                                key: 'partner2-portfolio-input',
+                                type: 'number',
+                                value: inputs.partner2PersonalPortfolio || 0,
+                                onChange: (e) => setInputs({...inputs, partner2PersonalPortfolio: parseInt(e.target.value) || 0}),
+                                className: "w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-purple-500"
+                            })
+                        ]),
+                        React.createElement('div', { key: 'partner2-realestate' }, [
+                            React.createElement('label', { 
+                                key: 'partner2-realestate-label',
+                                className: "block text-xs font-medium text-gray-600 mb-1" 
+                            }, `🏠 ${t.realEstateValue}`),
+                            React.createElement('input', {
+                                key: 'partner2-realestate-input',
+                                type: 'number',
+                                value: inputs.partner2RealEstate || 0,
+                                onChange: (e) => setInputs({...inputs, partner2RealEstate: parseInt(e.target.value) || 0}),
+                                className: "w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-purple-500"
+                            })
+                        ]),
+                        React.createElement('div', { key: 'partner2-crypto' }, [
+                            React.createElement('label', { 
+                                key: 'partner2-crypto-label',
+                                className: "block text-xs font-medium text-gray-600 mb-1" 
+                            }, `₿ ${t.cryptoValue}`),
+                            React.createElement('input', {
+                                key: 'partner2-crypto-input',
+                                type: 'number',
+                                value: inputs.partner2Crypto || 0,
+                                onChange: (e) => setInputs({...inputs, partner2Crypto: parseInt(e.target.value) || 0}),
+                                className: "w-full p-2 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-purple-500"
+                            })
+                        ])
+                    ])
                 ])
             ])
         ]),
