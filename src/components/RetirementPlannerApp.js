@@ -6,9 +6,13 @@ function RetirementPlannerApp() {
     var language = languageState[0];
     var setLanguage = languageState[1];
     
-    var viewModeState = React.useState('dashboard');
+    var viewModeState = React.useState('wizard');
     var viewMode = viewModeState[0];
     var setViewMode = viewModeState[1];
+    
+    var wizardCompletedState = React.useState(false);
+    var wizardCompleted = wizardCompletedState[0];
+    var setWizardCompleted = wizardCompletedState[1];
     
     var activeSectionState = React.useState(null);
     var activeSection = activeSectionState[0];
@@ -370,6 +374,13 @@ function RetirementPlannerApp() {
             });
         }
     }
+    
+    // Wizard completion handler
+    function handleWizardComplete() {
+        setWizardCompleted(true);
+        setViewMode('dashboard');
+        setTimeout(handleCalculate, 100);
+    }
 
     // Handle section expansion from dashboard
     function handleSectionExpand(sectionId, isExpanded) {
@@ -469,7 +480,7 @@ function RetirementPlannerApp() {
             className: 'max-w-7xl mx-auto px-4 py-8'
         }, [
             // View Mode Toggle
-            React.createElement('div', {
+            wizardCompleted && React.createElement('div', {
                 key: 'view-toggle',
                 className: 'professional-tabs mb-6'
             }, [
@@ -490,8 +501,27 @@ function RetirementPlannerApp() {
                     React.createElement('span', { key: 'icon' }, '📊'),
                     ' ',
                     language === 'en' ? 'Detailed View' : (t.detailed || 'Detailed View')
+                ]),
+                React.createElement('button', {
+                    key: 'wizard', 
+                    onClick: function() { setViewMode('wizard'); setWizardCompleted(false); },
+                    className: 'professional-tab' + (viewMode === 'wizard' ? ' active' : '')
+                }, [
+                    React.createElement('span', { key: 'icon' }, '🧙‍♂️'),
+                    ' ',
+                    language === 'en' ? 'Restart Wizard' : 'אשף מחדש'
                 ])
             ]),
+            
+            // Wizard View
+            viewMode === 'wizard' && window.RetirementWizard && React.createElement(window.RetirementWizard, {
+                key: 'wizard',
+                inputs: inputs,
+                setInputs: setInputs,
+                onComplete: handleWizardComplete,
+                language: language,
+                workingCurrency: workingCurrency
+            }),
 
             // Dashboard View with Integrated Control Panel
             viewMode === 'dashboard' && React.createElement('div', {

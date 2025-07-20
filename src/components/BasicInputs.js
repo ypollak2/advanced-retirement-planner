@@ -124,7 +124,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                                         React.createElement('input', {
                                             key: 'partner1-age-input',
                                             type: 'number',
-                                            value: inputs.partner1Age || '',
+                                            value: inputs.partner1Age || 0,
                                             onChange: (e) => setInputs({...inputs, partner1Age: parseInt(e.target.value) || 0}),
                                             className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
                                         })
@@ -137,7 +137,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                                         React.createElement('input', {
                                             key: 'partner1-salary-input',
                                             type: 'number',
-                                            value: inputs.partner1Salary || '',
+                                            value: inputs.partner1Salary || 0,
                                             onChange: (e) => setInputs({...inputs, partner1Salary: parseInt(e.target.value) || 0}),
                                             className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
                                         })
@@ -178,7 +178,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                                         React.createElement('input', {
                                             key: 'partner1-current-savings-input',
                                             type: 'number',
-                                            value: inputs.partner1CurrentSavings || '',
+                                            value: inputs.partner1CurrentSavings || 0,
                                             onChange: (e) => setInputs({...inputs, partner1CurrentSavings: parseInt(e.target.value) || 0}),
                                             className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
                                         })
@@ -217,7 +217,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                                         React.createElement('input', {
                                             key: 'partner2-age-input',
                                             type: 'number',
-                                            value: inputs.partner2Age || '',
+                                            value: inputs.partner2Age || 0,
                                             onChange: (e) => setInputs({...inputs, partner2Age: parseInt(e.target.value) || 0}),
                                             className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
                                         })
@@ -230,7 +230,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                                         React.createElement('input', {
                                             key: 'partner2-salary-input',
                                             type: 'number',
-                                            value: inputs.partner2Salary || '',
+                                            value: inputs.partner2Salary || 0,
                                             onChange: (e) => setInputs({...inputs, partner2Salary: parseInt(e.target.value) || 0}),
                                             className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
                                         })
@@ -271,7 +271,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                                         React.createElement('input', {
                                             key: 'partner2-current-savings-input',
                                             type: 'number',
-                                            value: inputs.partner2CurrentSavings || '',
+                                            value: inputs.partner2CurrentSavings || 0,
                                             onChange: (e) => setInputs({...inputs, partner2CurrentSavings: parseInt(e.target.value) || 0}),
                                             className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 text-sm"
                                         })
@@ -579,7 +579,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                                 React.createElement('input', {
                                     key: 'rsu-units-input',
                                     type: 'number',
-                                    value: inputs.rsuUnits || '',
+                                    value: inputs.rsuUnits || 0,
                                     onChange: (e) => setInputs({...inputs, rsuUnits: parseInt(e.target.value) || 0}),
                                     placeholder: language === 'he' ? 'מספר יחידות' : 'Number of units',
                                     className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 text-sm"
@@ -595,7 +595,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                                     key: 'rsu-current-price-input',
                                     type: 'number',
                                     step: '0.01',
-                                    value: inputs.rsuCurrentPrice || '',
+                                    value: inputs.rsuCurrentPrice || 0,
                                     onChange: (e) => setInputs({...inputs, rsuCurrentPrice: parseFloat(e.target.value) || 0}),
                                     placeholder: language === 'he' ? 'מחיר למניה' : 'Price per share',
                                     className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 text-sm"
