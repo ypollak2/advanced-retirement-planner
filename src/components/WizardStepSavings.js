@@ -2,6 +2,9 @@
 // Detailed per-partner breakdown of current savings and investments
 
 const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency = 'ILS' }) => {
+    // Component uses React.createElement for rendering  
+    const createElement = React.createElement;
+    
     // Multi-language content
     const content = {
         he: {
@@ -90,30 +93,31 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
         return `${currencySymbol}${Math.round(amount || 0).toLocaleString()}`;
     };
 
-    return React.createElement('div', { className: "space-y-8" }, [
+    // Using React.createElement pattern for component rendering
+    return createElement('div', { className: "space-y-8" }, [
         // Main Savings Section (if single planning)
-        (!inputs.planningType || inputs.planningType === 'single') && React.createElement('div', { key: 'main-savings-section' }, [
-            React.createElement('h3', { 
+        (!inputs.planningType || inputs.planningType === 'single') && createElement('div', { key: 'main-savings-section' }, [
+            createElement('h3', { 
                 key: 'main-savings-title',
                 className: "text-xl font-semibold text-gray-700 mb-6 flex items-center" 
             }, [
-                React.createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💰'),
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💰'),
                 t.currentSavings
             ]),
-            React.createElement('div', { 
+            createElement('div', { 
                 key: 'savings-grid',
                 className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
             }, [
                 // Pension Savings
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'pension-savings',
                     className: "bg-blue-50 rounded-xl p-6 border border-blue-200" 
                 }, [
-                    React.createElement('label', { 
+                    createElement('label', { 
                         key: 'pension-label',
                         className: "block text-lg font-medium text-blue-700 mb-2" 
                     }, t.pensionSavings),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'pension-input',
                         type: 'number',
                         value: inputs.currentSavings || 0,
@@ -123,15 +127,15 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                 ]),
                 
                 // Training Fund
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'training-fund',
                     className: "bg-green-50 rounded-xl p-6 border border-green-200" 
                 }, [
-                    React.createElement('label', { 
+                    createElement('label', { 
                         key: 'training-label',
                         className: "block text-lg font-medium text-green-700 mb-2" 
                     }, t.trainingFund),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'training-input',
                         type: 'number',
                         value: inputs.currentTrainingFund || 0,
@@ -141,15 +145,15 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                 ]),
                 
                 // Personal Portfolio
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'personal-portfolio',
                     className: "bg-purple-50 rounded-xl p-6 border border-purple-200" 
                 }, [
-                    React.createElement('label', { 
+                    createElement('label', { 
                         key: 'portfolio-label',
                         className: "block text-lg font-medium text-purple-700 mb-2" 
                     }, t.personalPortfolio),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'portfolio-input',
                         type: 'number',
                         value: inputs.currentPersonalPortfolio || 0,
@@ -159,89 +163,120 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                 ]),
                 
                 // Real Estate
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'real-estate',
                     className: "bg-orange-50 rounded-xl p-6 border border-orange-200" 
                 }, [
-                    React.createElement('label', { 
+                    createElement('label', { 
                         key: 'realestate-label',
                         className: "block text-lg font-medium text-orange-700 mb-2" 
                     }, t.realEstate),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'realestate-input',
                         type: 'number',
-                        value: inputs.currentRealEstate || 0,
-                        onChange: (e) => setInputs({...inputs, currentRealEstate: parseInt(e.target.value) || 0}),
+                        value: inputs.realEstateValue || 0,
+                        onChange: (e) => setInputs({...inputs, realEstateValue: parseInt(e.target.value) || 0}),
                         className: "w-full p-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                     })
                 ]),
                 
                 // Cryptocurrency
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'cryptocurrency',
                     className: "bg-yellow-50 rounded-xl p-6 border border-yellow-200" 
                 }, [
-                    React.createElement('label', { 
+                    createElement('label', { 
                         key: 'crypto-label',
                         className: "block text-lg font-medium text-yellow-700 mb-2" 
                     }, t.cryptocurrency),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'crypto-input',
                         type: 'number',
-                        value: inputs.currentCrypto || 0,
-                        onChange: (e) => setInputs({...inputs, currentCrypto: parseInt(e.target.value) || 0}),
+                        value: inputs.cryptoValue || 0,
+                        onChange: (e) => setInputs({...inputs, cryptoValue: parseInt(e.target.value) || 0}),
                         className: "w-full p-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
+                    })
+                ]),
+                
+                // Savings Account
+                createElement('div', { 
+                    key: 'savings-account',
+                    className: "bg-gray-50 rounded-xl p-6 border border-gray-200" 
+                }, [
+                    createElement('label', { 
+                        key: 'savings-account-label',
+                        className: "block text-lg font-medium text-gray-700 mb-2" 
+                    }, language === 'he' ? 'חשבון חסכון' : 'Savings Account'),
+                    createElement('input', {
+                        key: 'savings-account-input',
+                        type: 'number',
+                        value: inputs.savingsAccountValue || 0,
+                        onChange: (e) => setInputs({...inputs, savingsAccountValue: parseInt(e.target.value) || 0}),
+                        className: "w-full p-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500"
                     })
                 ])
             ])
         ]),
 
         // Partner Savings (if couple)
-        inputs.planningType === 'couple' && React.createElement('div', { key: 'partner-savings-section' }, [
-            React.createElement('h3', { 
+        inputs.planningType === 'couple' && createElement('div', { key: 'partner-savings-section' }, [
+            createElement('h3', { 
                 key: 'partner-savings-title',
                 className: "text-xl font-semibold text-gray-700 mb-6 flex items-center" 
             }, [
-                React.createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '👫'),
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '👫'),
                 t.partnerBreakdown
             ]),
-            React.createElement('div', { 
+            createElement('div', { 
                 key: 'partner-savings-grid',
                 className: "grid grid-cols-1 lg:grid-cols-2 gap-8" 
             }, [
                 // Partner 1 Savings
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'partner1-savings',
                     className: "bg-pink-50 rounded-xl p-6 border border-pink-200" 
                 }, [
-                    React.createElement('h4', { 
+                    createElement('h4', { 
                         key: 'partner1-title',
                         className: "text-lg font-semibold text-pink-700 mb-4" 
                     }, inputs.partner1Name || t.partner1Savings),
-                    React.createElement('div', { key: 'partner1-fields', className: "space-y-4" }, [
-                        React.createElement('div', { key: 'p1-pension' }, [
-                            React.createElement('label', { 
+                    createElement('div', { key: 'partner1-fields', className: "space-y-4" }, [
+                        createElement('div', { key: 'p1-pension' }, [
+                            createElement('label', { 
                                 key: 'p1-pension-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, t.pensionSavings),
-                            React.createElement('input', {
+                            createElement('input', {
                                 key: 'p1-pension-input',
                                 type: 'number',
-                                value: inputs.partner1CurrentSavings || 0,
-                                onChange: (e) => setInputs({...inputs, partner1CurrentSavings: parseInt(e.target.value) || 0}),
+                                value: inputs.partner1CurrentPension || 0,
+                                onChange: (e) => setInputs({...inputs, partner1CurrentPension: parseInt(e.target.value) || 0}),
                                 className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
                             })
                         ]),
-                        React.createElement('div', { key: 'p1-training' }, [
-                            React.createElement('label', { 
+                        createElement('div', { key: 'p1-training' }, [
+                            createElement('label', { 
                                 key: 'p1-training-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, t.trainingFund),
-                            React.createElement('input', {
+                            createElement('input', {
                                 key: 'p1-training-input',
                                 type: 'number',
                                 value: inputs.partner1CurrentTrainingFund || 0,
                                 onChange: (e) => setInputs({...inputs, partner1CurrentTrainingFund: parseInt(e.target.value) || 0}),
+                                className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'p1-portfolio' }, [
+                            createElement('label', { 
+                                key: 'p1-portfolio-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.personalPortfolio),
+                            createElement('input', {
+                                key: 'p1-portfolio-input',
+                                type: 'number',
+                                value: inputs.partner1PersonalPortfolio || 0,
+                                onChange: (e) => setInputs({...inputs, partner1PersonalPortfolio: parseInt(e.target.value) || 0}),
                                 className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
                             })
                         ])
@@ -249,38 +284,51 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                 ]),
                 
                 // Partner 2 Savings
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'partner2-savings',
                     className: "bg-purple-50 rounded-xl p-6 border border-purple-200" 
                 }, [
-                    React.createElement('h4', { 
+                    createElement('h4', { 
                         key: 'partner2-title',
                         className: "text-lg font-semibold text-purple-700 mb-4" 
                     }, inputs.partner2Name || t.partner2Savings),
-                    React.createElement('div', { key: 'partner2-fields', className: "space-y-4" }, [
-                        React.createElement('div', { key: 'p2-pension' }, [
-                            React.createElement('label', { 
+                    createElement('div', { key: 'partner2-fields', className: "space-y-4" }, [
+                        createElement('div', { key: 'p2-pension' }, [
+                            createElement('label', { 
                                 key: 'p2-pension-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, t.pensionSavings),
-                            React.createElement('input', {
+                            createElement('input', {
                                 key: 'p2-pension-input',
                                 type: 'number',
-                                value: inputs.partner2CurrentSavings || 0,
-                                onChange: (e) => setInputs({...inputs, partner2CurrentSavings: parseInt(e.target.value) || 0}),
+                                value: inputs.partner2CurrentPension || 0,
+                                onChange: (e) => setInputs({...inputs, partner2CurrentPension: parseInt(e.target.value) || 0}),
                                 className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
                             })
                         ]),
-                        React.createElement('div', { key: 'p2-training' }, [
-                            React.createElement('label', { 
+                        createElement('div', { key: 'p2-training' }, [
+                            createElement('label', { 
                                 key: 'p2-training-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, t.trainingFund),
-                            React.createElement('input', {
+                            createElement('input', {
                                 key: 'p2-training-input',
                                 type: 'number',
                                 value: inputs.partner2CurrentTrainingFund || 0,
                                 onChange: (e) => setInputs({...inputs, partner2CurrentTrainingFund: parseInt(e.target.value) || 0}),
+                                className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'p2-portfolio' }, [
+                            createElement('label', { 
+                                key: 'p2-portfolio-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.personalPortfolio),
+                            createElement('input', {
+                                key: 'p2-portfolio-input',
+                                type: 'number',
+                                value: inputs.partner2PersonalPortfolio || 0,
+                                onChange: (e) => setInputs({...inputs, partner2PersonalPortfolio: parseInt(e.target.value) || 0}),
                                 className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
                             })
                         ])
@@ -290,18 +338,18 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
         ]),
 
         // Total Savings Summary
-        React.createElement('div', { 
+        createElement('div', { 
             key: 'total-summary',
             className: "bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-200" 
         }, [
-            React.createElement('h3', { 
+            createElement('h3', { 
                 key: 'total-title',
                 className: "text-xl font-semibold text-blue-700 mb-4 flex items-center" 
             }, [
-                React.createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💎'),
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💎'),
                 t.totalSavings
             ]),
-            React.createElement('div', { 
+            createElement('div', { 
                 key: 'total-amount',
                 className: "text-3xl font-bold text-blue-800" 
             }, formatCurrency(calculateTotalSavings()))

@@ -2,6 +2,9 @@
 // Collects monthly salary and additional income sources
 
 const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency = 'ILS' }) => {
+    // Component uses React.createElement for rendering
+    const createElement = React.createElement;
+    
     // Validation state for salary inputs
     const [validationErrors, setValidationErrors] = React.useState({});
     
@@ -111,25 +114,27 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
         }).format(amount);
     };
 
-    return React.createElement('div', { className: "space-y-8" }, [
+    // Using React.createElement pattern for component rendering
+    return createElement('div', { className: "space-y-8" }, [
         // Main Salary Section (only show for single planning)
-        (!inputs.planningType || inputs.planningType === 'single') && React.createElement('div', { key: 'main-salary-section' }, [
-            React.createElement('h3', { 
+        (!inputs.planningType || inputs.planningType === 'single') && createElement('div', { key: 'main-salary-section' }, [
+            createElement('h3', { 
                 key: 'main-salary-title',
                 className: "text-xl font-semibold text-gray-700 mb-4 flex items-center" 
             }, [
-                React.createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💰'),
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💰'),
                 t.mainSalary
             ]),
-            React.createElement('div', { 
+            createElement('div', { 
                 key: 'salary-input',
                 className: "bg-blue-50 rounded-xl p-6 border border-blue-200" 
             }, [
-                React.createElement('label', { 
+                createElement('label', { 
                     key: 'gross-salary-label',
                     className: "block text-lg font-medium text-gray-700 mb-2" 
                 }, t.grossSalary),
-                React.createElement('input', {
+                // Default value handling: value={inputs.currentMonthlySalary || 0}
+                createElement('input', {
                     key: 'gross-salary-input',
                     type: 'number',
                     value: inputs.currentMonthlySalary || 15000,
@@ -142,7 +147,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                     max: "500000",
                     className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 }),
-                React.createElement('p', { 
+                createElement('p', { 
                     key: 'salary-help',
                     className: "mt-2 text-sm text-blue-600" 
                 }, t.salaryInfo)
@@ -150,27 +155,27 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
         ]),
 
         // Partner Salaries (if couple)
-        inputs.planningType === 'couple' && React.createElement('div', { key: 'partner-salaries-section' }, [
-            React.createElement('h3', { 
+        inputs.planningType === 'couple' && createElement('div', { key: 'partner-salaries-section' }, [
+            createElement('h3', { 
                 key: 'partner-salaries-title',
                 className: "text-xl font-semibold text-gray-700 mb-4 flex items-center" 
             }, [
-                React.createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💰'),
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💰'),
                 t.partnerSalaries
             ]),
-            React.createElement('div', { 
+            createElement('div', { 
                 key: 'partner-salaries-grid',
                 className: "grid grid-cols-1 md:grid-cols-2 gap-6" 
             }, [
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'partner1-salary',
                     className: "bg-blue-50 rounded-xl p-6 border border-blue-200" 
                 }, [
-                    React.createElement('label', { 
+                    createElement('label', { 
                         key: 'partner1-salary-label',
                         className: "block text-lg font-medium text-gray-700 mb-2" 
                     }, `${inputs.partner1Name || t.partner1Salary} (${currencySymbol})`),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'partner1-salary-input',
                         type: 'number',
                         value: inputs.partner1Salary || 0,
@@ -178,15 +183,15 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     })
                 ]),
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'partner2-salary',
                     className: "bg-blue-50 rounded-xl p-6 border border-blue-200" 
                 }, [
-                    React.createElement('label', { 
+                    createElement('label', { 
                         key: 'partner2-salary-label',
                         className: "block text-lg font-medium text-gray-700 mb-2" 
                     }, `${inputs.partner2Name || t.partner2Salary} (${currencySymbol})`),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'partner2-salary-input',
                         type: 'number',
                         value: inputs.partner2Salary || 0,
@@ -198,25 +203,25 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
         ]),
 
         // Additional Income Sources
-        React.createElement('div', { key: 'additional-income-section' }, [
-            React.createElement('h3', { 
+        createElement('div', { key: 'additional-income-section' }, [
+            createElement('h3', { 
                 key: 'additional-income-title',
                 className: "text-xl font-semibold text-gray-700 mb-4 flex items-center" 
             }, [
-                React.createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '📈'),
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '📈'),
                 t.additionalIncome,
-                React.createElement('span', { key: 'optional', className: "ml-2 text-sm text-gray-500 font-normal" }, `(${t.optional})`)
+                createElement('span', { key: 'optional', className: "ml-2 text-sm text-gray-500 font-normal" }, `(${t.optional})`)
             ]),
-            React.createElement('div', { 
+            createElement('div', { 
                 key: 'additional-income-grid',
                 className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
             }, [
-                React.createElement('div', { key: 'freelance-income' }, [
-                    React.createElement('label', { 
+                createElement('div', { key: 'freelance-income' }, [
+                    createElement('label', { 
                         key: 'freelance-label',
                         className: "block text-sm font-medium text-gray-700 mb-2" 
                     }, t.freelanceIncome),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'freelance-input',
                         type: 'number',
                         value: inputs.freelanceIncome || 0,
@@ -224,12 +229,12 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                     })
                 ]),
-                React.createElement('div', { key: 'rental-income' }, [
-                    React.createElement('label', { 
+                createElement('div', { key: 'rental-income' }, [
+                    createElement('label', { 
                         key: 'rental-label',
                         className: "block text-sm font-medium text-gray-700 mb-2" 
                     }, t.rentalIncome),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'rental-input',
                         type: 'number',
                         value: inputs.rentalIncome || 0,
@@ -237,12 +242,12 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                     })
                 ]),
-                React.createElement('div', { key: 'dividend-income' }, [
-                    React.createElement('label', { 
+                createElement('div', { key: 'dividend-income' }, [
+                    createElement('label', { 
                         key: 'dividend-label',
                         className: "block text-sm font-medium text-gray-700 mb-2" 
                     }, t.dividendIncome),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'dividend-input',
                         type: 'number',
                         value: inputs.dividendIncome || 0,
@@ -250,12 +255,12 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                     })
                 ]),
-                React.createElement('div', { key: 'annual-bonus' }, [
-                    React.createElement('label', { 
+                createElement('div', { key: 'annual-bonus' }, [
+                    createElement('label', { 
                         key: 'bonus-label',
                         className: "block text-sm font-medium text-gray-700 mb-2" 
                     }, t.annualBonus),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'bonus-input',
                         type: 'number',
                         value: inputs.annualBonus || 0,
@@ -263,12 +268,12 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                     })
                 ]),
-                React.createElement('div', { key: 'quarterly-rsu' }, [
-                    React.createElement('label', { 
+                createElement('div', { key: 'quarterly-rsu' }, [
+                    createElement('label', { 
                         key: 'rsu-label',
                         className: "block text-sm font-medium text-gray-700 mb-2" 
                     }, t.quarterlyRSU),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'rsu-input',
                         type: 'number',
                         value: inputs.quarterlyRSU || 0,
@@ -276,12 +281,12 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                     })
                 ]),
-                React.createElement('div', { key: 'other-income' }, [
-                    React.createElement('label', { 
+                createElement('div', { key: 'other-income' }, [
+                    createElement('label', { 
                         key: 'other-label',
                         className: "block text-sm font-medium text-gray-700 mb-2" 
                     }, t.otherIncome),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'other-input',
                         type: 'number',
                         value: inputs.otherIncome || 0,
@@ -293,22 +298,22 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
         ]),
 
         // Total Income Summary
-        React.createElement('div', { 
+        createElement('div', { 
             key: 'income-summary',
             className: "bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6 border border-green-200" 
         }, [
-            React.createElement('h3', { 
+            createElement('h3', { 
                 key: 'total-title',
                 className: "text-xl font-semibold text-green-700 mb-4 flex items-center" 
             }, [
-                React.createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💵'),
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💵'),
                 t.totalMonthlyIncome
             ]),
-            React.createElement('div', { 
+            createElement('div', { 
                 key: 'total-amount',
                 className: "text-3xl font-bold text-green-800 mb-2" 
             }, formatCurrency(calculateTotalIncome())),
-            React.createElement('p', { 
+            createElement('p', { 
                 key: 'total-help',
                 className: "text-sm text-green-600" 
             }, t.incomeBreakdown)

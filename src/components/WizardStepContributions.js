@@ -2,6 +2,9 @@
 // Country-specific pension contribution rules and settings
 
 const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCurrency = 'ILS' }) => {
+    // Component uses React.createElement for rendering
+    const createElement = React.createElement;
+    
     // Multi-language content
     const content = {
         he: {
@@ -150,22 +153,23 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
         });
     };
 
-    return React.createElement('div', { className: "space-y-8" }, [
+    // Using React.createElement pattern for component rendering
+    return createElement('div', { className: "space-y-8" }, [
         // Country Selection
-        React.createElement('div', { key: 'country-section' }, [
-            React.createElement('h3', { 
+        createElement('div', { key: 'country-section' }, [
+            createElement('h3', { 
                 key: 'country-title',
                 className: "text-xl font-semibold text-gray-700 mb-4 flex items-center" 
             }, [
-                React.createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '🌍'),
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '🌍'),
                 t.country
             ]),
-            React.createElement('div', { 
+            createElement('div', { 
                 key: 'country-grid',
                 className: "grid grid-cols-2 md:grid-cols-3 gap-4" 
             }, [
                 // Israel
-                React.createElement('button', {
+                createElement('button', {
                     key: 'israel',
                     type: 'button',
                     onClick: () => handleCountryChange('israel'),
@@ -175,13 +179,13 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                             : 'border-gray-200 bg-white hover:border-blue-300'
                     }`
                 }, [
-                    React.createElement('div', { key: 'flag', className: "text-2xl mb-2" }, '🇮🇱'),
-                    React.createElement('div', { key: 'name', className: "font-medium" }, t.israel),
-                    React.createElement('div', { key: 'rate', className: "text-xs text-gray-500" }, '17.5% pension')
+                    createElement('div', { key: 'flag', className: "text-2xl mb-2" }, '🇮🇱'),
+                    createElement('div', { key: 'name', className: "font-medium" }, t.israel),
+                    createElement('div', { key: 'rate', className: "text-xs text-gray-500" }, '17.5% pension')
                 ]),
                 
                 // USA
-                React.createElement('button', {
+                createElement('button', {
                     key: 'usa',
                     type: 'button',
                     onClick: () => handleCountryChange('usa'),
@@ -191,13 +195,13 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                             : 'border-gray-200 bg-white hover:border-blue-300'
                     }`
                 }, [
-                    React.createElement('div', { key: 'flag', className: "text-2xl mb-2" }, '🇺🇸'),
-                    React.createElement('div', { key: 'name', className: "font-medium" }, t.usa),
-                    React.createElement('div', { key: 'rate', className: "text-xs text-gray-500" }, '12% 401k')
+                    createElement('div', { key: 'flag', className: "text-2xl mb-2" }, '🇺🇸'),
+                    createElement('div', { key: 'name', className: "font-medium" }, t.usa),
+                    createElement('div', { key: 'rate', className: "text-xs text-gray-500" }, '12% 401k')
                 ]),
                 
                 // UK
-                React.createElement('button', {
+                createElement('button', {
                     key: 'uk',
                     type: 'button',
                     onClick: () => handleCountryChange('uk'),
@@ -207,45 +211,45 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                             : 'border-gray-200 bg-white hover:border-blue-300'
                     }`
                 }, [
-                    React.createElement('div', { key: 'flag', className: "text-2xl mb-2" }, '🇬🇧'),
-                    React.createElement('div', { key: 'name', className: "font-medium" }, t.uk),
-                    React.createElement('div', { key: 'rate', className: "text-xs text-gray-500" }, '8% auto-enroll')
+                    createElement('div', { key: 'flag', className: "text-2xl mb-2" }, '🇬🇧'),
+                    createElement('div', { key: 'name', className: "font-medium" }, t.uk),
+                    createElement('div', { key: 'rate', className: "text-xs text-gray-500" }, '8% auto-enroll')
                 ]),
                 
                 // Other countries (coming soon)
-                React.createElement('div', {
+                createElement('div', {
                     key: 'others',
                     className: "col-span-2 md:col-span-3 p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 text-center"
                 }, [
-                    React.createElement('div', { key: 'flags', className: "text-xl mb-2" }, '🇫🇷 🇩🇪 🇦🇺'),
-                    React.createElement('div', { key: 'text', className: "text-gray-600" }, t.comingSoon)
+                    createElement('div', { key: 'flags', className: "text-xl mb-2" }, '🇫🇷 🇩🇪 🇦🇺'),
+                    createElement('div', { key: 'text', className: "text-gray-600" }, t.comingSoon)
                 ])
             ])
         ]),
 
         // Contribution Rates
-        React.createElement('div', { key: 'rates-section' }, [
-            React.createElement('h3', { 
+        createElement('div', { key: 'rates-section' }, [
+            createElement('h3', { 
                 key: 'rates-title',
                 className: "text-xl font-semibold text-gray-700 mb-4 flex items-center" 
             }, [
-                React.createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💰'),
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💰'),
                 t.contributionSettings
             ]),
-            React.createElement('div', { 
+            createElement('div', { 
                 key: 'rates-grid',
                 className: "grid grid-cols-1 md:grid-cols-2 gap-6" 
             }, [
                 // Employee Pension Contribution
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'employee-contribution',
                     className: "bg-blue-50 rounded-xl p-6 border border-blue-200" 
                 }, [
-                    React.createElement('label', { 
+                    createElement('label', { 
                         key: 'employee-label',
                         className: "block text-lg font-medium text-gray-700 mb-2" 
                     }, t.employeeContribution),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'employee-input',
                         type: 'number',
                         step: '0.1',
@@ -253,22 +257,22 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         onChange: (e) => setInputs({...inputs, employeePensionRate: parseFloat(e.target.value) || 0}),
                         className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     }),
-                    React.createElement('p', { 
+                    createElement('p', { 
                         key: 'employee-help',
                         className: "mt-2 text-sm text-blue-600" 
                     }, `${t.defaultRates}: ${defaultRates.employee}%`)
                 ]),
                 
                 // Employer Matching
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'employer-matching',
                     className: "bg-green-50 rounded-xl p-6 border border-green-200" 
                 }, [
-                    React.createElement('label', { 
+                    createElement('label', { 
                         key: 'employer-label',
                         className: "block text-lg font-medium text-gray-700 mb-2" 
                     }, t.employerMatching),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'employer-input',
                         type: 'number',
                         step: '0.1',
@@ -276,22 +280,22 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         onChange: (e) => setInputs({...inputs, employerPensionRate: parseFloat(e.target.value) || 0}),
                         className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     }),
-                    React.createElement('p', { 
+                    createElement('p', { 
                         key: 'employer-help',
                         className: "mt-2 text-sm text-green-600" 
                     }, `${t.defaultRates}: ${defaultRates.employer}%`)
                 ]),
                 
                 // Training Fund Contribution
-                selectedCountry === 'israel' && React.createElement('div', { 
+                selectedCountry === 'israel' && createElement('div', { 
                     key: 'training-fund-contribution',
                     className: "bg-green-50 rounded-xl p-6 border border-green-200" 
                 }, [
-                    React.createElement('label', { 
+                    createElement('label', { 
                         key: 'training-fund-label',
                         className: "block text-lg font-medium text-gray-700 mb-2" 
                     }, t.trainingFundRate),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'training-fund-input',
                         type: 'number',
                         step: '0.1',
@@ -299,7 +303,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         onChange: (e) => setInputs({...inputs, trainingFundContributionRate: parseFloat(e.target.value) || 0}),
                         className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     }),
-                    React.createElement('p', { 
+                    createElement('p', { 
                         key: 'training-fund-help',
                         className: "mt-2 text-sm text-green-600" 
                     }, `${t.defaultRates}: ${defaultRates.trainingFund}%`)
@@ -308,50 +312,50 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
         ]),
 
         // Training Fund Limits (Israel only)
-        selectedCountry === 'israel' && React.createElement('div', { key: 'training-fund-limits-section' }, [
-            React.createElement('h3', { 
+        selectedCountry === 'israel' && createElement('div', { key: 'training-fund-limits-section' }, [
+            createElement('h3', { 
                 key: 'training-fund-limits-title',
                 className: "text-xl font-semibold text-gray-700 mb-4 flex items-center" 
             }, [
-                React.createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '📊'),
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '📊'),
                 t.trainingFundLimits
             ]),
-            React.createElement('div', { 
+            createElement('div', { 
                 key: 'training-fund-limits-grid',
                 className: "grid grid-cols-1 md:grid-cols-3 gap-6" 
             }, [
                 // Salary Threshold
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'salary-threshold',
                     className: "bg-yellow-50 rounded-xl p-6 border border-yellow-200" 
                 }, [
-                    React.createElement('label', { 
+                    createElement('label', { 
                         key: 'threshold-label',
                         className: "block text-lg font-medium text-gray-700 mb-2" 
                     }, t.salaryThreshold),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'threshold-input',
                         type: 'number',
                         value: inputs.trainingFundThreshold || defaultRates.trainingFundThreshold,
                         onChange: (e) => setInputs({...inputs, trainingFundThreshold: parseInt(e.target.value) || 0}),
                         className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
                     }),
-                    React.createElement('p', { 
+                    createElement('p', { 
                         key: 'threshold-help',
                         className: "mt-2 text-sm text-yellow-600" 
                     }, `${language === 'he' ? 'ברירת מחדל' : 'Default'}: ₪${defaultRates.trainingFundThreshold?.toLocaleString()}`)
                 ]),
                 
                 // Below Threshold Rate
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'below-threshold-rate',
                     className: "bg-green-50 rounded-xl p-6 border border-green-200" 
                 }, [
-                    React.createElement('label', { 
+                    createElement('label', { 
                         key: 'below-label',
                         className: "block text-lg font-medium text-gray-700 mb-2" 
                     }, t.belowThreshold),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'below-input',
                         type: 'number',
                         step: '0.1',
@@ -359,22 +363,22 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         onChange: (e) => setInputs({...inputs, trainingFundBelowThreshold: parseFloat(e.target.value) || 0}),
                         className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     }),
-                    React.createElement('p', { 
+                    createElement('p', { 
                         key: 'below-help',
                         className: "mt-2 text-sm text-green-600" 
                     }, `${language === 'he' ? 'ברירת מחדל' : 'Default'}: ${defaultRates.trainingFundBelowThreshold}%`)
                 ]),
                 
                 // Above Threshold Rate
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'above-threshold-rate',
                     className: "bg-orange-50 rounded-xl p-6 border border-orange-200" 
                 }, [
-                    React.createElement('label', { 
+                    createElement('label', { 
                         key: 'above-label',
                         className: "block text-lg font-medium text-gray-700 mb-2" 
                     }, t.aboveThreshold),
-                    React.createElement('input', {
+                    createElement('input', {
                         key: 'above-input',
                         type: 'number',
                         step: '0.1',
@@ -382,7 +386,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         onChange: (e) => setInputs({...inputs, trainingFundAboveThreshold: parseFloat(e.target.value) || 0}),
                         className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                     }),
-                    React.createElement('p', { 
+                    createElement('p', { 
                         key: 'above-help',
                         className: "mt-2 text-sm text-orange-600" 
                     }, `${language === 'he' ? 'ברירת מחדל' : 'Default'}: ${defaultRates.trainingFundAboveThreshold}%`)
@@ -390,48 +394,48 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
             ]),
             
             // Current Salary Status Display
-            (inputs.currentMonthlySalary || inputs.partner1Salary || inputs.partner2Salary) && React.createElement('div', { 
+            (inputs.currentMonthlySalary || inputs.partner1Salary || inputs.partner2Salary) && createElement('div', { 
                 key: 'salary-status',
                 className: "mt-6 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-6 border border-blue-200" 
             }, [
-                React.createElement('h4', { 
+                createElement('h4', { 
                     key: 'status-title',
                     className: "text-lg font-semibold text-blue-700 mb-4" 
                 }, t.currentSalaryStatus),
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'salary-status-grid',
                     className: "space-y-3" 
                 }, [
                     // Main salary status
-                    inputs.currentMonthlySalary && React.createElement('div', { 
+                    inputs.currentMonthlySalary && createElement('div', { 
                         key: 'main-salary-status',
                         className: "flex justify-between items-center p-3 bg-white rounded-lg" 
                     }, [
-                        React.createElement('span', { key: 'main-label', className: "font-medium" }, 
+                        createElement('span', { key: 'main-label', className: "font-medium" }, 
                             language === 'he' ? 'משכורת עיקרית' : 'Main Salary'),
-                        React.createElement('span', { key: 'main-status', className: "text-blue-600" }, 
+                        createElement('span', { key: 'main-status', className: "text-blue-600" }, 
                             getSalaryStatus(inputs.currentMonthlySalary))
                     ]),
                     
                     // Partner 1 salary status
-                    inputs.planningType === 'couple' && inputs.partner1Salary && React.createElement('div', { 
+                    inputs.planningType === 'couple' && inputs.partner1Salary && createElement('div', { 
                         key: 'partner1-salary-status',
                         className: "flex justify-between items-center p-3 bg-white rounded-lg" 
                     }, [
-                        React.createElement('span', { key: 'partner1-label', className: "font-medium" }, 
+                        createElement('span', { key: 'partner1-label', className: "font-medium" }, 
                             inputs.partner1Name || (language === 'he' ? 'בן/בת זוג 1' : 'Partner 1')),
-                        React.createElement('span', { key: 'partner1-status', className: "text-pink-600" }, 
+                        createElement('span', { key: 'partner1-status', className: "text-pink-600" }, 
                             getSalaryStatus(inputs.partner1Salary))
                     ]),
                     
                     // Partner 2 salary status
-                    inputs.planningType === 'couple' && inputs.partner2Salary && React.createElement('div', { 
+                    inputs.planningType === 'couple' && inputs.partner2Salary && createElement('div', { 
                         key: 'partner2-salary-status',
                         className: "flex justify-between items-center p-3 bg-white rounded-lg" 
                     }, [
-                        React.createElement('span', { key: 'partner2-label', className: "font-medium" }, 
+                        createElement('span', { key: 'partner2-label', className: "font-medium" }, 
                             inputs.partner2Name || (language === 'he' ? 'בן/בת זוג 2' : 'Partner 2')),
-                        React.createElement('span', { key: 'partner2-status', className: "text-purple-600" }, 
+                        createElement('span', { key: 'partner2-status', className: "text-purple-600" }, 
                             getSalaryStatus(inputs.partner2Salary))
                     ])
                 ])
@@ -439,36 +443,36 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
         ]),
 
         // Partner Contributions (if couple)
-        inputs.planningType === 'couple' && React.createElement('div', { key: 'partner-contributions-section' }, [
-            React.createElement('h3', { 
+        inputs.planningType === 'couple' && createElement('div', { key: 'partner-contributions-section' }, [
+            createElement('h3', { 
                 key: 'partner-contributions-title',
                 className: "text-xl font-semibold text-gray-700 mb-4 flex items-center" 
             }, [
-                React.createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '👫'),
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '👫'),
                 t.partnerContributions
             ]),
-            React.createElement('div', { 
+            createElement('div', { 
                 key: 'partner-contributions-grid',
                 className: "grid grid-cols-1 lg:grid-cols-2 gap-8" 
             }, [
                 // Partner 1 Contributions
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'partner1-contributions',
                     className: "bg-pink-50 rounded-xl p-6 border border-pink-200" 
                 }, [
-                    React.createElement('h4', { 
+                    createElement('h4', { 
                         key: 'partner1-title',
                         className: "text-lg font-semibold text-pink-700 mb-4" 
                     }, inputs.partner1Name || t.partner1Contributions),
                     
-                    React.createElement('div', { key: 'partner1-rates', className: "space-y-4" }, [
+                    createElement('div', { key: 'partner1-rates', className: "space-y-4" }, [
                         // Partner 1 Employee Rate
-                        React.createElement('div', { key: 'partner1-employee' }, [
-                            React.createElement('label', { 
+                        createElement('div', { key: 'partner1-employee' }, [
+                            createElement('label', { 
                                 key: 'partner1-employee-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, t.employeeContribution),
-                            React.createElement('input', {
+                            createElement('input', {
                                 key: 'partner1-employee-input',
                                 type: 'number',
                                 step: '0.1',
@@ -479,12 +483,12 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         ]),
                         
                         // Partner 1 Employer Matching
-                        React.createElement('div', { key: 'partner1-employer' }, [
-                            React.createElement('label', { 
+                        createElement('div', { key: 'partner1-employer' }, [
+                            createElement('label', { 
                                 key: 'partner1-employer-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, t.employerMatching),
-                            React.createElement('input', {
+                            createElement('input', {
                                 key: 'partner1-employer-input',
                                 type: 'number',
                                 step: '0.1',
@@ -495,12 +499,12 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         ]),
                         
                         // Partner 1 Training Fund (if Israel)
-                        selectedCountry === 'israel' && React.createElement('div', { key: 'partner1-training' }, [
-                            React.createElement('label', { 
+                        selectedCountry === 'israel' && createElement('div', { key: 'partner1-training' }, [
+                            createElement('label', { 
                                 key: 'partner1-training-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, t.trainingFundRate),
-                            React.createElement('input', {
+                            createElement('input', {
                                 key: 'partner1-training-input',
                                 type: 'number',
                                 step: '0.1',
@@ -513,23 +517,23 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                 ]),
                 
                 // Partner 2 Contributions
-                React.createElement('div', { 
+                createElement('div', { 
                     key: 'partner2-contributions',
                     className: "bg-purple-50 rounded-xl p-6 border border-purple-200" 
                 }, [
-                    React.createElement('h4', { 
+                    createElement('h4', { 
                         key: 'partner2-title',
                         className: "text-lg font-semibold text-purple-700 mb-4" 
                     }, inputs.partner2Name || t.partner2Contributions),
                     
-                    React.createElement('div', { key: 'partner2-rates', className: "space-y-4" }, [
+                    createElement('div', { key: 'partner2-rates', className: "space-y-4" }, [
                         // Partner 2 Employee Rate
-                        React.createElement('div', { key: 'partner2-employee' }, [
-                            React.createElement('label', { 
+                        createElement('div', { key: 'partner2-employee' }, [
+                            createElement('label', { 
                                 key: 'partner2-employee-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, t.employeeContribution),
-                            React.createElement('input', {
+                            createElement('input', {
                                 key: 'partner2-employee-input',
                                 type: 'number',
                                 step: '0.1',
@@ -540,12 +544,12 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         ]),
                         
                         // Partner 2 Employer Matching
-                        React.createElement('div', { key: 'partner2-employer' }, [
-                            React.createElement('label', { 
+                        createElement('div', { key: 'partner2-employer' }, [
+                            createElement('label', { 
                                 key: 'partner2-employer-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, t.employerMatching),
-                            React.createElement('input', {
+                            createElement('input', {
                                 key: 'partner2-employer-input',
                                 type: 'number',
                                 step: '0.1',
@@ -556,12 +560,12 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         ]),
                         
                         // Partner 2 Training Fund (if Israel)
-                        selectedCountry === 'israel' && React.createElement('div', { key: 'partner2-training' }, [
-                            React.createElement('label', { 
+                        selectedCountry === 'israel' && createElement('div', { key: 'partner2-training' }, [
+                            createElement('label', { 
                                 key: 'partner2-training-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
                             }, t.trainingFundRate),
-                            React.createElement('input', {
+                            createElement('input', {
                                 key: 'partner2-training-input',
                                 type: 'number',
                                 step: '0.1',
@@ -576,19 +580,19 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
         ]),
 
         // Info Panel
-        React.createElement('div', { 
+        createElement('div', { 
             key: 'info-panel',
             className: "bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200" 
         }, [
-            React.createElement('div', { 
+            createElement('div', { 
                 key: 'info-icon',
                 className: "text-2xl mb-2" 
             }, 'ℹ️'),
-            React.createElement('h4', { 
+            createElement('h4', { 
                 key: 'info-title',
                 className: "text-lg font-semibold text-blue-700 mb-2" 
             }, language === 'he' ? 'מידע על הפקדות' : 'Contribution Information'),
-            React.createElement('p', { 
+            createElement('p', { 
                 key: 'info-text',
                 className: "text-blue-600 text-sm" 
             }, language === 'he' ? 

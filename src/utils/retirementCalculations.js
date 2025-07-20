@@ -329,8 +329,8 @@ window.calculateRetirement = (
     const futureMonthlyExpenses = baseExpenses * Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement);
     const remainingAfterExpenses = totalNetIncome - futureMonthlyExpenses;
 
-    const currentSalary = workPeriods.length > 0 ? workPeriods[workPeriods.length - 1].salary : 0;
-    const targetMonthlyIncome = (currentSalary * inputs.targetReplacement) / 100;
+    const finalSalary = workPeriods.length > 0 ? workPeriods[workPeriods.length - 1].salary : 0;
+    const targetMonthlyIncome = (finalSalary * inputs.targetReplacement) / 100;
     const achievesTarget = totalNetIncome >= targetMonthlyIncome;
 
     return {
