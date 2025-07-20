@@ -118,6 +118,8 @@
     <script src="src/components/HelpTooltip.js?v={{VERSION}}"></script>
     <script src="src/components/ReadinessScore.js?v={{VERSION}}"></script>
     <script src="src/components/BasicInputs.js?v={{VERSION}}"></script>
+    <script src="src/components/RetirementAdvancedForm.js?v={{VERSION}}"></script>
+    <script src="src/components/RetirementResultsPanel.js?v={{VERSION}}"></script>
     
     <!-- Dashboard Components (lazy-loaded as needed) -->
     <script src="src/components/SavingsSummaryPanel.js?v={{VERSION}}"></script>
@@ -186,7 +188,11 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', async () => {
                 try {
-                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    // Determine correct service worker path based on deployment
+                    const isGitHubPages = window.location.hostname === 'ypollak2.github.io';
+                    const swPath = isGitHubPages ? '/advanced-retirement-planner/sw.js' : '/sw.js';
+                    
+                    const registration = await navigator.serviceWorker.register(swPath);
                     console.log('📦 Service Worker registered successfully:', registration.scope);
                     
                     // Listen for updates

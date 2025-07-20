@@ -22,6 +22,7 @@ const COMPONENT_PATHS = {
     
     // Dashboard Components (loaded on demand)
     'SummaryPanel': '/src/components/SummaryPanel.js',
+    'SavingsSummaryPanel': '/src/components/SavingsSummaryPanel.js',
     'PermanentSidePanel': '/src/components/PermanentSidePanel.js',
     'DynamicPartnerCharts': '/src/components/DynamicPartnerCharts.js',
     'ExportControls': '/src/components/ExportControls.js',
