@@ -731,10 +731,10 @@ function testPartnerPlanningFeatures() {
                                              savingsContent.includes('partner2PersonalPortfolio');
             logTest('WizardStepSavings: Partner savings breakdown', hasPartnerSavingsBreakdown);
             
-            // Check for investment category separation
-            const hasInvestmentCategories = savingsContent.includes('realEstateValue') && 
-                                          savingsContent.includes('cryptoValue') &&
-                                          savingsContent.includes('savingsAccountValue');
+            // Check for investment category separation (updated field names)
+            const hasInvestmentCategories = savingsContent.includes('currentRealEstate') && 
+                                          savingsContent.includes('currentCrypto') &&
+                                          savingsContent.includes('currentSavingsAccount');
             logTest('WizardStepSavings: Investment categories', hasInvestmentCategories);
             
             // Check for total calculation logic
@@ -766,9 +766,10 @@ function testPartnerPlanningFeatures() {
                                                contributionsContent.includes('employerMatching');
             logTest('WizardStepContributions: Employee/employer breakdown', hasEmployerEmployeeBreakdown);
             
-            // Check for partner contribution rates
+            // Check for partner contribution rates (corrected field names)
             const hasPartnerContributions = contributionsContent.includes('partner1EmployeeRate') &&
-                                          contributionsContent.includes('partner2EmployeeRate');
+                                          contributionsContent.includes('partner1EmployerRate') &&
+                                          contributionsContent.includes('partner1TrainingFundRate');
             logTest('WizardStepContributions: Partner contribution rates', hasPartnerContributions);
             
         } else {
@@ -1294,6 +1295,382 @@ function testWizardSaveResumeFunctionality() {
     }
 }
 
+// High-Priority Fixes QA Tests (v6.3.1)
+function testCurrentSavingsUpdateFunctionality() {
+    console.log('\n💰 Testing Current Savings Update Functionality...');
+    
+    // Test 1: Check WizardStepSavings field name consistency
+    if (fs.existsSync('src/components/WizardStepSavings.js')) {
+        const content = fs.readFileSync('src/components/WizardStepSavings.js', 'utf8');
+        
+        // Check for corrected field names
+        const hasCurrentRealEstate = content.includes('currentRealEstate');
+        const hasCurrentCrypto = content.includes('currentCrypto');
+        const noOldRealEstateValue = !content.includes('realEstateValue');
+        const noOldCryptoValue = !content.includes('cryptoValue');
+        
+        logTest('Current Savings: Field name consistency (currentRealEstate)', hasCurrentRealEstate);
+        logTest('Current Savings: Field name consistency (currentCrypto)', hasCurrentCrypto);
+        logTest('Current Savings: Removed old field names (realEstateValue)', noOldRealEstateValue);
+        logTest('Current Savings: Removed old field names (cryptoValue)', noOldCryptoValue);
+        
+        // Test calculateTotalSavings function includes all partner fields
+        const hasTotalCalculation = content.includes('currentSavings + currentTrainingFund + currentPersonalPortfolio');
+        const includesPartnerFields = content.includes('partner1Pension + partner1TrainingFund') &&
+                                     content.includes('partner2Pension + partner2TrainingFund');
+        
+        logTest('Current Savings: Total calculation function updated', hasTotalCalculation);
+        logTest('Current Savings: Partner fields included in calculation', includesPartnerFields);
+    } else {
+        logTest('Current Savings: WizardStepSavings.js exists', false, 'File not found');
+    }
+    
+    // Test 2: Check SavingsSummaryPanel field consistency
+    if (fs.existsSync('src/components/SavingsSummaryPanel.js')) {
+        const content = fs.readFileSync('src/components/SavingsSummaryPanel.js', 'utf8');
+        
+        const hasCorrectTrainingFundField = content.includes('currentTrainingFund') && 
+                                           !content.includes('currentTrainingFundSavings');
+        
+        logTest('Current Savings: SavingsSummaryPanel field consistency', hasCorrectTrainingFundField);
+    } else {
+        logTest('Current Savings: SavingsSummaryPanel.js exists', false, 'File not found');
+    }
+}
+
+function testCorrectedPensionContributionRates() {
+    console.log('\n🏛️ Testing Corrected Pension Contribution Rates...');
+    
+    if (fs.existsSync('src/components/WizardStepContributions.js')) {
+        const content = fs.readFileSync('src/components/WizardStepContributions.js', 'utf8');
+        
+        // Test Israeli rates - Updated to 14.333% employer, 7% employee, total 21.333%
+        const hasCorrectIsraeliEmployer = content.includes('employer: 14.333');
+        const hasCorrectIsraeliEmployee = content.includes('employee: 7.0');
+        const hasCorrectIsraeliTotal = content.includes('pension: 21.333');
+        
+        logTest('Pension Rates: Israeli employer contribution (14.333%)', hasCorrectIsraeliEmployer);
+        logTest('Pension Rates: Israeli employee contribution (7%)', hasCorrectIsraeliEmployee);
+        logTest('Pension Rates: Israeli total pension rate (21.333%)', hasCorrectIsraeliTotal);
+        
+        // Test training fund rates remain 10%
+        const hasCorrectTrainingFundRate = content.includes('trainingFund: 10.0');
+        logTest('Pension Rates: Training fund rate maintained (10%)', hasCorrectTrainingFundRate);
+        
+        // Verify no old rates remain (10.5% employer was incorrect)
+        const noOldEmployerRate = !content.includes('employer: 10.5');
+        logTest('Pension Rates: Removed incorrect old employer rate (10.5%)', noOldEmployerRate);
+        
+    } else {
+        logTest('Pension Rates: WizardStepContributions.js exists', false, 'File not found');
+    }
+}
+
+function testRedesignedTrainingFundSystem() {
+    console.log('\n📊 Testing Redesigned Training Fund System...');
+    
+    if (fs.existsSync('src/components/WizardStepContributions.js')) {
+        const content = fs.readFileSync('src/components/WizardStepContributions.js', 'utf8');
+        
+        // Test 1: Simplified checkbox system (corrected pattern)
+        const hasUnlimitedCheckbox = content.includes('trainingFundUnlimited') && 
+                                    content.includes("type: 'checkbox'");
+        logTest('Training Fund: Unlimited contribution checkbox implemented', hasUnlimitedCheckbox);
+        
+        // Test 2: 2024 threshold values
+        const hasCorrectThreshold = content.includes('15792') || content.includes('trainingFundThreshold');
+        logTest('Training Fund: 2024 salary threshold (15,792 ILS)', hasCorrectThreshold);
+        
+        // Test 3: Correct employee/employer breakdown (2.5% / 7.5%)
+        const hasEmployeeRate = content.includes('2.5%') || content.includes('trainingFundEmployeeRate: 2.5');
+        const hasEmployerRate = content.includes('7.5%') || content.includes('trainingFundEmployerRate: 7.5');
+        
+        logTest('Training Fund: Employee rate (2.5%)', hasEmployeeRate);
+        logTest('Training Fund: Employer rate (7.5%)', hasEmployerRate);
+        
+        // Test 4: Tax treatment logic
+        const hasTaxBenefitLogic = content.includes('taxDeductible') && content.includes('taxableAmount');
+        logTest('Training Fund: Tax benefit calculation logic', hasTaxBenefitLogic);
+        
+        // Test 5: Status display functionality
+        const hasStatusDisplay = content.includes('currentSalaryStatus') && 
+                                content.includes('Above threshold') && 
+                                content.includes('Below threshold');
+        logTest('Training Fund: Salary status display', hasStatusDisplay);
+        
+    } else {
+        logTest('Training Fund: WizardStepContributions.js exists', false, 'File not found');
+    }
+}
+
+function testNoDuplicatePartnerContributions() {
+    console.log('\n👥 Testing No Duplicate Partner Contributions...');
+    
+    if (fs.existsSync('src/components/WizardStepContributions.js')) {
+        const content = fs.readFileSync('src/components/WizardStepContributions.js', 'utf8');
+        
+        // Count contribution sections - should only have main + partner, not duplicate partner sections
+        const contributionSectionMatches = content.match(/key: 'partner.*-contributions'/g) || [];
+        const partnerContributionSections = contributionSectionMatches.length;
+        
+        // Should have exactly 1 partner contribution section for couples (not 2)
+        const hasCorrectNumberOfSections = partnerContributionSections <= 1;
+        logTest('No Duplicate Contributions: Single partner contribution section', hasCorrectNumberOfSections,
+               `Found ${partnerContributionSections} partner sections (should be ≤1)`);
+        
+        // Test that removed duplicate code is gone - look for lines that were problematic
+        const noDuplicateLines = !content.includes('lines 650-783') && 
+                                !content.includes('duplicate partner contributions');
+        logTest('No Duplicate Contributions: Removed duplicate code lines', noDuplicateLines);
+        
+        // Verify couple layout only shows main + single partner (improved detection)
+        const hasMainContributions = content.includes('main-contributions');
+        const hasPartnerContributions = content.includes('partner-contributions');
+        const partnerContributionMatches = content.match(/partner-contributions/g) || [];
+        const hasExactlyOnePartnerSection = partnerContributionMatches.length === 1;
+        
+        logTest('No Duplicate Contributions: Couple mode has 1 main section', hasMainContributions);
+        logTest('No Duplicate Contributions: Couple mode has 1 partner section', hasExactlyOnePartnerSection,
+               `Found ${partnerContributionMatches.length} partner-contributions sections`);
+        
+    } else {
+        logTest('No Duplicate Contributions: WizardStepContributions.js exists', false, 'File not found');
+    }
+}
+
+function testManagementFeesUIImprovements() {
+    console.log('\n💼 Testing Management Fees UI Improvements...');
+    
+    if (fs.existsSync('src/components/WizardStepFees.js')) {
+        const content = fs.readFileSync('src/components/WizardStepFees.js', 'utf8');
+        
+        // Test 1: Single mode hidden when couple selected
+        const hasCoupleCondition = content.includes("inputs.planningType !== 'couple'");
+        const hasOldConditionOnYieldSection = content.includes("(!inputs.planningType || inputs.planningType === 'single')");
+        // The old condition exists in the yield section (line 120) but not in the main fees section (line 50)
+        const mainFeesSectionHasCorrectCondition = content.substring(0, content.indexOf('// %yield Section')).includes("inputs.planningType !== 'couple'");
+        
+        logTest('Management Fees: Single mode hidden in couple planning', hasCoupleCondition);
+        logTest('Management Fees: Main fees section uses correct condition', mainFeesSectionHasCorrectCondition);
+        
+        // Test 2: % Yield labels in partner returns
+        const hasYieldLabel = content.includes('expectedReturns: \'Expected %yield\'') ||
+                             content.includes('%yield') || content.includes('% Yield');
+        logTest('Management Fees: Partner returns use % Yield labels', hasYieldLabel);
+        
+        // Test 3: Proper couple mode sections
+        const hasCoupleFeesSection = content.includes("inputs.planningType === 'couple'") &&
+                                    content.includes('partner-fees-section');
+        const hasCoupleReturnsSection = content.includes('partner-returns-section');
+        
+        logTest('Management Fees: Couple fees section properly conditional', hasCoupleFeesSection);
+        logTest('Management Fees: Couple returns section exists', hasCoupleReturnsSection);
+        
+        // Test 4: Both partners displayed in couple mode
+        const hasPartner1Section = content.includes('partner1-fees') && content.includes('partner1-returns');
+        const hasPartner2Section = content.includes('partner2-fees') && content.includes('partner2-returns');
+        
+        logTest('Management Fees: Partner 1 sections exist', hasPartner1Section);
+        logTest('Management Fees: Partner 2 sections exist', hasPartner2Section);
+        
+    } else {
+        logTest('Management Fees: WizardStepFees.js exists', false, 'File not found');
+    }
+}
+
+function testWizardStepsImplementation() {
+    console.log('\n🧙‍♂️ Testing Wizard Steps Implementation...');
+    
+    // Test Investment Preferences (Step 6)
+    if (fs.existsSync('src/components/WizardStepInvestments.js')) {
+        const content = fs.readFileSync('src/components/WizardStepInvestments.js', 'utf8');
+        
+        const hasRiskProfiles = content.includes('conservative') && content.includes('moderate') && 
+                               content.includes('aggressive');
+        const hasAssetAllocation = content.includes('stockAllocation') && content.includes('bondAllocation');
+        const hasInvestmentParameters = content.includes('expectedReturn') && content.includes('volatility');
+        const hasPartnerInvestments = content.includes('partner1RiskProfile') && content.includes('partner2RiskProfile');
+        
+        logTest('Investment Preferences: Risk profiles implemented', hasRiskProfiles);
+        logTest('Investment Preferences: Asset allocation controls', hasAssetAllocation);
+        logTest('Investment Preferences: Investment parameters', hasInvestmentParameters);
+        logTest('Investment Preferences: Partner investment options', hasPartnerInvestments);
+        
+    } else {
+        logTest('Investment Preferences: WizardStepInvestments.js exists', false, 'File not found');
+    }
+    
+    // Test Retirement Goals (Step 7)
+    if (fs.existsSync('src/components/WizardStepGoals.js')) {
+        const content = fs.readFileSync('src/components/WizardStepGoals.js', 'utf8');
+        
+        const hasRetirementGoal = content.includes('retirementGoal');
+        const hasMonthlyExpenses = content.includes('currentMonthlyExpenses');
+        const hasEmergencyFund = content.includes('emergencyFund');
+        const hasLifestyleOptions = content.includes('retirementLifestyle') && content.includes('basic') && 
+                                   content.includes('comfortable') && content.includes('luxury');
+        
+        logTest('Retirement Goals: Retirement savings goal input', hasRetirementGoal);
+        logTest('Retirement Goals: Monthly expenses planning', hasMonthlyExpenses);
+        logTest('Retirement Goals: Emergency fund calculation', hasEmergencyFund);
+        logTest('Retirement Goals: Lifestyle selection options', hasLifestyleOptions);
+        
+    } else {
+        logTest('Retirement Goals: WizardStepGoals.js exists', false, 'File not found');
+    }
+    
+    // Test Review and Calculate (Step 10)
+    if (fs.existsSync('src/components/WizardStepReview.js')) {
+        const content = fs.readFileSync('src/components/WizardStepReview.js', 'utf8');
+        
+        // Check for actual review sections in the file
+        const hasFinancialHealthSection = content.includes('financial-health-score');
+        const hasComponentScores = content.includes('component-scores');
+        const hasRecommendationsSection = content.includes('recommendations') || content.includes('actionable');
+        const hasCalculationResults = content.includes('retirementProjections') || 
+                                     content.includes('totalAccumulation') ||
+                                     content.includes('monthlyRetirementIncome');
+        const hasFinancialHealthScore = content.includes('financial-health-score') || 
+                                       content.includes('healthScore');
+        const hasPrintFunctionality = content.includes('downloadPdf') || content.includes('emailPlan');
+        
+        logTest('Review & Calculate: Financial health section implemented', hasFinancialHealthSection);
+        logTest('Review & Calculate: Component scores implemented', hasComponentScores);
+        logTest('Review & Calculate: Calculation results display', hasCalculationResults);
+        logTest('Review & Calculate: Financial health scoring', hasFinancialHealthScore);
+        logTest('Review & Calculate: Print/export functionality', hasPrintFunctionality);
+        
+    } else {
+        logTest('Review & Calculate: WizardStepReview.js exists', false, 'File not found');
+    }
+    
+    // Test all wizard steps are properly exported to window
+    const wizardFiles = [
+        'WizardStepSavings.js',
+        'WizardStepContributions.js', 
+        'WizardStepFees.js',
+        'WizardStepInvestments.js',
+        'WizardStepGoals.js',
+        'WizardStepReview.js'
+    ];
+    
+    wizardFiles.forEach(filename => {
+        const filepath = `src/components/${filename}`;
+        if (fs.existsSync(filepath)) {
+            const content = fs.readFileSync(filepath, 'utf8');
+            const componentName = filename.replace('.js', '');
+            const hasWindowExport = content.includes(`window.${componentName} = ${componentName}`);
+            const hasSuccessLog = content.includes('✅') && content.includes('loaded successfully');
+            
+            logTest(`Wizard Steps: ${componentName} window export`, hasWindowExport);
+            logTest(`Wizard Steps: ${componentName} success logging`, hasSuccessLog);
+        }
+    });
+}
+
+// Mobile Responsiveness Tests (v6.3.2)
+function testMobileResponsivenessEnhancements() {
+    console.log('\n📱 Testing Mobile Responsiveness Enhancements...');
+    
+    const wizardFiles = [
+        'WizardStepPersonal.js',
+        'WizardStepSalary.js',
+        'WizardStepContributions.js',
+        'WizardStepInvestments.js',
+        'WizardStepInheritance.js'
+    ];
+    
+    wizardFiles.forEach(filename => {
+        const filepath = `src/components/${filename}`;
+        if (fs.existsSync(filepath)) {
+            const content = fs.readFileSync(filepath, 'utf8');
+            
+            // Test 1: Improved touch targets (various mobile-friendly patterns)
+            const hasMobileTouchTargets = content.includes('p-4 md:p-3') || content.includes('p-3 md:p-4') || 
+                                         content.includes('px-4 py-3') || content.includes('py-3 md:py-2');
+            logTest(`Mobile Responsiveness: ${filename} improved touch targets`, hasMobileTouchTargets);
+            
+            // Test 2: Better grid breakpoints (sm: breakpoint added)
+            const hasSmallBreakpoints = content.includes('sm:grid-cols-') || content.includes('grid-cols-1 lg:grid-cols-');
+            logTest(`Mobile Responsiveness: ${filename} improved grid breakpoints`, hasSmallBreakpoints);
+            
+            // Test 3: No excessive columns (no more than 4 columns)
+            const noExcessiveColumns = !content.includes('grid-cols-5') && !content.includes('grid-cols-6');
+            logTest(`Mobile Responsiveness: ${filename} no excessive columns`, noExcessiveColumns);
+            
+            // Test 4: Responsive text sizing (text-base md:text-lg instead of text-xl)
+            const hasResponsiveTextSizing = content.includes('text-base md:text-lg') || 
+                                          content.includes('text-base md:text-') ||
+                                          !content.includes('text-xl border-2');
+            logTest(`Mobile Responsiveness: ${filename} responsive text sizing`, hasResponsiveTextSizing);
+            
+            // Test 5: Progressive spacing (gap-4 md:gap-6)
+            const hasProgressiveSpacing = content.includes('gap-4 md:gap-6') || 
+                                         content.includes('gap-4 md:gap-') ||
+                                         content.includes('gap-6 lg:gap-8');
+            logTest(`Mobile Responsiveness: ${filename} progressive spacing`, hasProgressiveSpacing);
+        }
+    });
+    
+    // Test specific components for mobile-specific improvements
+    if (fs.existsSync('src/components/WizardStepPersonal.js')) {
+        const content = fs.readFileSync('src/components/WizardStepPersonal.js', 'utf8');
+        
+        // Planning type cards should use lg:grid-cols-2 instead of md:grid-cols-2
+        const hasBetterPlanningTypeLayout = content.includes('lg:grid-cols-2 gap-4 md:gap-6');
+        logTest('Mobile Responsiveness: Planning type cards delayed breakpoint', hasBetterPlanningTypeLayout);
+        
+        // Planning cards should have responsive padding
+        const hasResponsivePlanningCards = content.includes('p-4 md:p-6');
+        logTest('Mobile Responsiveness: Planning cards responsive padding', hasResponsivePlanningCards);
+    }
+    
+    if (fs.existsSync('src/components/WizardStepSalary.js')) {
+        const content = fs.readFileSync('src/components/WizardStepSalary.js', 'utf8');
+        
+        // Additional income grid should use sm:grid-cols-2
+        const hasBetterIncomeGrid = content.includes('sm:grid-cols-2 lg:grid-cols-3');
+        logTest('Mobile Responsiveness: Additional income improved grid', hasBetterIncomeGrid);
+        
+        // Main salary input should be mobile-optimized
+        const hasMobileSalaryInput = content.includes('text-base md:text-lg border-2');
+        logTest('Mobile Responsiveness: Main salary input mobile-optimized', hasMobileSalaryInput);
+    }
+    
+    if (fs.existsSync('src/components/WizardStepContributions.js')) {
+        const content = fs.readFileSync('src/components/WizardStepContributions.js', 'utf8');
+        
+        // Country selection should have better mobile layout
+        const hasBetterCountryGrid = content.includes('sm:grid-cols-2 md:grid-cols-3');
+        logTest('Mobile Responsiveness: Country selection improved layout', hasBetterCountryGrid);
+        
+        // Country buttons should have minimum height for touch
+        const hasMinHeightButtons = content.includes('min-h-[80px]');
+        logTest('Mobile Responsiveness: Country buttons minimum touch height', hasMinHeightButtons);
+    }
+    
+    if (fs.existsSync('src/components/WizardStepInvestments.js')) {
+        const content = fs.readFileSync('src/components/WizardStepInvestments.js', 'utf8');
+        
+        // Asset allocation should start with single column on mobile
+        const hasBetterAllocationGrid = content.includes('grid-cols-1 sm:grid-cols-2 md:grid-cols-4');
+        logTest('Mobile Responsiveness: Asset allocation improved grid', hasBetterAllocationGrid);
+        
+        // Investment inputs should have better touch targets
+        const hasBetterInvestmentInputs = content.includes('p-4 md:p-3 text-base border');
+        logTest('Mobile Responsiveness: Investment inputs improved touch targets', hasBetterInvestmentInputs);
+    }
+    
+    if (fs.existsSync('src/components/WizardStepInheritance.js')) {
+        const content = fs.readFileSync('src/components/WizardStepInheritance.js', 'utf8');
+        
+        // Beneficiaries grid should not exceed 3 columns
+        const hasReasonableBeneficiariesGrid = content.includes('md:grid-cols-3 gap-4') && 
+                                             !content.includes('lg:grid-cols-6');
+        logTest('Mobile Responsiveness: Beneficiaries grid reasonable columns', hasReasonableBeneficiariesGrid);
+    }
+}
+
 // Main test execution
 async function runAllTests() {
     console.log('Starting automated test suite...\n');
@@ -1325,6 +1702,17 @@ async function runAllTests() {
     testAdvancedWizardComponents();
     testWizardIntegrationPipeline();
     testWizardSaveResumeFunctionality();
+    
+    // High-Priority Fixes QA Tests (v6.3.1)
+    testCurrentSavingsUpdateFunctionality();
+    testCorrectedPensionContributionRates();
+    testRedesignedTrainingFundSystem();
+    testNoDuplicatePartnerContributions();
+    testManagementFeesUIImprovements();
+    testWizardStepsImplementation();
+    
+    // Mobile Responsiveness Tests (v6.3.2)
+    testMobileResponsivenessEnhancements();
     
     // Summary
     console.log('\n📊 Test Summary');

@@ -86,12 +86,12 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
             
             React.createElement('div', {
                 key: 'planning-type-options',
-                className: "grid grid-cols-1 md:grid-cols-2 gap-4"
+                className: "grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6"
             }, [
                 // Single Planning Option
                 React.createElement('label', {
                     key: 'single-option',
-                    className: `cursor-pointer border-2 rounded-lg p-6 transition-all duration-200 ${
+                    className: `cursor-pointer border-2 rounded-lg p-4 md:p-6 transition-all duration-200 ${
                         inputs.planningType === 'single' 
                             ? 'border-blue-500 bg-blue-50' 
                             : 'border-gray-300 hover:border-gray-400'
@@ -128,7 +128,7 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                 // Couple Planning Option
                 React.createElement('label', {
                     key: 'couple-option',
-                    className: `cursor-pointer border-2 rounded-lg p-6 transition-all duration-200 ${
+                    className: `cursor-pointer border-2 rounded-lg p-4 md:p-6 transition-all duration-200 ${
                         inputs.planningType === 'couple' 
                             ? 'border-blue-500 bg-blue-50' 
                             : 'border-gray-300 hover:border-gray-400'
@@ -169,7 +169,7 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
             // Couple Mode - Two Columns
             React.createElement('div', {
                 key: 'couple-info',
-                className: "grid grid-cols-1 lg:grid-cols-2 gap-8"
+                className: "grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8"
             }, [
                 // Your Information
                 React.createElement('div', {
@@ -194,7 +194,7 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                             type: 'text',
                             value: inputs.userName || '',
                             onChange: (e) => setInputs(prev => ({ ...prev, userName: e.target.value })),
-                            className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                            className: "w-full px-4 py-3 md:px-3 md:py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
                             placeholder: t.yourName
                         })
                     ]),
@@ -214,7 +214,7 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                             max: '100',
                             value: inputs.currentAge || '',
                             onChange: (e) => setInputs(prev => ({ ...prev, currentAge: parseInt(e.target.value) || '' })),
-                            className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            className: `w-full px-4 py-3 md:px-3 md:py-2 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                                 inputs.currentAge && !isValidAge(inputs.currentAge) ? 'border-red-500' : 'border-gray-300'
                             }`
                         }),
@@ -239,7 +239,7 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                             max: '100',
                             value: inputs.retirementAge || '',
                             onChange: (e) => setInputs(prev => ({ ...prev, retirementAge: parseInt(e.target.value) || '' })),
-                            className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            className: `w-full px-4 py-3 md:px-3 md:py-2 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                                 inputs.retirementAge && !isValidRetirementAge(inputs.retirementAge, inputs.currentAge) ? 'border-red-500' : 'border-gray-300'
                             }`
                         }),
@@ -273,7 +273,7 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                             type: 'text',
                             value: inputs.partnerName || '',
                             onChange: (e) => setInputs(prev => ({ ...prev, partnerName: e.target.value })),
-                            className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500",
+                            className: "w-full px-4 py-3 md:px-3 md:py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500",
                             placeholder: t.partnerName
                         })
                     ]),
@@ -293,7 +293,7 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                             max: '100',
                             value: inputs.partnerAge || '',
                             onChange: (e) => setInputs(prev => ({ ...prev, partnerAge: parseInt(e.target.value) || '' })),
-                            className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                            className: `w-full px-4 py-3 md:px-3 md:py-2 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
                                 inputs.partnerAge && !isValidAge(inputs.partnerAge) ? 'border-red-500' : 'border-gray-300'
                             }`
                         }),
@@ -318,7 +318,7 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                             max: '100',
                             value: inputs.partnerRetirementAge || '',
                             onChange: (e) => setInputs(prev => ({ ...prev, partnerRetirementAge: parseInt(e.target.value) || '' })),
-                            className: `w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                            className: `w-full px-4 py-3 md:px-3 md:py-2 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
                                 inputs.partnerRetirementAge && !isValidRetirementAge(inputs.partnerRetirementAge, inputs.partnerAge) ? 'border-red-500' : 'border-gray-300'
                             }`
                         }),

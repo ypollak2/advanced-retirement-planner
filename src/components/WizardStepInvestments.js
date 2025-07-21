@@ -310,7 +310,7 @@ const WizardStepInvestments = ({ inputs, setInputs, language = 'en', workingCurr
             
             createElement('div', { 
                 key: 'allocation-grid',
-                className: "grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" 
+                className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-6" 
             }, [
                 createElement('div', { key: 'stocks' }, [
                     createElement('label', { 
@@ -324,7 +324,7 @@ const WizardStepInvestments = ({ inputs, setInputs, language = 'en', workingCurr
                         max: '100',
                         value: inputs.stockAllocation || riskProfiles[currentProfile].stocks,
                         onChange: (e) => setInputs({...inputs, stockAllocation: parseFloat(e.target.value) || 0}),
-                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     })
                 ]),
                 createElement('div', { key: 'bonds' }, [
@@ -414,7 +414,7 @@ const WizardStepInvestments = ({ inputs, setInputs, language = 'en', workingCurr
                         step: '0.1',
                         value: inputs.expectedReturn || riskProfiles[currentProfile].expectedReturn,
                         onChange: (e) => setInputs({...inputs, expectedReturn: parseFloat(e.target.value) || 0}),
-                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     })
                 ]),
                 createElement('div', { key: 'inflation-rate' }, [
@@ -480,7 +480,7 @@ const WizardStepInvestments = ({ inputs, setInputs, language = 'en', workingCurr
                                 key: 'partner1-risk-select',
                                 value: inputs.partner1RiskProfile || 'moderate',
                                 onChange: (e) => setInputs({...inputs, partner1RiskProfile: e.target.value}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                             }, [
                                 createElement('option', { key: 'conservative', value: 'conservative' }, t.conservative),
                                 createElement('option', { key: 'moderate', value: 'moderate' }, t.moderate),
@@ -498,7 +498,7 @@ const WizardStepInvestments = ({ inputs, setInputs, language = 'en', workingCurr
                                 step: '0.1',
                                 value: inputs.partner1ExpectedReturn || 7.0,
                                 onChange: (e) => setInputs({...inputs, partner1ExpectedReturn: parseFloat(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                             })
                         ])
                     ])

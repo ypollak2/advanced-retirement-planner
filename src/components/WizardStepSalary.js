@@ -185,7 +185,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                     placeholder: "15000",
                     min: "0",
                     max: "500000",
-                    className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className: "w-full p-3 md:p-4 text-base md:text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 }),
                 createElement('p', { 
                     key: 'salary-help',
@@ -220,7 +220,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         type: 'number',
                         value: inputs.partner1Salary || 0,
                         onChange: (e) => setInputs({...inputs, partner1Salary: parseInt(e.target.value) || 0}),
-                        className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className: "w-full p-3 md:p-4 text-base md:text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     }),
                     createElement('p', { 
                         key: 'partner1-salary-help',
@@ -240,7 +240,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         type: 'number',
                         value: inputs.partner2Salary || 0,
                         onChange: (e) => setInputs({...inputs, partner2Salary: parseInt(e.target.value) || 0}),
-                        className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className: "w-full p-3 md:p-4 text-base md:text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     }),
                     createElement('p', { 
                         key: 'partner2-salary-help',
@@ -262,7 +262,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             ]),
             createElement('div', { 
                 key: 'additional-income-grid',
-                className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
+                className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" 
             }, [
                 createElement('div', { key: 'freelance-income' }, [
                     createElement('label', { 

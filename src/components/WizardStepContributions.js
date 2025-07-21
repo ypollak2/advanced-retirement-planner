@@ -228,14 +228,14 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
             ]),
             createElement('div', { 
                 key: 'country-grid',
-                className: "grid grid-cols-2 md:grid-cols-3 gap-4" 
+                className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6" 
             }, [
                 // Israel
                 createElement('button', {
                     key: 'israel',
                     type: 'button',
                     onClick: () => handleCountryChange('israel'),
-                    className: `p-4 rounded-xl border-2 transition-all text-center ${
+                    className: `p-4 min-h-[80px] rounded-xl border-2 transition-all text-center ${
                         selectedCountry === 'israel' 
                             ? 'border-blue-500 bg-blue-50 text-blue-700' 
                             : 'border-gray-200 bg-white hover:border-blue-300'
@@ -251,7 +251,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                     key: 'usa',
                     type: 'button',
                     onClick: () => handleCountryChange('usa'),
-                    className: `p-4 rounded-xl border-2 transition-all text-center ${
+                    className: `p-4 min-h-[80px] rounded-xl border-2 transition-all text-center ${
                         selectedCountry === 'usa' 
                             ? 'border-blue-500 bg-blue-50 text-blue-700' 
                             : 'border-gray-200 bg-white hover:border-blue-300'
@@ -267,7 +267,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                     key: 'uk',
                     type: 'button',
                     onClick: () => handleCountryChange('uk'),
-                    className: `p-4 rounded-xl border-2 transition-all text-center ${
+                    className: `p-4 min-h-[80px] rounded-xl border-2 transition-all text-center ${
                         selectedCountry === 'uk' 
                             ? 'border-blue-500 bg-blue-50 text-blue-700' 
                             : 'border-gray-200 bg-white hover:border-blue-300'
@@ -319,7 +319,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         step: '0.1',
                         value: inputs.employeePensionRate || defaultRates.employee,
                         onChange: (e) => setInputs({...inputs, employeePensionRate: parseFloat(e.target.value) || 0}),
-                        className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className: "w-full p-3 md:p-4 text-base md:text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     }),
                     createElement('p', { 
                         key: 'employee-help',
@@ -342,7 +342,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         step: '0.1',
                         value: inputs.employerPensionRate || defaultRates.employer,
                         onChange: (e) => setInputs({...inputs, employerPensionRate: parseFloat(e.target.value) || 0}),
-                        className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        className: "w-full p-3 md:p-4 text-base md:text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     }),
                     createElement('p', { 
                         key: 'employer-help',
@@ -365,7 +365,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         step: '0.1',
                         value: inputs.trainingFundContributionRate || defaultRates.trainingFund,
                         onChange: (e) => setInputs({...inputs, trainingFundContributionRate: parseFloat(e.target.value) || 0}),
-                        className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                        className: "w-full p-3 md:p-4 text-base md:text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
                     }),
                     createElement('p', { 
                         key: 'training-fund-help',
@@ -377,7 +377,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
             // Couple Planning Layout
             inputs.planningType === 'couple' && createElement('div', { 
                 key: 'couple-layout',
-                className: "grid grid-cols-1 lg:grid-cols-2 gap-8" 
+                className: "grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8" 
             }, [
                 // Main Person Contributions
                 createElement('div', { 
@@ -400,7 +400,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                                 step: '0.1',
                                 value: inputs.employeePensionRate || defaultRates.employee,
                                 onChange: (e) => setInputs({...inputs, employeePensionRate: parseFloat(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                             }),
                             createElement('p', { 
                                 key: 'main-employee-help',
@@ -418,7 +418,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                                 step: '0.1',
                                 value: inputs.employerPensionRate || defaultRates.employer,
                                 onChange: (e) => setInputs({...inputs, employerPensionRate: parseFloat(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                             }),
                             createElement('p', { 
                                 key: 'main-employer-help',
@@ -436,7 +436,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                                 step: '0.1',
                                 value: inputs.trainingFundContributionRate || defaultRates.trainingFund,
                                 onChange: (e) => setInputs({...inputs, trainingFundContributionRate: parseFloat(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                             }),
                             createElement('p', { 
                                 key: 'main-training-help',
@@ -467,7 +467,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                                 step: '0.1',
                                 value: inputs.partner1EmployeeRate || defaultRates.employee,
                                 onChange: (e) => setInputs({...inputs, partner1EmployeeRate: parseFloat(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                                className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                             }),
                             createElement('p', { 
                                 key: 'partner-employee-help',
@@ -485,7 +485,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                                 step: '0.1',
                                 value: inputs.partner1EmployerRate || defaultRates.employer,
                                 onChange: (e) => setInputs({...inputs, partner1EmployerRate: parseFloat(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                                className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                             }),
                             createElement('p', { 
                                 key: 'partner-employer-help',
@@ -503,7 +503,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                                 step: '0.1',
                                 value: inputs.partner1TrainingFundRate || defaultRates.trainingFund,
                                 onChange: (e) => setInputs({...inputs, partner1TrainingFundRate: parseFloat(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                                className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                             }),
                             createElement('p', { 
                                 key: 'partner-training-help',

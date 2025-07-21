@@ -329,7 +329,7 @@ const WizardStepInheritance = ({ inputs, setInputs, language = 'en', workingCurr
                         // Also set hasWill for compatibility
                         updateInheritanceData('hasWill', e.target.value === 'hasWill', partner);
                     },
-                    className: `w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-${colorScheme}-500 focus:border-${colorScheme}-500`
+                    className: `w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-${colorScheme}-500 focus:border-${colorScheme}-500`
                 }, [
                     createElement('option', { key: 'will-empty', value: '' }, 'Select...'),
                     createElement('option', { key: 'will-has', value: 'hasWill' }, t.hasWill),
@@ -554,7 +554,7 @@ const WizardStepInheritance = ({ inputs, setInputs, language = 'en', workingCurr
             
             createElement('div', {
                 key: 'beneficiaries-grid',
-                className: "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
+                className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6"
             }, [
                 // Children
                 createElement('div', { key: 'children' }, [
@@ -569,7 +569,7 @@ const WizardStepInheritance = ({ inputs, setInputs, language = 'en', workingCurr
                         max: 100,
                         value: inputs.childrenBeneficiaryPercentage || '',
                         onChange: (e) => setInputs({...inputs, childrenBeneficiaryPercentage: e.target.value}),
-                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     })
                 ]),
                 
@@ -586,7 +586,7 @@ const WizardStepInheritance = ({ inputs, setInputs, language = 'en', workingCurr
                         max: 100,
                         value: inputs.spouseBeneficiaryPercentage || '',
                         onChange: (e) => setInputs({...inputs, spouseBeneficiaryPercentage: e.target.value}),
-                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     })
                 ]),
                 
@@ -603,7 +603,7 @@ const WizardStepInheritance = ({ inputs, setInputs, language = 'en', workingCurr
                         max: 100,
                         value: inputs.parentsBeneficiaryPercentage || '',
                         onChange: (e) => setInputs({...inputs, parentsBeneficiaryPercentage: e.target.value}),
-                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     })
                 ]),
                 
@@ -620,7 +620,7 @@ const WizardStepInheritance = ({ inputs, setInputs, language = 'en', workingCurr
                         max: 100,
                         value: inputs.siblingsBeneficiaryPercentage || '',
                         onChange: (e) => setInputs({...inputs, siblingsBeneficiaryPercentage: e.target.value}),
-                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     })
                 ]),
                 
@@ -637,7 +637,7 @@ const WizardStepInheritance = ({ inputs, setInputs, language = 'en', workingCurr
                         max: 100,
                         value: inputs.charityBeneficiaryPercentage || '',
                         onChange: (e) => setInputs({...inputs, charityBeneficiaryPercentage: e.target.value}),
-                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     })
                 ]),
                 
@@ -654,7 +654,7 @@ const WizardStepInheritance = ({ inputs, setInputs, language = 'en', workingCurr
                         max: 100,
                         value: inputs.otherBeneficiaryPercentage || '',
                         onChange: (e) => setInputs({...inputs, otherBeneficiaryPercentage: e.target.value}),
-                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     })
                 ])
             ]),
