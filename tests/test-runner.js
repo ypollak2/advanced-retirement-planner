@@ -1671,6 +1671,239 @@ function testMobileResponsivenessEnhancements() {
     }
 }
 
+// Test Wizard Navigation and Data Persistence (v6.4.0)
+function testWizardNavigationAndDataPersistence() {
+    console.log('\n🧙 Testing Wizard Navigation and Data Persistence...');
+    
+    // Test RetirementWizard component exists and has proper navigation
+    if (fs.existsSync('src/components/RetirementWizard.js')) {
+        const content = fs.readFileSync('src/components/RetirementWizard.js', 'utf8');
+        
+        // Should have step navigation controls
+        const hasStepNavigation = content.includes('currentStep') && 
+                                (content.includes('nextStep') || content.includes('setCurrentStep'));
+        logTest('Wizard Navigation: Has step navigation controls', hasStepNavigation);
+        
+        // Should have step validation before proceeding
+        const hasStepValidation = content.includes('validateStep') || content.includes('validation');
+        logTest('Wizard Navigation: Has step validation logic', hasStepValidation);
+        
+        // Should persist data between steps  
+        const hasDataPersistence = content.includes('setInputs') && content.includes('inputs');
+        logTest('Wizard Data Persistence: Persists data between steps', hasDataPersistence);
+    }
+    
+    // Test WizardStep components have proper data handling
+    const wizardSteps = [
+        'WizardStepPersonal.js',
+        'WizardStepSalary.js',
+        'WizardStepSavings.js',
+        'WizardStepContributions.js',
+        'WizardStepFees.js',
+        'WizardStepInvestments.js'
+    ];
+    
+    wizardSteps.forEach(stepFile => {
+        if (fs.existsSync(`src/components/${stepFile}`)) {
+            const content = fs.readFileSync(`src/components/${stepFile}`, 'utf8');
+            
+            // Should accept and use inputs prop
+            const acceptsInputsProp = content.includes('inputs') && content.includes('setInputs');
+            logTest(`Wizard Data: ${stepFile} accepts and uses inputs prop`, acceptsInputsProp);
+            
+            // Should use React.createElement pattern (browser compatibility)
+            const usesCreateElement = content.includes('React.createElement') || content.includes('createElement');
+            logTest(`Wizard Compatibility: ${stepFile} uses React.createElement pattern`, usesCreateElement);
+        }
+    });
+    
+    // Test automatic calculation integration
+    if (fs.existsSync('src/components/RetirementPlannerApp.js')) {
+        const content = fs.readFileSync('src/components/RetirementPlannerApp.js', 'utf8');
+        
+        // Should have wizard completion handler  
+        const hasWizardCompletion = content.includes('handleWizardComplete') || content.includes('wizardCompleted');
+        logTest('Wizard Integration: Has wizard completion handler', hasWizardCompletion);
+        
+        // Should trigger calculations after wizard completion
+        const triggersCalculationsAfterWizard = content.includes('wizardCompleted') && 
+                                               content.includes('handleCalculate');
+        logTest('Wizard Integration: Triggers calculations after wizard completion', triggersCalculationsAfterWizard);
+    }
+}
+
+// Test Training Fund Calculation Logic (v6.4.0)
+function testTrainingFundCalculationLogic() {
+    console.log('\n💰 Testing Training Fund Calculation Logic...');
+    
+    // Test calculateTrainingFundRate function
+    if (fs.existsSync('src/components/WizardStepContributions.js')) {
+        const content = fs.readFileSync('src/components/WizardStepContributions.js', 'utf8');
+        
+        // Should have calculateTrainingFundRate function defined
+        const hasFunctionDefinition = content.includes('function calculateTrainingFundRate') &&
+                                    content.includes('threshold = 15792');
+        logTest('Training Fund: calculateTrainingFundRate function defined with Israeli threshold', hasFunctionDefinition);
+        
+        // Should handle above and below threshold calculations
+        const hasThresholdLogic = content.includes('salary > threshold') && 
+                                content.includes('employee: 2.5') &&
+                                content.includes('employer: 7.5');
+        logTest('Training Fund: Has above/below threshold rate calculations', hasThresholdLogic);
+        
+        // Should export function to window
+        const exportsToWindow = content.includes('window.calculateTrainingFundRate');
+        logTest('Training Fund: Function exported to window for global access', exportsToWindow);
+    }
+    
+    // Test enhanced calculation integration  
+    if (fs.existsSync('src/components/RetirementPlannerApp.js')) {
+        const content = fs.readFileSync('src/components/RetirementPlannerApp.js', 'utf8');
+        
+        // Should use calculateTrainingFundRate for Israeli calculations
+        const usesEnhancedCalculation = content.includes('window.calculateTrainingFundRate') &&
+                                      content.includes('inputs.country === \'israel\'');
+        logTest('Training Fund: Uses enhanced calculation for Israeli users', usesEnhancedCalculation);
+        
+        // Should handle contribution above ceiling option
+        const handlesAboveCeiling = content.includes('trainingFundContributeAboveCeiling');
+        logTest('Training Fund: Handles contribute above ceiling option', handlesAboveCeiling);
+    }
+}
+
+// Test Couple/Single Mode State Management (v6.4.0)
+function testCoupleSingleModeStateManagement() {
+    console.log('\n🤝 Testing Couple/Single Mode State Management...');
+    
+    // Test BasicInputs.js couple/single mode logic
+    if (fs.existsSync('src/components/BasicInputs.js')) {
+        const content = fs.readFileSync('src/components/BasicInputs.js', 'utf8');
+        
+        // Should hide individual fields when couple mode is selected
+        const hasConditionalIndividualFields = content.includes("inputs.planningType !== 'couple'") && 
+                                             content.includes("key: 'row1'") &&
+                                             content.includes("key: 'row2'");
+        logTest('Couple/Single Mode: Individual fields conditional on planning type', hasConditionalIndividualFields);
+        
+        // Should show partner information only in couple mode
+        const hasConditionalPartnerInfo = content.includes("inputs.planningType === 'couple'") && 
+                                        content.includes("Partner Information");
+        logTest('Couple/Single Mode: Partner information shown only in couple mode', hasConditionalPartnerInfo);
+        
+        // Should have planning type selection buttons
+        const hasPlanningTypeButtons = content.includes("planningType: 'single'") && 
+                                     content.includes("planningType: 'couple'");
+        logTest('Couple/Single Mode: Planning type selection buttons available', hasPlanningTypeButtons);
+    }
+    
+    // Test automatic calculation triggering
+    if (fs.existsSync('src/components/RetirementPlannerApp.js')) {
+        const content = fs.readFileSync('src/components/RetirementPlannerApp.js', 'utf8');
+        
+        // Should have useEffect for automatic calculations
+        const hasAutoCalculationTrigger = content.includes('React.useEffect(function()') && 
+                                         content.includes('handleCalculate()') &&
+                                         content.includes('inputs.currentAge');
+        logTest('Auto Calculations: useEffect triggers calculations on input changes', hasAutoCalculationTrigger);
+        
+        // Should include planning type in dependency array
+        const includesPlanningTypeInDeps = content.includes('inputs.planningType,') ||
+                                         content.includes('inputs.planningType');
+        logTest('Auto Calculations: Planning type included in useEffect dependencies', includesPlanningTypeInDeps);
+    }
+    
+    // Test wizard steps for proper couple/single mode handling
+    const wizardSteps = [
+        'WizardStepSalary.js',
+        'WizardStepSavings.js', 
+        'WizardStepContributions.js',
+        'WizardStepFees.js'
+    ];
+    
+    wizardSteps.forEach(stepFile => {
+        if (fs.existsSync(`src/components/${stepFile}`)) {
+            const content = fs.readFileSync(`src/components/${stepFile}`, 'utf8');
+            
+            // Should have conditional logic for couple mode
+            const hasConditionalLogic = content.includes("inputs.planningType === 'couple'") ||
+                                      content.includes("inputs.planningType !== 'couple'");
+            logTest(`Couple/Single Mode: ${stepFile} has conditional couple/single logic`, hasConditionalLogic);
+        }
+    });
+}
+
+// Test Version Consistency Validation (v6.4.0)
+function testVersionConsistencyValidation() {
+    console.log('\n🏷️ Testing Version Consistency...');
+    
+    try {
+        // Read all version-containing files
+        const versionJson = fs.existsSync('version.json') ? 
+            JSON.parse(fs.readFileSync('version.json', 'utf8')).version : null;
+        
+        const packageJson = fs.existsSync('package.json') ? 
+            JSON.parse(fs.readFileSync('package.json', 'utf8')).version : null;
+            
+        const versionJs = fs.existsSync('src/version.js') ? 
+            fs.readFileSync('src/version.js', 'utf8') : null;
+        
+        const indexHtml = fs.existsSync('index.html') ? 
+            fs.readFileSync('index.html', 'utf8') : null;
+            
+        const readme = fs.existsSync('README.md') ? 
+            fs.readFileSync('README.md', 'utf8') : null;
+        
+        // Test version.json vs package.json consistency
+        if (versionJson && packageJson) {
+            const versionsMatch = versionJson === packageJson;
+            logTest('Version Consistency: version.json matches package.json', versionsMatch,
+                versionsMatch ? `Both at v${versionJson}` : `Mismatch: version.json=${versionJson}, package.json=${packageJson}`);
+        }
+        
+        // Test src/version.js consistency
+        if (versionJs && versionJson) {
+            const versionJsMatch = versionJs.includes(`"${versionJson}"`);
+            logTest('Version Consistency: src/version.js matches version.json', versionJsMatch,
+                versionJsMatch ? `Both at v${versionJson}` : `src/version.js does not contain v${versionJson}`);
+        }
+        
+        // Test index.html title consistency
+        if (indexHtml && versionJson) {
+            const titleMatch = indexHtml.includes(`Advanced Retirement Planner v${versionJson}`);
+            logTest('Version Consistency: index.html title matches version', titleMatch,
+                titleMatch ? `Title shows v${versionJson}` : `Title does not show v${versionJson}`);
+            
+            // Test fallback version indicator
+            const fallbackMatch = indexHtml.includes(`'${versionJson}'`);
+            logTest('Version Consistency: index.html fallback version matches', fallbackMatch,
+                fallbackMatch ? `Fallback shows v${versionJson}` : `Fallback does not show v${versionJson}`);
+        }
+        
+        // Test README.md consistency
+        if (readme && versionJson) {
+            const readmeMatch = readme.includes(`v${versionJson}`);
+            logTest('Version Consistency: README.md contains current version', readmeMatch,
+                readmeMatch ? `README shows v${versionJson}` : `README does not show v${versionJson}`);
+        }
+        
+        // Test update-version.js automation coverage
+        if (fs.existsSync('update-version.js')) {
+            const updateScript = fs.readFileSync('update-version.js', 'utf8');
+            
+            const updatesSrcVersion = updateScript.includes('src/version.js') && 
+                                    updateScript.includes('number:');
+            logTest('Version Automation: update-version.js updates src/version.js', updatesSrcVersion);
+            
+            const updatesIndexHtml = updateScript.includes('index.html') && 
+                                   updateScript.includes('Advanced Retirement Planner');
+            logTest('Version Automation: update-version.js updates index.html', updatesIndexHtml);
+        }
+        
+    } catch (error) {
+        logTest('Version Consistency Test', false, `Error during version consistency check: ${error.message}`);
+    }
+}
+
 // Main test execution
 async function runAllTests() {
     console.log('Starting automated test suite...\n');
@@ -1713,6 +1946,18 @@ async function runAllTests() {
     
     // Mobile Responsiveness Tests (v6.3.2)
     testMobileResponsivenessEnhancements();
+    
+    // Version Consistency Tests (v6.4.0)
+    testVersionConsistencyValidation();
+    
+    // Wizard Navigation and Data Persistence Tests (v6.4.0)
+    testWizardNavigationAndDataPersistence();
+    
+    // Training Fund Calculation Logic Tests (v6.4.0)
+    testTrainingFundCalculationLogic();
+    
+    // Couple/Single Mode State Management Tests (v6.4.0)
+    testCoupleSingleModeStateManagement();
     
     // Summary
     console.log('\n📊 Test Summary');

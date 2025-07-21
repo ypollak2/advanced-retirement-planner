@@ -252,6 +252,24 @@ self.addEventListener('message', (event) => {
     }
 });
 
+// Fallback stock prices for offline use
+function getFallbackPrice(symbol) {
+    const fallbackPrices = {
+        'AAPL': 175.0,
+        'GOOGL': 135.0,
+        'MSFT': 360.0,
+        'AMZN': 145.0,
+        'META': 320.0,
+        'TSLA': 250.0,
+        'NVDA': 850.0,
+        'NFLX': 450.0,
+        'CRM': 220.0,
+        'UBER': 65.0
+    };
+    
+    return fallbackPrices[symbol] || 100.0; // Default fallback price
+}
+
 async function cacheStockPricesForOffline(symbols) {
     const cache = await caches.open(DYNAMIC_CACHE_NAME);
     

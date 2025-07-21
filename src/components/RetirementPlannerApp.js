@@ -392,11 +392,27 @@ function RetirementPlannerApp() {
                     var optimizedPensionRate = inputs.optimizedPensionRate || inputs.pensionContributionRate || 17.5;
                     var optimizedTrainingRate = inputs.optimizedTrainingFundRate || inputs.trainingFundContributionRate || 7.5;
                     
+                    // Calculate training fund contribution using Israeli threshold logic
+                    var monthlyTrainingFundContribution = 0;
+                    if (window.calculateTrainingFundRate && inputs.country === 'israel') {
+                        var rateInfo = window.calculateTrainingFundRate(totalIncome, inputs.trainingFundContributeAboveCeiling);
+                        if (typeof rateInfo === 'object') {
+                            // Use the total rate from the rate info
+                            monthlyTrainingFundContribution = Math.round(totalIncome * (rateInfo.total / 100));
+                        } else {
+                            // Fallback to simple rate calculation
+                            monthlyTrainingFundContribution = Math.round(totalIncome * (rateInfo / 100));
+                        }
+                    } else {
+                        // For non-Israeli countries, use simple percentage
+                        monthlyTrainingFundContribution = Math.round(totalIncome * (optimizedTrainingRate / 100));
+                    }
+                    
                     updatedWorkPeriods[0] = {
                         ...updatedWorkPeriods[0],
                         salary: totalIncome,
                         monthlyContribution: Math.round(totalIncome * (optimizedPensionRate / 100)),
-                        monthlyTrainingFund: Math.round(totalIncome * (optimizedTrainingRate / 100))
+                        monthlyTrainingFund: monthlyTrainingFundContribution
                     };
                     
                     // Update work periods state
@@ -529,6 +545,37 @@ function RetirementPlannerApp() {
             });
         }
     }
+    
+    // Automatic calculation when key inputs change
+    React.useEffect(function() {
+        // Only auto-calculate if wizard is completed or we have minimal required data
+        if (wizardCompleted || (inputs.currentAge && inputs.retirementAge && inputs.currentSalary)) {
+            // Debounce calculations to avoid excessive calls
+            var timeoutId = setTimeout(function() {
+                handleCalculate();
+            }, 500); // 500ms delay
+            
+            return function() {
+                clearTimeout(timeoutId);
+            };
+        }
+    }, [
+        inputs.currentAge, 
+        inputs.retirementAge, 
+        inputs.currentSalary,
+        inputs.currentMonthlySalary,
+        inputs.currentSavings,
+        inputs.currentTrainingFundSavings,
+        inputs.pensionContributionRate,
+        inputs.trainingFundContributionRate,
+        inputs.expectedReturn,
+        inputs.managementFees,
+        inputs.planningType,
+        inputs.partner1Salary,
+        inputs.partner2Salary,
+        workingCurrency,
+        wizardCompleted
+    ]);
     
     // Wizard completion handler
     function handleWizardComplete() {
@@ -1090,7 +1137,9 @@ function RetirementPlannerApp() {
         // Convert HTML to PDF using browser's print functionality - secure method
         const printWindow = window.open('', '_blank');
         printWindow.document.open();
-        printWindow.document.documentElement.innerHTML = htmlContent;
+        
+        // Secure method: Write content directly to document instead of innerHTML
+        printWindow.document.write(htmlContent);
         printWindow.document.close();
         
         // Wait for content to load, then trigger print dialog

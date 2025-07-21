@@ -281,7 +281,8 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                         ])
                     ]),
 
-                    React.createElement('div', { 
+                    // Individual fields (only show in single mode)
+                    inputs.planningType !== 'couple' && React.createElement('div', { 
                         key: 'row1',
                         className: "grid grid-cols-2 gap-4" 
                     }, [
@@ -326,7 +327,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                             })
                         ])
                     ]),
-                    React.createElement('div', { 
+                    inputs.planningType !== 'couple' && React.createElement('div', { 
                         key: 'row2',
                         className: "grid grid-cols-2 gap-4" 
                     }, [
@@ -357,7 +358,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                             })
                         ])
                     ]),
-                    React.createElement('div', { 
+                    inputs.planningType !== 'couple' && React.createElement('div', { 
                         key: 'row3',
                         className: "grid grid-cols-2 gap-4" 
                     }, [
@@ -441,7 +442,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                             ])
                         ])
                     ]),
-                    React.createElement('div', { 
+                    inputs.planningType !== 'couple' && React.createElement('div', { 
                         key: 'row4',
                         className: "grid grid-cols-2 gap-4" 
                     }, [
@@ -474,7 +475,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                             })
                         ])
                     ]),
-                    React.createElement('div', { 
+                    inputs.planningType !== 'couple' && React.createElement('div', { 
                         key: 'row5',
                         className: "grid grid-cols-2 gap-4" 
                     }, [
@@ -507,7 +508,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                             })
                         ])
                     ]),
-                    React.createElement('div', { 
+                    inputs.planningType !== 'couple' && React.createElement('div', { 
                         key: 'row6',
                         className: "grid grid-cols-2 gap-4" 
                     }, [
@@ -544,7 +545,7 @@ const BasicInputs = ({ inputs, setInputs, language, t, workingCurrency = 'ILS', 
                                     language === 'he' ? 'ארה״ב' : 'United States')
                             ])
                         ])
-                    ]),
+                    ]), // End of individual fields conditional
 
                     // RSU (Restricted Stock Units) Section
                     React.createElement('div', {

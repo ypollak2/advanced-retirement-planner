@@ -1,5 +1,37 @@
 # Claude Code Development Standards for Advanced Retirement Planner
 
+## CRITICAL REQUIREMENT: Pre-Release QA Checkpoint
+
+**⚠️ MANDATORY: Every release MUST pass the Pre-Release QA Checkpoint**
+
+```bash
+npm run qa:pre-release
+```
+
+This is the **MANDATORY CHECKPOINT** before every release that validates:
+- 🛡️ **Security**: No critical vulnerabilities, XSS protection, CSP policy
+- 🧪 **Functionality**: All tests pass (100% required)
+- 📝 **Syntax**: All JavaScript files valid
+- 🏷️ **Version Consistency**: All 6 files have matching versions
+- 💼 **Business Logic**: Calculations, inflation, contributions
+- ⚡ **Performance**: File sizes within limits
+
+**EXIT CODES:**
+- **0**: ✅ APPROVED FOR RELEASE - All critical checks passed
+- **1**: ❌ BLOCKED FOR RELEASE - Critical issues found
+
+**Files that MUST have consistent versions:**
+1. `version.json` - `"version": "X.X.X"`
+2. `package.json` - `"version": "X.X.X"`
+3. `src/version.js` - `number: "X.X.X"`
+4. `index.html` - `Advanced Retirement Planner vX.X.X`
+5. `README.md` - `# 🚀 Advanced Retirement Planner vX.X.X`
+
+**Report Generation:**
+- Detailed JSON report: `pre-release-qa-report.json`
+- Real-time console output with pass/fail status
+- Critical and high-priority issue categorization
+
 ## Mandatory Pre-Work Validation Protocol
 
 **ALWAYS run before making ANY code changes:**
@@ -131,6 +163,36 @@ This means:
 4. **Update QA process** to include the new test coverage
 
 **Never consider a task complete without adding appropriate tests!**
+
+## CRITICAL REQUIREMENT: Version Consistency
+
+**⚠️ MANDATORY: ALL version numbers MUST be consistent across all files:**
+
+### Version Files That Must Match:
+- **version.json** → `"version": "X.Y.Z"`
+- **package.json** → `"version": "X.Y.Z"`
+- **src/version.js** → `number: "X.Y.Z"`
+- **index.html** → `<title>Advanced Retirement Planner vX.Y.Z</title>`
+- **index.html** → `window.APP_VERSION = 'X.Y.Z'` (fallback)
+- **README.md** → `# 🚀 Advanced Retirement Planner vX.Y.Z ✨`
+
+### Automated Version Consistency Check:
+```bash
+# Version consistency is automatically tested
+npm test  # Includes version consistency validation
+```
+
+### Manual Version Consistency Check:
+```bash
+echo "🏷️ Checking Version Consistency"
+echo "version.json: $(grep -o '"version": "[^"]*"' version.json | head -1)"
+echo "package.json: $(grep -o '"version": "[^"]*"' package.json | head -1)"
+echo "src/version.js: $(grep -o 'number: "[^"]*"' src/version.js | head -1)"
+echo "index.html title: $(grep -o '<title>[^<]*v[0-9.]*[^<]*</title>' index.html)"
+echo "README.md: $(grep -o '# 🚀 Advanced Retirement Planner v[0-9.]*' README.md | head -1)"
+```
+
+**NEVER commit if versions don't match across ALL files!**
 
 ## CRITICAL REQUIREMENT: Pre-Push Protocol
 

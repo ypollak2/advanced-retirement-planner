@@ -93,7 +93,11 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
     
     // Function to fetch stock price using the API
     const fetchStockPriceForSymbol = async (symbol) => {
-        if (!symbol || !window.fetchStockPrice) return;
+        if (!symbol || !window.fetchStockPrice) {
+            console.warn('⚠️ fetchStockPrice function not available');
+            setManualPriceMode(true);
+            return;
+        }
         
         setPriceLoading(true);
         setManualPriceMode(false);
