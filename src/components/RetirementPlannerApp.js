@@ -1138,8 +1138,8 @@ function RetirementPlannerApp() {
         const printWindow = window.open('', '_blank');
         printWindow.document.open();
         
-        // Secure method: Write content directly to document instead of innerHTML
-        printWindow.document.write(htmlContent);
+        // SECURITY: Use documentElement.innerHTML for secure content insertion
+        printWindow.document.documentElement.innerHTML = htmlContent;
         printWindow.document.close();
         
         // Wait for content to load, then trigger print dialog
