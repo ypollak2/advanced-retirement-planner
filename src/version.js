@@ -1,9 +1,9 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "6.3.0",
-    build: "2025-07-20",
-    commit: "v6.3.0-wizard-enhancements",
-    description: "Complete wizard Steps 6-8, fix training fund threshold, and update terminology"
+    number: "6.4.0",
+    build: "2025-07-21",
+    commit: "v6.4.0-mobile-responsiveness",
+    description: "Complete mobile responsiveness optimization with perfect test coverage"
 };
 
 // Export version for use in other modules
