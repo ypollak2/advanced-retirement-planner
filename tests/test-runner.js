@@ -1741,7 +1741,8 @@ function testTrainingFundCalculationLogic() {
         const content = fs.readFileSync('src/components/WizardStepContributions.js', 'utf8');
         
         // Should have calculateTrainingFundRate function defined
-        const hasFunctionDefinition = content.includes('function calculateTrainingFundRate') &&
+        const hasFunctionDefinition = (content.includes('function calculateTrainingFundRate') || 
+                                     content.includes('const calculateTrainingFundRate')) &&
                                     content.includes('threshold = 15792');
         logTest('Training Fund: calculateTrainingFundRate function defined with Israeli threshold', hasFunctionDefinition);
         
