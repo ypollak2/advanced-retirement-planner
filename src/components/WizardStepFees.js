@@ -46,8 +46,8 @@ const WizardStepFees = ({ inputs, setInputs, language = 'en' }) => {
 
     // Using React.createElement pattern for component rendering
     return createElement('div', { className: "space-y-8" }, [
-        // Single Planning - Main Fees Section
-        (!inputs.planningType || inputs.planningType === 'single') && createElement('div', { key: 'main-fees-section' }, [
+        // Single Planning - Main Fees Section (hide if couple mode)
+        inputs.planningType !== 'couple' && createElement('div', { key: 'main-fees-section' }, [
             createElement('h3', { 
                 key: 'single-fees-title',
                 className: "text-xl font-semibold text-gray-700 mb-6 flex items-center" 
