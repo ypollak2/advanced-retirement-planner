@@ -9,17 +9,103 @@ const RetirementWizard = ({
     language = 'en',
     workingCurrency = 'ILS' 
 }) => {
-    const [currentStep, setCurrentStep] = React.useState(1);
-    const [completedSteps, setCompletedSteps] = React.useState([]);
-    const [skippedSteps, setSkippedSteps] = React.useState([]);
+    // Local storage key for wizard progress
+    const WIZARD_STORAGE_KEY = 'retirementWizardProgress';
+    const WIZARD_INPUTS_KEY = 'retirementWizardInputs';
+    
+    // Load saved progress from localStorage
+    const loadSavedProgress = () => {
+        try {
+            const savedProgress = localStorage.getItem(WIZARD_STORAGE_KEY);
+            const savedInputs = localStorage.getItem(WIZARD_INPUTS_KEY);
+            
+            if (savedProgress) {
+                const progress = JSON.parse(savedProgress);
+                return {
+                    currentStep: progress.currentStep || 1,
+                    completedSteps: progress.completedSteps || [],
+                    skippedSteps: progress.skippedSteps || [],
+                    lastSaved: progress.lastSaved
+                };
+            }
+        } catch (error) {
+            console.warn('Failed to load saved wizard progress:', error);
+        }
+        return null;
+    };
+    
+    const savedProgress = loadSavedProgress();
+    
+    const [currentStep, setCurrentStep] = React.useState(savedProgress?.currentStep || 1);
+    const [completedSteps, setCompletedSteps] = React.useState(savedProgress?.completedSteps || []);
+    const [skippedSteps, setSkippedSteps] = React.useState(savedProgress?.skippedSteps || []);
+    const [showSaveNotification, setShowSaveNotification] = React.useState(false);
+    const [lastSaved, setLastSaved] = React.useState(savedProgress?.lastSaved || null);
 
-    const totalSteps = 8;
+    const totalSteps = 10;
+    
+    // Auto-save progress to localStorage
+    React.useEffect(() => {
+        const saveProgress = () => {
+            try {
+                const progress = {
+                    currentStep,
+                    completedSteps,
+                    skippedSteps,
+                    lastSaved: new Date().toISOString()
+                };
+                localStorage.setItem(WIZARD_STORAGE_KEY, JSON.stringify(progress));
+                localStorage.setItem(WIZARD_INPUTS_KEY, JSON.stringify(inputs));
+                setLastSaved(new Date().toISOString());
+                
+                // Show save notification briefly
+                setShowSaveNotification(true);
+                setTimeout(() => setShowSaveNotification(false), 2000);
+            } catch (error) {
+                console.error('Failed to save wizard progress:', error);
+            }
+        };
+        
+        // Save after a short delay to debounce rapid changes
+        const timer = setTimeout(saveProgress, 500);
+        return () => clearTimeout(timer);
+    }, [currentStep, completedSteps, skippedSteps, inputs]);
+    
+    // Load saved inputs on mount
+    React.useEffect(() => {
+        if (savedProgress) {
+            try {
+                const savedInputs = localStorage.getItem(WIZARD_INPUTS_KEY);
+                if (savedInputs) {
+                    const parsedInputs = JSON.parse(savedInputs);
+                    setInputs(prevInputs => ({...prevInputs, ...parsedInputs}));
+                }
+            } catch (error) {
+                console.warn('Failed to load saved inputs:', error);
+            }
+        }
+    }, []);
+    
+    // Clear saved progress when wizard is completed
+    const clearSavedProgress = () => {
+        try {
+            localStorage.removeItem(WIZARD_STORAGE_KEY);
+            localStorage.removeItem(WIZARD_INPUTS_KEY);
+        } catch (error) {
+            console.error('Failed to clear saved progress:', error);
+        }
+    };
 
     // Multi-language content
     const content = {
         he: {
             wizardTitle: 'אשף תכנון פנסיה מתקדם',
             wizardSubtitle: 'נאסוף את כל המידע הדרוש לחישוב מקיף של תכנית הפנסיה שלך',
+            saveStatus: 'נשמר אוטומטית',
+            lastSavedAt: 'נשמר לאחרונה ב',
+            clearProgress: 'נקה התקדמות',
+            resumeProgress: 'המשך מהמקום שבו הפסקת',
+            startFresh: 'התחל מחדש',
             steps: {
                 1: { title: 'פרטים אישיים', subtitle: 'גיל, גיל פרישה וסוג התכנון' },
                 2: { title: 'משכורת והכנסות', subtitle: 'משכורת חודשית ומקורות הכנסה נוספים' },
@@ -28,12 +114,19 @@ const RetirementWizard = ({
                 5: { title: 'דמי ניהול', subtitle: 'עמלות ועלויות ניהול השקעות' },
                 6: { title: 'העדפות השקעה', subtitle: 'סיכון, תשואה וחלוקת נכסים' },
                 7: { title: 'יעדי פרישה', subtitle: 'הכנסה רצויה בפרישה ותכנון אורח חיים' },
-                8: { title: 'סקירה וחישוב', subtitle: 'סיכום כל הנתונים וחישוב תוצאות' }
+                8: { title: 'תכנון ירושה', subtitle: 'עזבון, צוואה ובטוח חיים לפי מדינה' },
+                9: { title: 'אופטימיזציה מיסויית', subtitle: 'תכנון מס וחיסכון מיסויי מתקדם' },
+                10: { title: 'סקירה מקיפה', subtitle: 'ניתוח מלא עם המלצות והערכת בריאות פיננסית' }
             }
         },
         en: {
             wizardTitle: 'Advanced Retirement Planning Wizard',
             wizardSubtitle: 'We\'ll collect all the information needed for a comprehensive retirement plan calculation',
+            saveStatus: 'Auto-saved',
+            lastSavedAt: 'Last saved at',
+            clearProgress: 'Clear Progress',
+            resumeProgress: 'Resume where you left off',
+            startFresh: 'Start Fresh',
             steps: {
                 1: { title: 'Personal Information', subtitle: 'Age, retirement age, and planning type' },
                 2: { title: 'Salary & Income', subtitle: 'Monthly salary and additional income sources' },
@@ -42,7 +135,9 @@ const RetirementWizard = ({
                 5: { title: 'Management Fees', subtitle: 'Investment fees and management costs' },
                 6: { title: 'Investment Preferences', subtitle: 'Risk tolerance, returns, and asset allocation' },
                 7: { title: 'Retirement Goals', subtitle: 'Target retirement income and lifestyle planning' },
-                8: { title: 'Review & Calculate', subtitle: 'Summary of all data and results calculation' }
+                8: { title: 'Inheritance Planning', subtitle: 'Estate planning, wills, and life insurance by country' },
+                9: { title: 'Tax Optimization', subtitle: 'Advanced tax planning and optimization strategies' },
+                10: { title: 'Comprehensive Review', subtitle: 'Complete analysis with recommendations and financial health scoring' }
             }
         }
     };
@@ -61,6 +156,7 @@ const RetirementWizard = ({
             setCurrentStep(currentStep + 1);
         } else {
             // Final step - complete wizard
+            clearSavedProgress();
             onComplete && onComplete();
         }
     };
@@ -128,7 +224,15 @@ const RetirementWizard = ({
                        (inputs.currentMonthlyExpenses || 0) > 0;
             
             case 8: 
-                // Review step - check if we have minimum required data
+                // Inheritance planning - basic validation
+                return true; // Optional step, always valid
+            
+            case 9: 
+                // Tax optimization - basic validation
+                return true; // Optional step, always valid
+            
+            case 10: 
+                // Final review step - check if we have minimum required data
                 return inputs.currentAge && inputs.retirementAge && 
                        (inputs.currentMonthlySalary || inputs.partner1Salary || inputs.partner2Salary);
             
@@ -197,11 +301,25 @@ const RetirementWizard = ({
                         'Retirement Goals Step - To be implemented');
                 }
             case 8:
+                if (window.WizardStepInheritance) {
+                    return React.createElement(window.WizardStepInheritance, stepProps);
+                } else {
+                    return React.createElement('div', { className: 'text-center p-8' }, 
+                        'Inheritance Planning Step - Loading...');
+                }
+            case 9:
+                if (window.WizardStepTaxes) {
+                    return React.createElement(window.WizardStepTaxes, stepProps);
+                } else {
+                    return React.createElement('div', { className: 'text-center p-8' }, 
+                        'Tax Optimization Step - Loading...');
+                }
+            case 10:
                 if (window.WizardStepReview) {
                     return React.createElement(window.WizardStepReview, stepProps);
                 } else {
                     return React.createElement('div', { className: 'text-center p-8' }, 
-                        'Review & Calculate Step - To be implemented');
+                        'Comprehensive Review Step - Loading...');
                 }
             default:
                 return React.createElement('div', { className: 'text-center p-8' }, 'Invalid step');
@@ -216,20 +334,71 @@ const RetirementWizard = ({
             key: 'wizard-header',
             className: "text-center mb-8" 
         }, [
-            // Return to Dashboard button
-            onReturnToDashboard && React.createElement('div', {
-                key: 'dashboard-nav',
-                className: "flex justify-between items-center mb-6"
+            // Navigation and Save Status
+            React.createElement('div', {
+                key: 'nav-and-status',
+                className: "mb-6"
             }, [
-                React.createElement('button', {
-                    key: 'return-button',
-                    onClick: onReturnToDashboard,
-                    className: "flex items-center px-4 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                // Return to Dashboard and Save Status Row
+                React.createElement('div', {
+                    key: 'top-nav',
+                    className: "flex justify-between items-center mb-4"
                 }, [
-                    React.createElement('span', { key: 'arrow', className: "mr-2" }, '←'),
-                    React.createElement('span', { key: 'text' }, language === 'he' ? 'חזרה ללוח הבקרה' : 'Return to Dashboard')
+                    onReturnToDashboard && React.createElement('button', {
+                        key: 'return-button',
+                        onClick: onReturnToDashboard,
+                        className: "flex items-center px-4 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                    }, [
+                        React.createElement('span', { key: 'arrow', className: "mr-2" }, '←'),
+                        React.createElement('span', { key: 'text' }, language === 'he' ? 'חזרה ללוח הבקרה' : 'Return to Dashboard')
+                    ]),
+                    
+                    // Save Status Indicator
+                    React.createElement('div', {
+                        key: 'save-status',
+                        className: `flex items-center px-4 py-2 rounded-lg transition-all duration-300 ${
+                            showSaveNotification ? 'bg-green-100 text-green-700 opacity-100' : 'bg-gray-100 text-gray-600 opacity-75'
+                        }`
+                    }, [
+                        React.createElement('span', {
+                            key: 'save-icon',
+                            className: "mr-2"
+                        }, showSaveNotification ? '✓' : '💾'),
+                        React.createElement('span', {
+                            key: 'save-text',
+                            className: "text-sm font-medium"
+                        }, t.saveStatus),
+                        lastSaved && React.createElement('span', {
+                            key: 'save-time',
+                            className: "ml-2 text-xs opacity-75"
+                        }, `${t.lastSavedAt} ${new Date(lastSaved).toLocaleTimeString()}`)
+                    ])
                 ]),
-                React.createElement('div', { key: 'spacer' }) // Empty div for spacing
+                
+                // Clear Progress Button (only show if there's saved progress)
+                savedProgress && currentStep > 1 && React.createElement('div', {
+                    key: 'progress-controls',
+                    className: "flex justify-center"
+                }, [
+                    React.createElement('button', {
+                        key: 'clear-progress',
+                        onClick: () => {
+                            if (window.confirm(language === 'he' ? 
+                                'האם אתה בטוח שברצונך למחוק את ההתקדמות השמורה?' : 
+                                'Are you sure you want to clear your saved progress?')) {
+                                clearSavedProgress();
+                                setCurrentStep(1);
+                                setCompletedSteps([]);
+                                setSkippedSteps([]);
+                                setInputs({});
+                            }
+                        },
+                        className: "px-4 py-2 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                    }, [
+                        React.createElement('span', { key: 'icon', className: "mr-2" }, '🗑️'),
+                        t.clearProgress
+                    ])
+                ])
             ]),
             React.createElement('h1', { 
                 key: 'wizard-title',
@@ -252,7 +421,7 @@ const RetirementWizard = ({
             onPrevious: handlePrevious,
             onSkip: handleSkip,
             isValid: isCurrentStepValid(),
-            canSkip: currentStep !== 8, // Can't skip final review step
+            canSkip: currentStep !== 10, // Can't skip final review step
             isFirst: currentStep === 1,
             isLast: currentStep === totalSteps,
             language: language,

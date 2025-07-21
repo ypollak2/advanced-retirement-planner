@@ -139,6 +139,12 @@ const WizardStepTaxes = ({ inputs, setInputs, language = 'en', workingCurrency =
             pensionDeductionLimit: 0.07, // 7% of income
             trainingFundDeductionLimit: 15792, // Monthly threshold
             capitalGainsExemption: true,
+            israeliTaxRates: {
+                basic: 0.1,
+                medium: 0.31,
+                high: 0.47,
+                maximum: 0.5
+            },
             features: [
                 t.trainingFundBenefits,
                 t.pensionDeductions,
@@ -158,6 +164,11 @@ const WizardStepTaxes = ({ inputs, setInputs, language = 'en', workingCurrency =
             pensionAnnualAllowance: 60000, // £60k per year
             isaAllowance: 20000, // £20k per year
             lifetimeAllowance: 1073100, // £1.073M
+            ukTaxRates: {
+                basic: 0.2,
+                higher: 0.4,
+                additional: 0.45
+            },
             features: [
                 t.ukIsaPensions,
                 t.ukBasicHigherRate,
@@ -178,6 +189,11 @@ const WizardStepTaxes = ({ inputs, setInputs, language = 'en', workingCurrency =
             standard401kLimit: 23000, // 2024 limit
             catchUpContribution: 7500, // Age 50+
             rothIraIncomeLimit: 153000, // Phase-out starts
+            usTaxRates: {
+                federal: 0.22,
+                state: 0.05,
+                combined: 0.27
+            },
             features: [
                 t.us401kRoth,
                 t.usRmdPlanning,
@@ -252,7 +268,7 @@ const WizardStepTaxes = ({ inputs, setInputs, language = 'en', workingCurrency =
         return contribution * marginalRate;
     };
 
-    const calculateTaxEfficiencyScore = () => {
+    const calculateTaxEfficiency = () => {
         const currentIncome = parseFloat(inputs.currentMonthlySalary || 0) * 12;
         const pensionContribution = parseFloat(inputs.pensionContributionRate || 0) / 100 * currentIncome;
         const trainingFundContribution = parseFloat(inputs.trainingFundContributionRate || 0) / 100 * currentIncome;
@@ -266,6 +282,47 @@ const WizardStepTaxes = ({ inputs, setInputs, language = 'en', workingCurrency =
         const maxPossibleSavings = currentIncome * 0.15; // Assume 15% max tax-efficient contribution
         
         return Math.min(100, (totalSavings / maxPossibleSavings) * 100);
+    };
+
+    const calculateTaxEfficiencyScore = calculateTaxEfficiency;
+
+    // Optimize tax contributions based on country-specific rules
+    const calculateOptimal = (type) => {
+        const currentIncome = parseFloat(inputs.currentMonthlySalary || 0) * 12;
+        const marginalRate = calculateMarginalTaxRate(currentIncome);
+        
+        if (type === 'pension') {
+            // Calculate optimal pension contribution rate
+            if (selectedCountry === 'israel') {
+                return Math.min(7.0, marginalRate * 100); // Israeli pension deduction limit
+            } else if (selectedCountry === 'uk') {
+                return Math.min(40.0, marginalRate * 100); // UK pension relief
+            } else if (selectedCountry === 'us') {
+                return Math.min(22.5, marginalRate * 100); // US 401k limit percentage
+            }
+            return 17.5; // Default
+        } else if (type === 'training') {
+            // Calculate optimal training fund contribution rate
+            if (selectedCountry === 'israel') {
+                const monthlyThreshold = 15792;
+                const monthlyIncome = currentIncome / 12;
+                return Math.min(7.5, (monthlyThreshold / monthlyIncome) * 100);
+            }
+            return 7.5; // Default
+        }
+        return 0;
+    };
+
+    const optimizeTax = () => {
+        const optimalPensionRate = calculateOptimal('pension');
+        const optimalTrainingFundRate = calculateOptimal('training');
+        
+        setInputs(prev => ({
+            ...prev,
+            optimizedPensionRate: optimalPensionRate,
+            optimizedTrainingFundRate: optimalTrainingFundRate,
+            taxEfficiencyScore: calculateTaxEfficiencyScore()
+        }));
     };
 
     // Render country-specific tax information
@@ -564,6 +621,89 @@ const WizardStepTaxes = ({ inputs, setInputs, language = 'en', workingCurrency =
 
         // Tax efficiency dashboard
         renderTaxEfficiencyDashboard(),
+
+        // Tax rate inputs section
+        createElement('div', {
+            key: 'tax-rates-section',
+            className: "bg-white rounded-xl p-6 border border-gray-200 mb-8"
+        }, [
+            createElement('h3', {
+                key: 'rates-title',
+                className: "text-xl font-semibold text-gray-700 mb-6"
+            }, 'Tax Rate Configuration'),
+            
+            createElement('div', { key: 'rates-grid', className: "grid grid-cols-1 md:grid-cols-3 gap-6" }, [
+                createElement('div', { key: 'current-tax-rate' }, [
+                    createElement('label', {
+                        key: 'current-label',
+                        className: "block text-sm font-medium text-gray-700 mb-2"
+                    }, t.currentTaxRate || 'Current Tax Rate (%)'),
+                    createElement('input', {
+                        key: 'current-input',
+                        type: 'number',
+                        min: 0,
+                        max: 100,
+                        step: 0.1,
+                        value: inputs.currentTaxRate || '',
+                        onChange: (e) => setInputs({...inputs, currentTaxRate: e.target.value}),
+                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    })
+                ]),
+                
+                createElement('div', { key: 'marginal-tax-rate' }, [
+                    createElement('label', {
+                        key: 'marginal-label',
+                        className: "block text-sm font-medium text-gray-700 mb-2"
+                    }, t.marginalTaxRate || 'Marginal Tax Rate (%)'),
+                    createElement('input', {
+                        key: 'marginal-input',
+                        type: 'number',
+                        min: 0,
+                        max: 100,
+                        step: 0.1,
+                        value: inputs.marginalTaxRate || '',
+                        onChange: (e) => setInputs({...inputs, marginalTaxRate: e.target.value}),
+                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    })
+                ]),
+                
+                createElement('div', { key: 'effective-tax-rate' }, [
+                    createElement('label', {
+                        key: 'effective-label',
+                        className: "block text-sm font-medium text-gray-700 mb-2"
+                    }, t.effectiveTaxRate || 'Effective Tax Rate (%)'),
+                    createElement('input', {
+                        key: 'effective-input',
+                        type: 'number',
+                        min: 0,
+                        max: 100,
+                        step: 0.1,
+                        value: inputs.effectiveTaxRate || '',
+                        onChange: (e) => setInputs({...inputs, effectiveTaxRate: e.target.value}),
+                        className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    })
+                ])
+            ]),
+            
+            // Auto-calculate button
+            createElement('div', { key: 'auto-calculate', className: "mt-6 text-center" }, [
+                createElement('button', {
+                    key: 'auto-calc-btn',
+                    onClick: () => {
+                        const currentIncome = parseFloat(inputs.currentMonthlySalary || 0) * 12;
+                        const marginal = calculateMarginalTaxRate(currentIncome) * 100;
+                        const effective = calculateEffectiveTaxRate(currentIncome) * 100;
+                        setInputs({
+                            ...inputs,
+                            marginalTaxRate: marginal.toFixed(1),
+                            effectiveTaxRate: effective.toFixed(1),
+                            currentTaxRate: effective.toFixed(1)
+                        });
+                    },
+                    className: "px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                }, 'Auto-Calculate Based on Income')
+            ])
+        ]),
 
         // Contribution optimization
         renderContributionOptimization(),

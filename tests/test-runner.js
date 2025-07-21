@@ -1021,6 +1021,279 @@ function testDataValidationAndErrorHandling() {
     }
 }
 
+// Test 20: Advanced Wizard Components Testing Pipeline (v6.3.0)
+function testAdvancedWizardComponents() {
+    console.log('\n🧙‍♂️ Testing Advanced Wizard Components...');
+    
+    // Test WizardStepInheritance component
+    if (fs.existsSync('src/components/WizardStepInheritance.js')) {
+        const inheritanceContent = fs.readFileSync('src/components/WizardStepInheritance.js', 'utf8');
+        
+        // Test inheritance planning features
+        const hasAssetCategories = inheritanceContent.includes('realEstateAssets') &&
+                                  inheritanceContent.includes('investmentAssets') &&
+                                  inheritanceContent.includes('businessAssets') &&
+                                  inheritanceContent.includes('personalAssets');
+        logTest('WizardStepInheritance: Asset categorization', hasAssetCategories);
+        
+        const hasDebtTracking = inheritanceContent.includes('mortgageDebts') &&
+                               inheritanceContent.includes('loanDebts') &&
+                               inheritanceContent.includes('creditCardDebts');
+        logTest('WizardStepInheritance: Debt tracking', hasDebtTracking);
+        
+        const hasBeneficiaryManagement = inheritanceContent.includes('children') &&
+                                        inheritanceContent.includes('spouse') &&
+                                        inheritanceContent.includes('parents');
+        logTest('WizardStepInheritance: Beneficiary management', hasBeneficiaryManagement);
+        
+        const hasWillStatus = inheritanceContent.includes('willStatus') &&
+                             inheritanceContent.includes('hasWill');
+        logTest('WizardStepInheritance: Will status tracking', hasWillStatus);
+        
+        const hasLifeInsurance = inheritanceContent.includes('lifeInsuranceAmount') &&
+                                inheritanceContent.includes('premiumAmount');
+        logTest('WizardStepInheritance: Life insurance integration', hasLifeInsurance);
+        
+        const hasCountrySpecificLaws = inheritanceContent.includes('israel') ||
+                                      inheritanceContent.includes('uk') ||
+                                      inheritanceContent.includes('us');
+        logTest('WizardStepInheritance: Country-specific inheritance laws', hasCountrySpecificLaws);
+        
+        const hasNetWorthCalculation = inheritanceContent.includes('totalAssets') &&
+                                      inheritanceContent.includes('totalDebts') &&
+                                      inheritanceContent.includes('netWorth');
+        logTest('WizardStepInheritance: Net worth calculation', hasNetWorthCalculation);
+        
+    } else {
+        logTest('WizardStepInheritance: Component exists', false, 'Missing WizardStepInheritance.js');
+    }
+    
+    // Test WizardStepTaxes component
+    if (fs.existsSync('src/components/WizardStepTaxes.js')) {
+        const taxesContent = fs.readFileSync('src/components/WizardStepTaxes.js', 'utf8');
+        
+        const hasTaxCountrySelection = taxesContent.includes('taxCountry') &&
+                                      taxesContent.includes('israel') &&
+                                      taxesContent.includes('uk');
+        logTest('WizardStepTaxes: Tax country selection', hasTaxCountrySelection);
+        
+        const hasTaxRateInputs = taxesContent.includes('currentTaxRate') &&
+                                taxesContent.includes('marginalTaxRate') &&
+                                taxesContent.includes('effectiveTaxRate');
+        logTest('WizardStepTaxes: Tax rate inputs', hasTaxRateInputs);
+        
+        const hasOptimizedRates = taxesContent.includes('optimizedPensionRate') &&
+                                 taxesContent.includes('optimizedTrainingFundRate');
+        logTest('WizardStepTaxes: Optimized contribution rates', hasOptimizedRates);
+        
+        const hasTaxEfficiencyScoring = taxesContent.includes('taxEfficiencyScore') &&
+                                       taxesContent.includes('calculateTaxEfficiency');
+        logTest('WizardStepTaxes: Tax efficiency scoring', hasTaxEfficiencyScoring);
+        
+        const hasCountrySpecificTax = taxesContent.includes('israeliTaxRates') ||
+                                     taxesContent.includes('ukTaxRates') ||
+                                     taxesContent.includes('usTaxRates');
+        logTest('WizardStepTaxes: Country-specific tax calculations', hasCountrySpecificTax);
+        
+        const hasTaxOptimizationLogic = taxesContent.includes('optimizeTax') ||
+                                       taxesContent.includes('calculateOptimal');
+        logTest('WizardStepTaxes: Tax optimization algorithms', hasTaxOptimizationLogic);
+        
+    } else {
+        logTest('WizardStepTaxes: Component exists', false, 'Missing WizardStepTaxes.js');
+    }
+    
+    // Test WizardStepReview component
+    if (fs.existsSync('src/components/WizardStepReview.js')) {
+        const reviewContent = fs.readFileSync('src/components/WizardStepReview.js', 'utf8');
+        
+        const hasFinancialHealthScore = reviewContent.includes('financialHealthScore') &&
+                                       reviewContent.includes('calculateHealthScore');
+        logTest('WizardStepReview: Financial health scoring', hasFinancialHealthScore);
+        
+        const hasComprehensiveAnalysis = reviewContent.includes('totalAccumulation') &&
+                                        reviewContent.includes('monthlyIncome') &&
+                                        reviewContent.includes('readinessScore');
+        logTest('WizardStepReview: Comprehensive analysis', hasComprehensiveAnalysis);
+        
+        const hasActionItems = reviewContent.includes('actionItems') ||
+                              reviewContent.includes('recommendations');
+        logTest('WizardStepReview: Action items generation', hasActionItems);
+        
+        const hasDataValidation = reviewContent.includes('validateInputs') ||
+                                 reviewContent.includes('checkComplete');
+        logTest('WizardStepReview: Data validation', hasDataValidation);
+        
+        const hasRetirementProjections = reviewContent.includes('retirementAge') &&
+                                        reviewContent.includes('projectedIncome');
+        logTest('WizardStepReview: Retirement projections', hasRetirementProjections);
+        
+        const hasRiskAssessment = reviewContent.includes('riskTolerance') &&
+                                 reviewContent.includes('riskLevel');
+        logTest('WizardStepReview: Risk assessment integration', hasRiskAssessment);
+        
+    } else {
+        logTest('WizardStepReview: Component exists', false, 'Missing WizardStepReview.js');
+    }
+}
+
+// Test 21: Wizard Integration Pipeline Testing
+function testWizardIntegrationPipeline() {
+    console.log('\n🔄 Testing Wizard Integration Pipeline...');
+    
+    // Test RetirementWizard main component
+    if (fs.existsSync('src/components/RetirementWizard.js')) {
+        const wizardContent = fs.readFileSync('src/components/RetirementWizard.js', 'utf8');
+        
+        const hasTenStepStructure = wizardContent.includes('totalSteps = 10') ||
+                                   wizardContent.includes('totalSteps: 10');
+        logTest('RetirementWizard: 10-step structure', hasTenStepStructure);
+        
+        const hasAdvancedStepRefs = wizardContent.includes('WizardStepInheritance') &&
+                                   wizardContent.includes('WizardStepTaxes') &&
+                                   wizardContent.includes('WizardStepReview');
+        logTest('RetirementWizard: Advanced step references', hasAdvancedStepRefs);
+        
+        const hasStepValidation = wizardContent.includes('isCurrentStepValid') &&
+                                 wizardContent.includes('case 8') &&
+                                 wizardContent.includes('case 9') &&
+                                 wizardContent.includes('case 10');
+        logTest('RetirementWizard: Advanced step validation', hasStepValidation);
+        
+        const hasStepNavigation = wizardContent.includes('handleNext') &&
+                                 wizardContent.includes('handlePrevious') &&
+                                 wizardContent.includes('handleSkip');
+        logTest('RetirementWizard: Step navigation logic', hasStepNavigation);
+        
+        const hasProgressTracking = wizardContent.includes('currentStep') &&
+                                   wizardContent.includes('completedSteps') &&
+                                   wizardContent.includes('skippedSteps');
+        logTest('RetirementWizard: Progress tracking', hasProgressTracking);
+        
+    } else {
+        logTest('RetirementWizard: Component exists', false, 'Missing RetirementWizard.js');
+    }
+    
+    // Test data flow integration
+    if (fs.existsSync('src/components/RetirementPlannerApp.js')) {
+        const appContent = fs.readFileSync('src/components/RetirementPlannerApp.js', 'utf8');
+        
+        const hasWizardCompletion = appContent.includes('handleWizardComplete') &&
+                                   appContent.includes('setWizardCompleted');
+        logTest('RetirementPlannerApp: Wizard completion handling', hasWizardCompletion);
+        
+        const hasDataIntegration = appContent.includes('totalAssets') &&
+                                  appContent.includes('totalDebts') &&
+                                  appContent.includes('taxOptimization');
+        logTest('RetirementPlannerApp: Advanced data integration', hasDataIntegration);
+        
+        const hasCalculationEnhancement = appContent.includes('nationalInsuranceBenefits') &&
+                                         appContent.includes('optimizedPensionRate');
+        logTest('RetirementPlannerApp: Enhanced calculations', hasCalculationEnhancement);
+        
+        const hasExportIntegration = appContent.includes('inheritance') &&
+                                    appContent.includes('taxOptimization') &&
+                                    appContent.includes('nationalInsurance');
+        logTest('RetirementPlannerApp: Export data integration', hasExportIntegration);
+        
+    }
+    
+    // Test Dashboard integration
+    if (fs.existsSync('src/components/Dashboard.js')) {
+        const dashboardContent = fs.readFileSync('src/components/Dashboard.js', 'utf8');
+        
+        const hasInheritanceSection = dashboardContent.includes('inheritancePlanning') &&
+                                     dashboardContent.includes('estateScore');
+        logTest('Dashboard: Inheritance planning section', hasInheritanceSection);
+        
+        const hasTaxOptimizationSection = dashboardContent.includes('taxOptimization') &&
+                                         dashboardContent.includes('taxScore');
+        logTest('Dashboard: Tax optimization section', hasTaxOptimizationSection);
+        
+        const hasNationalInsuranceSection = dashboardContent.includes('nationalInsurance') &&
+                                           dashboardContent.includes('niScore');
+        logTest('Dashboard: National insurance section', hasNationalInsuranceSection);
+        
+        const hasEnhancedHealthScore = dashboardContent.includes('estateScore') &&
+                                      dashboardContent.includes('taxScore') &&
+                                      dashboardContent.includes('niScore');
+        logTest('Dashboard: Enhanced financial health score', hasEnhancedHealthScore);
+        
+    }
+    
+    // Test HTML component loading
+    if (fs.existsSync('index.html')) {
+        const htmlContent = fs.readFileSync('index.html', 'utf8');
+        
+        const hasAdvancedComponentScripts = htmlContent.includes('WizardStepInheritance.js') &&
+                                           htmlContent.includes('WizardStepTaxes.js') &&
+                                           htmlContent.includes('WizardStepReview.js');
+        logTest('index.html: Advanced wizard component scripts', hasAdvancedComponentScripts);
+        
+        const hasCorrectLoadOrder = htmlContent.indexOf('WizardStepInheritance.js') < 
+                                   htmlContent.indexOf('WizardStepReview.js');
+        logTest('index.html: Correct component load order', hasCorrectLoadOrder);
+        
+    }
+}
+
+// Test 22: Wizard Save/Resume Functionality Testing
+function testWizardSaveResumeFunctionality() {
+    console.log('\n💾 Testing Wizard Save/Resume Functionality...');
+    
+    if (fs.existsSync('src/components/RetirementWizard.js')) {
+        const wizardContent = fs.readFileSync('src/components/RetirementWizard.js', 'utf8');
+        
+        const hasLocalStorageKeys = wizardContent.includes('WIZARD_STORAGE_KEY') &&
+                                   wizardContent.includes('WIZARD_INPUTS_KEY');
+        logTest('RetirementWizard: LocalStorage key definitions', hasLocalStorageKeys);
+        
+        const hasAutoSaveLogic = wizardContent.includes('React.useEffect') &&
+                                wizardContent.includes('localStorage.setItem') &&
+                                wizardContent.includes('saveProgress');
+        logTest('RetirementWizard: Auto-save functionality', hasAutoSaveLogic);
+        
+        const hasProgressLoading = wizardContent.includes('loadSavedProgress') &&
+                                  wizardContent.includes('localStorage.getItem');
+        logTest('RetirementWizard: Progress loading', hasProgressLoading);
+        
+        const hasSaveStatusIndicator = wizardContent.includes('showSaveNotification') &&
+                                      wizardContent.includes('lastSaved');
+        logTest('RetirementWizard: Save status indicator', hasSaveStatusIndicator);
+        
+        const hasClearProgressOption = wizardContent.includes('clearSavedProgress') &&
+                                      wizardContent.includes('localStorage.removeItem');
+        logTest('RetirementWizard: Clear progress functionality', hasClearProgressOption);
+        
+        const hasProgressValidation = wizardContent.includes('savedProgress') &&
+                                     wizardContent.includes('currentStep');
+        logTest('RetirementWizard: Progress validation', hasProgressValidation);
+        
+        const hasMultiLanguageSupport = wizardContent.includes('saveStatus') &&
+                                       wizardContent.includes('clearProgress') &&
+                                       wizardContent.includes('language === \'he\'');
+        logTest('RetirementWizard: Multi-language save/resume', hasMultiLanguageSupport);
+        
+    }
+    
+    if (fs.existsSync('src/components/RetirementPlannerApp.js')) {
+        const appContent = fs.readFileSync('src/components/RetirementPlannerApp.js', 'utf8');
+        
+        const hasResumeDetection = appContent.includes('localStorage.getItem') &&
+                                  appContent.includes('retirementWizardProgress');
+        logTest('RetirementPlannerApp: Resume detection', hasResumeDetection);
+        
+        const hasResumeOptions = appContent.includes('resume-wizard-btn') &&
+                                appContent.includes('start-fresh-btn');
+        logTest('RetirementPlannerApp: Resume/start fresh options', hasResumeOptions);
+        
+        const hasProgressConfirmation = appContent.includes('window.confirm') &&
+                                       appContent.includes('start fresh');
+        logTest('RetirementPlannerApp: Progress confirmation dialogs', hasProgressConfirmation);
+        
+    }
+}
+
 // Main test execution
 async function runAllTests() {
     console.log('Starting automated test suite...\n');
@@ -1047,6 +1320,11 @@ async function runAllTests() {
     testEnhancedCalculationLogic();
     testMultiStepWizardUX();
     testDataValidationAndErrorHandling();
+    
+    // Advanced Wizard Components Testing Pipeline (v6.3.0)
+    testAdvancedWizardComponents();
+    testWizardIntegrationPipeline();
+    testWizardSaveResumeFunctionality();
     
     // Summary
     console.log('\n📊 Test Summary');

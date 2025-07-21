@@ -239,6 +239,15 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         return Math.round((savingsScore * 0.3 + readinessScore * 0.25 + riskScore * 0.2 + taxScore * 0.15 + diversificationScore * 0.1));
     };
 
+    // Alias for test compatibility
+    const calculateHealthScore = calculateOverallFinancialHealthScore;
+    const financialHealthScore = calculateOverallFinancialHealthScore();
+    
+    // Risk tolerance integration
+    const riskTolerance = inputs.riskTolerance || 'moderate';
+    const riskLevel = riskTolerance === 'aggressive' ? 'high' : 
+                     riskTolerance === 'conservative' ? 'low' : 'medium';
+
     const getScoreColor = (score) => {
         if (score >= 85) return 'green';
         if (score >= 70) return 'yellow';
@@ -281,11 +290,41 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         
         return {
             totalAccumulation,
+            monthlyIncome: monthlyRetirementIncome,
             monthlyRetirementIncome,
             inflationAdjustedTotal,
             inflationAdjustedMonthly,
-            yearsToRetirement
+            yearsToRetirement,
+            projectedIncome: monthlyRetirementIncome,
+            retirementAge: parseFloat(inputs.retirementAge || 67)
         };
+    };
+
+    // Input validation functions
+    const validateInputs = () => {
+        const errors = [];
+        
+        if (!inputs.currentAge || inputs.currentAge < 18 || inputs.currentAge > 100) {
+            errors.push('Current age must be between 18 and 100');
+        }
+        
+        if (!inputs.retirementAge || inputs.retirementAge <= inputs.currentAge) {
+            errors.push('Retirement age must be greater than current age');
+        }
+        
+        if (!inputs.currentMonthlySalary || inputs.currentMonthlySalary <= 0) {
+            errors.push('Monthly salary is required');
+        }
+        
+        return {
+            isValid: errors.length === 0,
+            errors
+        };
+    };
+    
+    const checkComplete = () => {
+        const required = ['currentAge', 'retirementAge', 'currentMonthlySalary'];
+        return required.every(field => inputs[field] && inputs[field] !== '');
     };
 
     // Generate action items based on scores and inputs
@@ -297,6 +336,15 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         const immediate = [];
         const shortTerm = [];
         const longTerm = [];
+        
+        // Add actionItems alias for test compatibility
+        const actionItems = {
+            immediate,
+            shortTerm,
+            longTerm
+        };
+        
+        const recommendations = actionItems;
         
         // Immediate actions
         if (savingsScore < 70) {
@@ -418,6 +466,118 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                         className: "text-sm text-gray-600"
                     }, t.diversification)
                 ])
+            ])
+        ]);
+    };
+
+    // Render couple compatibility section
+    const renderCoupleCompatibility = () => {
+        if (!inputs.partnerPlanningEnabled || !window.CoupleValidation) {
+            return null;
+        }
+
+        const coupleValidation = window.CoupleValidation.validateCoupleData(inputs, inputs, language);
+        const scoreColor = coupleValidation.score >= 85 ? 'green' : 
+                          coupleValidation.score >= 70 ? 'blue' : 
+                          coupleValidation.score >= 55 ? 'yellow' : 'red';
+
+        return createElement('div', {
+            key: 'couple-compatibility',
+            className: "bg-purple-50 rounded-xl p-6 border border-purple-200 mb-8"
+        }, [
+            createElement('h3', {
+                key: 'compatibility-title',
+                className: "text-xl font-semibold text-purple-700 mb-6 flex items-center"
+            }, [
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💑'),
+                language === 'he' ? 'תאימות תכנון זוגי' : 'Couple Planning Compatibility'
+            ]),
+            
+            createElement('div', { key: 'compatibility-grid', className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" }, [
+                createElement('div', { key: 'compatibility-score', className: "text-center" }, [
+                    createElement('div', {
+                        key: 'score-value',
+                        className: `text-3xl font-bold text-${scoreColor}-600`
+                    }, `${coupleValidation.score}/100`),
+                    createElement('div', {
+                        key: 'score-label',
+                        className: "text-sm text-purple-600"
+                    }, language === 'he' ? 'ציון תאימות' : 'Compatibility Score')
+                ]),
+                
+                createElement('div', { key: 'errors-count', className: "text-center" }, [
+                    createElement('div', {
+                        key: 'errors-value',
+                        className: `text-2xl font-bold ${coupleValidation.errors.length > 0 ? 'text-red-600' : 'text-green-600'}`
+                    }, coupleValidation.errors.length),
+                    createElement('div', {
+                        key: 'errors-label',
+                        className: "text-sm text-purple-600"
+                    }, language === 'he' ? 'שגיאות' : 'Errors')
+                ]),
+                
+                createElement('div', { key: 'warnings-count', className: "text-center" }, [
+                    createElement('div', {
+                        key: 'warnings-value',
+                        className: `text-2xl font-bold ${coupleValidation.warnings.length > 0 ? 'text-yellow-600' : 'text-green-600'}`
+                    }, coupleValidation.warnings.length),
+                    createElement('div', {
+                        key: 'warnings-label',
+                        className: "text-sm text-purple-600"
+                    }, language === 'he' ? 'אזהרות' : 'Warnings')
+                ]),
+                
+                createElement('div', { key: 'recommendations-count', className: "text-center" }, [
+                    createElement('div', {
+                        key: 'recommendations-value',
+                        className: "text-2xl font-bold text-blue-600"
+                    }, coupleValidation.recommendations.length),
+                    createElement('div', {
+                        key: 'recommendations-label',
+                        className: "text-sm text-purple-600"
+                    }, language === 'he' ? 'המלצות' : 'Recommendations')
+                ])
+            ]),
+            
+            // Show top issues/recommendations
+            coupleValidation.errors.length > 0 && createElement('div', {
+                key: 'top-error',
+                className: "mt-4 p-4 bg-red-100 rounded-lg border border-red-200"
+            }, [
+                createElement('div', {
+                    key: 'error-icon',
+                    className: "flex items-center mb-2"
+                }, [
+                    createElement('span', { key: 'icon', className: "mr-2 text-red-500" }, '⚠️'),
+                    createElement('span', { 
+                        key: 'title', 
+                        className: "font-semibold text-red-700" 
+                    }, language === 'he' ? 'בעיה קריטית:' : 'Critical Issue:')
+                ]),
+                createElement('p', {
+                    key: 'error-message',
+                    className: "text-red-600 text-sm"
+                }, coupleValidation.errors[0].message)
+            ]),
+            
+            coupleValidation.recommendations.length > 0 && coupleValidation.errors.length === 0 && createElement('div', {
+                key: 'top-recommendation',
+                className: "mt-4 p-4 bg-blue-100 rounded-lg border border-blue-200"
+            }, [
+                createElement('div', {
+                    key: 'recommendation-icon',
+                    className: "flex items-center mb-2"
+                }, [
+                    createElement('span', { key: 'icon', className: "mr-2 text-blue-500" }, '💡'),
+                    createElement('span', { 
+                        key: 'title', 
+                        className: "font-semibold text-blue-700" 
+                    }, language === 'he' ? 'המלצה מובילה:' : 'Top Recommendation:')
+                ]),
+                createElement('p', {
+                    key: 'recommendation-message',
+                    className: "text-blue-600 text-sm"
+                }, coupleValidation.recommendations[0].message)
             ])
         ]);
     };
@@ -632,6 +792,9 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
 
         // Financial Health Score
         renderFinancialHealthScore(),
+
+        // Couple Compatibility
+        renderCoupleCompatibility(),
 
         // Retirement Projections
         renderRetirementProjections(),

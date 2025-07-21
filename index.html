@@ -100,6 +100,8 @@
     <script src="src/utils/stressTestScenarios.js?v={{VERSION}}"></script>
     <script src="src/utils/currencyAPI.js?v={{VERSION}}"></script>
     <script src="src/utils/IsraeliNationalInsurance.js?v={{VERSION}}"></script>
+    <script src="src/utils/coupleValidation.js?v={{VERSION}}"></script>
+    <script src="src/utils/portfolioOptimizer.js?v={{VERSION}}"></script>
     
     <!-- Base Components (loaded first) -->
     <script src="src/components/EnhancedRSUCompanySelector.js?v={{VERSION}}"></script>
@@ -117,6 +119,8 @@
     <script src="src/components/WizardStepFees.js?v={{VERSION}}"></script>
     <script src="src/components/WizardStepInvestments.js?v={{VERSION}}"></script>
     <script src="src/components/WizardStepGoals.js?v={{VERSION}}"></script>
+    <script src="src/components/WizardStepInheritance.js?v={{VERSION}}"></script>
+    <script src="src/components/WizardStepTaxes.js?v={{VERSION}}"></script>
     <script src="src/components/WizardStepReview.js?v={{VERSION}}"></script>
     <script src="src/components/RetirementWizard.js?v={{VERSION}}"></script>
     
@@ -129,6 +133,20 @@
     
     <!-- Dashboard Components (lazy-loaded as needed) -->
     <script src="src/components/SavingsSummaryPanel.js?v={{VERSION}}"></script>
+    
+    <!-- Scenario Comparison Components -->
+    <script src="src/components/ScenarioChart.js?v={{VERSION}}"></script>
+    <script src="src/components/ScenarioEditor.js?v={{VERSION}}"></script>
+    <script src="src/components/ScenarioComparison.js?v={{VERSION}}"></script>
+    
+    <!-- Goal Tracking Components -->
+    <script src="src/components/GoalTrackingDashboard.js?v={{VERSION}}"></script>
+    
+    <!-- Couple Planning Components -->
+    <script src="src/components/CoupleValidationPanel.js?v={{VERSION}}"></script>
+    
+    <!-- Portfolio Optimization Components -->
+    <script src="src/components/PortfolioOptimizationPanel.js?v={{VERSION}}"></script>
     
     <!-- Currency & Dashboard Components -->
     <script src="src/components/CurrencySelector.js?v={{VERSION}}"></script>
@@ -144,7 +162,9 @@
         function validateComponents() {
             const requiredComponents = [
                 'RetirementPlannerApp', 'Dashboard', 'CurrencySelector', 'BasicInputs', 'AdvancedInputs', 'ResultsPanel',
-                'ReadinessScore', 'HelpTooltip', 'calculateRetirement', 'formatCurrency', 'currencyAPI'
+                'ReadinessScore', 'HelpTooltip', 'calculateRetirement', 'formatCurrency', 'currencyAPI',
+                'ScenarioComparison', 'ScenarioEditor', 'ScenarioChart', 'GoalTrackingDashboard', 
+                'CoupleValidationPanel', 'CoupleValidation', 'PortfolioOptimizer', 'PortfolioOptimizationPanel'
             ];
             
             const missing = requiredComponents.filter(comp => !window[comp]);

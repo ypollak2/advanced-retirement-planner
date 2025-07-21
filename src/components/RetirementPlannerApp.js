@@ -363,7 +363,7 @@ function RetirementPlannerApp() {
         return displayValue;
     }
 
-    // Calculate function with error handling and wizard data sync
+    // Enhanced calculate function with full wizard data integration
     function handleCalculate() {
         try {
             if (window.calculateRetirement) {
@@ -388,25 +388,94 @@ function RetirementPlannerApp() {
                                   ((inputs.quarterlyRSU || 0) / 3) + // Convert quarterly to monthly
                                   (inputs.otherIncome || 0);
                     
+                    // Apply tax optimization from Step 9 if available
+                    var optimizedPensionRate = inputs.optimizedPensionRate || inputs.pensionContributionRate || 17.5;
+                    var optimizedTrainingRate = inputs.optimizedTrainingFundRate || inputs.trainingFundContributionRate || 7.5;
+                    
                     updatedWorkPeriods[0] = {
                         ...updatedWorkPeriods[0],
                         salary: totalIncome,
-                        monthlyContribution: Math.round(totalIncome * 0.175), // Default 17.5% pension contribution
-                        monthlyTrainingFund: Math.round(totalIncome * 0.075) // Default 7.5% training fund
+                        monthlyContribution: Math.round(totalIncome * (optimizedPensionRate / 100)),
+                        monthlyTrainingFund: Math.round(totalIncome * (optimizedTrainingRate / 100))
                     };
                     
                     // Update work periods state
                     setWorkPeriods(updatedWorkPeriods);
                 }
                 
-                // Update inputs with calculated total income for the calculation
+                // Calculate inheritance and estate data from Step 8
+                var totalAssets = (inputs.realEstateAssets || 0) + 
+                                 (inputs.investmentAssets || 0) + 
+                                 (inputs.businessAssets || 0) + 
+                                 (inputs.personalAssets || 0) + 
+                                 (inputs.pensionAssets || 0);
+                
+                var totalDebts = (inputs.mortgageDebts || 0) + 
+                                (inputs.loanDebts || 0) + 
+                                (inputs.creditCardDebts || 0) + 
+                                (inputs.businessDebts || 0);
+                
+                var netWorth = totalAssets - totalDebts;
+                
+                // Calculate Israeli National Insurance benefits if applicable
+                var nationalInsuranceBenefits = 0;
+                var nationalInsuranceMonthly = 0;
+                
+                if (inputs.country === 'israel' && window.IsraeliNationalInsurance) {
+                    try {
+                        var niCalculator = new window.IsraeliNationalInsurance();
+                        var yearsContribution = (inputs.retirementAge || 67) - (inputs.currentAge || 30);
+                        var avgSalary = updatedWorkPeriods[0]?.salary || inputs.currentMonthlySalary || 20000;
+                        
+                        var niBenefits = niCalculator.calculateOldAgePension(
+                            yearsContribution,
+                            avgSalary * 12, // Annual salary
+                            inputs.gender || 'male'
+                        );
+                        
+                        nationalInsuranceBenefits = niBenefits.totalPension || 0;
+                        nationalInsuranceMonthly = niBenefits.monthlyPension || 0;
+                        
+                        console.log('National Insurance calculated:', niBenefits);
+                    } catch (niError) {
+                        console.warn('National Insurance calculation failed:', niError);
+                    }
+                }
+                
+                // Enhanced inputs with full wizard integration
                 var updatedInputs = {
                     ...inputs,
-                    currentSalary: updatedWorkPeriods[0]?.salary || inputs.currentMonthlySalary || 20000
+                    currentSalary: updatedWorkPeriods[0]?.salary || inputs.currentMonthlySalary || 20000,
+                    
+                    // Inheritance and estate planning (Step 8)
+                    totalAssets: totalAssets,
+                    totalDebts: totalDebts,
+                    netWorth: netWorth,
+                    hasWill: inputs.willStatus === 'hasWill',
+                    lifeInsuranceAmount: inputs.lifeInsuranceAmount || 0,
+                    
+                    // Tax optimization (Step 9)
+                    taxCountry: inputs.taxCountry || inputs.country || 'israel',
+                    currentTaxRate: inputs.currentTaxRate || 20,
+                    marginalTaxRate: inputs.marginalTaxRate || 30,
+                    effectiveTaxRate: inputs.effectiveTaxRate || 25,
+                    optimizedPensionRate: optimizedPensionRate,
+                    optimizedTrainingFundRate: optimizedTrainingRate,
+                    taxEfficiencyScore: inputs.taxEfficiencyScore || 0,
+                    
+                    // National Insurance integration
+                    nationalInsuranceBenefits: nationalInsuranceBenefits,
+                    nationalInsuranceMonthly: nationalInsuranceMonthly,
+                    
+                    // Enhanced data from Review step (Step 10)
+                    financialHealthScore: inputs.financialHealthScore || 0,
+                    retirementReadiness: inputs.retirementReadiness || 'needs-improvement'
                 };
                 
-                console.log('Calculate: Using updated inputs:', updatedInputs);
-                console.log('Calculate: Using updated work periods:', updatedWorkPeriods);
+                console.log('Calculate: Using enhanced inputs with full wizard integration:', updatedInputs);
+                console.log('Calculate: Inheritance data - Assets:', totalAssets, 'Debts:', totalDebts, 'Net Worth:', netWorth);
+                console.log('Calculate: Tax optimization - Pension:', optimizedPensionRate, '% Training Fund:', optimizedTrainingRate, '%');
+                console.log('Calculate: National Insurance - Monthly:', nationalInsuranceMonthly);
                 
                 var result = window.calculateRetirement(
                     updatedInputs, 
@@ -417,6 +486,26 @@ function RetirementPlannerApp() {
                     updatedWorkPeriods[0]?.monthlyTrainingFund || 500,
                     partnerWorkPeriods
                 );
+                
+                // Enhance result with integrated data
+                if (result) {
+                    result.inheritanceData = {
+                        totalAssets: totalAssets,
+                        totalDebts: totalDebts,
+                        netWorth: netWorth,
+                        hasWill: inputs.willStatus === 'hasWill'
+                    };
+                    result.taxOptimization = {
+                        currentRate: inputs.currentTaxRate || 20,
+                        optimizedPensionRate: optimizedPensionRate,
+                        optimizedTrainingRate: optimizedTrainingRate,
+                        efficiencyScore: inputs.taxEfficiencyScore || 0
+                    };
+                    result.nationalInsurance = {
+                        monthlyBenefit: nationalInsuranceMonthly,
+                        totalBenefit: nationalInsuranceBenefits
+                    };
+                }
                 
                 console.log('Calculate: Result received:', result);
                 setResults(result);
@@ -450,7 +539,13 @@ function RetirementPlannerApp() {
 
     // Handle section expansion from dashboard
     function handleSectionExpand(sectionId, isExpanded) {
-        if (isExpanded) {
+        if (sectionId === 'openScenarios') {
+            setViewMode('scenarios');
+        } else if (sectionId === 'openGoals') {
+            setViewMode('goals');
+        } else if (sectionId === 'openOptimization') {
+            setViewMode('optimization');
+        } else if (isExpanded) {
             setActiveSection(sectionId);
             setViewMode('detailed');
         }
@@ -463,12 +558,10 @@ function RetirementPlannerApp() {
                 handleCalculate();
                 break;
             case 'optimize':
-                // TODO: Implement optimization logic
-                console.log('Optimization feature coming soon');
+                handleOptimize();
                 break;
             case 'export':
-                // TODO: Implement export logic
-                console.log('Export feature coming soon');
+                handleExport();
                 break;
             default:
                 console.log('Unknown action:', action);
@@ -497,6 +590,531 @@ function RetirementPlannerApp() {
         if (results) {
             setTimeout(handleCalculate, 100);
         }
+    }
+
+    // Handle portfolio optimization
+    function handleOptimize() {
+        try {
+            if (!results) {
+                alert(translations.optimizeRequiresCalculation || 'Please calculate your retirement plan first before optimizing.');
+                return;
+            }
+
+            // Get current age and risk tolerance
+            const currentAge = parseInt(inputs.currentAge) || 30;
+            const riskTolerance = inputs.riskTolerance || 'moderate';
+            const currentReturn = parseFloat(inputs.expectedReturn) || 7.0;
+            
+            // Risk-based asset allocation recommendations
+            const riskProfiles = {
+                conservative: { stocks: Math.max(20, 60 - currentAge), bonds: Math.min(80, 40 + currentAge), alternatives: 0 },
+                moderate: { stocks: Math.max(30, 70 - currentAge), bonds: Math.min(70, 30 + currentAge), alternatives: 0 },
+                aggressive: { stocks: Math.max(50, 90 - currentAge), bonds: Math.min(50, 10 + currentAge), alternatives: 0 }
+            };
+            
+            const recommendedAllocation = riskProfiles[riskTolerance] || riskProfiles.moderate;
+            
+            // Generate optimization recommendations
+            const optimizations = [];
+            
+            // Asset allocation optimization
+            const currentStocks = parseFloat(inputs.stockPercentage) || 60;
+            const currentBonds = parseFloat(inputs.bondPercentage) || 30;
+            
+            if (Math.abs(currentStocks - recommendedAllocation.stocks) > 10) {
+                optimizations.push(`Consider adjusting your stock allocation from ${currentStocks}% to ${recommendedAllocation.stocks}% based on your age and risk tolerance.`);
+            }
+            
+            // Fee optimization
+            const contributionFees = parseFloat(inputs.contributionFees) || 1.0;
+            const accumulationFees = parseFloat(inputs.accumulationFees) || 1.0;
+            
+            if (contributionFees > 0.5) {
+                optimizations.push(`Your contribution fees (${contributionFees}%) are high. Consider switching to a provider with lower fees to save thousands over time.`);
+            }
+            
+            if (accumulationFees > 0.75) {
+                optimizations.push(`Your annual management fees (${accumulationFees}%) could be reduced. Lower fees can significantly impact long-term returns.`);
+            }
+            
+            // Contribution rate optimization
+            const pensionRate = parseFloat(inputs.pensionContributionRate) || 0;
+            const country = inputs.taxCountry || 'israel';
+            
+            if (country === 'israel' && pensionRate < 7) {
+                optimizations.push(`Consider increasing your pension contribution to 7% to maximize tax deductions in Israel.`);
+            }
+            
+            // Show optimization results
+            if (optimizations.length > 0) {
+                const optimizationText = optimizations.join('\\n\\n');
+                alert(`💡 Portfolio Optimization Recommendations:\\n\\n${optimizationText}\\n\\nWould you like to apply these changes automatically?`);
+                
+                // Auto-apply basic optimizations if user confirms
+                if (confirm('Apply recommended asset allocation changes?')) {
+                    setInputs(prev => ({
+                        ...prev,
+                        stockPercentage: recommendedAllocation.stocks,
+                        bondPercentage: recommendedAllocation.bonds,
+                        alternativePercentage: recommendedAllocation.alternatives
+                    }));
+                    
+                    // Recalculate with new allocations
+                    setTimeout(handleCalculate, 500);
+                }
+            } else {
+                alert('✅ Your portfolio appears to be well-optimized for your age and risk tolerance!');
+            }
+            
+        } catch (error) {
+            console.error('Optimization error:', error);
+            alert('Unable to generate optimization recommendations. Please try again.');
+        }
+    }
+
+    // Handle export functionality
+    // Enhanced export with multiple format options
+    function handleExport() {
+        // Show export format selection dialog
+        const formats = [
+            { id: 'pdf', name: language === 'he' ? 'PDF - דוח מקצועי' : 'PDF - Professional Report', icon: '📄' },
+            { id: 'excel', name: language === 'he' ? 'Excel - גיליון אלקטרוני' : 'Excel - Spreadsheet', icon: '📊' },
+            { id: 'json', name: language === 'he' ? 'JSON - נתונים גולמיים' : 'JSON - Raw Data', icon: '📝' },
+            { id: 'csv', name: language === 'he' ? 'CSV - פורמט פשוט' : 'CSV - Simple Format', icon: '📋' },
+            { id: 'all', name: language === 'he' ? 'כל הפורמטים' : 'All Formats', icon: '📦' }
+        ];
+
+        const formatSelector = React.createElement('div', {
+            key: 'export-dialog',
+            style: {
+                position: 'fixed',
+                top: '0',
+                left: '0',
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: '9999'
+            }
+        }, [
+            React.createElement('div', {
+                key: 'dialog-content',
+                style: {
+                    backgroundColor: 'white',
+                    padding: '2rem',
+                    borderRadius: '12px',
+                    maxWidth: '500px',
+                    width: '90%',
+                    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
+                }
+            }, [
+                React.createElement('h3', {
+                    key: 'dialog-title',
+                    style: { marginBottom: '1rem', fontSize: '1.5rem', fontWeight: 'bold', textAlign: 'center' }
+                }, language === 'he' ? 'בחר פורמט ייצוא' : 'Choose Export Format'),
+                
+                React.createElement('div', {
+                    key: 'format-options',
+                    style: { display: 'grid', gap: '0.5rem', marginBottom: '1rem' }
+                }, formats.map(format => 
+                    React.createElement('button', {
+                        key: format.id,
+                        onClick: () => {
+                            document.body.removeChild(document.getElementById('export-dialog-overlay'));
+                            performExport(format.id);
+                        },
+                        style: {
+                            padding: '0.75rem',
+                            border: '2px solid #e5e7eb',
+                            borderRadius: '8px',
+                            backgroundColor: '#f9fafb',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            display: 'flex',
+                            alignItems: 'center',
+                            transition: 'all 0.2s'
+                        },
+                        onMouseOver: (e) => {
+                            e.target.style.backgroundColor = '#e5e7eb';
+                            e.target.style.borderColor = '#3b82f6';
+                        },
+                        onMouseOut: (e) => {
+                            e.target.style.backgroundColor = '#f9fafb';
+                            e.target.style.borderColor = '#e5e7eb';
+                        }
+                    }, [
+                        React.createElement('span', { 
+                            key: 'icon', 
+                            style: { marginRight: '0.5rem', fontSize: '1.25rem' } 
+                        }, format.icon),
+                        React.createElement('span', { key: 'text' }, format.name)
+                    ])
+                )),
+                
+                React.createElement('button', {
+                    key: 'cancel-btn',
+                    onClick: () => document.body.removeChild(document.getElementById('export-dialog-overlay')),
+                    style: {
+                        width: '100%',
+                        padding: '0.5rem',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '6px',
+                        backgroundColor: '#f3f4f6',
+                        cursor: 'pointer'
+                    }
+                }, language === 'he' ? 'ביטול' : 'Cancel')
+            ])
+        ]);
+
+        const overlay = document.createElement('div');
+        overlay.id = 'export-dialog-overlay';
+        document.body.appendChild(overlay);
+        ReactDOM.render(formatSelector, overlay);
+    }
+
+    function performExport(format) {
+        try {
+            if (!results) {
+                alert(translations.exportRequiresCalculation || 'Please calculate your retirement plan first before exporting.');
+                return;
+            }
+
+            const timestamp = new Date().toISOString().split('T')[0];
+            const exportData = generateExportData();
+
+            switch (format) {
+                case 'pdf':
+                    exportToPDF(exportData, timestamp);
+                    break;
+                case 'excel':
+                    exportToExcel(exportData, timestamp);
+                    break;
+                case 'json':
+                    exportToJSON(exportData, timestamp);
+                    break;
+                case 'csv':
+                    exportToCSV(exportData, timestamp);
+                    break;
+                case 'all':
+                    exportToJSON(exportData, timestamp);
+                    exportToCSV(exportData, timestamp);
+                    exportToExcel(exportData, timestamp);
+                    setTimeout(() => exportToPDF(exportData, timestamp), 500);
+                    break;
+            }
+            
+        } catch (error) {
+            console.error('Export error:', error);
+            alert((language === 'he' ? 'שגיאה בייצוא הקובץ. אנא נסה שוב.' : 'Export error. Please try again.'));
+        }
+    }
+
+    function generateExportData() {
+        return {
+            timestamp: new Date().toISOString(),
+            version: window.APP_VERSION || '6.3.0',
+            personalInfo: {
+                currentAge: inputs.currentAge,
+                retirementAge: inputs.retirementAge,
+                planningType: inputs.planningType || 'single',
+                country: inputs.taxCountry || inputs.country || 'israel'
+            },
+            financial: {
+                currentSalary: inputs.currentMonthlySalary,
+                currentSavings: inputs.totalCurrentSavings,
+                pensionRate: inputs.pensionContributionRate,
+                trainingFundRate: inputs.trainingFundContributionRate,
+                expectedReturn: inputs.expectedReturn
+            },
+            inheritance: {
+                totalAssets: inputs.totalAssets || 0,
+                totalDebts: inputs.totalDebts || 0,
+                netWorth: inputs.netWorth || 0,
+                hasWill: inputs.hasWill || inputs.willStatus === 'hasWill',
+                lifeInsurance: inputs.lifeInsuranceAmount || 0
+            },
+            taxOptimization: {
+                currentTaxRate: inputs.currentTaxRate || 20,
+                optimizedPensionRate: inputs.optimizedPensionRate || inputs.pensionContributionRate || 17.5,
+                optimizedTrainingRate: inputs.optimizedTrainingFundRate || inputs.trainingFundContributionRate || 7.5,
+                taxEfficiencyScore: inputs.taxEfficiencyScore || 0
+            },
+            nationalInsurance: {
+                monthlyBenefit: results.nationalInsurance?.monthlyBenefit || 0,
+                totalBenefit: results.nationalInsurance?.totalBenefit || 0
+            },
+            results: {
+                totalAccumulation: results.totalAccumulation,
+                monthlyIncome: results.monthlyIncome,
+                inflationAdjusted: results.inflationAdjusted,
+                readinessScore: results.readinessScore,
+                financialHealthScore: inputs.financialHealthScore || 0
+            },
+            allocation: {
+                stocks: inputs.stockPercentage,
+                bonds: inputs.bondPercentage,
+                alternatives: inputs.alternativePercentage
+            }
+        };
+    }
+
+    // Export to JSON format
+    function exportToJSON(exportData, timestamp) {
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        downloadFile(dataBlob, `retirement-plan-${timestamp}.json`);
+    }
+
+    // Export to CSV format
+    function exportToCSV(exportData, timestamp) {
+        const csvData = [
+            ['Field', 'Value'],
+            ['Generated', new Date().toLocaleDateString()],
+            ['Version', exportData.version],
+            [''],
+            ['Personal Information', ''],
+            ['Current Age', exportData.personalInfo.currentAge],
+            ['Retirement Age', exportData.personalInfo.retirementAge],
+            ['Planning Type', exportData.personalInfo.planningType],
+            ['Country', exportData.personalInfo.country],
+            [''],
+            ['Financial Information', ''],
+            ['Monthly Salary', exportData.financial.currentSalary],
+            ['Current Savings', exportData.financial.currentSavings],
+            ['Pension Rate (%)', exportData.financial.pensionRate],
+            ['Training Fund Rate (%)', exportData.financial.trainingFundRate],
+            ['Expected Return (%)', exportData.financial.expectedReturn],
+            [''],
+            ['Estate Planning', ''],
+            ['Total Assets', exportData.inheritance.totalAssets],
+            ['Total Debts', exportData.inheritance.totalDebts],
+            ['Net Worth', exportData.inheritance.netWorth],
+            ['Has Will', exportData.inheritance.hasWill ? 'Yes' : 'No'],
+            ['Life Insurance', exportData.inheritance.lifeInsurance],
+            [''],
+            ['Tax Optimization', ''],
+            ['Current Tax Rate (%)', exportData.taxOptimization.currentTaxRate],
+            ['Optimized Pension Rate (%)', exportData.taxOptimization.optimizedPensionRate],
+            ['Optimized Training Rate (%)', exportData.taxOptimization.optimizedTrainingRate],
+            ['Tax Efficiency Score', exportData.taxOptimization.taxEfficiencyScore],
+            [''],
+            ['National Insurance', ''],
+            ['Monthly Benefit', exportData.nationalInsurance.monthlyBenefit],
+            ['Total Benefit', exportData.nationalInsurance.totalBenefit],
+            [''],
+            ['Results', ''],
+            ['Total Accumulation', exportData.results.totalAccumulation],
+            ['Monthly Retirement Income', exportData.results.monthlyIncome],
+            ['Inflation Adjusted', exportData.results.inflationAdjusted],
+            ['Readiness Score', exportData.results.readinessScore],
+            ['Financial Health Score', exportData.results.financialHealthScore],
+            [''],
+            ['Asset Allocation', ''],
+            ['Stocks (%)', exportData.allocation.stocks],
+            ['Bonds (%)', exportData.allocation.bonds],
+            ['Alternatives (%)', exportData.allocation.alternatives]
+        ];
+
+        const csvContent = csvData.map(row => 
+            row.map(cell => typeof cell === 'string' && cell.includes(',') ? `"${cell}"` : cell).join(',')
+        ).join('\\n');
+        
+        const csvBlob = new Blob([csvContent], { type: 'text/csv' });
+        downloadFile(csvBlob, `retirement-plan-${timestamp}.csv`);
+    }
+
+    // Export to Excel format (using simplified XLSX structure)
+    function exportToExcel(exportData, timestamp) {
+        // Create a simple Excel-compatible XML structure
+        const excelData = `<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <Worksheet ss:Name="Retirement Plan">
+  <Table>
+   <Row><Cell><Data ss:Type="String">Advanced Retirement Plan Report</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Generated: ${new Date().toLocaleDateString()}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Version: ${exportData.version}</Data></Cell></Row>
+   <Row></Row>
+   
+   <Row><Cell><Data ss:Type="String">Personal Information</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Current Age</Data></Cell><Cell><Data ss:Type="Number">${exportData.personalInfo.currentAge}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Retirement Age</Data></Cell><Cell><Data ss:Type="Number">${exportData.personalInfo.retirementAge}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Planning Type</Data></Cell><Cell><Data ss:Type="String">${exportData.personalInfo.planningType}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Country</Data></Cell><Cell><Data ss:Type="String">${exportData.personalInfo.country}</Data></Cell></Row>
+   <Row></Row>
+   
+   <Row><Cell><Data ss:Type="String">Financial Information</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Monthly Salary</Data></Cell><Cell><Data ss:Type="Number">${exportData.financial.currentSalary}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Current Savings</Data></Cell><Cell><Data ss:Type="Number">${exportData.financial.currentSavings}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Pension Rate (%)</Data></Cell><Cell><Data ss:Type="Number">${exportData.financial.pensionRate}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Training Fund Rate (%)</Data></Cell><Cell><Data ss:Type="Number">${exportData.financial.trainingFundRate}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Expected Return (%)</Data></Cell><Cell><Data ss:Type="Number">${exportData.financial.expectedReturn}</Data></Cell></Row>
+   <Row></Row>
+   
+   <Row><Cell><Data ss:Type="String">Estate Planning</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Total Assets</Data></Cell><Cell><Data ss:Type="Number">${exportData.inheritance.totalAssets}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Total Debts</Data></Cell><Cell><Data ss:Type="Number">${exportData.inheritance.totalDebts}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Net Worth</Data></Cell><Cell><Data ss:Type="Number">${exportData.inheritance.netWorth}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Has Will</Data></Cell><Cell><Data ss:Type="String">${exportData.inheritance.hasWill ? 'Yes' : 'No'}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Life Insurance</Data></Cell><Cell><Data ss:Type="Number">${exportData.inheritance.lifeInsurance}</Data></Cell></Row>
+   <Row></Row>
+   
+   <Row><Cell><Data ss:Type="String">Tax Optimization</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Current Tax Rate (%)</Data></Cell><Cell><Data ss:Type="Number">${exportData.taxOptimization.currentTaxRate}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Optimized Pension Rate (%)</Data></Cell><Cell><Data ss:Type="Number">${exportData.taxOptimization.optimizedPensionRate}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Optimized Training Rate (%)</Data></Cell><Cell><Data ss:Type="Number">${exportData.taxOptimization.optimizedTrainingRate}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Tax Efficiency Score</Data></Cell><Cell><Data ss:Type="Number">${exportData.taxOptimization.taxEfficiencyScore}</Data></Cell></Row>
+   <Row></Row>
+   
+   <Row><Cell><Data ss:Type="String">National Insurance</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Monthly Benefit</Data></Cell><Cell><Data ss:Type="Number">${exportData.nationalInsurance.monthlyBenefit}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Total Benefit</Data></Cell><Cell><Data ss:Type="Number">${exportData.nationalInsurance.totalBenefit}</Data></Cell></Row>
+   <Row></Row>
+   
+   <Row><Cell><Data ss:Type="String">Results</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Total Accumulation</Data></Cell><Cell><Data ss:Type="Number">${exportData.results.totalAccumulation}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Monthly Retirement Income</Data></Cell><Cell><Data ss:Type="Number">${exportData.results.monthlyIncome}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Inflation Adjusted</Data></Cell><Cell><Data ss:Type="Number">${exportData.results.inflationAdjusted}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Readiness Score</Data></Cell><Cell><Data ss:Type="Number">${exportData.results.readinessScore}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Financial Health Score</Data></Cell><Cell><Data ss:Type="Number">${exportData.results.financialHealthScore}</Data></Cell></Row>
+   <Row></Row>
+   
+   <Row><Cell><Data ss:Type="String">Asset Allocation</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Stocks (%)</Data></Cell><Cell><Data ss:Type="Number">${exportData.allocation.stocks}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Bonds (%)</Data></Cell><Cell><Data ss:Type="Number">${exportData.allocation.bonds}</Data></Cell></Row>
+   <Row><Cell><Data ss:Type="String">Alternatives (%)</Data></Cell><Cell><Data ss:Type="Number">${exportData.allocation.alternatives}</Data></Cell></Row>
+  </Table>
+ </Worksheet>
+</Workbook>`;
+
+        const excelBlob = new Blob([excelData], { type: 'application/vnd.ms-excel' });
+        downloadFile(excelBlob, `retirement-plan-${timestamp}.xls`);
+    }
+
+    // Export to PDF format (using HTML to PDF conversion)
+    function exportToPDF(exportData, timestamp) {
+        // Create HTML content for PDF
+        const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Retirement Plan Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+        .section { margin-bottom: 25px; page-break-inside: avoid; }
+        .section-title { font-size: 18px; font-weight: bold; color: #2563eb; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 15px; }
+        .data-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
+        .data-label { font-weight: bold; }
+        .highlight { background-color: #f0f9ff; padding: 10px; border-left: 4px solid #2563eb; margin: 10px 0; }
+        .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Advanced Retirement Plan Report</h1>
+        <p>Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+        <p>Version ${exportData.version}</p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Personal Information</h2>
+        <div class="data-row"><span class="data-label">Current Age:</span><span>${exportData.personalInfo.currentAge} years</span></div>
+        <div class="data-row"><span class="data-label">Target Retirement Age:</span><span>${exportData.personalInfo.retirementAge} years</span></div>
+        <div class="data-row"><span class="data-label">Planning Type:</span><span>${exportData.personalInfo.planningType}</span></div>
+        <div class="data-row"><span class="data-label">Country:</span><span>${exportData.personalInfo.country}</span></div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Financial Overview</h2>
+        <div class="data-row"><span class="data-label">Monthly Salary:</span><span>₪${exportData.financial.currentSalary?.toLocaleString() || 0}</span></div>
+        <div class="data-row"><span class="data-label">Current Savings:</span><span>₪${exportData.financial.currentSavings?.toLocaleString() || 0}</span></div>
+        <div class="data-row"><span class="data-label">Pension Contribution Rate:</span><span>${exportData.financial.pensionRate || 0}%</span></div>
+        <div class="data-row"><span class="data-label">Training Fund Rate:</span><span>${exportData.financial.trainingFundRate || 0}%</span></div>
+        <div class="data-row"><span class="data-label">Expected Annual Return:</span><span>${exportData.financial.expectedReturn || 0}%</span></div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Estate Planning</h2>
+        <div class="data-row"><span class="data-label">Total Assets:</span><span>₪${exportData.inheritance.totalAssets?.toLocaleString() || 0}</span></div>
+        <div class="data-row"><span class="data-label">Total Debts:</span><span>₪${exportData.inheritance.totalDebts?.toLocaleString() || 0}</span></div>
+        <div class="data-row"><span class="data-label">Net Worth:</span><span>₪${exportData.inheritance.netWorth?.toLocaleString() || 0}</span></div>
+        <div class="data-row"><span class="data-label">Will Status:</span><span>${exportData.inheritance.hasWill ? 'Current will in place' : 'No current will'}</span></div>
+        <div class="data-row"><span class="data-label">Life Insurance:</span><span>₪${exportData.inheritance.lifeInsurance?.toLocaleString() || 0}</span></div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Tax Optimization</h2>
+        <div class="data-row"><span class="data-label">Current Tax Rate:</span><span>${exportData.taxOptimization.currentTaxRate}%</span></div>
+        <div class="data-row"><span class="data-label">Optimized Pension Rate:</span><span>${exportData.taxOptimization.optimizedPensionRate}%</span></div>
+        <div class="data-row"><span class="data-label">Optimized Training Fund Rate:</span><span>${exportData.taxOptimization.optimizedTrainingRate}%</span></div>
+        <div class="data-row"><span class="data-label">Tax Efficiency Score:</span><span>${exportData.taxOptimization.taxEfficiencyScore}/100</span></div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">National Insurance Benefits</h2>
+        <div class="data-row"><span class="data-label">Projected Monthly Benefit:</span><span>₪${exportData.nationalInsurance.monthlyBenefit?.toLocaleString() || 0}</span></div>
+        <div class="data-row"><span class="data-label">Total Projected Benefits:</span><span>₪${exportData.nationalInsurance.totalBenefit?.toLocaleString() || 0}</span></div>
+    </div>
+
+    <div class="highlight">
+        <h2 class="section-title">Retirement Projection Results</h2>
+        <div class="data-row"><span class="data-label">Total Accumulation at Retirement:</span><span>₪${exportData.results.totalAccumulation?.toLocaleString() || 0}</span></div>
+        <div class="data-row"><span class="data-label">Monthly Retirement Income:</span><span>₪${exportData.results.monthlyIncome?.toLocaleString() || 0}</span></div>
+        <div class="data-row"><span class="data-label">Inflation-Adjusted Value:</span><span>₪${exportData.results.inflationAdjusted?.toLocaleString() || 0}</span></div>
+        <div class="data-row"><span class="data-label">Retirement Readiness Score:</span><span>${exportData.results.readinessScore || 0}/100</span></div>
+        <div class="data-row"><span class="data-label">Financial Health Score:</span><span>${exportData.results.financialHealthScore || 0}/100</span></div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Recommended Asset Allocation</h2>
+        <div class="data-row"><span class="data-label">Stocks:</span><span>${exportData.allocation.stocks || 0}%</span></div>
+        <div class="data-row"><span class="data-label">Bonds:</span><span>${exportData.allocation.bonds || 0}%</span></div>
+        <div class="data-row"><span class="data-label">Alternative Investments:</span><span>${exportData.allocation.alternatives || 0}%</span></div>
+    </div>
+
+    <div class="footer">
+        <p>This report was generated by the Advanced Retirement Planner v${exportData.version}</p>
+        <p>For questions or updates, please consult with a financial advisor.</p>
+        <p><em>Disclaimer: This is a projection based on assumptions and should not be considered as financial advice.</em></p>
+    </div>
+</body>
+</html>`;
+
+        // Convert HTML to PDF using browser's print functionality
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+        
+        // Wait for content to load, then trigger print dialog
+        setTimeout(() => {
+            printWindow.print();
+            
+            // Provide alternative download for browsers that don't support print-to-PDF
+            setTimeout(() => {
+                const htmlBlob = new Blob([htmlContent], { type: 'text/html' });
+                downloadFile(htmlBlob, `retirement-plan-${timestamp}.html`);
+                printWindow.close();
+            }, 1000);
+        }, 500);
+    }
+
+    // Helper function to download files
+    function downloadFile(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     }
 
     return React.createElement('div', {
@@ -668,17 +1286,68 @@ function RetirementPlannerApp() {
                                 language === 'he' ? 'תחזית תשואות וניתוח סיכונים' : 'Return projections and risk analysis'
                             ])
                         ]),
-                        React.createElement('button', {
-                            key: 'start-wizard-btn',
-                            onClick: function() { setViewMode('wizard'); setCurrentStep(1); },
-                            className: 'w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center'
-                        }, [
-                            React.createElement('span', {
-                                key: 'start-icon',
-                                className: 'mr-2'
-                            }, '🚀'),
-                            language === 'he' ? 'התחל אשף תכנון' : 'Start Planning Wizard'
-                        ])
+                        // Check for saved wizard progress
+                        (() => {
+                            const savedProgress = localStorage.getItem('retirementWizardProgress');
+                            const hasSavedProgress = savedProgress && JSON.parse(savedProgress).currentStep > 1;
+                            
+                            if (hasSavedProgress) {
+                                const progress = JSON.parse(savedProgress);
+                                return React.createElement('div', {
+                                    key: 'wizard-actions',
+                                    className: 'space-y-2'
+                                }, [
+                                    React.createElement('button', {
+                                        key: 'resume-wizard-btn',
+                                        onClick: function() { 
+                                            setViewMode('wizard'); 
+                                            // Wizard will automatically load saved progress
+                                        },
+                                        className: 'w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center'
+                                    }, [
+                                        React.createElement('span', {
+                                            key: 'resume-icon',
+                                            className: 'mr-2'
+                                        }, '▶️'),
+                                        language === 'he' ? 
+                                            `המשך משלב ${progress.currentStep} מתוך 10` : 
+                                            `Resume from Step ${progress.currentStep} of 10`
+                                    ]),
+                                    React.createElement('button', {
+                                        key: 'start-fresh-btn',
+                                        onClick: function() { 
+                                            if (window.confirm(language === 'he' ? 
+                                                'האם אתה בטוח שברצונך להתחיל מחדש? ההתקדמות השמורה תימחק.' : 
+                                                'Are you sure you want to start fresh? Your saved progress will be cleared.')) {
+                                                localStorage.removeItem('retirementWizardProgress');
+                                                localStorage.removeItem('retirementWizardInputs');
+                                                setViewMode('wizard');
+                                                setCurrentStep(1);
+                                            }
+                                        },
+                                        className: 'w-full bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center text-sm'
+                                    }, [
+                                        React.createElement('span', {
+                                            key: 'fresh-icon',
+                                            className: 'mr-2'
+                                        }, '🔄'),
+                                        language === 'he' ? 'התחל מחדש' : 'Start Fresh'
+                                    ])
+                                ]);
+                            } else {
+                                return React.createElement('button', {
+                                    key: 'start-wizard-btn',
+                                    onClick: function() { setViewMode('wizard'); setCurrentStep(1); },
+                                    className: 'w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center'
+                                }, [
+                                    React.createElement('span', {
+                                        key: 'start-icon',
+                                        className: 'mr-2'
+                                    }, '🚀'),
+                                    language === 'he' ? 'התחל אשף תכנון' : 'Start Planning Wizard'
+                                ]);
+                            }
+                        })()
                     ]),
                     
                     // Currency Selector Card
@@ -730,6 +1399,15 @@ function RetirementPlannerApp() {
                                 React.createElement('span', { key: 'icon' }, '📊'),
                                 ' ',
                                 language === 'he' ? 'מצב מפורט' : 'Detailed View'
+                            ]),
+                            React.createElement('button', {
+                                key: 'scenarios-btn',
+                                onClick: function() { setViewMode('scenarios'); },
+                                className: 'w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium'
+                            }, [
+                                React.createElement('span', { key: 'icon' }, '🔄'),
+                                ' ',
+                                language === 'he' ? 'השוואת תרחישים' : 'Compare Scenarios'
                             ])
                         ])
                     ])
@@ -752,6 +1430,59 @@ function RetirementPlannerApp() {
                     })
                 ])
             ]),
+
+            // Scenario Comparison View
+            viewMode === 'scenarios' && window.ScenarioComparison && React.createElement(window.ScenarioComparison, {
+                key: 'scenario-comparison',
+                baseScenario: inputs,
+                language: language,
+                workingCurrency: workingCurrency,
+                onReturnToDashboard: () => setViewMode('dashboard'),
+                onScenarioUpdate: (scenarioId, newData) => {
+                    console.log('Scenario updated:', scenarioId, newData);
+                    // Handle scenario updates
+                }
+            }),
+
+            // Goal Tracking Dashboard View
+            viewMode === 'goals' && window.GoalTrackingDashboard && React.createElement(window.GoalTrackingDashboard, {
+                key: 'goal-tracking',
+                inputs: inputs,
+                results: results,
+                language: language,
+                workingCurrency: workingCurrency,
+                onReturnToDashboard: () => setViewMode('dashboard'),
+                onGoalUpdate: (goal, action) => {
+                    console.log('Goal updated:', goal, action);
+                    // Handle goal updates - could save to localStorage or send to server
+                    if (action === 'added' || action === 'updated') {
+                        // Update inputs with goal-related data if needed
+                        setInputs(prevInputs => ({
+                            ...prevInputs,
+                            // Add any goal-related fields that should be persisted
+                            lastGoalUpdate: new Date().toISOString()
+                        }));
+                    }
+                }
+            }),
+
+            // Portfolio Optimization View
+            viewMode === 'optimization' && window.PortfolioOptimizationPanel && React.createElement(window.PortfolioOptimizationPanel, {
+                key: 'portfolio-optimization',
+                inputs: inputs,
+                language: language,
+                workingCurrency: workingCurrency,
+                onReturnToDashboard: () => setViewMode('dashboard'),
+                onRebalance: (rebalancingActions) => {
+                    console.log('Rebalancing actions:', rebalancingActions);
+                    // Handle rebalancing actions - could save to localStorage or trigger notifications
+                    setInputs(prevInputs => ({
+                        ...prevInputs,
+                        lastRebalancing: new Date().toISOString(),
+                        pendingRebalancing: rebalancingActions
+                    }));
+                }
+            }),
 
             // Detailed View
             viewMode === 'detailed' && React.createElement('div', {

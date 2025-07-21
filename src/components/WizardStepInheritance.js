@@ -222,7 +222,7 @@ const WizardStepInheritance = ({ inputs, setInputs, language = 'en', workingCurr
     // Asset and debt calculation functions
     const calculateTotalAssets = (partner = '') => {
         const prefix = partner ? `${partner}` : '';
-        const realEstate = parseFloat(inputs[`${prefix}realEstateValue`] || 0);
+        const realEstate = parseFloat(inputs[`${prefix}realEstateAssets`] || 0);
         const investments = parseFloat(inputs[`${prefix}investmentAssets`] || 0);
         const business = parseFloat(inputs[`${prefix}businessAssets`] || 0);
         const personal = parseFloat(inputs[`${prefix}personalAssets`] || 0);
@@ -232,10 +232,10 @@ const WizardStepInheritance = ({ inputs, setInputs, language = 'en', workingCurr
 
     const calculateTotalDebts = (partner = '') => {
         const prefix = partner ? `${partner}` : '';
-        const mortgages = parseFloat(inputs[`${prefix}mortgageDebt`] || 0);
-        const loans = parseFloat(inputs[`${prefix}loanDebt`] || 0);
-        const credit = parseFloat(inputs[`${prefix}creditCardDebt`] || 0);
-        const business = parseFloat(inputs[`${prefix}businessDebt`] || 0);
+        const mortgages = parseFloat(inputs[`${prefix}mortgageDebts`] || 0);
+        const loans = parseFloat(inputs[`${prefix}loanDebts`] || 0);
+        const credit = parseFloat(inputs[`${prefix}creditCardDebts`] || 0);
+        const business = parseFloat(inputs[`${prefix}businessDebts`] || 0);
         return mortgages + loans + credit + business;
     };
 
@@ -324,11 +324,15 @@ const WizardStepInheritance = ({ inputs, setInputs, language = 'en', workingCurr
                 createElement('select', {
                     key: 'will-select',
                     value: inputs[`${prefix}willStatus`] || '',
-                    onChange: (e) => updateInheritanceData('willStatus', e.target.value, partner),
+                    onChange: (e) => {
+                        updateInheritanceData('willStatus', e.target.value, partner);
+                        // Also set hasWill for compatibility
+                        updateInheritanceData('hasWill', e.target.value === 'hasWill', partner);
+                    },
                     className: `w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-${colorScheme}-500 focus:border-${colorScheme}-500`
                 }, [
                     createElement('option', { key: 'will-empty', value: '' }, 'Select...'),
-                    createElement('option', { key: 'will-has', value: 'has' }, t.hasWill),
+                    createElement('option', { key: 'will-has', value: 'hasWill' }, t.hasWill),
                     createElement('option', { key: 'will-needs', value: 'needs' }, t.needsWill),
                     createElement('option', { key: 'will-none', value: 'none' }, t.noWill)
                 ])
@@ -345,16 +349,16 @@ const WizardStepInheritance = ({ inputs, setInputs, language = 'en', workingCurr
                         key: 'insurance-amount',
                         type: 'number',
                         placeholder: t.insuranceAmount,
-                        value: inputs[`${prefix}insuranceAmount`] || '',
-                        onChange: (e) => updateInheritanceData('insuranceAmount', e.target.value, partner),
+                        value: inputs[`${prefix}lifeInsuranceAmount`] || '',
+                        onChange: (e) => updateInheritanceData('lifeInsuranceAmount', e.target.value, partner),
                         className: `p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-${colorScheme}-500 focus:border-${colorScheme}-500`
                     }),
                     createElement('input', {
                         key: 'insurance-premium',
                         type: 'number',
                         placeholder: t.premiumAmount,
-                        value: inputs[`${prefix}insurancePremium`] || '',
-                        onChange: (e) => updateInheritanceData('insurancePremium', e.target.value, partner),
+                        value: inputs[`${prefix}premiumAmount`] || '',
+                        onChange: (e) => updateInheritanceData('premiumAmount', e.target.value, partner),
                         className: `p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-${colorScheme}-500 focus:border-${colorScheme}-500`
                     })
                 ])
@@ -371,8 +375,8 @@ const WizardStepInheritance = ({ inputs, setInputs, language = 'en', workingCurr
                         key: 'real-estate',
                         type: 'number',
                         placeholder: t.realEstate,
-                        value: inputs[`${prefix}realEstateValue`] || '',
-                        onChange: (e) => updateInheritanceData('realEstateValue', e.target.value, partner),
+                        value: inputs[`${prefix}realEstateAssets`] || '',
+                        onChange: (e) => updateInheritanceData('realEstateAssets', e.target.value, partner),
                         className: `p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-${colorScheme}-500 focus:border-${colorScheme}-500`
                     }),
                     createElement('input', {
@@ -421,36 +425,52 @@ const WizardStepInheritance = ({ inputs, setInputs, language = 'en', workingCurr
                         key: 'mortgages',
                         type: 'number',
                         placeholder: t.mortgages,
-                        value: inputs[`${prefix}mortgageDebt`] || '',
-                        onChange: (e) => updateInheritanceData('mortgageDebt', e.target.value, partner),
+                        value: inputs[`${prefix}mortgageDebts`] || '',
+                        onChange: (e) => updateInheritanceData('mortgageDebts', e.target.value, partner),
                         className: `p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-${colorScheme}-500 focus:border-${colorScheme}-500`
                     }),
                     createElement('input', {
                         key: 'loans',
                         type: 'number',
                         placeholder: t.loans,
-                        value: inputs[`${prefix}loanDebt`] || '',
-                        onChange: (e) => updateInheritanceData('loanDebt', e.target.value, partner),
+                        value: inputs[`${prefix}loanDebts`] || '',
+                        onChange: (e) => updateInheritanceData('loanDebts', e.target.value, partner),
                         className: `p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-${colorScheme}-500 focus:border-${colorScheme}-500`
                     }),
                     createElement('input', {
                         key: 'credit-cards',
                         type: 'number',
                         placeholder: t.creditCards,
-                        value: inputs[`${prefix}creditCardDebt`] || '',
-                        onChange: (e) => updateInheritanceData('creditCardDebt', e.target.value, partner),
+                        value: inputs[`${prefix}creditCardDebts`] || '',
+                        onChange: (e) => updateInheritanceData('creditCardDebts', e.target.value, partner),
                         className: `p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-${colorScheme}-500 focus:border-${colorScheme}-500`
                     }),
                     createElement('input', {
                         key: 'business-debts',
                         type: 'number',
                         placeholder: t.businessDebts,
-                        value: inputs[`${prefix}businessDebt`] || '',
-                        onChange: (e) => updateInheritanceData('businessDebt', e.target.value, partner),
+                        value: inputs[`${prefix}businessDebts`] || '',
+                        onChange: (e) => updateInheritanceData('businessDebts', e.target.value, partner),
                         className: `p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-${colorScheme}-500 focus:border-${colorScheme}-500`
                     })
                 ])
             ]),
+
+            // Store calculated values for dashboard integration
+            React.useEffect(() => {
+                const totalAssets = calculateTotalAssets(partner);
+                const totalDebts = calculateTotalDebts(partner);
+                const netWorth = calculateNetWorth(partner);
+                
+                // Update inputs with calculated values for dashboard integration
+                const updates = {
+                    [`${partner || ''}totalAssets`]: totalAssets,
+                    [`${partner || ''}totalDebts`]: totalDebts,
+                    [`${partner || ''}netWorth`]: netWorth
+                };
+                
+                setInputs(prev => ({...prev, ...updates}));
+            }, [inputs[`${prefix}realEstateAssets`], inputs[`${prefix}investmentAssets`], inputs[`${prefix}businessAssets`], inputs[`${prefix}personalAssets`], inputs[`${prefix}pensionAssets`], inputs[`${prefix}mortgageDebts`], inputs[`${prefix}loanDebts`], inputs[`${prefix}creditCardDebts`], inputs[`${prefix}businessDebts`]]),
 
             // Net Worth Summary
             createElement('div', {
