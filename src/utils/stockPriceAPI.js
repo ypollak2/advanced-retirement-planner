@@ -203,10 +203,33 @@ function isAppOnline() {
 
 // Real-time stock price fetching function - CORS-safe version
 async function fetchRealTimePrice(symbol) {
-    // Skip external API calls to prevent CORS errors
-    // Use fallback prices only to ensure stable functionality
-    console.log(`📊 StockAPI: Using fallback price for ${symbol} (external APIs disabled to prevent CORS errors)`);
-    return null; // This will cause the main function to use fallback prices
+    try {
+        // Try Yahoo Finance API first (most reliable for CORS)
+        const yahooUrl = `${STOCK_API_ENDPOINTS.YAHOO_FINANCE}/${symbol}`;
+        console.log(`📊 StockAPI: Attempting to fetch ${symbol} from Yahoo Finance...`);
+        
+        const response = await fetch(yahooUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            const price = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+            if (price && !isNaN(price)) {
+                console.log(`✅ StockAPI: Successfully fetched ${symbol}: $${price}`);
+                return parseFloat(price);
+            }
+        }
+        
+        console.log(`⚠️ StockAPI: Yahoo Finance failed for ${symbol}, using fallback`);
+        return null;
+    } catch (error) {
+        console.log(`❌ StockAPI: External API error for ${symbol}:`, error.message);
+        return null; // This will cause the main function to use fallback prices
+    }
 }
 
 // Background refresh function for stale-while-revalidate
