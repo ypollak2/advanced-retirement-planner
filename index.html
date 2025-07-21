@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Retirement Planner v6.4.0</title>
+    <title>Advanced Retirement Planner v6.4.1</title>
     <meta name="description" content="Advanced retirement planning tool with comprehensive investment tracking">
     
     <!-- Security Headers (Note: X-Frame-Options removed - should be set via HTTP headers, not meta tags) -->
@@ -78,8 +78,8 @@
             .catch(error => {
                 console.warn('⚠️ Could not load version from version.json:', error);
                 // Fallback version
-                window.APP_VERSION = '6.4.0';
-                document.getElementById('version-indicator').textContent = '✨ v6.4.0';
+                window.APP_VERSION = '6.4.1';
+                document.getElementById('version-indicator').textContent = '✨ v6.4.1';
             });
     </script>
 
@@ -102,8 +102,10 @@
     <script src="src/utils/IsraeliNationalInsurance.js?v={{VERSION}}"></script>
     <script src="src/utils/coupleValidation.js?v={{VERSION}}"></script>
     <script src="src/utils/portfolioOptimizer.js?v={{VERSION}}"></script>
+    <script src="src/utils/inputValidation.js?v={{VERSION}}"></script>
     
     <!-- Base Components (loaded first) -->
+    <script src="src/components/SecureInput.js?v={{VERSION}}"></script>
     <script src="src/components/EnhancedRSUCompanySelector.js?v={{VERSION}}"></script>
     <script src="src/components/BottomLineSummary.js?v={{VERSION}}"></script>
     <script src="src/components/FinancialChart.js?v={{VERSION}}"></script>

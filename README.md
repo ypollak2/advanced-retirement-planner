@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v6.4.0 ✨
+# 🚀 Advanced Retirement Planner v6.4.1 ✨
 
-[![Version](https://img.shields.io/badge/version-6.4.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-6.4.1-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -16,7 +16,7 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v6.4.0 - MOBILE RESPONSIVENESS & USER EXPERIENCE REVOLUTION 📱
+## 🎨 What's New in v6.4.1 - MOBILE RESPONSIVENESS & USER EXPERIENCE REVOLUTION 📱
 
 ### **📱 COMPREHENSIVE MOBILE OPTIMIZATION** (July 2025)
 

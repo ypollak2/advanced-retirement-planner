@@ -1904,6 +1904,113 @@ function testVersionConsistencyValidation() {
     }
 }
 
+// Test 24: Input Validation and XSS Protection
+function testInputValidationAndXSSProtection() {
+    console.log('\n🛡️ Testing Input Validation and XSS Protection...');
+    
+    if (!window.InputValidation) {
+        logTest('InputValidation utility exists', false, 'InputValidation not found in global scope');
+        return;
+    }
+    
+    // Test number validation
+    const numberTests = [
+        { input: 25, options: { min: 0, max: 100 }, expected: { valid: true, value: 25 } },
+        { input: -5, options: { min: 0, max: 100 }, expected: { valid: false, value: 0 } },
+        { input: 150, options: { min: 0, max: 100 }, expected: { valid: false, value: 100 } },
+        { input: 'abc', options: { min: 0, max: 100 }, expected: { valid: false, value: 0 } }
+    ];
+    
+    numberTests.forEach((test, index) => {
+        const result = window.InputValidation.validators.number(test.input, test.options);
+        logTest(`Number validation test ${index + 1}`, 
+            result.valid === test.expected.valid && result.value === test.expected.value,
+            `Input: ${test.input}, Expected: ${JSON.stringify(test.expected)}, Got: ${JSON.stringify(result)}`);
+    });
+    
+    // Test XSS protection
+    const xssTests = [
+        { input: '<script>alert("xss")</script>', expected: '' },
+        { input: 'Normal text', expected: 'Normal text' },
+        { input: '<b>Bold</b> text', expected: 'Bold text' },
+        { input: 'onclick="alert(1)"', expected: 'onclick="alert(1)"' }
+    ];
+    
+    xssTests.forEach((test, index) => {
+        const result = window.InputValidation.stripHtmlTags(test.input);
+        logTest(`XSS protection test ${index + 1}`, 
+            result === test.expected,
+            `Input: ${test.input}, Expected: ${test.expected}, Got: ${result}`);
+    });
+    
+    // Test HTML escaping
+    const escapeTests = [
+        { input: '<script>', expected: '&lt;script&gt;' },
+        { input: '"quotes"', expected: '&quot;quotes&quot;' },
+        { input: "it's", expected: 'it&#39;s' },
+        { input: 'normal text', expected: 'normal text' }
+    ];
+    
+    escapeTests.forEach((test, index) => {
+        const result = window.InputValidation.escapeHtml(test.input);
+        logTest(`HTML escape test ${index + 1}`, 
+            result === test.expected,
+            `Input: ${test.input}, Expected: ${test.expected}, Got: ${result}`);
+    });
+    
+    // Test age validation
+    const ageResult = window.InputValidation.validateAge(25);
+    logTest('Age validation (valid)', ageResult.valid && ageResult.value === 25);
+    
+    const invalidAgeResult = window.InputValidation.validateAge(150);
+    logTest('Age validation (invalid)', !invalidAgeResult.valid && invalidAgeResult.value === 120);
+    
+    // Test percentage validation
+    const percentResult = window.InputValidation.validatePercentage(50);
+    logTest('Percentage validation (valid)', percentResult.valid && percentResult.value === 50);
+    
+    const invalidPercentResult = window.InputValidation.validatePercentage(150);
+    logTest('Percentage validation (invalid)', !invalidPercentResult.valid && invalidPercentResult.value === 100);
+    
+    // Test email validation
+    const emailResult = window.InputValidation.validateEmail('test@example.com');
+    logTest('Email validation (valid)', emailResult.valid);
+    
+    const invalidEmailResult = window.InputValidation.validateEmail('invalid-email');
+    logTest('Email validation (invalid)', !invalidEmailResult.valid);
+    
+    // Test SQL injection protection
+    const sqlTest = window.InputValidation.validators.string('DROP TABLE users', {});
+    logTest('SQL injection protection', !sqlTest.valid);
+    
+    // Test form validation
+    const formData = {
+        age: 30,
+        salary: 50000,
+        email: 'user@example.com',
+        name: '<script>alert("xss")</script>John'
+    };
+    
+    const schema = {
+        age: { type: 'age' },
+        salary: { type: 'currency', options: { max: 1000000 } },
+        email: { type: 'email' },
+        name: { type: 'string', options: { maxLength: 50, stripHtml: true } }
+    };
+    
+    const formResult = window.InputValidation.validateForm(formData, schema);
+    logTest('Form validation', formResult.isValid);
+    logTest('Form sanitization', formResult.values.name === 'John');
+    
+    // Test SecureInput component
+    if (window.SecureInput) {
+        logTest('SecureInput component exists', true);
+        logTest('SecureInput examples defined', window.SecureInput.examples !== undefined);
+    } else {
+        logTest('SecureInput component exists', false, 'SecureInput not found');
+    }
+}
+
 // Main test execution
 async function runAllTests() {
     console.log('Starting automated test suite...\n');
@@ -1955,6 +2062,9 @@ async function runAllTests() {
     
     // Training Fund Calculation Logic Tests (v6.4.0)
     testTrainingFundCalculationLogic();
+    
+    // Input Validation and XSS Protection Tests (v6.4.1)
+    testInputValidationAndXSSProtection();
     
     // Couple/Single Mode State Management Tests (v6.4.0)
     testCoupleSingleModeStateManagement();
