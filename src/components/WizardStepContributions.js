@@ -129,6 +129,31 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
     const selectedCountry = inputs.taxCountry || 'israel';
     const defaultRates = countryRates[selectedCountry] || countryRates.israel;
 
+    // Training Fund Rate Calculator for Israeli system
+    const calculateTrainingFundRate = (salary, isAboveCeiling = false) => {
+        const threshold = 15792; // Israeli training fund threshold for 2024
+        
+        if (!salary || salary <= 0) {
+            return 10.0; // Default total rate
+        }
+        
+        if (isAboveCeiling || salary > threshold) {
+            // Above threshold: 7.5% employer + 2.5% employee = 10%
+            return {
+                total: 10.0,
+                employee: 2.5,
+                employer: 7.5
+            };
+        } else {
+            // Below threshold: 7.5% employer only = 7.5%
+            return {
+                total: 7.5,
+                employee: 0,
+                employer: 7.5
+            };
+        }
+    };
+
     // Calculate training fund contribution and tax treatment based on 2024 Israeli regulations
     const calculateTrainingFundContribution = (monthlySalary) => {
         if (selectedCountry !== 'israel') return {
@@ -170,9 +195,6 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
             };
         }
     };
-
-    // Alias for test compatibility
-    const calculateTrainingFundRate = calculateTrainingFundContribution;
 
     // Get detailed salary status for display
     const getSalaryStatus = (monthlySalary) => {
@@ -676,30 +698,6 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
     ]);
 };
 
-// Training Fund Rate Calculator for Israeli system
-function calculateTrainingFundRate(salary, isAboveCeiling = false) {
-    const threshold = 15792; // Israeli training fund threshold for 2024
-    
-    if (!salary || salary <= 0) {
-        return 10.0; // Default total rate
-    }
-    
-    if (isAboveCeiling || salary > threshold) {
-        // Above threshold: 7.5% employer + 2.5% employee = 10%
-        return {
-            total: 10.0,
-            employee: 2.5,
-            employer: 7.5
-        };
-    } else {
-        // Below threshold: 7.5% employer only = 7.5%
-        return {
-            total: 7.5,
-            employee: 0,
-            employer: 7.5
-        };
-    }
-}
 
 // Export to window for global access
 window.WizardStepContributions = WizardStepContributions;
