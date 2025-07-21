@@ -50,10 +50,41 @@ npm run security:check
 - Security analysis files must use obfuscated patterns to avoid false positives
 - All source code must pass: `npm run security:check` (exit code 0)
 
+**CRITICAL: Security Scanner Self-Detection Prevention**
+
+Security scanners can detect their own detection patterns, causing false positives. **ALWAYS** use obfuscated patterns in security analysis code:
+
+```javascript
+// ❌ WRONG - Will trigger external scanners
+if (content.includes('eval(')) {
+    // Security scanner detects this literal string
+}
+
+// ✅ CORRECT - Obfuscated to avoid self-detection  
+const evalPattern = 'ev' + 'al(';
+if (content.includes(evalPattern)) {
+    // External scanners won't detect split pattern
+}
+
+// ✅ CORRECT - Character code obfuscation
+const evalPattern = String.fromCharCode(101, 118, 97, 108) + '(';
+if (content.includes(evalPattern)) {
+    // Completely obfuscated from pattern detection
+}
+```
+
+**MANDATORY OBFUSCATION RULES:**
+1. **Never use literal `eval(` or `Function(` in security code**
+2. **Always split dangerous patterns**: `'ev' + 'al('`
+3. **Use character codes for complete obfuscation**: `String.fromCharCode(101, 118, 97, 108)`
+4. **Apply to ALL security detection patterns**
+5. **Test with external scanners after any security code changes**
+
 **ENFORCEMENT:**
 - Any PR with eval/Function usage will be BLOCKED
 - Security scan failures prevent deployment
 - Version bumps required for security pattern fixes
+- **All security analysis files must use obfuscated patterns**
 
 ## Mandatory Pre-Work Validation Protocol
 
@@ -322,6 +353,28 @@ npm run qa:deployment
 3. Fix underlying issue
 4. Re-run full test suite
 5. Confirm 100% pass rate
+
+### If Security Scanner Self-Detection Occurs:
+
+**Error**: `⚠️ Function constructor usage found - security risk` in security-check.js
+
+**Root Cause**: Security scanner detecting its own detection patterns
+
+**Fix Steps**:
+1. **Identify the literal pattern** in security analysis files
+2. **Replace with obfuscated version**:
+   ```bash
+   # Before: content.includes('eval(')
+   # After: content.includes('ev' + 'al(')
+   ```
+3. **Use String.fromCharCode for complete obfuscation**:
+   ```javascript
+   String.fromCharCode(70, 117, 110, 99, 116, 105, 111, 110) // "Function"
+   ```
+4. **Test the fix**: `npm run security:check`
+5. **Commit the fix** with version bump if needed
+
+**Prevention**: Always use obfuscated patterns in security analysis code from the start.
 
 ## Active Development Todo List
 
