@@ -344,6 +344,12 @@ const WizardStepInheritance = ({ inputs, setInputs, language = 'en', workingCurr
                     key: 'insurance-title',
                     className: "text-md font-medium text-gray-700 mb-3"
                 }, t.lifeInsurance),
+                createElement('p', {
+                    key: 'insurance-help',
+                    className: "text-sm text-gray-600 mb-3"
+                }, language === 'he' ? 
+                    'הזינו את סכום הביטוח החודשי והפרמיה. אם אין ביטוח - השאירו ריק.' :
+                    'Enter life insurance coverage amount and monthly premium. Leave blank if no insurance.'),
                 createElement('div', { key: 'insurance-grid', className: "grid grid-cols-2 gap-3" }, [
                     createElement('input', {
                         key: 'insurance-amount',

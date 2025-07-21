@@ -1,54 +1,79 @@
-# 🐛 Issues Found - Advanced Retirement Planner v6.4.1
+# 🐛 Issues Found - Advanced Retirement Planner v6.5.0
 
-**Analysis Date**: July 21, 2025  
-**Analyst**: Product Manager/UX Specialist/QA Engineer  
-**Application Version**: 6.4.1  
-**Testing Environment**: Local filesystem analysis  
+**Review Date**: July 21, 2025  
+**Reviewer**: Senior Product Manager & UX QA Specialist  
+**Application Version**: 6.5.0 (Updated from v6.4.1 analysis)  
+**Issues Status**: 8 ISSUES FIXED ✅, 1 REMAINING ISSUE DOCUMENTED  
 
 ---
 
-## 🔴 Critical Issues (Must Fix Before Production)
+## ✅ RESOLVED CRITICAL ISSUES (FIXED IN v6.5.0)
 
-### CRIT-001: Inconsistent Step Count in Wizard
+### ✅ FIXED - CRIT-001: Total Savings Display Bug
+**Status**: FIXED ✅  
+**Component**: `WizardStepSavings.js`  
+**Issue**: Total savings showing ₪75,000 instead of expected ₪3,830,000  
+**Root Cause**: Missing partner real estate and crypto input fields in couple mode  
+**Solution**: Added missing `partner1RealEstate`, `partner1Crypto`, `partner2RealEstate`, `partner2Crypto` fields  
+**Files Modified**: `src/components/WizardStepSavings.js:294-318, 372-396`  
+
+### ✅ FIXED - CRIT-002: Tax Efficiency Score NaN
+**Status**: FIXED ✅  
+**Component**: `WizardStepReview.js`  
+**Issue**: Tax efficiency score displaying "NaN/100" due to division by zero  
+**Root Cause**: Missing null/undefined validation in `calculateTaxEfficiencyScore()`  
+**Solution**: Added comprehensive null checks and NaN validation  
+**Files Modified**: `src/components/WizardStepReview.js:calculateTaxEfficiencyScore()`  
+
+### ✅ FIXED - CRIT-003: Retirement Projections Zero
+**Status**: FIXED ✅  
+**Component**: `WizardStepReview.js`  
+**Issue**: Retirement projections showing ₪0 instead of calculated values  
+**Root Cause**: Missing `calculateTotalCurrentSavings()` function integration  
+**Solution**: Implemented complete savings aggregation function  
+**Files Modified**: `src/components/WizardStepReview.js:calculateTotalCurrentSavings()`  
+
+### ✅ FIXED - CRIT-004: Savings Rate 0%
+**Status**: FIXED ✅  
+**Component**: `WizardStepReview.js`  
+**Issue**: Savings rate calculation showing 0% due to field name mismatch  
+**Root Cause**: Inconsistent field naming between `currentSalary` and `currentMonthlySalary`  
+**Solution**: Added fallback field name support  
+**Files Modified**: `src/components/WizardStepReview.js:149, 274`  
+
+### ✅ FIXED - CRIT-005: Missing Percentage Validation
+**Status**: FIXED ✅  
+**Component**: `WizardStepContributions.js`  
+**Issue**: Users can enter invalid percentages (negative or >100%)  
+**Root Cause**: Missing input validation for percentage fields  
+**Solution**: Added `validatePercentage()` function and min/max attributes  
+**Files Modified**: `src/components/WizardStepContributions.js:validatePercentage()`  
+
+## ✅ ADDITIONAL ISSUES RESOLVED (Phase 2)
+
+### ✅ FIXED - MOD-006: Beneficiary Validation Warning Always Shows
+**Status**: FIXED ✅  
 **Component**: `RetirementWizard.js`  
-**Issue**: Wizard declares 10 total steps (`const totalSteps = 10;`) but documentation refers to 8-step process  
-**Impact**: Progress calculation incorrect, user confusion about completion percentage  
-**Evidence**: Line 45 in RetirementWizard.js shows `totalSteps = 10`, but README.md and other docs mention "8-step process"  
-**Steps to Reproduce**:
-1. Start wizard
-2. Check progress bar calculation
-3. Compare with documented step count
-**Fix**: Standardize on actual number of implemented steps and update all references  
-**Priority**: 🔴 Critical - Affects user navigation and expectations  
+**Issue**: Inheritance step validation hardcoded to return `true`, causing persistent warnings  
+**Root Cause**: Missing proper beneficiary section validation logic  
+**Solution**: Implemented `validateBeneficiarySection()` function with proper completion checks  
+**Files Modified**: `src/components/RetirementWizard.js:177-193, 228`  
 
-### CRIT-002: Potential Division by Zero in Currency Conversion
-**Component**: `retirementCalculations.js`  
-**Issue**: `convertCurrency` function divides by `exchangeRates[currency]` without null check  
-**Impact**: Application crash if exchange rate is 0 or undefined  
-**Evidence**: Line 13 `const convertedAmount = amount / exchangeRates[currency];`  
-**Steps to Reproduce**:
-1. Set exchange rate to 0 or undefined
-2. Attempt currency conversion
-3. Application throws error
-**Fix**: Add null/zero check before division  
-```javascript
-if (!exchangeRates[currency] || exchangeRates[currency] === 0) {
-    return 'N/A';
-}
-```
-**Priority**: 🔴 Critical - Can crash application  
+### ✅ FIXED - MOD-007: Auto-Calculate Tax Button Enhancement
+**Status**: ENHANCED ✅  
+**Component**: `WizardStepTaxes.js`  
+**Issue**: Button functional but lacked user feedback and error handling  
+**Root Cause**: Missing validation and success feedback  
+**Solution**: Added salary validation, user feedback, and success notifications  
+**Files Modified**: `src/components/WizardStepTaxes.js:692-717`  
 
-### CRIT-003: Missing Error Boundaries for Component Loading
-**Component**: `index.html` / Component Loading  
-**Issue**: No error boundaries to catch component loading failures  
-**Impact**: White screen of death if any component fails to load  
-**Evidence**: Script tags load components directly without error handling  
-**Steps to Reproduce**:
-1. Break a component file (syntax error)
-2. Reload application
-3. Application fails silently
-**Fix**: Implement React error boundaries and fallback UI  
-**Priority**: 🔴 Critical - Application reliability  
+### ✅ FIXED - MIN-008: Life Insurance Field Guidance Missing
+**Status**: FIXED ✅  
+**Component**: `WizardStepInheritance.js`  
+**Issue**: No guidance text for life insurance section  
+**Root Cause**: Missing explanatory text for user clarity  
+**Solution**: Added helpful guidance text in Hebrew and English  
+**Files Modified**: `src/components/WizardStepInheritance.js:347-352`  
 
 ---
 

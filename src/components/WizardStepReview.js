@@ -146,9 +146,9 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
 
     // Calculate financial health score components
     const calculateSavingsRateScore = () => {
-        const monthlyIncome = parseFloat(inputs.currentMonthlySalary || 0);
-        const pensionRate = parseFloat(inputs.pensionContributionRate || 0);
-        const trainingFundRate = parseFloat(inputs.trainingFundContributionRate || 0);
+        const monthlyIncome = parseFloat(inputs.currentMonthlySalary || inputs.currentSalary || 0);
+        const pensionRate = parseFloat(inputs.pensionContributionRate || inputs.employeePensionRate || 0);
+        const trainingFundRate = parseFloat(inputs.trainingFundContributionRate || inputs.trainingFundEmployeeRate || 0);
         const totalSavingsRate = pensionRate + trainingFundRate;
         
         if (totalSavingsRate >= 15) return 100;
@@ -199,19 +199,24 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         const pensionRate = parseFloat(inputs.pensionContributionRate || 0);
         const trainingFundRate = parseFloat(inputs.trainingFundContributionRate || 0);
         
+        // Validate inputs to prevent NaN
+        if (isNaN(pensionRate)) return 0;
+        
         // Israel-specific optimization
         if (selectedCountry === 'israel') {
             const optimalPensionRate = 7; // 7% is deductible
             const optimalTrainingFundRate = 10; // Up to threshold
             
-            const pensionEfficiency = Math.min(100, (pensionRate / optimalPensionRate) * 100);
-            const trainingFundEfficiency = Math.min(100, (trainingFundRate / optimalTrainingFundRate) * 100);
+            const pensionEfficiency = optimalPensionRate > 0 ? Math.min(100, (pensionRate / optimalPensionRate) * 100) : 0;
+            const trainingFundEfficiency = optimalTrainingFundRate > 0 ? Math.min(100, (trainingFundRate / optimalTrainingFundRate) * 100) : 0;
             
-            return (pensionEfficiency + trainingFundEfficiency) / 2;
+            const score = (pensionEfficiency + trainingFundEfficiency) / 2;
+            return isNaN(score) ? 0 : Math.round(score);
         }
         
         // General tax efficiency for other countries
-        return Math.min(100, (pensionRate / 12) * 100);
+        const score = pensionRate > 0 ? Math.min(100, (pensionRate / 12) * 100) : 0;
+        return isNaN(score) ? 0 : Math.round(score);
     };
 
     const calculateDiversificationScore = () => {
@@ -266,8 +271,37 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     const calculateRetirementProjections = () => {
         const currentAge = parseFloat(inputs.currentAge || 30);
         const retirementAge = parseFloat(inputs.retirementAge || 67);
-        const monthlyIncome = parseFloat(inputs.currentMonthlySalary || 0);
-        const currentSavings = parseFloat(inputs.totalCurrentSavings || 0);
+        const monthlyIncome = parseFloat(inputs.currentMonthlySalary || inputs.currentSalary || 0);
+        
+        // Calculate total current savings from all sources
+        const calculateTotalCurrentSavings = () => {
+            let total = 0;
+            // Individual savings
+            total += parseFloat(inputs.currentSavings || 0);
+            total += parseFloat(inputs.currentTrainingFund || 0);
+            total += parseFloat(inputs.currentPersonalPortfolio || 0);
+            total += parseFloat(inputs.currentRealEstate || 0);
+            total += parseFloat(inputs.currentCrypto || 0);
+            total += parseFloat(inputs.currentSavingsAccount || 0);
+            
+            // Partner savings if couple mode
+            if (inputs.planningType === 'couple') {
+                total += parseFloat(inputs.partner1CurrentPension || 0);
+                total += parseFloat(inputs.partner1CurrentTrainingFund || 0);
+                total += parseFloat(inputs.partner1PersonalPortfolio || 0);
+                total += parseFloat(inputs.partner1RealEstate || 0);
+                total += parseFloat(inputs.partner1Crypto || 0);
+                total += parseFloat(inputs.partner2CurrentPension || 0);
+                total += parseFloat(inputs.partner2CurrentTrainingFund || 0);
+                total += parseFloat(inputs.partner2PersonalPortfolio || 0);
+                total += parseFloat(inputs.partner2RealEstate || 0);
+                total += parseFloat(inputs.partner2Crypto || 0);
+            }
+            
+            return total;
+        };
+        
+        const currentSavings = calculateTotalCurrentSavings();
         const savingsRate = (parseFloat(inputs.pensionContributionRate || 0) + parseFloat(inputs.trainingFundContributionRate || 0)) / 100;
         const expectedReturn = parseFloat(inputs.expectedAnnualReturn || 7) / 100;
         const inflationRate = 0.03; // 3% inflation assumption
@@ -277,7 +311,9 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         
         // Future value calculation
         const futureValueCurrentSavings = currentSavings * Math.pow(1 + expectedReturn, yearsToRetirement);
-        const futureValueAnnualSavings = annualSavings * (Math.pow(1 + expectedReturn, yearsToRetirement) - 1) / expectedReturn;
+        const futureValueAnnualSavings = expectedReturn > 0 ? 
+            annualSavings * (Math.pow(1 + expectedReturn, yearsToRetirement) - 1) / expectedReturn : 
+            annualSavings * yearsToRetirement;
         const totalAccumulation = futureValueCurrentSavings + futureValueAnnualSavings;
         
         // Safe withdrawal rate (4% rule)
@@ -289,14 +325,15 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         const inflationAdjustedMonthly = monthlyRetirementIncome / Math.pow(1 + inflationRate, yearsToRetirement);
         
         return {
-            totalAccumulation,
-            monthlyIncome: monthlyRetirementIncome,
-            monthlyRetirementIncome,
-            inflationAdjustedTotal,
-            inflationAdjustedMonthly,
+            totalAccumulation: isNaN(totalAccumulation) ? 0 : totalAccumulation,
+            monthlyIncome: isNaN(monthlyRetirementIncome) ? 0 : monthlyRetirementIncome,
+            monthlyRetirementIncome: isNaN(monthlyRetirementIncome) ? 0 : monthlyRetirementIncome,
+            inflationAdjustedTotal: isNaN(inflationAdjustedTotal) ? 0 : inflationAdjustedTotal,
+            inflationAdjustedMonthly: isNaN(inflationAdjustedMonthly) ? 0 : inflationAdjustedMonthly,
             yearsToRetirement,
-            projectedIncome: monthlyRetirementIncome,
-            retirementAge: parseFloat(inputs.retirementAge || 67)
+            projectedIncome: isNaN(monthlyRetirementIncome) ? 0 : monthlyRetirementIncome,
+            retirementAge: parseFloat(inputs.retirementAge || 67),
+            currentSavings
         };
     };
 

@@ -290,6 +290,32 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                 onChange: (e) => setInputs({...inputs, partner1PersonalPortfolio: parseInt(e.target.value) || 0}),
                                 className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
                             })
+                        ]),
+                        createElement('div', { key: 'p1-real-estate' }, [
+                            createElement('label', { 
+                                key: 'p1-real-estate-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.realEstate),
+                            createElement('input', {
+                                key: 'p1-real-estate-input',
+                                type: 'number',
+                                value: inputs.partner1RealEstate || 0,
+                                onChange: (e) => setInputs({...inputs, partner1RealEstate: parseInt(e.target.value) || 0}),
+                                className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'p1-crypto' }, [
+                            createElement('label', { 
+                                key: 'p1-crypto-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.cryptocurrency),
+                            createElement('input', {
+                                key: 'p1-crypto-input',
+                                type: 'number',
+                                value: inputs.partner1Crypto || 0,
+                                onChange: (e) => setInputs({...inputs, partner1Crypto: parseInt(e.target.value) || 0}),
+                                className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
+                            })
                         ])
                     ])
                 ]),
@@ -340,6 +366,32 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                 type: 'number',
                                 value: inputs.partner2PersonalPortfolio || 0,
                                 onChange: (e) => setInputs({...inputs, partner2PersonalPortfolio: parseInt(e.target.value) || 0}),
+                                className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'p2-real-estate' }, [
+                            createElement('label', { 
+                                key: 'p2-real-estate-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.realEstate),
+                            createElement('input', {
+                                key: 'p2-real-estate-input',
+                                type: 'number',
+                                value: inputs.partner2RealEstate || 0,
+                                onChange: (e) => setInputs({...inputs, partner2RealEstate: parseInt(e.target.value) || 0}),
+                                className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'p2-crypto' }, [
+                            createElement('label', { 
+                                key: 'p2-crypto-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.cryptocurrency),
+                            createElement('input', {
+                                key: 'p2-crypto-input',
+                                type: 'number',
+                                value: inputs.partner2Crypto || 0,
+                                onChange: (e) => setInputs({...inputs, partner2Crypto: parseInt(e.target.value) || 0}),
                                 className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
                             })
                         ])

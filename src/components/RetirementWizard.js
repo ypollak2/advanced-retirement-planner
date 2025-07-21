@@ -174,6 +174,24 @@ const RetirementWizard = ({
         }
     };
 
+    // Beneficiary section validation for inheritance planning
+    const validateBeneficiarySection = (inputs) => {
+        // Check if will status is completed
+        const hasWillStatus = inputs.willStatus && inputs.willStatus !== '';
+        
+        // Check if life insurance information is provided (if enabled)
+        const hasLifeInsuranceInfo = inputs.lifeInsuranceAmount || inputs.premiumAmount;
+        
+        // For couple mode, check that basic inheritance planning is addressed
+        if (inputs.planningType === 'couple') {
+            // At minimum, will status should be set for couples
+            return hasWillStatus;
+        }
+        
+        // For single mode, either will status OR life insurance info should be provided
+        return hasWillStatus || hasLifeInsuranceInfo;
+    };
+
     // Enhanced step validation with realistic business rules
     const isCurrentStepValid = () => {
         switch (currentStep) {
@@ -224,8 +242,8 @@ const RetirementWizard = ({
                        (inputs.currentMonthlyExpenses || 0) > 0;
             
             case 8: 
-                // Inheritance planning - basic validation
-                return true; // Optional step, always valid
+                // Inheritance planning - proper validation
+                return validateBeneficiarySection(inputs);
             
             case 9: 
                 // Tax optimization - basic validation

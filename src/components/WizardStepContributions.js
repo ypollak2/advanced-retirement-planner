@@ -5,6 +5,15 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
     // Component uses React.createElement for rendering
     const createElement = React.createElement;
     
+    // Percentage validation function (0-100)
+    const validatePercentage = (value) => {
+        const numValue = parseFloat(value);
+        if (isNaN(numValue)) return 0;
+        if (numValue < 0) return 0;
+        if (numValue > 100) return 100;
+        return numValue;
+    };
+    
     // Multi-language content
     const content = {
         he: {
@@ -317,8 +326,10 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         key: 'employee-input',
                         type: 'number',
                         step: '0.1',
+                        min: '0',
+                        max: '100',
                         value: inputs.employeePensionRate || defaultRates.employee,
-                        onChange: (e) => setInputs({...inputs, employeePensionRate: parseFloat(e.target.value) || 0}),
+                        onChange: (e) => setInputs({...inputs, employeePensionRate: validatePercentage(e.target.value)}),
                         className: "w-full p-3 md:p-4 text-base md:text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     }),
                     createElement('p', { 
@@ -340,8 +351,10 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         key: 'employer-input',
                         type: 'number',
                         step: '0.1',
+                        min: '0',
+                        max: '100',
                         value: inputs.employerPensionRate || defaultRates.employer,
-                        onChange: (e) => setInputs({...inputs, employerPensionRate: parseFloat(e.target.value) || 0}),
+                        onChange: (e) => setInputs({...inputs, employerPensionRate: validatePercentage(e.target.value)}),
                         className: "w-full p-3 md:p-4 text-base md:text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     }),
                     createElement('p', { 
@@ -363,8 +376,10 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                         key: 'training-fund-input',
                         type: 'number',
                         step: '0.1',
+                        min: '0',
+                        max: '100',
                         value: inputs.trainingFundContributionRate || defaultRates.trainingFund,
-                        onChange: (e) => setInputs({...inputs, trainingFundContributionRate: parseFloat(e.target.value) || 0}),
+                        onChange: (e) => setInputs({...inputs, trainingFundContributionRate: validatePercentage(e.target.value)}),
                         className: "w-full p-3 md:p-4 text-base md:text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
                     }),
                     createElement('p', { 
@@ -398,8 +413,10 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                                 key: 'main-employee-input',
                                 type: 'number',
                                 step: '0.1',
+                                min: '0',
+                                max: '100',
                                 value: inputs.employeePensionRate || defaultRates.employee,
-                                onChange: (e) => setInputs({...inputs, employeePensionRate: parseFloat(e.target.value) || 0}),
+                                onChange: (e) => setInputs({...inputs, employeePensionRate: validatePercentage(e.target.value)}),
                                 className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                             }),
                             createElement('p', { 
@@ -416,8 +433,10 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                                 key: 'main-employer-input',
                                 type: 'number',
                                 step: '0.1',
+                                min: '0',
+                                max: '100',
                                 value: inputs.employerPensionRate || defaultRates.employer,
-                                onChange: (e) => setInputs({...inputs, employerPensionRate: parseFloat(e.target.value) || 0}),
+                                onChange: (e) => setInputs({...inputs, employerPensionRate: validatePercentage(e.target.value)}),
                                 className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                             }),
                             createElement('p', { 
@@ -434,8 +453,10 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                                 key: 'main-training-input',
                                 type: 'number',
                                 step: '0.1',
+                                min: '0',
+                                max: '100',
                                 value: inputs.trainingFundContributionRate || defaultRates.trainingFund,
-                                onChange: (e) => setInputs({...inputs, trainingFundContributionRate: parseFloat(e.target.value) || 0}),
+                                onChange: (e) => setInputs({...inputs, trainingFundContributionRate: validatePercentage(e.target.value)}),
                                 className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                             }),
                             createElement('p', { 
@@ -465,8 +486,10 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                                 key: 'partner-employee-input',
                                 type: 'number',
                                 step: '0.1',
+                                min: '0',
+                                max: '100',
                                 value: inputs.partner1EmployeeRate || defaultRates.employee,
-                                onChange: (e) => setInputs({...inputs, partner1EmployeeRate: parseFloat(e.target.value) || 0}),
+                                onChange: (e) => setInputs({...inputs, partner1EmployeeRate: validatePercentage(e.target.value)}),
                                 className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                             }),
                             createElement('p', { 
@@ -483,8 +506,10 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                                 key: 'partner-employer-input',
                                 type: 'number',
                                 step: '0.1',
+                                min: '0',
+                                max: '100',
                                 value: inputs.partner1EmployerRate || defaultRates.employer,
-                                onChange: (e) => setInputs({...inputs, partner1EmployerRate: parseFloat(e.target.value) || 0}),
+                                onChange: (e) => setInputs({...inputs, partner1EmployerRate: validatePercentage(e.target.value)}),
                                 className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                             }),
                             createElement('p', { 
@@ -501,8 +526,10 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                                 key: 'partner-training-input',
                                 type: 'number',
                                 step: '0.1',
+                                min: '0',
+                                max: '100',
                                 value: inputs.partner1TrainingFundRate || defaultRates.trainingFund,
-                                onChange: (e) => setInputs({...inputs, partner1TrainingFundRate: parseFloat(e.target.value) || 0}),
+                                onChange: (e) => setInputs({...inputs, partner1TrainingFundRate: validatePercentage(e.target.value)}),
                                 className: "w-full p-4 md:p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                             }),
                             createElement('p', { 

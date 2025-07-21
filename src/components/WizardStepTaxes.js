@@ -691,6 +691,14 @@ const WizardStepTaxes = ({ inputs, setInputs, language = 'en', workingCurrency =
                     key: 'auto-calc-btn',
                     onClick: () => {
                         const currentIncome = parseFloat(inputs.currentMonthlySalary || 0) * 12;
+                        
+                        if (currentIncome <= 0) {
+                            alert(language === 'he' ? 
+                                'יש להזין משכורת חודשית תחילה' : 
+                                'Please enter monthly salary first');
+                            return;
+                        }
+                        
                         const marginal = calculateMarginalTaxRate(currentIncome) * 100;
                         const effective = calculateEffectiveTaxRate(currentIncome) * 100;
                         setInputs({
@@ -699,6 +707,13 @@ const WizardStepTaxes = ({ inputs, setInputs, language = 'en', workingCurrency =
                             effectiveTaxRate: effective.toFixed(1),
                             currentTaxRate: effective.toFixed(1)
                         });
+                        
+                        // Show success feedback
+                        setTimeout(() => {
+                            alert(language === 'he' ? 
+                                `שיעורי מס מחושבים: שולי ${marginal.toFixed(1)}%, אפקטיבי ${effective.toFixed(1)}%` :
+                                `Tax rates calculated: Marginal ${marginal.toFixed(1)}%, Effective ${effective.toFixed(1)}%`);
+                        }, 100);
                     },
                     className: "px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 }, 'Auto-Calculate Based on Income')
