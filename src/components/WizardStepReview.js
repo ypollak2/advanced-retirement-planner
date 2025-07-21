@@ -863,4 +863,69 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
 // Export the component
 window.WizardStepReview = WizardStepReview;
 
+// Export calculation functions for global access
+window.calculateTotalCurrentSavings = (inputs) => {
+    let total = 0;
+    // Individual savings
+    total += parseFloat(inputs.currentSavings || 0);
+    total += parseFloat(inputs.currentTrainingFund || 0);
+    total += parseFloat(inputs.currentPersonalPortfolio || 0);
+    total += parseFloat(inputs.currentRealEstate || 0);
+    total += parseFloat(inputs.currentCrypto || 0);
+    total += parseFloat(inputs.currentSavingsAccount || 0);
+    
+    // Partner savings if couple mode
+    if (inputs.planningType === 'couple') {
+        total += parseFloat(inputs.partner1CurrentPension || 0);
+        total += parseFloat(inputs.partner1CurrentTrainingFund || 0);
+        total += parseFloat(inputs.partner1PersonalPortfolio || 0);
+        total += parseFloat(inputs.partner1RealEstate || 0);
+        total += parseFloat(inputs.partner1Crypto || 0);
+        total += parseFloat(inputs.partner2CurrentPension || 0);
+        total += parseFloat(inputs.partner2CurrentTrainingFund || 0);
+        total += parseFloat(inputs.partner2PersonalPortfolio || 0);
+        total += parseFloat(inputs.partner2RealEstate || 0);
+        total += parseFloat(inputs.partner2Crypto || 0);
+    }
+    
+    return total;
+};
+
+window.calculateTaxEfficiencyScore = (inputs, selectedCountry = 'israel') => {
+    const pensionRate = parseFloat(inputs.pensionContributionRate || 0);
+    const trainingFundRate = parseFloat(inputs.trainingFundContributionRate || 0);
+    
+    // Validate inputs to prevent NaN
+    if (isNaN(pensionRate)) return 0;
+    
+    // Israel-specific optimization
+    if (selectedCountry === 'israel') {
+        const optimalPensionRate = 7; // 7% is deductible
+        const optimalTrainingFundRate = 10; // Up to threshold
+        
+        const pensionEfficiency = optimalPensionRate > 0 ? Math.min(100, (pensionRate / optimalPensionRate) * 100) : 0;
+        const trainingFundEfficiency = optimalTrainingFundRate > 0 ? Math.min(100, (trainingFundRate / optimalTrainingFundRate) * 100) : 0;
+        
+        const score = (pensionEfficiency + trainingFundEfficiency) / 2;
+        return isNaN(score) ? 0 : Math.round(score);
+    }
+    
+    // General tax efficiency for other countries
+    const score = pensionRate > 0 ? Math.min(100, (pensionRate / 12) * 100) : 0;
+    return isNaN(score) ? 0 : Math.round(score);
+};
+
+window.calculateSavingsRateScore = (inputs) => {
+    const monthlyIncome = parseFloat(inputs.currentMonthlySalary || inputs.currentSalary || 0);
+    const pensionRate = parseFloat(inputs.pensionContributionRate || inputs.employeePensionRate || 0);
+    const trainingFundRate = parseFloat(inputs.trainingFundContributionRate || inputs.trainingFundEmployeeRate || 0);
+    const totalSavingsRate = pensionRate + trainingFundRate;
+    
+    if (totalSavingsRate >= 15) return 100;
+    if (totalSavingsRate >= 12) return 85;
+    if (totalSavingsRate >= 10) return 70;
+    if (totalSavingsRate >= 7) return 55;
+    return Math.max(0, totalSavingsRate * 5);
+};
+
 console.log('✅ WizardStepReview component loaded successfully');

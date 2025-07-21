@@ -597,8 +597,35 @@ function RetirementPlannerApp() {
             setViewMode('goals');
         } else if (sectionId === 'openOptimization') {
             setViewMode('optimization');
+        } else if (sectionId === 'openInheritance') {
+            setActiveSection('inheritance');
+            setViewMode('detailed');
+        } else if (sectionId === 'openTaxOptimization') {
+            setActiveSection('taxOptimization');
+            setViewMode('detailed');
+        } else if (sectionId === 'openNationalInsurance') {
+            setActiveSection('nationalInsurance');
+            setViewMode('detailed');
+        } else if (sectionId === 'openPartnerPlanning') {
+            setActiveSection('partner');
+            setViewMode('detailed');
         } else if (isExpanded) {
-            setActiveSection(sectionId);
+            // Map dashboard sections to activeSection values
+            if (sectionId === 'investments') {
+                setActiveSection('investments');
+            } else if (sectionId === 'pension') {
+                setActiveSection('pension');
+            } else if (sectionId === 'partner') {
+                setActiveSection('partner');
+            } else if (sectionId === 'inheritance') {
+                setActiveSection('inheritance');
+            } else if (sectionId === 'taxOptimization') {
+                setActiveSection('taxOptimization');
+            } else if (sectionId === 'nationalInsurance') {
+                setActiveSection('nationalInsurance');
+            } else {
+                setActiveSection(sectionId);
+            }
             setViewMode('detailed');
         }
     }
@@ -1578,6 +1605,58 @@ function RetirementPlannerApp() {
                         Plus: function() { return React.createElement('span', {}, '➕'); },
                         Trash2: function() { return React.createElement('span', {}, '🗑️'); }
                     }),
+
+                    // Partner Planning Section
+                    activeSection === 'partner' && window.CoupleValidationPanel && React.createElement(window.CoupleValidationPanel, {
+                        key: 'partner-form',
+                        inputs,
+                        setInputs,
+                        language,
+                        workingCurrency: workingCurrency
+                    }),
+
+                    // Inheritance Planning Section
+                    activeSection === 'inheritance' && React.createElement('div', {
+                        key: 'inheritance-form',
+                        className: 'bg-white rounded-lg p-6 border border-gray-200'
+                    }, [
+                        React.createElement('h3', {
+                            key: 'inheritance-title',
+                            className: 'text-lg font-semibold mb-4 text-gray-800'
+                        }, language === 'he' ? 'תכנון ירושה ועזבון' : 'Inheritance & Estate Planning'),
+                        React.createElement('p', {
+                            key: 'inheritance-desc',
+                            className: 'text-gray-600 mb-4'
+                        }, language === 'he' ? 
+                            'תכנון מקיף לירושה ועזבון כולל צוואות, ביטוח חיים ואופטימיזציה מיסויית.' :
+                            'Comprehensive inheritance and estate planning including wills, life insurance, and tax optimization.')
+                    ]),
+
+                    // Tax Optimization Section  
+                    activeSection === 'taxOptimization' && window.TaxOptimizationPanel && React.createElement(window.TaxOptimizationPanel, {
+                        key: 'tax-optimization-form',
+                        inputs,
+                        setInputs,
+                        language,
+                        workingCurrency: workingCurrency
+                    }),
+
+                    // National Insurance Section
+                    activeSection === 'nationalInsurance' && React.createElement('div', {
+                        key: 'national-insurance-form',
+                        className: 'bg-white rounded-lg p-6 border border-gray-200'
+                    }, [
+                        React.createElement('h3', {
+                            key: 'ni-title',
+                            className: 'text-lg font-semibold mb-4 text-gray-800'
+                        }, language === 'he' ? 'ביטוח לאומי' : 'National Insurance'),
+                        React.createElement('p', {
+                            key: 'ni-desc',
+                            className: 'text-gray-600 mb-4'
+                        }, language === 'he' ? 
+                            'חישוב זכויות ביטוח לאומי לפי הרגולציות הישראליות העדכניות.' :
+                            'Calculate National Insurance benefits according to current Israeli regulations.')
+                    ]),
                     
                     // Default to basic form if no specific section
                     !activeSection && window.BasicInputs && React.createElement(window.BasicInputs, {
@@ -1673,7 +1752,7 @@ function RetirementPlannerApp() {
                 React.createElement('span', {
                     key: 'version',
                     className: 'version'
-                }, window.versionInfo ? `v${window.versionInfo.number}` : 'v6.0.0'),
+                }, window.versionInfo ? `v${window.versionInfo.number}` : 'v6.5.0'),
                 ' • Created by ',
                 React.createElement('span', {
                     key: 'author',
