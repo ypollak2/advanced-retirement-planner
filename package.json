@@ -45,6 +45,7 @@
     "pre-push": "echo '📋 Pre-push checklist:' && echo '✅ Version updated in version.json, package.json, README.md?' && echo '✅ Commit message includes version number and main changes?' && echo '✅ README What\\'s New section updated?' && echo '✅ All tests passing?' && npm run qa:full",
     "qa:full": "npm test && node tests/security-qa-analysis.js && npm run test:components && npm run test:accessibility && npm run test:ux && npm run test:language && npm run test:version && npm run test:currency",
     "qa:security": "node tests/security-qa-analysis.js",
+    "security:check": "node scripts/security-check.js",
     "qa:business-logic": "node tests/business-logic-validator.js",
     "qa:performance": "node tests/performance-validator.js",
     "qa:pre-release": "node scripts/pre-release-qa.js",
