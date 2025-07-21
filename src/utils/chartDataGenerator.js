@@ -1,6 +1,12 @@
 // Chart data generator for GitHub Pages compatibility
 // Dependencies: calculateWeightedReturn, getAdjustedReturn from retirementCalculations.js
 
+// Enhanced precision helper function for consistency
+const safeMoney = (value) => {
+    if (isNaN(value) || !isFinite(value)) return 0;
+    return Math.round(value);
+};
+
 window.generateChartData = (
     inputs, 
     workPeriods, 
@@ -82,13 +88,13 @@ window.generateChartData = (
         chartPoints.push({
             year: currentAge,
             age: currentAge,
-            pensionSavings: Math.round(accumulatedPensionSavings),
-            trainingFund: Math.round(accumulatedTrainingFund),
-            personalPortfolio: Math.round(accumulatedPersonalPortfolio),
-            crypto: Math.round(accumulatedCrypto),
-            realEstate: Math.round(accumulatedRealEstate),
-            totalSavings: Math.round(totalSavings),
-            inflationAdjusted: Math.round(inflationAdjustedValue),
+            pensionSavings: safeMoney(accumulatedPensionSavings),
+            trainingFund: safeMoney(accumulatedTrainingFund),
+            personalPortfolio: safeMoney(accumulatedPersonalPortfolio),
+            crypto: safeMoney(accumulatedCrypto),
+            realEstate: safeMoney(accumulatedRealEstate),
+            totalSavings: safeMoney(totalSavings),
+            inflationAdjusted: safeMoney(inflationAdjustedValue),
             yearLabel: `Age ${currentAge}`
         });
     }

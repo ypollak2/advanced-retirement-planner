@@ -152,8 +152,8 @@ const SummaryPanel = ({
         const resultsPension = results?.totalSavings || pension;
         const resultsTraining = results?.trainingFundValue || training;
         const resultsPersonal = results?.personalPortfolioValue || personal;
-        const resultsRealEstate = results?.realEstateValue || realEstate;
-        const resultsCrypto = results?.cryptoValue || crypto;
+        const resultsRealEstate = results?.currentRealEstate || realEstate;
+        const resultsCrypto = results?.currentCrypto || crypto;
         
         const total = resultsPension + resultsTraining + resultsPersonal + resultsRealEstate + resultsCrypto + partnerAssets;
         

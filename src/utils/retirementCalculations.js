@@ -10,12 +10,39 @@ window.formatCurrency = (amount) => {
 };
 
 window.convertCurrency = (amount, currency, exchangeRates) => {
+    // Critical fix: Add null/zero check to prevent division by zero errors
+    if (!exchangeRates || !exchangeRates[currency] || exchangeRates[currency] === 0) {
+        console.warn(`Exchange rate for ${currency} is invalid:`, exchangeRates[currency]);
+        return 'N/A';
+    }
+    
+    // Validate amount is a valid number
+    if (isNaN(amount) || amount === null || amount === undefined) {
+        console.warn(`Invalid amount for currency conversion:`, amount);
+        return 'N/A';
+    }
+    
     const convertedAmount = amount / exchangeRates[currency];
     const formatters = {
         USD: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }),
         GBP: new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', minimumFractionDigits: 0 }),
-        EUR: new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0 })
+        EUR: new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0 }),
+        ILS: new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS', minimumFractionDigits: 0 }),
+        BTC: (amount) => `₿${(amount).toFixed(6)}`,
+        ETH: (amount) => `Ξ${(amount).toFixed(4)}`
     };
+    
+    // Handle crypto currencies with special formatting
+    if (currency === 'BTC' || currency === 'ETH') {
+        return formatters[currency](convertedAmount);
+    }
+    
+    // Handle regular currencies
+    if (!formatters[currency]) {
+        console.warn(`No formatter available for currency: ${currency}`);
+        return `${convertedAmount.toFixed(2)} ${currency}`;
+    }
+    
     return formatters[currency].format(convertedAmount);
 };
 
@@ -69,8 +96,12 @@ window.calculateRetirement = (
     const basePensionWeightedReturn = calculateWeightedReturn(pensionIndexAllocation, yearsToRetirement, historicalReturns);
     const baseTrainingFundWeightedReturn = calculateWeightedReturn(trainingFundIndexAllocation, yearsToRetirement, historicalReturns);
     
-    const pensionWeightedReturn = getAdjustedReturn(basePensionWeightedReturn, inputs.riskTolerance);
-    const trainingFundWeightedReturn = getAdjustedReturn(baseTrainingFundWeightedReturn, inputs.riskTolerance);
+    // Apply dynamic return assumptions if available
+    const effectivePensionReturn = inputs.pensionReturn !== undefined ? inputs.pensionReturn : basePensionWeightedReturn;
+    const effectiveTrainingFundReturn = inputs.trainingFundReturn !== undefined ? inputs.trainingFundReturn : baseTrainingFundWeightedReturn;
+    
+    const pensionWeightedReturn = getAdjustedReturn(effectivePensionReturn, inputs.riskTolerance);
+    const trainingFundWeightedReturn = getAdjustedReturn(effectiveTrainingFundReturn, inputs.riskTolerance);
 
     let totalPensionSavings = inputs.currentSavings;
     let totalTrainingFund = inputs.currentTrainingFund;
@@ -353,47 +384,58 @@ window.calculateRetirement = (
     const targetMonthlyIncome = (finalSalary * inputs.targetReplacement) / 100;
     const achievesTarget = totalNetIncome >= targetMonthlyIncome;
 
-    // Helper function to safely round numbers and avoid NaN
-    const safeRound = (value) => {
+    // Enhanced helper function for precise financial calculations
+    const safeRound = (value, decimals = 0) => {
         if (isNaN(value) || !isFinite(value)) return 0;
-        return Math.round(value);
+        if (decimals === 0) return Math.round(value);
+        const factor = Math.pow(10, decimals);
+        return Math.round(value * factor) / factor;
     };
+    
+    // Helper function for monetary values (whole numbers)
+    const safeMoney = (value) => safeRound(value, 0);
+    
+    // Helper function for rates and percentages (2 decimal places)
+    const safeRate = (value) => safeRound(value, 2);
+    
+    // Helper function for large monetary amounts with precision
+    const safePreciseMoney = (value) => safeRound(value, 2);
 
     return {
-        // Individual results
-        totalSavings: safeRound(totalPensionSavings),
-        trainingFundValue: safeRound(totalTrainingFund),
-        personalPortfolioValue: safeRound(totalPersonalPortfolio),
-        cryptoValue: safeRound(totalCrypto),
-        realEstateValue: safeRound(totalRealEstate),
-        monthlyPension: safeRound(monthlyPension),
-        monthlyTrainingFundIncome: safeRound(monthlyTrainingFundIncome),
-        monthlyPersonalPortfolioIncome: safeRound(monthlyPersonalPortfolioIncome),
-        monthlyCryptoIncome: safeRound(monthlyCryptoIncome),
-        monthlyRealEstateIncome: safeRound(monthlyRealEstateIncome),
-        realEstateRentalIncome: safeRound(realEstateRentalIncome),
-        pensionTax: safeRound(pensionTax),
-        personalPortfolioTax: safeRound(personalPortfolioTax),
-        cryptoTax: safeRound(cryptoTax),
-        realEstateTax: safeRound(realEstateTax),
-        netPension: safeRound(netPension),
-        netTrainingFundIncome: safeRound(netTrainingFundIncome),
-        netPersonalPortfolioIncome: safeRound(netPersonalPortfolioIncome),
-        netCryptoIncome: safeRound(netCryptoIncome),
-        netRealEstateIncome: safeRound(netRealEstateIncome),
+        // Individual results (monetary values - whole numbers)
+        totalSavings: safeMoney(totalPensionSavings),
+        trainingFundValue: safeMoney(totalTrainingFund),
+        personalPortfolioValue: safeMoney(totalPersonalPortfolio),
+        currentCrypto: safeMoney(totalCrypto),
+        currentRealEstate: safeMoney(totalRealEstate),
+        monthlyPension: safeMoney(monthlyPension),
+        monthlyTrainingFundIncome: safeMoney(monthlyTrainingFundIncome),
+        monthlyPersonalPortfolioIncome: safeMoney(monthlyPersonalPortfolioIncome),
+        monthlyCryptoIncome: safeMoney(monthlyCryptoIncome),
+        monthlyRealEstateIncome: safeMoney(monthlyRealEstateIncome),
+        realEstateRentalIncome: safeMoney(realEstateRentalIncome),
+        pensionTax: safeMoney(pensionTax),
+        personalPortfolioTax: safeMoney(personalPortfolioTax),
+        cryptoTax: safeMoney(cryptoTax),
+        realEstateTax: safeMoney(realEstateTax),
+        netPension: safeMoney(netPension),
+        netTrainingFundIncome: safeMoney(netTrainingFundIncome),
+        netPersonalPortfolioIncome: safeMoney(netPersonalPortfolioIncome),
+        netCryptoIncome: safeMoney(netCryptoIncome),
+        netRealEstateIncome: safeMoney(netRealEstateIncome),
         socialSecurity: socialSecurity || 0,
-        individualNetIncome: safeRound(individualNetIncome),
+        individualNetIncome: safeMoney(individualNetIncome),
         
         // Partner results (if enabled)
         partnerResults: partnerResults,
-        partnerNetIncome: safeRound(partnerNetIncome),
+        partnerNetIncome: safeMoney(partnerNetIncome),
         partnerSocialSecurity: partnerSocialSecurity || 0,
         
         // Additional income breakdown
-        annualBonusMonthly: safeRound(annualBonusMonthly),
-        quarterlyRSUMonthly: safeRound(quarterlyRSUMonthly),
-        freelanceIncome: safeRound(freelanceIncome),
-        additionalRentalIncome: safeRound(rentalIncome),
+        annualBonusMonthly: safeMoney(annualBonusMonthly),
+        quarterlyRSUMonthly: safeMoney(quarterlyRSUMonthly),
+        freelanceIncome: safeMoney(freelanceIncome),
+        additionalRentalIncome: safeMoney(rentalIncome),
         dividendIncome: safeRound(dividendIncome),
         additionalIncomeTotal: safeRound(additionalIncomeTotal),
         partnerAdditionalIncome: safeRound(partnerAdditionalIncome),
@@ -406,19 +448,85 @@ window.calculateRetirement = (
         // Other calculations
         periodResults: periodResults || [],
         lastCountry: lastCountry,
-        weightedTaxRate: safeRound(weightedTaxRate * 100),
-        inflationAdjustedIncome: safeRound(totalNetIncome / Math.pow(1 + (inputs.inflationRate || 3) / 100, yearsToRetirement)),
+        weightedTaxRate: safeRate(weightedTaxRate * 100),
+        inflationAdjustedIncome: safePreciseMoney(totalNetIncome / Math.pow(1 + (inputs.inflationRate || 3) / 100, yearsToRetirement)),
         trainingFundNetReturn: trainingFundNetReturn || 0,
         pensionWeightedReturn: pensionWeightedReturn || 0,
         trainingFundWeightedReturn: trainingFundWeightedReturn || 0,
-        futureMonthlyExpenses: safeRound(futureMonthlyExpenses),
-        remainingAfterExpenses: safeRound(remainingAfterExpenses),
-        remainingAfterExpensesInflationAdjusted: safeRound(remainingAfterExpenses / Math.pow(1 + (inputs.inflationRate || 3) / 100, yearsToRetirement)),
+        futureMonthlyExpenses: safeMoney(futureMonthlyExpenses),
+        remainingAfterExpenses: safeMoney(remainingAfterExpenses),
+        remainingAfterExpensesInflationAdjusted: safePreciseMoney(remainingAfterExpenses / Math.pow(1 + (inputs.inflationRate || 3) / 100, yearsToRetirement)),
         targetMonthlyIncome: safeRound(targetMonthlyIncome),
         achievesTarget: achievesTarget || false,
         targetGap: safeRound(targetMonthlyIncome - totalNetIncome),
         riskLevel: inputs.riskTolerance || 'moderate',
         riskMultiplier: riskScenarios[inputs.riskTolerance]?.multiplier || 1.0,
+        
+        // Tax optimization analysis (if tax optimization utility is available)
+        taxOptimization: (() => {
+            try {
+                return window.taxOptimization ? window.taxOptimization.analyzePersonalTaxSituation(inputs) : null;
+            } catch (error) {
+                console.warn('Tax optimization analysis failed:', error);
+                return null;
+            }
+        })(),
+        
+        // Inflation-adjusted analysis (comprehensive real vs nominal values)
+        inflationAnalysis: (() => {
+            try {
+                if (window.inflationCalculations) {
+                    const inflationRate = parseFloat(inputs.inflationRate || 3);
+                    const country = inputs.country || 'israel';
+                    
+                    // Calculate real values of all major savings components
+                    const realValues = {
+                        totalSavings: window.adjustForInflation(safeMoney(totalPensionSavings), inflationRate, yearsToRetirement),
+                        trainingFundValue: window.adjustForInflation(safeMoney(totalTrainingFund), inflationRate, yearsToRetirement),
+                        personalPortfolioValue: window.adjustForInflation(safeMoney(totalPersonalPortfolio), inflationRate, yearsToRetirement),
+                        currentCrypto: window.adjustForInflation(safeMoney(totalCrypto), inflationRate, yearsToRetirement),
+                        currentRealEstate: window.adjustForInflation(safeMoney(totalRealEstate), inflationRate, yearsToRetirement),
+                        totalNetIncome: window.adjustForInflation(safeMoney(totalNetIncome), inflationRate, yearsToRetirement)
+                    };
+                    
+                    // Calculate inflation protection score
+                    const inflationProtection = window.inflationCalculations.calculateInflationProtection(inputs);
+                    
+                    // Calculate real returns
+                    const nominalReturns = {
+                        pensionReturn: inputs.pensionReturn || 7.0,
+                        trainingFundReturn: inputs.trainingFundReturn || 6.5,
+                        personalPortfolioReturn: inputs.personalPortfolioReturn || 8.0,
+                        realEstateReturn: inputs.realEstateReturn || 6.0,
+                        cryptoReturn: inputs.cryptoReturn || 15.0
+                    };
+                    const realReturns = window.inflationCalculations.calculateRealReturns(nominalReturns, inflationRate);
+                    
+                    return {
+                        inflationRate,
+                        yearsToRetirement,
+                        realValues,
+                        nominalValues: {
+                            totalSavings: safeMoney(totalPensionSavings),
+                            trainingFundValue: safeMoney(totalTrainingFund),
+                            personalPortfolioValue: safeMoney(totalPersonalPortfolio),
+                            currentCrypto: safeMoney(totalCrypto),
+                            currentRealEstate: safeMoney(totalRealEstate),
+                            totalNetIncome: safeMoney(totalNetIncome)
+                        },
+                        inflationProtection,
+                        realReturns,
+                        nominalReturns,
+                        purchasingPowerErosion: ((safeMoney(totalNetIncome) - realValues.totalNetIncome) / safeMoney(totalNetIncome)) * 100,
+                        realVsNominalRatio: realValues.totalNetIncome / safeMoney(totalNetIncome)
+                    };
+                }
+                return null;
+            } catch (error) {
+                console.warn('Inflation analysis failed:', error);
+                return null;
+            }
+        })(),
         
         // Readiness score calculation
         readinessScore: (() => {
@@ -463,8 +571,8 @@ window.generateRetirementChartData = (inputs, workPeriods, partnerWorkPeriods, c
             pensionSavings: results.totalSavings, // Simplified for chart
             trainingFund: results.trainingFundValue,
             personalPortfolio: results.personalPortfolioValue,
-            crypto: results.cryptoValue,
-            realEstate: results.realEstateValue,
+            crypto: results.currentCrypto,
+            realEstate: results.currentRealEstate,
         };
 
         if (inputs.planningType === 'couple' && results.partnerResults) {
@@ -537,8 +645,8 @@ window.generateUnifiedPartnerProjections = (
                     pensionSavings: Math.round(results.totalSavings || 0),
                     trainingFund: Math.round(results.trainingFundValue || 0),
                     personalPortfolio: Math.round(results.personalPortfolioValue || 0),
-                    crypto: Math.round(results.cryptoValue || 0),
-                    realEstate: Math.round(results.realEstateValue || 0)
+                    crypto: Math.round(results.currentCrypto || 0),
+                    realEstate: Math.round(results.currentRealEstate || 0)
                 });
 
                 // Partner data (if available)

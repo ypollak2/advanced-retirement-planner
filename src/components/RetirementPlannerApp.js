@@ -170,6 +170,11 @@ function RetirementPlannerApp() {
         partnerPersonalPortfolioMonthly: 0,
         partnerPersonalPortfolioReturn: 8.0,
         partnerPersonalPortfolioTaxRate: 25,
+        // Partner 1 & 2 additional asset fields
+        partner1RealEstate: 0,
+        partner1Crypto: 0,
+        partner2RealEstate: 0,
+        partner2Crypto: 0,
         // Joint household expenses
         jointMonthlyExpenses: 0,
         jointRetirementExpenses: 0

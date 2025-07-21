@@ -134,8 +134,8 @@ const WizardStepTaxes = ({ inputs, setInputs, language = 'en', workingCurrency =
     const taxRules = {
         israel: {
             currency: '₪',
-            marginalTaxRates: [0.1, 0.14, 0.2, 0.31, 0.35, 0.47, 0.5], // 2024 rates
-            taxBrackets: [0, 77040, 110280, 177480, 247440, 331560, 647640],
+            marginalTaxRates: [0.1, 0.14, 0.2, 0.31, 0.35, 0.47, 0.5], // 2025 rates
+            taxBrackets: [0, 81480, 116760, 188280, 269280, 558240, 718440],
             pensionDeductionLimit: 0.07, // 7% of income
             trainingFundDeductionLimit: 15792, // Monthly threshold
             capitalGainsExemption: true,

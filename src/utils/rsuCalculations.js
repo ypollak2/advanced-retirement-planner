@@ -91,14 +91,15 @@ class RSUCalculations {
 
     // Calculate RSU taxation for Israeli residents
     calculateIsraeliTax(rsuValue, annualSalary) {
-        // Israeli tax brackets for 2024 (in NIS)
+        // Israeli tax brackets for 2025 (in NIS) - Official rates
         const brackets = [
-            { min: 0, max: 77040, rate: 0.10 },
-            { min: 77040, max: 110280, rate: 0.14 },
-            { min: 110280, max: 177480, rate: 0.20 },
-            { min: 177480, max: 247440, rate: 0.31 },
-            { min: 247440, max: 663240, rate: 0.35 },
-            { min: 663240, max: Infinity, rate: 0.47 }
+            { min: 0, max: 81480, rate: 0.10 },
+            { min: 81480, max: 116760, rate: 0.14 },
+            { min: 116760, max: 188280, rate: 0.20 },
+            { min: 188280, max: 269280, rate: 0.31 },
+            { min: 269280, max: 558240, rate: 0.35 },
+            { min: 558240, max: 718440, rate: 0.47 },
+            { min: 718440, max: Infinity, rate: 0.50 }
         ];
 
         const totalIncome = annualSalary + rsuValue;

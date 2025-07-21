@@ -1,8 +1,8 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "6.4.1",
+    number: "6.5.0",
     build: "2025-07-21",
-    commit: "v6.4.1-update",
+    commit: "v6.5.0-update",
     description: "Complete mobile responsiveness optimization with perfect test coverage"
 };
 

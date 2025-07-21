@@ -74,14 +74,18 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             const partner1Pension = inputs.partner1CurrentPension || 0;
             const partner1TrainingFund = inputs.partner1CurrentTrainingFund || 0;
             const partner1Portfolio = inputs.partner1PersonalPortfolio || 0;
+            const partner1RealEstate = inputs.partner1RealEstate || 0;
+            const partner1Crypto = inputs.partner1Crypto || 0;
             const partner2Pension = inputs.partner2CurrentPension || 0;
             const partner2TrainingFund = inputs.partner2CurrentTrainingFund || 0;
             const partner2Portfolio = inputs.partner2PersonalPortfolio || 0;
+            const partner2RealEstate = inputs.partner2RealEstate || 0;
+            const partner2Crypto = inputs.partner2Crypto || 0;
             
             const total = currentSavings + currentTrainingFund + currentPersonalPortfolio + 
                          currentRealEstate + currentCrypto + currentSavingsAccount +
-                         partner1Pension + partner1TrainingFund + partner1Portfolio +
-                         partner2Pension + partner2TrainingFund + partner2Portfolio;
+                         partner1Pension + partner1TrainingFund + partner1Portfolio + partner1RealEstate + partner1Crypto +
+                         partner2Pension + partner2TrainingFund + partner2Portfolio + partner2RealEstate + partner2Crypto;
             
             // Validate result
             if (isNaN(total) || !isFinite(total)) {

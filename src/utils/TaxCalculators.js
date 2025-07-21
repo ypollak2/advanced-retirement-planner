@@ -18,7 +18,7 @@
         let totalTax = 0;
         let remainingIncome = annualGross;
 
-        // Israeli tax brackets 2024 (NIS)
+        // Israeli tax brackets 2025 (NIS) - Official rates
         const brackets = [
             { min: 0, max: 81480, rate: 0.10 },
             { min: 81480, max: 116760, rate: 0.14 },
@@ -40,9 +40,9 @@
             }
         }
 
-        // Health insurance (2.5%) and National Insurance (12% up to ceiling)
-        const healthInsurance = annualGross * 0.025;
-        const nationalInsuranceCeiling = 481620; // 2024 ceiling
+        // Health insurance (3.1%) and National Insurance (12% up to ceiling) - 2025 rates
+        const healthInsurance = annualGross * 0.031;
+        const nationalInsuranceCeiling = 494580; // 2025 ceiling updated
         const nationalInsurance = Math.min(annualGross, nationalInsuranceCeiling) * 0.12;
 
         const totalDeductions = totalTax + healthInsurance + nationalInsurance;

@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v6.4.1 ✨
+# 🚀 Advanced Retirement Planner v6.5.0 ✨
 
-[![Version](https://img.shields.io/badge/version-6.4.1-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-6.5.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -16,9 +16,37 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v6.4.1 - MOBILE RESPONSIVENESS & USER EXPERIENCE REVOLUTION 📱
+## 🎨 What's New in v6.5.0 - ADVANCED FINANCIAL INTELLIGENCE & RISK ANALYSIS 🧠
 
-### **📱 COMPREHENSIVE MOBILE OPTIMIZATION** (July 2025)
+### **🧠 ADVANCED PORTFOLIO INTELLIGENCE** (July 2025)
+
+#### **🎯 Professional-Grade Risk Analysis**
+- **Advanced Portfolio Rebalancing**: Automated rebalancing suggestions with tax-optimized strategies and urgency assessment
+- **Monte Carlo Simulations**: 10,000+ iteration probabilistic projections with success rate analysis and risk metrics
+- **Dynamic Return Assumptions**: Market scenario presets (Conservative/Moderate/Aggressive) with historical validation
+- **Inflation Impact Analysis**: Real vs nominal value tracking with purchasing power erosion visualization
+- **Systematic Withdrawal Strategies**: Six withdrawal methods with Israeli tax optimization and depletion risk assessment
+
+#### **💰 Tax Optimization Engine**
+- **Comprehensive Tax Analysis**: Personal tax situation analysis with savings calculations and optimization recommendations
+- **Israeli Tax Compliance**: 2025 tax brackets with training fund threshold logic and pension contribution optimization
+- **Multi-Country Support**: Tax-efficient strategies for Israel, USA, and Eurozone markets
+- **Asset Location Optimization**: Tax-efficient account allocation with loss harvesting strategies
+
+#### **📊 Advanced UX Dashboards**
+- **Monte Carlo Results Dashboard**: Interactive probability distributions with success metrics and risk analysis
+- **Inflation Visualization Panel**: Real vs nominal charts with scenario comparison and protection scoring  
+- **Withdrawal Strategy Interface**: Strategy comparison with tax analysis and scenario modeling
+- **Advanced Rebalancing Panel**: Urgency assessment with cost-benefit analysis and automation settings
+- **Comprehensive Settings Panel**: Centralized configuration for all advanced features with import/export
+
+#### **🔬 Enhanced Business Logic**
+- **Precision Financial Calculations**: Specialized rounding functions (`safeRound`, `safeMoney`, `safeRate`) for financial accuracy
+- **Field Naming Standardization**: Consistent field names (currentRealEstate, currentCrypto) across all calculations
+- **Enhanced Partner Aggregation**: Complete savings calculation including all partner asset types
+- **Dynamic Market Scenarios**: Economic condition modeling with recession, expansion, and stagflation scenarios
+
+### **📱 COMPREHENSIVE MOBILE OPTIMIZATION** (Continued from v6.4.x)
 
 #### **🎯 Touch-First Design Overhaul**
 - **Enhanced Touch Targets**: All input fields upgraded to minimum 44px touch targets for optimal mobile interaction
@@ -295,10 +323,14 @@ advanced-retirement-planner/
 
 ### **Professional Analysis**
 - 🧪 **Stress Testing**: 5 economic scenarios (Conservative, Optimistic, Market Crash, High Inflation, Stagnation)
+- 🎲 **Monte Carlo Simulations**: 10,000+ iteration probabilistic projections with success rate analysis
+- ⚖️ **Advanced Portfolio Rebalancing**: Tax-optimized automatic rebalancing with urgency assessment
+- 📈 **Inflation Impact Analysis**: Real vs nominal value tracking with purchasing power visualization
+- 💰 **Withdrawal Strategy Analysis**: Six systematic withdrawal methods with Israeli tax optimization
 - 🤖 **Claude AI Integration**: Natural language scenario translation and personalized recommendations
 - 📋 **Enhanced Summary Dashboard**: Key metrics, inflation impact, portfolio breakdown, risk assessment
-- 📈 **Real vs Nominal**: Inflation-adjusted calculations with purchasing power analysis
 - 🎯 **5-Factor Readiness Score**: Comprehensive retirement preparedness assessment with actionable insights
+- 🏛️ **Tax Optimization Engine**: Personal tax analysis with 2025 Israeli compliance and multi-country support
 
 ### **Export & Sharing**
 - 🖼️ **Image Export**: High-quality PNG and PDF generation for reports and presentations
