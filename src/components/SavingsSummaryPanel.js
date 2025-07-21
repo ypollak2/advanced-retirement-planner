@@ -45,7 +45,7 @@ const SavingsSummaryPanel = ({
         // Enhanced safe defaults for current savings with more realistic values
         // Always show meaningful values instead of zeros for better UX
         const rawPensionSavings = inputs.currentSavings;
-        const rawTrainingFundSavings = inputs.currentTrainingFundSavings;
+        const rawTrainingFundSavings = inputs.currentTrainingFund;
         const userAge = inputs.currentAge || 30;
         
         // Use realistic age-based estimates when values are undefined, null, or very low

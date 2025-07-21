@@ -68,13 +68,20 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             const currentPersonalPortfolio = inputs.currentPersonalPortfolio || 0;
             const currentRealEstate = inputs.currentRealEstate || 0;
             const currentCrypto = inputs.currentCrypto || 0;
+            const currentSavingsAccount = inputs.currentSavingsAccount || 0;
             
             // Partner savings if couple
-            const partner1Savings = inputs.partner1CurrentSavings || 0;
-            const partner2Savings = inputs.partner2CurrentSavings || 0;
+            const partner1Pension = inputs.partner1CurrentPension || 0;
+            const partner1TrainingFund = inputs.partner1CurrentTrainingFund || 0;
+            const partner1Portfolio = inputs.partner1PersonalPortfolio || 0;
+            const partner2Pension = inputs.partner2CurrentPension || 0;
+            const partner2TrainingFund = inputs.partner2CurrentTrainingFund || 0;
+            const partner2Portfolio = inputs.partner2PersonalPortfolio || 0;
             
             const total = currentSavings + currentTrainingFund + currentPersonalPortfolio + 
-                         currentRealEstate + currentCrypto + partner1Savings + partner2Savings;
+                         currentRealEstate + currentCrypto + currentSavingsAccount +
+                         partner1Pension + partner1TrainingFund + partner1Portfolio +
+                         partner2Pension + partner2TrainingFund + partner2Portfolio;
             
             // Validate result
             if (isNaN(total) || !isFinite(total)) {
@@ -174,8 +181,8 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                     createElement('input', {
                         key: 'realestate-input',
                         type: 'number',
-                        value: inputs.realEstateValue || 0,
-                        onChange: (e) => setInputs({...inputs, realEstateValue: parseInt(e.target.value) || 0}),
+                        value: inputs.currentRealEstate || 0,
+                        onChange: (e) => setInputs({...inputs, currentRealEstate: parseInt(e.target.value) || 0}),
                         className: "w-full p-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                     })
                 ]),
@@ -192,8 +199,8 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                     createElement('input', {
                         key: 'crypto-input',
                         type: 'number',
-                        value: inputs.cryptoValue || 0,
-                        onChange: (e) => setInputs({...inputs, cryptoValue: parseInt(e.target.value) || 0}),
+                        value: inputs.currentCrypto || 0,
+                        onChange: (e) => setInputs({...inputs, currentCrypto: parseInt(e.target.value) || 0}),
                         className: "w-full p-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
                     })
                 ]),
@@ -210,8 +217,8 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                     createElement('input', {
                         key: 'savings-account-input',
                         type: 'number',
-                        value: inputs.savingsAccountValue || 0,
-                        onChange: (e) => setInputs({...inputs, savingsAccountValue: parseInt(e.target.value) || 0}),
+                        value: inputs.currentSavingsAccount || 0,
+                        onChange: (e) => setInputs({...inputs, currentSavingsAccount: parseInt(e.target.value) || 0}),
                         className: "w-full p-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500"
                     })
                 ])
