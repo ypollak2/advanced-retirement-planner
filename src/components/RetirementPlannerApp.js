@@ -1087,9 +1087,10 @@ function RetirementPlannerApp() {
 </body>
 </html>`;
 
-        // Convert HTML to PDF using browser's print functionality
+        // Convert HTML to PDF using browser's print functionality - secure method
         const printWindow = window.open('', '_blank');
-        printWindow.document.write(htmlContent);
+        printWindow.document.open();
+        printWindow.document.documentElement.innerHTML = htmlContent;
         printWindow.document.close();
         
         // Wait for content to load, then trigger print dialog
