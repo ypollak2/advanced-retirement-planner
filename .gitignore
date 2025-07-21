@@ -96,6 +96,19 @@ temp/
 # Backup files
 *.bak
 *.backup
+*.old
+*.tmp
+
+# QA Reports (generated)
+*qa-report.json
+deployment-validation-report.json
+pre-release-qa-report.json
+
+# Build artifacts (should be generated)
+dist/
+build/
+typescript-version/dist/
+typescript-version/node_modules/
 
 # Test files
 test-results/

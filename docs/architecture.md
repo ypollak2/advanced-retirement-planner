@@ -1,4 +1,4 @@
-# 🏗️ Advanced Retirement Planner v6.0.0 - System Architecture
+# 🏗️ Advanced Retirement Planner v6.4.0 - System Architecture
 
 ## Overview
 
@@ -557,8 +557,8 @@ Source Code → Build Process → Static Files → CDN Distribution
 
 ---
 
-**Last Updated**: July 20, 2025  
-**Version**: 6.0.0  
+**Last Updated**: July 21, 2025  
+**Version**: 6.4.0  
 **Author**: Yali Pollak (יהלי פולק)
 
 This architecture document reflects the current v6.0.0 implementation with major partner planning overhaul and serves as a blueprint for future development. The modular, component-based design ensures maintainability and extensibility while delivering a professional-grade financial planning experience.
