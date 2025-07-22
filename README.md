@@ -8,8 +8,12 @@
 [![UX](https://img.shields.io/badge/UX-92.8%25-brightgreen.svg)](tests/user-experience-test.js)
 [![Deployment](https://img.shields.io/badge/deployment-Netlify%20%2B%20GitHub%20Pages-4078c0.svg)](https://advanced-pension-planner.netlify.app/)
 
-> **🌟 The Most Intelligent, Transparent, and Empowering Retirement Planner on the Web**
-> Complete professional-grade retirement planning with advanced partner planning, wizard-based interface, and comprehensive export functionality.
+**Professional-grade retirement planning application with:**
+- Advanced partner planning and joint financial projections
+- Wizard-based interface for guided data collection  
+- Comprehensive investment tracking across multiple asset classes
+- Real-time calculations with intelligent results display
+- Export functionality for reports and analysis
 
 ## 🌐 Live Deployments
 
