@@ -11,12 +11,17 @@
 > **🌟 The Most Intelligent, Transparent, and Empowering Retirement Planner on the Web**
 > Complete professional-grade retirement planning with advanced partner planning, wizard-based interface, and comprehensive export functionality.
 
-**🌐 Live Demo:** [https://advanced-pension-planner.netlify.app/](https://advanced-pension-planner.netlify.app/)  
-**🔗 Alternative Demo:** [https://ypollak2.github.io/advanced-retirement-planner](https://ypollak2.github.io/advanced-retirement-planner)
+## 🌐 Live Deployments
+
+| Environment | Status | URL | Purpose |
+|-------------|--------|-----|---------|
+| **🚀 Production** | [![Production](https://img.shields.io/badge/status-live-brightgreen.svg)](https://ypollak2.github.io/advanced-retirement-planner) | [https://ypollak2.github.io/advanced-retirement-planner](https://ypollak2.github.io/advanced-retirement-planner) | **Main live version for users** |
+| **🧪 Stage** | [![Stage](https://img.shields.io/badge/status-testing-orange.svg)](https://ypollak2.github.io/advanced-retirement-planner/stage/) | [https://ypollak2.github.io/advanced-retirement-planner/stage/](https://ypollak2.github.io/advanced-retirement-planner/stage/) | **Latest features for testing** |
+| **🔄 Mirror** | [![Mirror](https://img.shields.io/badge/status-synced-blue.svg)](https://advanced-pension-planner.netlify.app/) | [https://advanced-pension-planner.netlify.app/](https://advanced-pension-planner.netlify.app/) | **Production backup on Netlify** |
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v6.5.1 - ADVANCED FINANCIAL INTELLIGENCE & RISK ANALYSIS 🧠
+## 🎨 What's New in v6.5.2 - NAVIGATION FIXES & STAGE DEPLOYMENT 🎯
 
 ### **🧠 ADVANCED PORTFOLIO INTELLIGENCE** (July 2025)
 
