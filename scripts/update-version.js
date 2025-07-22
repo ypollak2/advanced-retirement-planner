@@ -27,8 +27,21 @@ const VERSION_FILES = [
     },
     {
         file: 'src/version.js',
-        pattern: /const\s+APP_VERSION\s*=\s*['"][^'"]*['"]/,
-        replacement: newVersion => `const APP_VERSION = '${newVersion}'`
+        pattern: /number:\s*"[^"]*"/,
+        replacement: newVersion => `number: "${newVersion}"`
+    },
+    {
+        file: 'README.md',
+        patterns: [
+            {
+                pattern: /# 🚀 Advanced Retirement Planner v[^\s]* ✨/,
+                replacement: newVersion => `# 🚀 Advanced Retirement Planner v${newVersion} ✨`
+            },
+            {
+                pattern: /version-[\d.]+-blue/,
+                replacement: newVersion => `version-${newVersion}-blue`
+            }
+        ]
     },
     {
         file: 'index.html',
