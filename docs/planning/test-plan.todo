@@ -1,0 +1,460 @@
+# 🧪 Product Manager & QA Test Plan - Advanced Retirement Planner v6.4.1
+
+**Date**: July 21, 2025  
+**Tester**: Product Manager/UX Specialist/QA Engineer Hybrid Analysis  
+**Application Version**: 6.4.1  
+**Test Environment**: Local web application  
+
+---
+
+## 📋 Pre-Testing Setup
+
+### Application Launch
+- [ ] Start local server: `npm run serve` or open `index.html` directly
+- [ ] Verify version indicator shows v6.4.1 in top-left corner
+- [ ] Check browser console for any startup errors
+- [ ] Confirm all external dependencies load (React, Chart.js, Tailwind CSS)
+- [ ] Test responsive layout on different screen sizes
+- [ ] Verify application loads within 3 seconds
+
+---
+
+## 🏠 Dashboard Component Testing
+
+### Financial Health Meter
+- [ ] **Purpose**: Displays overall retirement readiness score and key metrics
+- [ ] **Business Goal**: Provide at-a-glance financial health assessment
+- [ ] Test financial health score calculation (should be 0-100)
+- [ ] Verify health meter color coding (red/yellow/green indicators)
+- [ ] Check net worth display accuracy
+- [ ] Test age-related information display (current age, target retirement age)
+- [ ] Validate "last updated" timestamp functionality
+
+### Quick Actions Panel
+- [ ] **Purpose**: Provide shortcuts to common retirement planning tasks
+- [ ] **Business Goal**: Reduce friction for core user workflows
+- [ ] Test "Plan Pension" button → Should navigate to pension planning
+- [ ] Test "Manage Investments" button → Should open investment interface
+- [ ] Test "Partner Planning" button → Should enable couple mode
+- [ ] Test "Test Scenarios" button → Should open stress testing
+- [ ] Verify all buttons are properly labeled and accessible
+
+### Expandable Sections
+- [ ] **Pension Planning Section**
+  - [ ] Expand/collapse functionality works
+  - [ ] Displays current pension contribution rates
+  - [ ] Shows country-specific pension rules
+  - [ ] Calculates employee vs employer breakdown
+- [ ] **Investment Portfolio Section**
+  - [ ] Shows current asset allocation
+  - [ ] Displays diversification score
+  - [ ] Lists individual investments and RSUs
+- [ ] **Partner Planning Section** (if couple mode)
+  - [ ] Shows both partners' data
+  - [ ] Compares individual vs combined projections
+  - [ ] Displays partner-specific metrics
+- [ ] **Scenario Testing Section**
+  - [ ] Lists available stress test scenarios
+  - [ ] Shows previous test results
+  - [ ] Provides access to scenario comparison
+- [ ] **Goal Tracking Section**
+  - [ ] Displays retirement goals progress
+  - [ ] Shows savings vs target comparison
+  - [ ] Tracks milestone achievements
+- [ ] **Inheritance Planning Section**
+  - [ ] Shows estate value calculation
+  - [ ] Displays will status and beneficiaries
+  - [ ] Shows life insurance coverage
+- [ ] **Tax Optimization Section**
+  - [ ] Displays tax efficiency rating
+  - [ ] Shows optimized contribution rates
+  - [ ] Calculates tax savings potential
+- [ ] **National Insurance Section** (for Israeli users)
+  - [ ] Shows monthly benefit eligibility
+  - [ ] Calculates total benefit projections
+  - [ ] Displays contribution history impact
+
+---
+
+## 🧙‍♂️ Wizard Flow Testing (8-Step Process)
+
+### Step 1: Personal Information (WizardStepPersonal.js)
+- [ ] **Purpose**: Collect basic demographic and planning preferences
+- [ ] **Business Goal**: Establish foundation for personalized planning
+- [ ] Test planning type selection (Individual vs Couple)
+- [ ] Validate age input (should accept 18-100)
+- [ ] Test retirement age selection
+- [ ] Verify country selection affects subsequent calculations
+- [ ] Check language toggle functionality (Hebrew/English)
+- [ ] Validate input field labels are clear and understandable
+- [ ] Test navigation: "Next" button enabled with valid inputs
+- [ ] **Edge Cases**:
+  - [ ] Age below 18 or above 100
+  - [ ] Retirement age before current age
+  - [ ] Missing required fields handling
+
+### Step 2: Salary Information (WizardStepSalary.js)
+- [ ] **Purpose**: Collect comprehensive income sources for accurate planning
+- [ ] **Business Goal**: Capture all income streams for precise calculations
+- [ ] Test base monthly salary input (supports multi-currency)
+- [ ] Validate annual bonus input and monthly conversion
+- [ ] Test quarterly RSU input with stock price integration
+- [ ] **Partner Mode Testing** (if couple selected):
+  - [ ] Partner 1 name and salary inputs
+  - [ ] Partner 2 name and salary inputs
+  - [ ] Combined income calculation accuracy
+- [ ] **Additional Income Sources**:
+  - [ ] Freelance income input
+  - [ ] Rental income input
+  - [ ] Dividend income input
+  - [ ] Other income sources
+- [ ] Test currency conversion display
+- [ ] Verify gross vs net income clarification
+- [ ] Check input validation for negative values
+- [ ] **Edge Cases**:
+  - [ ] Zero salary values
+  - [ ] Extremely high salary values (₿1M+)
+  - [ ] Partner salary without partner name
+
+### Step 3: Current Savings (WizardStepSavings.js)
+- [ ] **Purpose**: Catalog existing retirement savings across all categories
+- [ ] **Business Goal**: Provide accurate baseline for retirement projections
+- [ ] Test pension fund savings input
+- [ ] Validate training fund savings input
+- [ ] Test personal portfolio value input
+- [ ] Check real estate value input (currentRealEstate field)
+- [ ] Validate cryptocurrency holdings input (currentCrypto field)
+- [ ] Test savings account balance input
+- [ ] **Partner Mode Testing**:
+  - [ ] Partner 1 individual savings categories
+  - [ ] Partner 2 individual savings categories
+  - [ ] Combined savings calculation (calculateTotalSavings function)
+- [ ] Verify total savings calculation accuracy
+- [ ] Test currency formatting consistency
+- [ ] **Edge Cases**:
+  - [ ] All zero values scenario
+  - [ ] Extremely high asset values
+  - [ ] Missing partner data handling
+
+### Step 4: Contribution Rates (WizardStepContributions.js)
+- [ ] **Purpose**: Configure pension and training fund contribution rates
+- [ ] **Business Goal**: Optimize contribution strategy based on regulations
+- [ ] **Country-Specific Testing**:
+  - [ ] Israel: 21.333% total pension rate (7% employee + 14.333% employer)
+  - [ ] Training fund checkbox functionality
+  - [ ] Training fund threshold logic (₪45k monthly salary)
+  - [ ] Below threshold: 7.5% rate
+  - [ ] Above threshold: Blended rate calculation
+- [ ] Test employee contribution rate input (7% for Israel)
+- [ ] Validate employer contribution rate input (14.333% for Israel)
+- [ ] Check training fund rate calculation (calculateTrainingFundRate function)
+- [ ] **Partner Mode Testing**:
+  - [ ] Individual contribution rates per partner
+  - [ ] Different countries per partner support
+- [ ] Verify rate validation (0-100% range)
+- [ ] **Edge Cases**:
+  - [ ] Contribution rates exceeding 100%
+  - [ ] Zero contribution scenarios
+  - [ ] Mixed country regulations (couple mode)
+
+### Step 5: Investment Preferences (WizardStepInvestments.js)  
+- [ ] **Purpose**: Define investment strategy and risk tolerance
+- [ ] **Business Goal**: Align investments with risk profile and time horizon
+- [ ] Test risk profile selection (Conservative/Moderate/Aggressive)
+- [ ] Validate asset allocation sliders (should sum to 100%)
+- [ ] **Asset Categories**:
+  - [ ] Pension fund allocation
+  - [ ] Training fund allocation  
+  - [ ] Personal portfolio allocation
+  - [ ] Real estate percentage
+  - [ ] Cryptocurrency percentage
+- [ ] Test expected return rate inputs (per asset class)
+- [ ] Validate management fee inputs (per asset class)
+- [ ] **Partner Mode Testing**:
+  - [ ] Individual risk profiles per partner
+  - [ ] Separate asset allocations per partner
+  - [ ] Individual fee structures per partner
+- [ ] **Edge Cases**:
+  - [ ] Asset allocation not summing to 100%
+  - [ ] Unrealistic return rates (>50% annually)
+  - [ ] Negative fee values
+
+### Step 6: Goals & Planning (WizardStepGoals.js)
+- [ ] **Purpose**: Define retirement lifestyle and financial targets
+- [ ] **Business Goal**: Align planning with desired retirement outcome
+- [ ] Test target monthly retirement income input
+- [ ] Validate desired lifestyle selection (Basic/Comfortable/Luxury)
+- [ ] Check emergency fund target (months of expenses)
+- [ ] Test debt payoff timeline input
+- [ ] Validate major expense planning (travel, healthcare, etc.)
+- [ ] **Partner Mode Testing**:
+  - [ ] Combined lifestyle planning
+  - [ ] Joint financial goals
+  - [ ] Shared emergency fund planning
+- [ ] **Edge Cases**:
+  - [ ] Unrealistic retirement income goals
+  - [ ] Zero emergency fund target
+  - [ ] Conflicting partner goals
+
+### Step 7: Review & Analysis (WizardStepReview.js)
+- [ ] **Purpose**: Comprehensive financial health analysis and validation
+- [ ] **Business Goal**: Provide professional-grade financial assessment
+- [ ] **Financial Health Scoring** (5-Factor System):
+  - [ ] Factor 1: Savings Rate (40 points max)
+  - [ ] Factor 2: Current Savings Adequacy (25 points max)  
+  - [ ] Factor 3: Time Horizon (20 points max)
+  - [ ] Factor 4: Diversification Bonus (10 points max)
+  - [ ] Factor 5: Income Replacement Ratio (5 points max)
+- [ ] Test comprehensive data review display
+- [ ] Validate calculation preview accuracy
+- [ ] Check action items generation
+- [ ] Test data editing capabilities (return to previous steps)
+- [ ] **Partner Mode Testing**:
+  - [ ] Combined health score calculation
+  - [ ] Individual vs joint projections
+  - [ ] Partner-specific recommendations
+
+### Step 8: Results & Export (WizardStepResults.js)
+- [ ] **Purpose**: Present final projections and enable data export
+- [ ] **Business Goal**: Deliver actionable retirement planning insights
+- [ ] **Projection Displays**:
+  - [ ] Monthly income projection (nominal)
+  - [ ] Monthly income projection (inflation-adjusted)
+  - [ ] Total savings at retirement
+  - [ ] Retirement readiness score
+- [ ] **Export Functionality**:
+  - [ ] Claude AI recommendations export
+  - [ ] PDF report generation
+  - [ ] PNG image export  
+  - [ ] JSON data export
+- [ ] **Chart Visualizations**:
+  - [ ] Savings growth projection chart
+  - [ ] Asset allocation pie chart
+  - [ ] Income replacement chart
+- [ ] **Partner Mode Testing**:
+  - [ ] Individual partner projections
+  - [ ] Combined couple projections
+  - [ ] Partner comparison views
+
+---
+
+## 🔧 Advanced Features Testing
+
+### Multi-Currency Support
+- [ ] **Purpose**: Support international users with local currency display
+- [ ] **Business Goal**: Increase global accessibility and usability
+- [ ] Test currency selector (ILS, USD, EUR, GBP, BTC, ETH)
+- [ ] Validate real-time conversion rates
+- [ ] Check currency symbol display consistency
+- [ ] Test fallback rates when API unavailable
+- [ ] Verify calculations remain in ILS base
+- [ ] **Edge Cases**:
+  - [ ] Network failure during conversion
+  - [ ] Extreme currency volatility (crypto)
+  - [ ] Unsupported currency codes
+
+### Stress Testing Interface
+- [ ] **Purpose**: Test retirement plan resilience under economic scenarios
+- [ ] **Business Goal**: Prepare users for market volatility impact
+- [ ] **5 Economic Scenarios**:
+  - [ ] Conservative Scenario (4.5% returns, 5.5% inflation)
+  - [ ] Optimistic Scenario (9.5% returns, 1.5% inflation)
+  - [ ] Market Crash Scenario (35% loss in year 10)
+  - [ ] High Inflation Scenario (7.5% persistent inflation)
+  - [ ] Economic Stagnation (5.5% returns, 1% salary growth)
+- [ ] Test scenario selection and parameter adjustment
+- [ ] Validate stress test result calculations
+- [ ] Check scenario comparison functionality
+- [ ] **Edge Cases**:
+  - [ ] Multiple simultaneous stress scenarios
+  - [ ] Custom scenario parameter limits
+
+### Portfolio Optimization
+- [ ] **Purpose**: Recommend optimal asset allocation based on risk tolerance
+- [ ] **Business Goal**: Maximize returns while managing risk appropriately
+- [ ] Test efficient frontier calculation
+- [ ] Validate diversification scoring algorithm
+- [ ] Check rebalancing recommendations
+- [ ] Test risk-adjusted return projections
+- [ ] **Edge Cases**:
+  - [ ] Extreme risk tolerance selections
+  - [ ] Concentrated portfolio positions
+
+### Inheritance Planning
+- [ ] **Purpose**: Plan estate transfer and tax implications
+- [ ] **Business Goal**: Preserve wealth for beneficiaries
+- [ ] Test asset categorization (liquid, real estate, investments)
+- [ ] Validate debt tracking and net estate calculation
+- [ ] Check beneficiary management interface
+- [ ] Test will status tracking
+- [ ] Validate life insurance integration
+- [ ] **Country-Specific Rules**:
+  - [ ] Israeli inheritance tax exemptions
+  - [ ] Spouse vs children inheritance limits
+  - [ ] Pension fund survivor benefits
+
+---
+
+## 🧪 Technical & Performance Testing
+
+### Input Validation
+- [ ] **Age Fields**: Accept 18-100, reject invalid ranges
+- [ ] **Currency Fields**: Accept positive numbers, handle decimals properly
+- [ ] **Percentage Fields**: Accept 0-100%, validate range limits
+- [ ] **Text Fields**: Max 200 characters, XSS protection
+- [ ] **Required Fields**: Proper error messaging for missing data
+- [ ] **Real-time Validation**: Immediate feedback on invalid input
+
+### Data Persistence
+- [ ] Test data persistence between wizard steps
+- [ ] Validate localStorage functionality
+- [ ] Check data restoration on page reload  
+- [ ] Test save/resume functionality
+- [ ] **Edge Cases**:
+  - [ ] localStorage quota exceeded
+  - [ ] Corrupted saved data handling
+  - [ ] Browser privacy mode compatibility
+
+### Performance Metrics
+- [ ] Page load time under 3 seconds
+- [ ] Calculation response time under 500ms
+- [ ] Chart rendering time under 1 second
+- [ ] Memory usage reasonable (under 100MB)
+- [ ] No memory leaks during extended use
+
+### Security Testing
+- [ ] XSS protection in all input fields
+- [ ] No eval() or Function() usage (security scanner compliance)
+- [ ] CSP policy enforcement
+- [ ] No sensitive data in console logs
+- [ ] Local data only (no external transmission)
+
+---
+
+## 📱 Mobile & Accessibility Testing
+
+### Mobile Responsiveness (Recently Enhanced)
+- [ ] **Touch Targets**: Minimum 44px for all interactive elements
+- [ ] **Responsive Grid**: Proper breakpoints (sm/md/lg)
+- [ ] **Text Sizing**: Readable on mobile (16px minimum)
+- [ ] **Spacing**: Adequate padding and margins on small screens
+- [ ] **Navigation**: Easy thumb navigation for wizard steps
+- [ ] Test on multiple screen sizes (320px to 1200px+)
+
+### Accessibility
+- [ ] **Keyboard Navigation**: Tab through all interactive elements
+- [ ] **Screen Reader**: Proper ARIA labels and descriptions
+- [ ] **Color Contrast**: WCAG AA compliance (4.5:1 ratio)
+- [ ] **Focus Management**: Visible focus indicators
+- [ ] **Error Announcements**: Screen reader accessible error messages
+
+---
+
+## 🔍 Edge Cases & Error Scenarios
+
+### Boundary Value Testing
+- [ ] Age 18 and 100 (boundary values)
+- [ ] Zero values in all numeric fields
+- [ ] Maximum currency values (999,999,999)
+- [ ] Negative value handling
+- [ ] Decimal precision edge cases
+
+### Error Handling
+- [ ] Network failure during stock price fetch
+- [ ] Invalid JSON data corruption
+- [ ] Browser compatibility issues
+- [ ] Third-party service failures (currency API)
+- [ ] Calculation overflow scenarios
+
+### User Journey Interruptions
+- [ ] Browser back/forward button usage
+- [ ] Page refresh during wizard process
+- [ ] Browser tab switching
+- [ ] Session timeout handling
+- [ ] Multiple browser window conflicts
+
+---
+
+## 📊 Business Logic Validation
+
+### Israeli Pension System Calculations
+- [ ] **Total Rate**: 21.333% (7% employee + 14.333% employer)
+- [ ] **Training Fund**: 10% total (2.5% employee + 7.5% employer)
+- [ ] **Threshold Logic**: ₪45k monthly salary threshold
+- [ ] **Blended Rates**: Accurate calculation above threshold
+- [ ] **Tax Benefits**: Proper tax deduction calculations
+
+### Multi-Partner Calculations
+- [ ] **Income Aggregation**: Accurate total household income
+- [ ] **Individual Tracking**: Separate calculation per partner
+- [ ] **Combined Projections**: Accurate joint retirement planning
+- [ ] **Asset Attribution**: Proper individual vs joint asset tracking
+
+### Inflation Adjustments
+- [ ] **Real vs Nominal**: Accurate inflation-adjusted projections
+- [ ] **Time Value**: Proper present value calculations
+- [ ] **Purchasing Power**: Accurate future value assessment
+
+---
+
+## 🎯 User Experience Evaluation
+
+### Information Architecture
+- [ ] **Logical Flow**: Natural progression through wizard steps
+- [ ] **Clear Labels**: Understandable to non-financial experts
+- [ ] **Help System**: Contextual tooltips and explanations
+- [ ] **Progress Indicators**: Clear wizard step progression
+
+### Cognitive Load Assessment
+- [ ] **Information Density**: Not overwhelming per screen
+- [ ] **Decision Points**: Clear choices without decision fatigue  
+- [ ] **Error Recovery**: Easy correction of mistakes
+- [ ] **Expert vs Novice**: Appropriate for different user levels
+
+### Visual Design
+- [ ] **Consistency**: Uniform design patterns throughout
+- [ ] **Visual Hierarchy**: Important information stands out
+- [ ] **Color Usage**: Meaningful and accessible color coding
+- [ ] **Typography**: Readable text hierarchy
+
+---
+
+## ✅ Test Completion Checklist
+
+### Critical Issues (🔴) - Must Fix Before Production
+- [ ] Any calculation errors or NaN values
+- [ ] Broken user flows or navigation
+- [ ] Data loss or corruption issues
+- [ ] Security vulnerabilities
+- [ ] Mobile blocking issues
+
+### Moderate Issues (🟠) - Should Fix Soon
+- [ ] UX confusion points
+- [ ] Performance problems
+- [ ] Minor calculation inaccuracies
+- [ ] Accessibility improvements needed
+- [ ] Cross-browser compatibility issues
+
+### Enhancement Opportunities (🟢) - Future Improvements
+- [ ] Additional features that would add value
+- [ ] UX optimizations
+- [ ] Performance improvements
+- [ ] Advanced functionality suggestions
+
+---
+
+## 📝 Documentation Deliverables
+
+Upon completion of testing:
+
+1. **issues-found.md** - Prioritized bug report with reproduction steps
+2. **ux-recommendations.md** - User experience enhancement suggestions  
+3. **business-logic-validation.md** - Financial calculation accuracy verification
+4. **mobile-accessibility-report.md** - Responsive design and accessibility audit
+5. **performance-analysis.md** - Load times, responsiveness, and optimization opportunities
+
+---
+
+**Test Plan Created**: July 21, 2025  
+**Expected Duration**: 4-6 hours for comprehensive testing  
+**Success Criteria**: All critical issues identified and documented, UX recommendations provided, business logic validated
