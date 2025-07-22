@@ -314,12 +314,17 @@ window.calculateRetirement = (
     
     // Get social security from last valid country or default
     let socialSecurity = 0;
+    let lastCountry = null;
     if (sortedPeriods.length > 0) {
         const lastPeriod = sortedPeriods[sortedPeriods.length - 1];
         if (lastPeriod && lastPeriod.country && countryData[lastPeriod.country]) {
-            const lastCountry = countryData[lastPeriod.country];
+            lastCountry = countryData[lastPeriod.country];
             socialSecurity = lastCountry.socialSecurity;
         }
+    }
+    // Default to Israel if no country data available
+    if (!lastCountry) {
+        lastCountry = countryData.israel || { socialSecurity: 0 };
     }
     
     // Calculate partner income (if applicable)

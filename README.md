@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v6.6.1 ✨
+# 🚀 Advanced Retirement Planner v6.6.2 ✨
 
-[![Version](https://img.shields.io/badge/version-6.6.1-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-6.6.2-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -25,7 +25,7 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v6.6.0 - MAJOR UX OVERHAUL & RUNTIME FIXES 🚀
+## 🎨 What's New in v6.6.2 - MAJOR UX OVERHAUL & RUNTIME FIXES 🚀
 
 ### **🎯 INTELLIGENT RESULTS DISPLAY** (July 2025)
 
