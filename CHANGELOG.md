@@ -2,6 +2,34 @@
 
 > **📋 Note**: This document should be updated with every version release and maintained on the [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
+## Version 6.6.0 (July 22, 2025) - **MAJOR UX OVERHAUL & RUNTIME FIXES** 🚀
+
+### 🎯 **INTELLIGENT RESULTS DISPLAY**
+- **Smart Calculation Results**: Only appear when meaningful financial data is entered
+- **Conditional Readiness Score**: Only shows with real user inputs (removed hardcoded 50,000 savings default)
+- **Clean Empty State**: Dashboard shows ₪0 Net Worth instead of incorrect ₪75,000 when no inputs
+- **Progressive Disclosure**: Components only appear when relevant and useful to the user
+
+### 🐛 **CRITICAL RUNTIME ERROR FIXES**
+- **Training Fund Calculator**: Fixed `calculateTrainingFundRate is not defined` error preventing calculations
+- **Retirement Calculations**: Fixed `lastCountry is not defined` error breaking retirement projections
+- **Portfolio Data Structure**: Fixed `Cannot read properties of undefined (reading 'forEach')` in scenario comparisons
+- **Inheritance Planning**: Fixed input blocking issues preventing estate planning data entry
+
+### ✨ **ENHANCED USER EXPERIENCE**
+- **No More Demo Values**: Eliminated hardcoded defaults (50,000 savings, 15,000 income, ages 30/67)
+- **Meaningful Data Validation**: Enhanced detection of when users have entered sufficient data for calculations
+- **Clean First Load**: Fresh dashboard without misleading placeholder data
+- **Real Data Focus**: All calculations and scores based on actual user input
+
+### 🔧 **TECHNICAL IMPROVEMENTS**
+- Enhanced `handleCalculate()` function with comprehensive data validation
+- Improved `RetirementResultsPanel.js` with conditional rendering logic
+- Better error handling and fallback mechanisms throughout the app
+- Optimized cache busting parameters for faster deployments (all 62 script references updated)
+
+---
+
 ## Version 6.5.1 (July 22, 2025) - **COMPREHENSIVE UI/UX FIXES** 🎯
 
 ### 🎉 **MAJOR IMPROVEMENTS**

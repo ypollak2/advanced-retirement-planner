@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 # 🚀 Advanced Retirement Planner v6.5.2 ✨
 
 [![Version](https://img.shields.io/badge/version-6.5.2-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+=======
+# 🚀 Advanced Retirement Planner v6.6.0 ✨
+
+[![Version](https://img.shields.io/badge/version-6.6.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+>>>>>>> d9baf56 (🚀 PRODUCTION RELEASE v6.6.0 - Major UX Overhaul & Runtime Fixes)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -21,7 +27,29 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v6.5.2 - NAVIGATION FIXES & STAGE DEPLOYMENT 🎯
+## 🎨 What's New in v6.6.0 - MAJOR UX OVERHAUL & RUNTIME FIXES 🚀
+
+### **🎯 INTELLIGENT RESULTS DISPLAY** (July 2025)
+
+#### **🧠 Smart Calculation Engine**
+- **Intelligent Results Display**: Calculation Results section only appears when meaningful financial data is entered
+- **Conditional Readiness Score**: Retirement Readiness Score only shows with real user inputs (no more hardcoded 50,000 defaults)
+- **Clean Empty State**: Dashboard shows ₪0 Net Worth instead of incorrect ₪75,000 when no inputs
+- **Meaningful Data Validation**: Enhanced detection of when users have entered sufficient data for calculations
+
+#### **🐛 Critical Runtime Error Fixes**
+- **Training Fund Calculator**: Fixed `calculateTrainingFundRate is not defined` error preventing calculations
+- **Retirement Calculations**: Fixed `lastCountry is not defined` error breaking retirement projections
+- **Portfolio Data Structure**: Fixed `Cannot read properties of undefined (reading 'forEach')` in scenario comparisons
+- **Inheritance Planning**: Fixed input blocking issues preventing estate planning data entry
+
+#### **✨ Enhanced User Experience**
+- **No More Demo Values**: Eliminated hardcoded defaults (50,000 savings, 15,000 income, ages 30/67)
+- **Progressive Disclosure**: Components only appear when relevant and useful to the user
+- **Clean First Load**: Fresh dashboard without misleading placeholder data
+- **Real Data Focus**: All calculations and scores based on actual user input
+
+## 🎨 Previous Updates - v6.5.x - NAVIGATION FIXES & STAGE DEPLOYMENT 🎯
 
 ### **🧠 ADVANCED PORTFOLIO INTELLIGENCE** (July 2025)
 
