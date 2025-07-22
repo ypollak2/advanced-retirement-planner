@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Retirement Planner v6.6.0</title>
+    <title>Advanced Retirement Planner v6.6.1</title>
     <meta name="description" content="Advanced retirement planning tool with comprehensive investment tracking">
     
     <!-- Security Headers (Note: X-Frame-Options removed - should be set via HTTP headers, not meta tags) -->
@@ -17,7 +17,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     
     <!-- Main Application Styles -->
-    <link rel="stylesheet" href="src/styles/main.css?v=6.6.0">
+    <link rel="stylesheet" href="src/styles/main.css?v=6.6.1">
     
     <style>
         /* Version indicator - repositioned for better UX */
@@ -78,8 +78,8 @@
             .catch(error => {
                 console.warn('⚠️ Could not load version from version.json:', error);
                 // Fallback version
-                window.APP_VERSION = '6.6.0';
-                document.getElementById('version-indicator').textContent = '✨ v6.6.0';
+                window.APP_VERSION = '6.6.1';
+                document.getElementById('version-indicator').textContent = '✨ v6.6.1';
             });
     </script>
 
@@ -91,85 +91,85 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Component Scripts -->
-    <script src="src/translations/multiLanguage.js?v=6.6.0"></script>
-    <script src="src/data/marketConstants.js?v=6.6.0"></script>
-    <script src="src/utils/retirementCalculations.js?v=6.6.0"></script>
-    <script src="src/utils/chartDataGenerator.js?v=6.6.0"></script>
-    <script src="src/utils/stockPriceAPI.js?v=6.6.0"></script>
-    <script src="src/utils/exportFunctions.js?v=6.6.0"></script>
-    <script src="src/utils/stressTestScenarios.js?v=6.6.0"></script>
-    <script src="src/utils/currencyAPI.js?v=6.6.0"></script>
-    <script src="src/utils/IsraeliNationalInsurance.js?v=6.6.0"></script>
-    <script src="src/utils/coupleValidation.js?v=6.6.0"></script>
-    <script src="src/utils/portfolioOptimizer.js?v=6.6.0"></script>
-    <script src="src/utils/taxOptimization.js?v=6.6.0"></script>
-    <script src="src/utils/dynamicReturnAssumptions.js?v=6.6.0"></script>
-    <script src="src/utils/advancedRebalancing.js?v=6.6.0"></script>
-    <script src="src/utils/inflationCalculations.js?v=6.6.0"></script>
-    <script src="src/utils/monteCarloSimulation.js?v=6.6.0"></script>
-    <script src="src/utils/withdrawalStrategies.js?v=6.6.0"></script>
-    <script src="src/utils/inputValidation.js?v=6.6.0"></script>
+    <script src="src/translations/multiLanguage.js?v=6.6.1"></script>
+    <script src="src/data/marketConstants.js?v=6.6.1"></script>
+    <script src="src/utils/retirementCalculations.js?v=6.6.1"></script>
+    <script src="src/utils/chartDataGenerator.js?v=6.6.1"></script>
+    <script src="src/utils/stockPriceAPI.js?v=6.6.1"></script>
+    <script src="src/utils/exportFunctions.js?v=6.6.1"></script>
+    <script src="src/utils/stressTestScenarios.js?v=6.6.1"></script>
+    <script src="src/utils/currencyAPI.js?v=6.6.1"></script>
+    <script src="src/utils/IsraeliNationalInsurance.js?v=6.6.1"></script>
+    <script src="src/utils/coupleValidation.js?v=6.6.1"></script>
+    <script src="src/utils/portfolioOptimizer.js?v=6.6.1"></script>
+    <script src="src/utils/taxOptimization.js?v=6.6.1"></script>
+    <script src="src/utils/dynamicReturnAssumptions.js?v=6.6.1"></script>
+    <script src="src/utils/advancedRebalancing.js?v=6.6.1"></script>
+    <script src="src/utils/inflationCalculations.js?v=6.6.1"></script>
+    <script src="src/utils/monteCarloSimulation.js?v=6.6.1"></script>
+    <script src="src/utils/withdrawalStrategies.js?v=6.6.1"></script>
+    <script src="src/utils/inputValidation.js?v=6.6.1"></script>
     
     <!-- Base Components (loaded first) -->
-    <script src="src/components/SecureInput.js?v=6.6.0"></script>
-    <script src="src/components/EnhancedRSUCompanySelector.js?v=6.6.0"></script>
-    <script src="src/components/BottomLineSummary.js?v=6.6.0"></script>
-    <script src="src/components/FinancialChart.js?v=6.6.0"></script>
-    <script src="src/components/MultiCurrencySavings.js?v=6.6.0"></script>
-    <script src="src/components/PermanentSidePanel.js?v=6.6.0"></script>
+    <script src="src/components/SecureInput.js?v=6.6.1"></script>
+    <script src="src/components/EnhancedRSUCompanySelector.js?v=6.6.1"></script>
+    <script src="src/components/BottomLineSummary.js?v=6.6.1"></script>
+    <script src="src/components/FinancialChart.js?v=6.6.1"></script>
+    <script src="src/components/MultiCurrencySavings.js?v=6.6.1"></script>
+    <script src="src/components/PermanentSidePanel.js?v=6.6.1"></script>
     
     <!-- Core Wizard Components -->
-    <script src="src/components/WizardStep.js?v=6.6.0"></script>
-    <script src="src/components/WizardStepPersonal.js?v=6.6.0"></script>
-    <script src="src/components/WizardStepSalary.js?v=6.6.0&t=20250720-couple-fix"></script>
-    <script src="src/components/WizardStepSavings.js?v=6.6.0"></script>
-    <script src="src/components/WizardStepContributions.js?v=6.6.0"></script>
-    <script src="src/components/WizardStepFees.js?v=6.6.0"></script>
-    <script src="src/components/WizardStepInvestments.js?v=6.6.0"></script>
-    <script src="src/components/WizardStepGoals.js?v=6.6.0"></script>
-    <script src="src/components/WizardStepInheritance.js?v=6.6.0"></script>
-    <script src="src/components/WizardStepTaxes.js?v=6.6.0"></script>
-    <script src="src/components/WizardStepReview.js?v=6.6.0"></script>
-    <script src="src/components/RetirementWizard.js?v=6.6.0"></script>
+    <script src="src/components/WizardStep.js?v=6.6.1"></script>
+    <script src="src/components/WizardStepPersonal.js?v=6.6.1"></script>
+    <script src="src/components/WizardStepSalary.js?v=6.6.1&t=20250720-couple-fix"></script>
+    <script src="src/components/WizardStepSavings.js?v=6.6.1"></script>
+    <script src="src/components/WizardStepContributions.js?v=6.6.1"></script>
+    <script src="src/components/WizardStepFees.js?v=6.6.1"></script>
+    <script src="src/components/WizardStepInvestments.js?v=6.6.1"></script>
+    <script src="src/components/WizardStepGoals.js?v=6.6.1"></script>
+    <script src="src/components/WizardStepInheritance.js?v=6.6.1"></script>
+    <script src="src/components/WizardStepTaxes.js?v=6.6.1"></script>
+    <script src="src/components/WizardStepReview.js?v=6.6.1"></script>
+    <script src="src/components/RetirementWizard.js?v=6.6.1"></script>
     
     <!-- Core Components (loaded immediately) -->
-    <script src="src/components/HelpTooltip.js?v=6.6.0"></script>
-    <script src="src/components/ReadinessScore.js?v=6.6.0"></script>
-    <script src="src/components/BasicInputs.js?v=6.6.0"></script>
-    <script src="src/components/RetirementAdvancedForm.js?v=6.6.0"></script>
-    <script src="src/components/RetirementResultsPanel.js?v=6.6.0"></script>
+    <script src="src/components/HelpTooltip.js?v=6.6.1"></script>
+    <script src="src/components/ReadinessScore.js?v=6.6.1"></script>
+    <script src="src/components/BasicInputs.js?v=6.6.1"></script>
+    <script src="src/components/RetirementAdvancedForm.js?v=6.6.1"></script>
+    <script src="src/components/RetirementResultsPanel.js?v=6.6.1"></script>
     
     <!-- Dashboard Components (lazy-loaded as needed) -->
-    <script src="src/components/SavingsSummaryPanel.js?v=6.6.0"></script>
+    <script src="src/components/SavingsSummaryPanel.js?v=6.6.1"></script>
     
     <!-- Scenario Comparison Components -->
-    <script src="src/components/ScenarioChart.js?v=6.6.0"></script>
-    <script src="src/components/ScenarioEditor.js?v=6.6.0"></script>
-    <script src="src/components/ScenarioComparison.js?v=6.6.0"></script>
+    <script src="src/components/ScenarioChart.js?v=6.6.1"></script>
+    <script src="src/components/ScenarioEditor.js?v=6.6.1"></script>
+    <script src="src/components/ScenarioComparison.js?v=6.6.1"></script>
     
     <!-- Goal Tracking Components -->
-    <script src="src/components/GoalTrackingDashboard.js?v=6.6.0"></script>
+    <script src="src/components/GoalTrackingDashboard.js?v=6.6.1"></script>
     
     <!-- Couple Planning Components -->
-    <script src="src/components/CoupleValidationPanel.js?v=6.6.0"></script>
+    <script src="src/components/CoupleValidationPanel.js?v=6.6.1"></script>
     
     <!-- Portfolio Optimization Components -->
-    <script src="src/components/PortfolioOptimizationPanel.js?v=6.6.0"></script>
-    <script src="src/components/TaxOptimizationPanel.js?v=6.6.0"></script>
-    <script src="src/components/DynamicReturnPanel.js?v=6.6.0"></script>
-    <script src="src/components/AdvancedRebalancingPanel.js?v=6.6.0"></script>
-    <script src="src/components/InflationVisualizationPanel.js?v=6.6.0"></script>
-    <script src="src/components/MonteCarloResultsDashboard.js?v=6.6.0"></script>
-    <script src="src/components/WithdrawalStrategyInterface.js?v=6.6.0"></script>
-    <script src="src/components/AdvancedSettingsPanel.js?v=6.6.0"></script>
+    <script src="src/components/PortfolioOptimizationPanel.js?v=6.6.1"></script>
+    <script src="src/components/TaxOptimizationPanel.js?v=6.6.1"></script>
+    <script src="src/components/DynamicReturnPanel.js?v=6.6.1"></script>
+    <script src="src/components/AdvancedRebalancingPanel.js?v=6.6.1"></script>
+    <script src="src/components/InflationVisualizationPanel.js?v=6.6.1"></script>
+    <script src="src/components/MonteCarloResultsDashboard.js?v=6.6.1"></script>
+    <script src="src/components/WithdrawalStrategyInterface.js?v=6.6.1"></script>
+    <script src="src/components/AdvancedSettingsPanel.js?v=6.6.1"></script>
     
     <!-- Currency & Dashboard Components -->
-    <script src="src/components/CurrencySelector.js?v=6.6.0"></script>
-    <script src="src/utils/performanceMonitor.js?v=6.6.0"></script>
-    <script src="src/utils/dynamicLoader.js?v=6.6.0"></script>
-    <script src="src/components/LazyComponent.js?v=6.6.0"></script>
-    <script src="src/components/Dashboard.js?v=6.6.0"></script>
-    <script src="src/components/RetirementPlannerApp.js?v=6.6.0"></script>
+    <script src="src/components/CurrencySelector.js?v=6.6.1"></script>
+    <script src="src/utils/performanceMonitor.js?v=6.6.1"></script>
+    <script src="src/utils/dynamicLoader.js?v=6.6.1"></script>
+    <script src="src/components/LazyComponent.js?v=6.6.1"></script>
+    <script src="src/components/Dashboard.js?v=6.6.1"></script>
+    <script src="src/components/RetirementPlannerApp.js?v=6.6.1"></script>
     
     <!-- Application Initialization -->
     <script>

@@ -1,9 +1,9 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "6.6.0",
+    number: "6.6.1",
     build: "2025-07-22",
-    commit: "v6.6.0-major-ux-overhaul",
-    description: "Major UX overhaul with intelligent results display and critical runtime fixes"
+    commit: "v6.6.1-deployment-sync",
+    description: "Deployment synchronization and professional README cleanup"
 };
 
 // Export version for use in other modules
