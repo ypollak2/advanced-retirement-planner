@@ -596,9 +596,36 @@ function createNationalInsuranceProfile(basicProfile) {
     };
 }
 
+/**
+ * Calculate Training Fund (Keren Hishtalmut) contribution rate
+ * @param {number} salary - Monthly salary in NIS
+ * @param {boolean} isAboveCeiling - Whether salary exceeds the ceiling
+ * @returns {number} Training fund rate percentage
+ */
+function calculateTrainingFundRate(salary, isAboveCeiling = false) {
+    const threshold = 15792; // 2024 threshold for training fund rate calculation
+    
+    if (!salary || salary <= 0) {
+        return 10.0; // Default maximum rate
+    }
+    
+    if (salary <= threshold) {
+        return 7.5; // Lower rate for salaries below threshold
+    } else {
+        // Blended rate calculation for salaries above threshold
+        const belowThresholdContribution = threshold * 7.5;
+        const aboveThresholdContribution = (salary - threshold) * 10.0;
+        const totalContribution = belowThresholdContribution + aboveThresholdContribution;
+        const weightedRate = (totalContribution / salary);
+        
+        return Math.min(weightedRate, 10.0); // Cap at 10%
+    }
+}
+
 // Export helper functions
 window.formatNIS = formatNIS;
 window.createNationalInsuranceProfile = createNationalInsuranceProfile;
 window.nationalInsuranceCalculator = nationalInsuranceCalculator;
+window.calculateTrainingFundRate = calculateTrainingFundRate;
 
 console.log('✅ Israeli National Insurance calculator loaded successfully');

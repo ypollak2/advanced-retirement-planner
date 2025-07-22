@@ -6,7 +6,7 @@ function RetirementPlannerApp() {
     var language = languageState[0];
     var setLanguage = languageState[1];
     
-    var viewModeState = React.useState('dashboard');
+    var viewModeState = React.useState('wizard'); // Start with wizard-first flow
     var viewMode = viewModeState[0];
     var setViewMode = viewModeState[1];
     
@@ -371,6 +371,20 @@ function RetirementPlannerApp() {
     // Enhanced calculate function with full wizard data integration
     function handleCalculate() {
         try {
+            // Check for meaningful data before calculating
+            const hasMeaningfulData = inputs && (
+                (inputs.currentAge && inputs.currentAge > 0) ||
+                (inputs.currentSalary && inputs.currentSalary > 0) ||
+                (inputs.currentMonthlySalary && inputs.currentMonthlySalary > 0) ||
+                (inputs.currentSavings && inputs.currentSavings > 0)
+            );
+            
+            if (!hasMeaningfulData) {
+                console.log('No meaningful data for calculation - clearing results');
+                setResults(null);
+                return;
+            }
+            
             if (window.calculateRetirement) {
                 // Sync wizard data with workPeriods
                 var updatedWorkPeriods = [...workPeriods];
@@ -581,6 +595,13 @@ function RetirementPlannerApp() {
         workingCurrency,
         wizardCompleted
     ]);
+    
+    // Wizard-first flow: redirect to wizard if trying to access dashboard without completion
+    React.useEffect(function() {
+        if (!wizardCompleted && viewMode === 'dashboard') {
+            setViewMode('wizard');
+        }
+    }, [wizardCompleted, viewMode]);
     
     // Wizard completion handler
     function handleWizardComplete() {
@@ -1250,7 +1271,8 @@ function RetirementPlannerApp() {
                 key: 'view-toggle',
                 className: 'professional-tabs mb-6'
             }, [
-                React.createElement('button', {
+                // Dashboard tab - only show if wizard is completed
+                wizardCompleted && React.createElement('button', {
                     key: 'dashboard',
                     onClick: function() { setViewMode('dashboard'); },
                     className: 'professional-tab' + (viewMode === 'dashboard' ? ' active' : '')
@@ -1301,8 +1323,8 @@ function RetirementPlannerApp() {
                 setCurrentStep: setCurrentStep
             }),
 
-            // Dashboard View with Integrated Control Panel
-            viewMode === 'dashboard' && React.createElement('div', {
+            // Dashboard View with Integrated Control Panel - only after wizard completion
+            viewMode === 'dashboard' && wizardCompleted && React.createElement('div', {
                 key: 'dashboard-view',
                 className: 'grid grid-cols-1 lg:grid-cols-4 gap-6'
             }, [

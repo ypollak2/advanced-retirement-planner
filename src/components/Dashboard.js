@@ -206,28 +206,42 @@ const Dashboard = ({
 
     const healthStatus = getHealthStatus(healthScore);
 
-    const hasUserData = inputs && (inputs.currentAge || inputs.currentSalary || inputs.currentSavings);
+    // More comprehensive check for user data
+    const hasUserData = inputs && (
+        inputs.currentAge || 
+        inputs.currentSalary || 
+        inputs.currentSavings || 
+        inputs.currentTrainingFund || 
+        inputs.currentPersonalPortfolio || 
+        inputs.currentRealEstate || 
+        inputs.currentCrypto ||
+        inputs.currentSavingsAccount
+    );
 
     // Calculate comprehensive total savings using the global function from WizardStepReview
     const calculateNetWorth = () => {
-        if (!hasUserData) return null;
+        // Always start with 0 and only calculate if we have meaningful data
+        let baseNetWorth = 0;
         
-        let baseNetWorth;
-        
-        // Use the comprehensive calculation function if available
-        if (window.calculateTotalCurrentSavings && inputs) {
-            baseNetWorth = window.calculateTotalCurrentSavings(inputs);
-            console.log('Dashboard: Using comprehensive savings calculation:', baseNetWorth);
-        } else {
-            // Fallback to basic calculation
-            baseNetWorth = (inputs?.currentSavings || 0) + 
-                          (inputs?.currentPersonalPortfolio || 0) + 
-                          (inputs?.currentRealEstate || 0) + 
-                          (inputs?.currentCrypto || 0) +
-                          (inputs?.currentTrainingFund || 0) +
-                          (inputs?.currentSavingsAccount || 0);
-            console.log('Dashboard: Using fallback savings calculation:', baseNetWorth);
+        if (hasUserData && inputs) {
+            // Use the comprehensive calculation function if available
+            if (window.calculateTotalCurrentSavings) {
+                baseNetWorth = window.calculateTotalCurrentSavings(inputs);
+                console.log('Dashboard: Using comprehensive savings calculation:', baseNetWorth);
+            } else {
+                // Fallback to basic calculation
+                baseNetWorth = (inputs?.currentSavings || 0) + 
+                              (inputs?.currentPersonalPortfolio || 0) + 
+                              (inputs?.currentRealEstate || 0) + 
+                              (inputs?.currentCrypto || 0) +
+                              (inputs?.currentTrainingFund || 0) +
+                              (inputs?.currentSavingsAccount || 0);
+                console.log('Dashboard: Using fallback savings calculation:', baseNetWorth);
+            }
         }
+        
+        // Ensure we always return a valid number (0 or positive)
+        baseNetWorth = Math.max(0, baseNetWorth || 0);
         
         if (selectedCurrency === 'ILS') return baseNetWorth;
         return baseNetWorth / (exchangeRates[selectedCurrency] || 1);

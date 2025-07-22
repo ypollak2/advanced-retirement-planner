@@ -1,6 +1,6 @@
 {
-  "version": "6.6.1",
+  "version": "6.6.2",
   "build": "2025-07-22",
-  "commit": "v6.6.1-deployment-sync",
-  "description": "Deployment synchronization and professional README cleanup"
+  "commit": "v6.6.2-update",
+  "description": "Version update to 6.6.2"
 }

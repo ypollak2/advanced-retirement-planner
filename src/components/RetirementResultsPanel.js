@@ -135,17 +135,25 @@ const ResultsPanel = ({
     }
 
     return React.createElement('div', { className: "space-y-6" }, [
-        // Retirement Readiness Score
-        ReadinessScore && React.createElement(ReadinessScore, {
-            key: 'readiness-score',
-            currentAge: inputs?.currentAge || effectiveResults.currentAge || 30,
-            retirementAge: inputs?.retirementAge || effectiveResults.retirementAge || 67,
-            currentSavings: inputs?.currentSavings || 50000,
-            monthlyContribution: (inputs?.monthlyContribution || 0) + (inputs?.trainingFundMonthly || 0),
-            targetRetirementIncome: inputs?.currentMonthlyExpenses || effectiveResults.monthlyIncome || 15000,
-            workingCurrency: workingCurrency,
-            language: language
-        }),
+        // Retirement Readiness Score (only show with meaningful data)
+        (() => {
+            const hasMeaningfulDataForScore = inputs && (
+                (inputs.currentAge && inputs.currentAge > 0) ||
+                (inputs.currentSavings && inputs.currentSavings > 0) ||
+                (inputs.currentSalary && inputs.currentSalary > 0)
+            );
+            
+            return hasMeaningfulDataForScore && ReadinessScore && React.createElement(ReadinessScore, {
+                key: 'readiness-score',
+                currentAge: inputs?.currentAge || effectiveResults.currentAge || 30,
+                retirementAge: inputs?.retirementAge || effectiveResults.retirementAge || 67,
+                currentSavings: inputs?.currentSavings || 0, // Changed from 50000 to 0
+                monthlyContribution: (inputs?.monthlyContribution || 0) + (inputs?.trainingFundMonthly || 0),
+                targetRetirementIncome: inputs?.currentMonthlyExpenses || effectiveResults.monthlyIncome || 0, // Changed from 15000 to 0
+                workingCurrency: workingCurrency,
+                language: language
+            });
+        })(),
         
         React.createElement('div', { 
             key: 'results',
