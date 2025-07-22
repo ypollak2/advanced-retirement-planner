@@ -1,12 +1,12 @@
 # Claude Code Development Standards for Advanced Retirement Planner
 
-## CRITICAL REQUIREMENT: Stage-First Development Workflow
+## CRITICAL REQUIREMENT: GitHub Stage Environment Workflow
 
-**⚠️ MANDATORY: ALL development MUST go through STAGE environment first**
+**⚠️ MANDATORY: ALL development MUST go through GitHub STAGE environment first**
 
-### Stage-First Development Protocol
+### GitHub Stage Environment Protocol
 
-**Never push directly to main/production! Always use the stage environment:**
+**Never push directly to main/production! Always use the GitHub stage environment:**
 
 ```bash
 # 1. Switch to stage branch for all development
@@ -15,40 +15,38 @@ git checkout stage
 # 2. Make your changes and commit
 git add -A && git commit -m "Feature: description"
 
-# 3. Deploy to stage environment
-npm run deploy:stage
+# 3. Push to stage branch (triggers GitHub stage environment)
+git push origin stage
 
-# 4. Test stage deployment
-npm run test:stage
+# 4. Wait for GitHub stage deployment and run tests
+npm test
 
-# 5. Only when stage tests pass 100%, merge to main
-git checkout main && git merge stage && git push
+# 5. Only when all tests pass 100%, merge to main
+git checkout main && git merge stage && git push origin main
 ```
 
-**Stage Environment URLs:**
-- **Stage**: https://stage-advanced-retirement-planner.netlify.app
-- **Production**: https://ypollak2.github.io/advanced-retirement-planner
-- **Production Mirror**: https://advanced-retirement-planner.netlify.app
+### GitHub Environments
 
-### Deployment Environments
-
-| Environment | Branch | URL | Purpose |
-|-------------|--------|-----|---------|
-| **Stage** | `stage` | https://stage-advanced-retirement-planner.netlify.app | Development testing |
-| **Production** | `main` | https://ypollak2.github.io/advanced-retirement-planner | Live users |
-| **Mirror** | `main` | https://advanced-retirement-planner.netlify.app | Backup production |
+| Environment | Branch | GitHub Environment | Purpose |
+|-------------|--------|--------------------|---------|
+| **Stage** | `stage` | `stage` | Development testing with GitHub environment |
+| **Production** | `main` | `production` | Live users via GitHub Pages |
 
 ### Testing Protocol
 
 ```bash
-# Test stage environment
-npm run test:stage
+# Test locally on stage branch
+npm test
 
-# Test production environment (after merge)
+# Test production deployment (after merge to main)
 npm run validate:deployment
 ```
 
-**⚠️ NEVER merge to main unless stage environment passes all tests!**
+**⚠️ Key Rules:**
+- **NEVER push directly to main branch**
+- **Always develop on stage branch first** 
+- **Use GitHub's stage environment for testing**
+- **Only merge to main after stage tests pass 100%**
 
 ## CRITICAL REQUIREMENT: Comprehensive Version Management
 
