@@ -21,7 +21,9 @@
 |-------------|--------|-----|---------|
 | **🚀 Production** | [![Production](https://img.shields.io/badge/status-live-brightgreen.svg)](https://ypollak2.github.io/advanced-retirement-planner) | [https://ypollak2.github.io/advanced-retirement-planner](https://ypollak2.github.io/advanced-retirement-planner) | **Main live version for users** |
 | **🧪 Stage** | [![Stage](https://img.shields.io/badge/status-testing-orange.svg)](https://ypollak2.github.io/advanced-retirement-planner/stage/) | [https://ypollak2.github.io/advanced-retirement-planner/stage/](https://ypollak2.github.io/advanced-retirement-planner/stage/) | **Latest features for testing** |
-| **🔄 Mirror** | [![Mirror](https://img.shields.io/badge/status-synced-blue.svg)](https://advanced-pension-planner.netlify.app/) | [https://advanced-pension-planner.netlify.app/](https://advanced-pension-planner.netlify.app/) | **Production backup on Netlify** |
+| **🔄 Netlify** | [![Mirror](https://img.shields.io/badge/status-rebuilding-yellow.svg)](https://advanced-retirement-planner.netlify.app/) | [https://advanced-retirement-planner.netlify.app/](https://advanced-retirement-planner.netlify.app/) | **Mirror deployment (rebuilding)** |
+
+> **📋 Deployment Status**: GitHub Pages is the primary deployment and is fully operational with the reorganized component structure. Netlify is currently rebuilding after the repository reorganization and should be available shortly.
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
