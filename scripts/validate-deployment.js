@@ -13,7 +13,7 @@ const path = require('path');
 const getDeploymentUrls = () => {
     const baseUrls = [
         'https://ypollak2.github.io/advanced-retirement-planner', // Production
-        'https://advanced-retirement-planner.netlify.app'         // Production Mirror
+        'https://advanced-pension-planner.netlify.app'           // Production Mirror
     ];
     
     // Add stage URL if testing stage environment
