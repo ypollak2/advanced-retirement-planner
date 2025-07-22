@@ -59,6 +59,57 @@ npm run validate:deployment
 - **Stage URL**: `/stage/` folder in same GitHub Pages site
 - **Production URL**: Root of GitHub Pages site
 
+## 🧠 MEMORIZE: Stage and Production Deployment Process
+
+**⚠️ CLAUDE: Always follow this exact deployment sequence:**
+
+### Stage Deployment
+```bash
+# Current branch should be: stage
+git checkout stage
+
+# After making changes:
+git add -A && git commit -m "Feature: description"
+git push origin stage
+
+# This triggers:
+# 1. GitHub Action runs automatically
+# 2. Deploys to https://ypollak2.github.io/advanced-retirement-planner/stage/
+# 3. Runs all 289 tests
+# 4. Posts deployment URL in commit comment
+
+# Then test stage:
+npm run test:stage
+```
+
+### Production Deployment
+```bash
+# Only after stage tests pass 100%:
+git checkout main
+git merge stage
+git push origin main
+
+# This triggers:
+# 1. GitHub Action runs automatically  
+# 2. Deploys to https://ypollak2.github.io/advanced-retirement-planner/
+# 3. Runs full test suite + validation
+# 4. Posts production URL in commit comment
+# 5. Automatic deployment validation
+```
+
+### Deployment URLs to Remember
+- **Stage**: https://ypollak2.github.io/advanced-retirement-planner/stage/
+- **Production**: https://ypollak2.github.io/advanced-retirement-planner/
+- **Mirror**: https://advanced-retirement-planner.netlify.app/
+
+### Commands to Remember
+- `npm run deploy:stage` - Push to stage branch
+- `npm run test:stage` - Test stage deployment
+- `npm run validate:deployment` - Test production deployment
+- `npm test` - Run all 289 tests locally
+
+**🚨 CRITICAL: Never skip stage environment - always test there first!**
+
 ## CRITICAL REQUIREMENT: Comprehensive Version Management
 
 **⚠️ MANDATORY: ALL version references MUST be updated automatically when bumping versions**
