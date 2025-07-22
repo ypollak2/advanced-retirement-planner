@@ -225,7 +225,7 @@ class PreReleaseQA {
         try {
             const performanceFiles = {
                 'index.html': 15, // KB limit
-                'src/components/RetirementPlannerApp.js': 50,
+                'src/components/core/RetirementPlannerApp.js': 50,
                 'src/utils/retirementCalculations.js': 30
             };
             

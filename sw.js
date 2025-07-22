@@ -9,9 +9,9 @@ const DYNAMIC_CACHE_NAME = 'retirement-planner-dynamic-v6.3.0';
 const STATIC_ASSETS = [
     './',
     './index.html',
-    './src/components/RetirementPlannerApp.js',
+    './src/components/core/RetirementPlannerApp.js',
     './src/components/RetirementWizard.js',
-    './src/components/Dashboard.js',
+    './src/components/core/Dashboard.js',
     './src/components/PermanentSidePanel.js',
     './src/utils/retirementCalculations.js',
     './src/utils/stockPriceAPI.js',

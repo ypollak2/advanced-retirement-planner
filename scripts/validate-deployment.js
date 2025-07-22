@@ -29,8 +29,8 @@ const DEPLOYMENT_URLS = getDeploymentUrls();
 const CRITICAL_FILES = [
     '/version.json',
     '/index.html',
-    '/src/components/RetirementPlannerApp.js',
-    '/src/components/Dashboard.js'
+    '/src/components/core/RetirementPlannerApp.js',
+    '/src/components/core/Dashboard.js'
 ];
 
 async function fetchUrl(url) {
@@ -107,7 +107,7 @@ async function validateDeployment() {
         
         // Check if navigation fixes are present
         try {
-            const appRes = await fetchUrl(`${baseUrl}/src/components/RetirementPlannerApp.js`);
+            const appRes = await fetchUrl(`${baseUrl}/src/components/core/RetirementPlannerApp.js`);
             const appContent = appRes.data;
             
             const hasBackNavigation = appContent.includes('back-nav');

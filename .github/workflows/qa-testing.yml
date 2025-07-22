@@ -42,7 +42,7 @@ jobs:
       run: |
         echo "📏 Checking File Sizes"
         echo "Index.html size: $(du -h index.html | cut -f1)"
-        echo "Main app size: $(du -h src/components/RetirementPlannerApp.js | cut -f1)"
+        echo "Main app size: $(du -h src/components/core/RetirementPlannerApp.js | cut -f1)"
         
     - name: 🔧 Verify Version Consistency
       run: |
@@ -95,7 +95,7 @@ jobs:
         
         # File size checks
         INDEX_SIZE=$(stat -c%s index.html)
-        APP_SIZE=$(stat -c%s src/components/RetirementPlannerApp.js)
+        APP_SIZE=$(stat -c%s src/components/core/RetirementPlannerApp.js)
         
         echo "📄 index.html: ${INDEX_SIZE} bytes"
         echo "📱 RetirementPlannerApp.js: ${APP_SIZE} bytes"
@@ -152,9 +152,9 @@ jobs:
           "index.html"
           "package.json"
           "src/version.js"
-          "src/components/RetirementPlannerApp.js"
-          "src/components/ReadinessScore.js"
-          "src/components/HelpTooltip.js"
+          "src/components/core/RetirementPlannerApp.js"
+          "src/components/analysis/ReadinessScore.js"
+          "src/components/shared/HelpTooltip.js"
           "src/utils/retirementCalculations.js"
           "src/styles/main.css"
         )

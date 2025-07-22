@@ -286,7 +286,7 @@ class SecurityQAAnalysis {
     }
 
     validateDataPersistence() {
-        const appFile = 'src/components/RetirementPlannerApp.js';
+        const appFile = 'src/components/core/RetirementPlannerApp.js';
         if (fs.existsSync(appFile)) {
             const content = fs.readFileSync(appFile, 'utf8');
             

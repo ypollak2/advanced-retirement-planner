@@ -68,13 +68,13 @@ coreVersionFiles.forEach(versionFile => {
 console.log('\n📁 Testing Component Version Headers...');
 
 const componentFiles = [
-    'src/components/RetirementPlannerApp.js',
+    'src/components/core/RetirementPlannerApp.js',
     'src/components/StressTestInterface.js',
-    'src/components/ExportControls.js',
-    'src/components/DynamicPartnerCharts.js',
-    'src/components/Dashboard.js',
-    'src/components/CurrencySelector.js',
-    'src/components/SummaryPanel.js',
+    'src/components/shared/ExportControls.js',
+    'src/components/charts/DynamicPartnerCharts.js',
+    'src/components/core/Dashboard.js',
+    'src/components/shared/CurrencySelector.js',
+    'src/components/panels/summary/SummaryPanel.js',
     'src/utils/exportFunctions.js',
     'src/utils/stockPriceAPI.js'
 ];

@@ -71,7 +71,7 @@ jobs:
     - name: 🧮 Test JavaScript syntax
       run: |
         # Use Node.js to check syntax of main files
-        for file in src/core/*.js src/modules/*.js src/utils/*.js src/components/*.js; do
+        for file in src/components/*/*.js src/utils/*.js; do
           if [ -f "$file" ]; then
             node -c "$file" && echo "✅ $file syntax OK"
           fi
@@ -142,7 +142,7 @@ jobs:
       run: |
         echo "📏 File size analysis:"
         du -h index.html
-        du -h src/components/*.js | head -5
+        du -h src/components/*/*.js | head -5
         
         # Check if main HTML is reasonable size (< 100KB)
         size=$(stat -c%s index.html)
