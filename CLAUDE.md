@@ -1,5 +1,55 @@
 # Claude Code Development Standards for Advanced Retirement Planner
 
+## CRITICAL REQUIREMENT: Stage-First Development Workflow
+
+**⚠️ MANDATORY: ALL development MUST go through STAGE environment first**
+
+### Stage-First Development Protocol
+
+**Never push directly to main/production! Always use the stage environment:**
+
+```bash
+# 1. Switch to stage branch for all development
+git checkout stage
+
+# 2. Make your changes and commit
+git add -A && git commit -m "Feature: description"
+
+# 3. Deploy to stage environment
+npm run deploy:stage
+
+# 4. Test stage deployment
+npm run test:stage
+
+# 5. Only when stage tests pass 100%, merge to main
+git checkout main && git merge stage && git push
+```
+
+**Stage Environment URLs:**
+- **Stage**: https://stage-advanced-retirement-planner.netlify.app
+- **Production**: https://ypollak2.github.io/advanced-retirement-planner
+- **Production Mirror**: https://advanced-retirement-planner.netlify.app
+
+### Deployment Environments
+
+| Environment | Branch | URL | Purpose |
+|-------------|--------|-----|---------|
+| **Stage** | `stage` | https://stage-advanced-retirement-planner.netlify.app | Development testing |
+| **Production** | `main` | https://ypollak2.github.io/advanced-retirement-planner | Live users |
+| **Mirror** | `main` | https://advanced-retirement-planner.netlify.app | Backup production |
+
+### Testing Protocol
+
+```bash
+# Test stage environment
+npm run test:stage
+
+# Test production environment (after merge)
+npm run validate:deployment
+```
+
+**⚠️ NEVER merge to main unless stage environment passes all tests!**
+
 ## CRITICAL REQUIREMENT: Comprehensive Version Management
 
 **⚠️ MANDATORY: ALL version references MUST be updated automatically when bumping versions**

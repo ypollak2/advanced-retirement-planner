@@ -10,8 +10,9 @@ const fs = require('fs');
 const path = require('path');
 
 const DEPLOYMENT_URLS = [
-    'https://ypollak2.github.io/advanced-retirement-planner',
-    'https://advanced-retirement-planner.netlify.app'
+    'https://ypollak2.github.io/advanced-retirement-planner', // Production
+    'https://advanced-retirement-planner.netlify.app',        // Production Mirror
+    'https://stage-advanced-retirement-planner.netlify.app'   // Stage Environment
 ];
 
 const CRITICAL_FILES = [
