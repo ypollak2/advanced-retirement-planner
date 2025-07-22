@@ -1,5 +1,54 @@
 # Claude Code Development Standards for Advanced Retirement Planner
 
+## CRITICAL REQUIREMENT: Comprehensive Version Management
+
+**⚠️ MANDATORY: ALL version references MUST be updated automatically when bumping versions**
+
+### Automatic Version Update System
+
+**Never manually update versions! Always use the automated script:**
+
+```bash
+# Update ALL version references automatically
+node scripts/update-version.js 6.5.2
+
+# Or use the npm script
+npm run version:update 6.5.2
+```
+
+**What gets updated automatically:**
+- ✅ `package.json` - version field
+- ✅ `version.json` - version field
+- ✅ `src/version.js` - APP_VERSION constant
+- ✅ `index.html` - title tag, fallback version, ALL cache busting parameters (?v=X.X.X)
+- ✅ **Critical**: ALL script tags with cache busting parameters
+
+### Version Update Verification
+
+**MANDATORY validation after version update:**
+
+```bash
+# Verify all versions are consistent
+npm run validate:deployment
+
+# Check locally before pushing
+npm run validate:pre-work
+```
+
+### Deployment Cache Validation
+
+**⚠️ CRITICAL: Cache busting parameters MUST match the current version**
+
+The script automatically updates ALL instances of `?v=X.X.X` in index.html to prevent the cache busting issue that prevented users from seeing deployed fixes.
+
+**Files that MUST have consistent versions:**
+1. `version.json` - `"version": "X.X.X"`
+2. `package.json` - `"version": "X.X.X"`
+3. `src/version.js` - `APP_VERSION = "X.X.X"`
+4. `index.html` - Title: `Advanced Retirement Planner vX.X.X`
+5. `index.html` - ALL cache busting: `?v=X.X.X` (30+ occurrences)
+6. `index.html` - Fallback version: `window.APP_VERSION = 'X.X.X'`
+
 ## CRITICAL REQUIREMENT: Pre-Release QA Checkpoint
 
 **⚠️ MANDATORY: Every release MUST pass the Pre-Release QA Checkpoint**
@@ -12,20 +61,14 @@ This is the **MANDATORY CHECKPOINT** before every release that validates:
 - 🛡️ **Security**: No critical vulnerabilities, XSS protection, CSP policy
 - 🧪 **Functionality**: All tests pass (100% required)
 - 📝 **Syntax**: All JavaScript files valid
-- 🏷️ **Version Consistency**: All 6 files have matching versions
+- 🏷️ **Version Consistency**: All files have matching versions + cache busting
 - 💼 **Business Logic**: Calculations, inflation, contributions
 - ⚡ **Performance**: File sizes within limits
+- 🚀 **Deployment**: Browsers will load the latest version (no cache issues)
 
 **EXIT CODES:**
 - **0**: ✅ APPROVED FOR RELEASE - All critical checks passed
 - **1**: ❌ BLOCKED FOR RELEASE - Critical issues found
-
-**Files that MUST have consistent versions:**
-1. `version.json` - `"version": "X.X.X"`
-2. `package.json` - `"version": "X.X.X"`
-3. `src/version.js` - `number: "X.X.X"`
-4. `index.html` - `Advanced Retirement Planner vX.X.X`
-5. `README.md` - `# 🚀 Advanced Retirement Planner vX.X.X`
 
 **Report Generation:**
 - Detailed JSON report: `pre-release-qa-report.json`

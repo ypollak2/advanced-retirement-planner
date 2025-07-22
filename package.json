@@ -14,6 +14,8 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
+    "version:update": "node scripts/update-version.js",
+    "validate:deployment": "node scripts/validate-deployment.js",
     "sync-version": "node sync-version.js",
     "preview": "vite preview",
     "deploy": "gh-pages -d .",
