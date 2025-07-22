@@ -1,6 +1,6 @@
 // Version Consistency Test - Advanced Retirement Planner
 // Tests for version consistency across all files in the project
-// Created for QA suite - v5.3.1
+// Created for QA suite - v6.6.1
 
 const fs = require('fs');
 const path = require('path');
@@ -13,7 +13,7 @@ let failedTests = 0;
 const issues = [];
 
 // Get the expected version from package.json
-let expectedVersion = '5.3.1';
+let expectedVersion = '6.6.1';
 try {
     const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
     expectedVersion = packageJson.version;

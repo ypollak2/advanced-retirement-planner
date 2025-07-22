@@ -1,6 +1,6 @@
 // Language Consistency Test - Advanced Retirement Planner
 // Tests for Hebrew/English translation consistency, typos, and default language settings
-// Created for QA suite - v5.3.1
+// Created for QA suite - v6.6.1
 
 const fs = require('fs');
 const path = require('path');

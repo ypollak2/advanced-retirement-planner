@@ -199,13 +199,13 @@
                         if (ReactDOM.createRoot) {
                             const root = ReactDOM.createRoot(document.getElementById('root'));
                             root.render(React.createElement(window.RetirementPlannerApp));
-                            console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '5.3.7'} initialized successfully`);
+                            console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '6.6.1'} initialized successfully`);
                         } else if (ReactDOM.render) {
                             ReactDOM.render(
                                 React.createElement(window.RetirementPlannerApp),
                                 document.getElementById('root')
                             );
-                            console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '5.3.7'} initialized (React 17 mode)`);
+                            console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '6.6.1'} initialized (React 17 mode)`);
                         }
                     } else {
                         throw new Error('Required components not loaded');
