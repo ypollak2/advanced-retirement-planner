@@ -1508,7 +1508,8 @@ function RetirementPlannerApp() {
                         language: language,
                         workingCurrency: workingCurrency,
                         formatCurrency: window.formatCurrency,
-                        onSectionExpand: handleSectionExpand
+                        onSectionExpand: handleSectionExpand,
+                        setViewMode: setViewMode
                     })
                 ])
             ]),

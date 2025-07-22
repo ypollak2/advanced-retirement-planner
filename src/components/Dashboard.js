@@ -8,7 +8,8 @@ const Dashboard = ({
     language = 'en',
     formatCurrency,
     onSectionExpand,
-    workingCurrency = 'ILS'
+    workingCurrency = 'ILS',
+    setViewMode
 }) => {
     const [exchangeRates, setExchangeRates] = React.useState({});
     const [selectedCurrency, setSelectedCurrency] = React.useState(workingCurrency || 'ILS');
@@ -588,7 +589,7 @@ const Dashboard = ({
                 React.createElement('div', {
                     key: 'scenarios-header',
                     className: `section-header ${expandedSections.scenarios ? 'expanded' : ''}`,
-                    onClick: () => toggleSection('scenarios')
+                    onClick: () => setViewMode ? setViewMode('scenarios') : toggleSection('scenarios')
                 }, [
                     React.createElement('div', {
                         key: 'title',
@@ -681,7 +682,7 @@ const Dashboard = ({
                 React.createElement('div', {
                     key: 'goals-header',
                     className: `section-header ${expandedSections.goals ? 'expanded' : ''}`,
-                    onClick: () => toggleSection('goals')
+                    onClick: () => setViewMode ? setViewMode('goals') : toggleSection('goals')
                 }, [
                     React.createElement('div', {
                         key: 'title',
@@ -852,7 +853,7 @@ const Dashboard = ({
                 React.createElement('div', {
                     key: 'tax-header',
                     className: `section-header ${expandedSections.taxOptimization ? 'expanded' : ''}`,
-                    onClick: () => toggleSection('taxOptimization')
+                    onClick: () => setViewMode ? setViewMode('optimization') : toggleSection('taxOptimization')
                 }, [
                     React.createElement('div', {
                         key: 'title',
