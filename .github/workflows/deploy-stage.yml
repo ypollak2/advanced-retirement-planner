@@ -5,11 +5,10 @@ on:
     branches: [ stage ]
   workflow_dispatch:
 
-# Permissions needed for GitHub Pages
+# Permissions for repository operations
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
+  pull-requests: write
 
 jobs:
   deploy-stage:
@@ -19,9 +18,11 @@ jobs:
       url: https://ypollak2.github.io/advanced-retirement-planner/stage/
     
     steps:
-    - name: Checkout
+    - name: Checkout stage branch
       uses: actions/checkout@v4
-      
+      with:
+        ref: stage
+        
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
@@ -33,37 +34,45 @@ jobs:
     - name: Run tests
       run: npm test
       
-    - name: Create stage directory structure
-      run: |
-        # Create _site directory for GitHub Pages
-        mkdir -p _site/stage
-        
-        # Copy all files to stage subdirectory
-        find . -maxdepth 1 ! -name . ! -name _site ! -name .git ! -name .github ! -name node_modules -exec cp -r {} _site/stage/ \;
-        
-        # Create a root redirect to production (optional)
-        echo '<!DOCTYPE html>
-        <html>
-        <head>
-          <meta http-equiv="refresh" content="0;url=https://ypollak2.github.io/advanced-retirement-planner/">
-          <title>Redirecting...</title>
-        </head>
-        <body>
-          <p>Redirecting to production... <a href="https://ypollak2.github.io/advanced-retirement-planner/">Click here if not redirected</a></p>
-        </body>
-        </html>' > _site/index.html
-        
-    - name: Setup GitHub Pages
-      uses: actions/configure-pages@v4
-      
-    - name: Upload Pages artifact
-      uses: actions/upload-pages-artifact@v3
+    - name: Checkout gh-pages branch
+      uses: actions/checkout@v4
       with:
-        path: _site
+        ref: gh-pages
+        path: gh-pages-repo
         
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+    - name: Update stage folder in gh-pages
+      run: |
+        # Remove existing stage folder if it exists
+        rm -rf gh-pages-repo/stage
+        
+        # Create stage directory
+        mkdir -p gh-pages-repo/stage
+        
+        # Copy all files from stage branch to gh-pages/stage/
+        find . -maxdepth 1 \
+          ! -name . \
+          ! -name gh-pages-repo \
+          ! -name .git \
+          ! -name .github \
+          ! -name node_modules \
+          -exec cp -r {} gh-pages-repo/stage/ \;
+        
+    - name: Commit and push to gh-pages
+      run: |
+        cd gh-pages-repo
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # Add changes
+        git add stage/
+        
+        # Check if there are changes to commit
+        if git diff --staged --quiet; then
+          echo "No changes to deploy"
+        else
+          git commit -m "🚀 Deploy stage: $(date '+%Y-%m-%d %H:%M:%S')"
+          git push origin gh-pages
+        fi
       
     - name: Comment deployment URL
       uses: actions/github-script@v7

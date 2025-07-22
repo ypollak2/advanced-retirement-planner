@@ -5,11 +5,10 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-# Permissions needed for GitHub Pages
+# Permissions for repository operations
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
+  pull-requests: write
 
 jobs:
   deploy-production:
@@ -19,8 +18,10 @@ jobs:
       url: https://ypollak2.github.io/advanced-retirement-planner/
     
     steps:
-    - name: Checkout
+    - name: Checkout main branch
       uses: actions/checkout@v4
+      with:
+        ref: main
         
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -36,25 +37,39 @@ jobs:
     - name: Validate deployment readiness
       run: npm run validate:pre-work
       
-    - name: Prepare production files
-      run: |
-        # Create _site directory for GitHub Pages
-        mkdir -p _site
-        
-        # Copy all files to root
-        find . -maxdepth 1 ! -name . ! -name _site ! -name .git ! -name .github ! -name node_modules -exec cp -r {} _site/ \;
-        
-    - name: Setup GitHub Pages
-      uses: actions/configure-pages@v4
-      
-    - name: Upload Pages artifact
-      uses: actions/upload-pages-artifact@v3
+    - name: Checkout gh-pages branch
+      uses: actions/checkout@v4
       with:
-        path: _site
+        ref: gh-pages
+        path: gh-pages-repo
         
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+    - name: Update production files in gh-pages root
+      run: |
+        # Copy all files from main branch to gh-pages root (but preserve stage folder)
+        find . -maxdepth 1 \
+          ! -name . \
+          ! -name gh-pages-repo \
+          ! -name .git \
+          ! -name .github \
+          ! -name node_modules \
+          -exec cp -r {} gh-pages-repo/ \;
+        
+    - name: Commit and push to gh-pages
+      run: |
+        cd gh-pages-repo
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # Add changes (but don't remove stage folder)
+        git add -A
+        
+        # Check if there are changes to commit
+        if git diff --staged --quiet; then
+          echo "No changes to deploy"
+        else
+          git commit -m "🎉 Deploy production: $(date '+%Y-%m-%d %H:%M:%S')"
+          git push origin gh-pages
+        fi
         
     - name: Validate production deployment
       run: |
