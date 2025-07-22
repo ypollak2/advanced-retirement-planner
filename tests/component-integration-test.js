@@ -30,10 +30,10 @@ function testComponentStructure() {
     console.log('🔍 Testing Component Structure and Dependencies...');
     
     const componentFiles = [
-        'src/components/RetirementBasicForm.js',
-        'src/components/RetirementAdvancedForm.js', 
-        'src/components/RetirementResultsPanel.js',
-        'src/components/RetirementPlannerApp.js'
+        'src/components/forms/RetirementBasicForm.js',
+        'src/components/forms/RetirementAdvancedForm.js', 
+        'src/components/panels/RetirementResultsPanel.js',
+        'src/components/core/RetirementPlannerApp.js'
     ];
     
     componentFiles.forEach(file => {
@@ -149,10 +149,10 @@ function testComponentExports() {
     console.log('\n📤 Testing Component Export Consistency...');
     
     const expectedExports = [
-        { file: 'src/components/RetirementBasicForm.js', export: 'BasicInputs' },
-        { file: 'src/components/RetirementAdvancedForm.js', export: 'AdvancedInputs' },
-        { file: 'src/components/RetirementResultsPanel.js', export: 'ResultsPanel' },
-        { file: 'src/components/RetirementPlannerApp.js', export: 'RetirementPlannerApp' }
+        { file: 'src/components/forms/RetirementBasicForm.js', export: 'BasicInputs' },
+        { file: 'src/components/forms/RetirementAdvancedForm.js', export: 'AdvancedInputs' },
+        { file: 'src/components/panels/RetirementResultsPanel.js', export: 'ResultsPanel' },
+        { file: 'src/components/core/RetirementPlannerApp.js', export: 'RetirementPlannerApp' }
     ];
     
     expectedExports.forEach(({ file, export: exportName }) => {
@@ -283,9 +283,9 @@ function testReactErrorPatterns() {
     console.log('\n⚛️ Testing Common React Error Patterns...');
     
     const componentFiles = [
-        'src/components/RetirementBasicForm.js',
-        'src/components/RetirementAdvancedForm.js',
-        'src/components/RetirementResultsPanel.js',
+        'src/components/forms/RetirementBasicForm.js',
+        'src/components/forms/RetirementAdvancedForm.js',
+        'src/components/panels/RetirementResultsPanel.js',
         'src/core/app-main.js'
     ];
     

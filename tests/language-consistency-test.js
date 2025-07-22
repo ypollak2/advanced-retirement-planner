@@ -16,16 +16,16 @@ const issues = [];
 console.log('\n📍 Testing Default Language Settings...');
 
 const componentsToCheck = [
-    'src/components/RetirementPlannerApp.js',
+    'src/components/core/RetirementPlannerApp.js',
     'src/components/StressTestInterface.js',
-    'src/components/ExportControls.js',
-    'src/components/DynamicPartnerCharts.js',
-    'src/components/Dashboard.js',
-    'src/components/CurrencySelector.js',
-    'src/components/SummaryPanel.js',
-    'src/components/HelpTooltip.js',
-    'src/components/ReadinessScore.js',
-    'src/components/FinancialChart.js',
+    'src/components/shared/ExportControls.js',
+    'src/components/charts/DynamicPartnerCharts.js',
+    'src/components/core/Dashboard.js',
+    'src/components/shared/CurrencySelector.js',
+    'src/components/panels/summary/SummaryPanel.js',
+    'src/components/shared/HelpTooltip.js',
+    'src/components/analysis/ReadinessScore.js',
+    'src/components/charts/FinancialChart.js',
     'src/utils/stressTestScenarios.js',
     'src/app.js'
 ];
@@ -232,10 +232,10 @@ console.log('\n🔄 Testing Component Fallback Logic...');
 
 const componentFallbackTests = [
     { file: 'src/components/StressTestInterface.js', expected: 'content.en' },
-    { file: 'src/components/Dashboard.js', expected: 'content.en' },
-    { file: 'src/components/SummaryPanel.js', expected: 'content.en' },
-    { file: 'src/components/DynamicPartnerCharts.js', expected: 'content.en' },
-    { file: 'src/components/ExportControls.js', expected: 'content.en' }
+    { file: 'src/components/core/Dashboard.js', expected: 'content.en' },
+    { file: 'src/components/panels/summary/SummaryPanel.js', expected: 'content.en' },
+    { file: 'src/components/charts/DynamicPartnerCharts.js', expected: 'content.en' },
+    { file: 'src/components/shared/ExportControls.js', expected: 'content.en' }
 ];
 
 componentFallbackTests.forEach(test => {

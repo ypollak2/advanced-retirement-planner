@@ -469,10 +469,10 @@ class E2ETestSuite {
             'src/translations/multiLanguage.js',
             'src/data/marketConstants.js', 
             'src/utils/retirementCalculations.js',
-            'src/components/RetirementPlannerApp.js',
-            'src/components/RetirementBasicForm.js',
-            'src/components/RetirementAdvancedForm.js',
-            'src/components/RetirementResultsPanel.js'
+            'src/components/core/RetirementPlannerApp.js',
+            'src/components/forms/RetirementBasicForm.js',
+            'src/components/forms/RetirementAdvancedForm.js',
+            'src/components/panels/RetirementResultsPanel.js'
         ];
         
         componentFiles.forEach(file => {
