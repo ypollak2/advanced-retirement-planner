@@ -1,12 +1,6 @@
-<<<<<<< HEAD
-# 🚀 Advanced Retirement Planner v6.5.2 ✨
-
-[![Version](https://img.shields.io/badge/version-6.5.2-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
-=======
 # 🚀 Advanced Retirement Planner v6.6.0 ✨
 
 [![Version](https://img.shields.io/badge/version-6.6.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
->>>>>>> d9baf56 (🚀 PRODUCTION RELEASE v6.6.0 - Major UX Overhaul & Runtime Fixes)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
