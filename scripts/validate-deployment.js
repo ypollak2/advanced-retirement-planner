@@ -9,10 +9,22 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-const DEPLOYMENT_URLS = [
-    'https://ypollak2.github.io/advanced-retirement-planner', // Production
-    'https://advanced-retirement-planner.netlify.app'         // Production Mirror
-];
+// Get URLs based on environment
+const getDeploymentUrls = () => {
+    const baseUrls = [
+        'https://ypollak2.github.io/advanced-retirement-planner', // Production
+        'https://advanced-retirement-planner.netlify.app'         // Production Mirror
+    ];
+    
+    // Add stage URL if testing stage environment
+    if (process.env.DEPLOY_ENV === 'stage' || process.argv.includes('--stage')) {
+        baseUrls.unshift('https://ypollak2.github.io/advanced-retirement-planner/stage/'); // Stage
+    }
+    
+    return baseUrls;
+};
+
+const DEPLOYMENT_URLS = getDeploymentUrls();
 
 const CRITICAL_FILES = [
     '/version.json',

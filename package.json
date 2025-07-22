@@ -17,6 +17,7 @@
     "version:update": "node scripts/update-version.js",
     "validate:deployment": "node scripts/validate-deployment.js",
     "deploy:stage": "git push origin stage",
+    "test:stage": "npm run validate:deployment -- --stage",
     "sync-version": "node sync-version.js",
     "preview": "vite preview",
     "deploy": "gh-pages -d .",

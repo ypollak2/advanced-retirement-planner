@@ -1,12 +1,12 @@
 # Claude Code Development Standards for Advanced Retirement Planner
 
-## CRITICAL REQUIREMENT: GitHub Stage Environment Workflow
+## CRITICAL REQUIREMENT: GitHub Pages Stage-Production Workflow
 
-**⚠️ MANDATORY: ALL development MUST go through GitHub STAGE environment first**
+**⚠️ MANDATORY: ALL development MUST go through STAGE environment first**
 
-### GitHub Stage Environment Protocol
+### Automated GitHub Pages Deployment
 
-**Never push directly to main/production! Always use the GitHub stage environment:**
+**Clean setup using GitHub Pages with /stage/ folder:**
 
 ```bash
 # 1. Switch to stage branch for all development
@@ -15,38 +15,49 @@ git checkout stage
 # 2. Make your changes and commit
 git add -A && git commit -m "Feature: description"
 
-# 3. Push to stage branch (triggers GitHub stage environment)
+# 3. Push to stage branch (auto-deploys to /stage/ folder)
 git push origin stage
 
-# 4. Wait for GitHub stage deployment and run tests
-npm test
+# 4. Test stage deployment
+npm run test:stage
 
-# 5. Only when all tests pass 100%, merge to main
+# 5. Only when stage tests pass 100%, merge to main
 git checkout main && git merge stage && git push origin main
 ```
 
-### GitHub Environments
+### Deployment Architecture
 
-| Environment | Branch | GitHub Environment | Purpose |
-|-------------|--------|--------------------|---------|
-| **Stage** | `stage` | `stage` | Development testing with GitHub environment |
-| **Production** | `main` | `production` | Live users via GitHub Pages |
+| Environment | Branch | URL | Purpose |
+|-------------|--------|-----|---------|
+| **Stage** | `stage` | https://ypollak2.github.io/advanced-retirement-planner/stage/ | Automated stage deployment |
+| **Production** | `main` | https://ypollak2.github.io/advanced-retirement-planner/ | Live production deployment |
+| **Mirror** | `main` | https://advanced-retirement-planner.netlify.app/ | Production mirror |
+
+### GitHub Actions Automation
+
+- **Stage Branch Push** → Auto-deploys to `/stage/` folder
+- **Main Branch Push** → Auto-deploys to production root
+- **All deployments** → Run full test suite automatically
+- **Comments** → Deployment URLs posted to commits
 
 ### Testing Protocol
 
 ```bash
-# Test locally on stage branch
+# Test locally before pushing
 npm test
 
-# Test production deployment (after merge to main)
+# Test stage deployment after push
+npm run test:stage
+
+# Test production deployment after merge
 npm run validate:deployment
 ```
 
 **⚠️ Key Rules:**
+- **GitHub Actions handle all deployments automatically**
 - **NEVER push directly to main branch**
-- **Always develop on stage branch first** 
-- **Use GitHub's stage environment for testing**
-- **Only merge to main after stage tests pass 100%**
+- **Stage URL**: `/stage/` folder in same GitHub Pages site
+- **Production URL**: Root of GitHub Pages site
 
 ## CRITICAL REQUIREMENT: Comprehensive Version Management
 
