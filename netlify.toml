@@ -1,5 +1,5 @@
 [build]
-  command = "echo 'Static site - no build needed'"
+  command = "echo 'Static site - no build needed - v6.6.2 reorganized'"
   publish = "."
   ignore = "false"
 
@@ -22,6 +22,12 @@
 
 [[headers]]
   for = "*.js"
+  [headers.values]
+    Content-Type = "application/javascript"
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/src/components/**/*.js"
   [headers.values]
     Content-Type = "application/javascript"
     Cache-Control = "no-cache, no-store, must-revalidate"
