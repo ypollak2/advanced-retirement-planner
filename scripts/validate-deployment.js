@@ -93,7 +93,7 @@ async function validateDeployment() {
             }
             
             // Check critical navigation fixes
-            const hasBackNav = indexContent.includes('RetirementPlannerApp.js?v=' + localVersion);
+            const hasBackNav = indexContent.includes('src/components/core/RetirementPlannerApp.js?v=' + localVersion);
             if (hasBackNav) {
                 console.log(`✅ Critical Component: RetirementPlannerApp.js loaded with correct version`);
             } else {
