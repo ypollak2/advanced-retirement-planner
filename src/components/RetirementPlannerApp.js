@@ -124,7 +124,7 @@ function RetirementPlannerApp() {
     var inputsState = React.useState({
         currentAge: 30,
         retirementAge: 67,
-        currentSavings: 50000,
+        currentSavings: 0,
         inflationRate: 3,
         currentMonthlyExpenses: 12000,
         targetReplacement: 75,
@@ -1266,8 +1266,8 @@ function RetirementPlannerApp() {
             key: 'container',
             className: 'max-w-7xl mx-auto px-4 py-8'
         }, [
-            // View Mode Toggle
-            wizardCompleted && React.createElement('div', {
+            // View Mode Toggle - Show wizard tab always, others only after completion
+            React.createElement('div', {
                 key: 'view-toggle',
                 className: 'professional-tabs mb-6'
             }, [
@@ -1281,7 +1281,7 @@ function RetirementPlannerApp() {
                     ' ',
                     language === 'en' ? 'Dashboard' : (t.dashboard || 'Dashboard')
                 ]),
-                React.createElement('button', {
+                wizardCompleted && React.createElement('button', {
                     key: 'detailed', 
                     onClick: function() { setViewMode('detailed'); },
                     className: 'professional-tab' + (viewMode === 'detailed' ? ' active' : '')
@@ -1290,6 +1290,7 @@ function RetirementPlannerApp() {
                     ' ',
                     language === 'en' ? 'Detailed View' : (t.detailed || 'Detailed View')
                 ]),
+                // Wizard tab - always show, but restart wizard if clicked when completed
                 React.createElement('button', {
                     key: 'wizard', 
                     onClick: function() { setViewMode('wizard'); setWizardCompleted(false); setCurrentStep(1); },
@@ -1303,7 +1304,7 @@ function RetirementPlannerApp() {
             
             // Wizard View with lazy-loaded components
             // Includes: WizardStepSalary, WizardStepSavings, WizardStepContributions, WizardStepFees
-            viewMode === 'wizard' && React.createElement(window.LazyWizard, {
+            viewMode === 'wizard' && React.createElement(window.RetirementWizard, {
                 key: 'wizard',
                 inputs: inputs,
                 setInputs: setInputs,
