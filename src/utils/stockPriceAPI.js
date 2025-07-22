@@ -276,21 +276,6 @@ async function fetchStockPrice(symbol, useCache = true) {
         // If too stale, fall through to fresh fetch
     }
     
-    // For GitHub Pages deployment, use fallback prices immediately to avoid CORS issues
-    if (window.location.hostname.includes('github.io') || window.location.hostname.includes('githubusercontent.com')) {
-        const fallbackPrice = FALLBACK_PRICES[upperSymbol];
-        if (fallbackPrice) {
-            console.log(`📊 Using fallback price for ${upperSymbol}: $${fallbackPrice} (GitHub Pages mode)`);
-            
-            // Cache fallback price
-            const entry = new CacheEntry(fallbackPrice, 'fallback-githubpages');
-            priceCache.set(upperSymbol, entry);
-            evictLeastUsed();
-            
-            return fallbackPrice;
-        }
-    }
-    
     // Check if we're offline and handle gracefully
     if (!isAppOnline()) {
         console.log('📱 App is offline, using cached/fallback data for', upperSymbol);

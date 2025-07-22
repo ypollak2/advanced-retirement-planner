@@ -1514,68 +1514,224 @@ function RetirementPlannerApp() {
             ]),
 
             // Scenario Comparison View
-            viewMode === 'scenarios' && window.ScenarioComparison && React.createElement(window.ScenarioComparison, {
-                key: 'scenario-comparison',
-                baseScenario: inputs,
-                language: language,
-                workingCurrency: workingCurrency,
-                onReturnToDashboard: () => setViewMode('dashboard'),
-                onScenarioUpdate: (scenarioId, newData) => {
-                    console.log('Scenario updated:', scenarioId, newData);
-                    // Handle scenario updates
-                }
-            }),
+            viewMode === 'scenarios' && React.createElement('div', {
+                key: 'scenarios-container',
+                className: 'space-y-6'
+            }, [
+                // Back to Dashboard Button
+                React.createElement('div', {
+                    key: 'back-nav',
+                    className: 'flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-200'
+                }, [
+                    React.createElement('button', {
+                        key: 'back-btn',
+                        onClick: () => setViewMode('dashboard'),
+                        className: 'flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors'
+                    }, [
+                        React.createElement('span', { key: 'back-icon', className: 'mr-2' }, '← '),
+                        language === 'he' ? 'חזרה ללוח הבקרה' : 'Back to Dashboard'
+                    ]),
+                    React.createElement('h2', {
+                        key: 'view-title',
+                        className: 'text-xl font-semibold text-gray-800'
+                    }, language === 'he' ? 'השוואת תרחישים' : 'Scenario Comparison')
+                ]),
+                // Scenario Component with Fallback
+                window.ScenarioComparison ? 
+                    React.createElement(window.ScenarioComparison, {
+                        key: 'scenario-comparison',
+                        baseScenario: inputs,
+                        language: language,
+                        workingCurrency: workingCurrency,
+                        onReturnToDashboard: () => setViewMode('dashboard'),
+                        onScenarioUpdate: (scenarioId, newData) => {
+                            console.log('Scenario updated:', scenarioId, newData);
+                            // Handle scenario updates
+                        }
+                    }) :
+                    React.createElement('div', {
+                        key: 'scenario-fallback',
+                        className: 'bg-white p-8 rounded-lg border border-gray-200 text-center'
+                    }, [
+                        React.createElement('div', { key: 'fallback-icon', className: 'text-6xl mb-4' }, '📊'),
+                        React.createElement('h3', { 
+                            key: 'fallback-title',
+                            className: 'text-xl font-semibold text-gray-700 mb-2'
+                        }, language === 'he' ? 'השוואת תרחישים' : 'Scenario Comparison'),
+                        React.createElement('p', {
+                            key: 'fallback-text',
+                            className: 'text-gray-600'
+                        }, language === 'he' ? 
+                            'רכיב זה נטען... אנא רענן את הדף אם הבעיה נמשכת.' :
+                            'This component is loading... Please refresh the page if the issue persists.')
+                    ])
+            ]),
 
             // Goal Tracking Dashboard View
-            viewMode === 'goals' && window.GoalTrackingDashboard && React.createElement(window.GoalTrackingDashboard, {
-                key: 'goal-tracking',
-                inputs: inputs,
-                results: results,
-                language: language,
-                workingCurrency: workingCurrency,
-                onReturnToDashboard: () => setViewMode('dashboard'),
-                onGoalUpdate: (goal, action) => {
-                    console.log('Goal updated:', goal, action);
-                    // Handle goal updates - could save to localStorage or send to server
-                    if (action === 'added' || action === 'updated') {
-                        // Update inputs with goal-related data if needed
-                        setInputs(prevInputs => ({
-                            ...prevInputs,
-                            // Add any goal-related fields that should be persisted
-                            lastGoalUpdate: new Date().toISOString()
-                        }));
-                    }
-                }
-            }),
+            viewMode === 'goals' && React.createElement('div', {
+                key: 'goals-container',
+                className: 'space-y-6'
+            }, [
+                // Back to Dashboard Button
+                React.createElement('div', {
+                    key: 'back-nav',
+                    className: 'flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-200'
+                }, [
+                    React.createElement('button', {
+                        key: 'back-btn',
+                        onClick: () => setViewMode('dashboard'),
+                        className: 'flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors'
+                    }, [
+                        React.createElement('span', { key: 'back-icon', className: 'mr-2' }, '← '),
+                        language === 'he' ? 'חזרה ללוח הבקרה' : 'Back to Dashboard'
+                    ]),
+                    React.createElement('h2', {
+                        key: 'view-title',
+                        className: 'text-xl font-semibold text-gray-800'
+                    }, language === 'he' ? 'מעקב יעדים' : 'Goal Tracking')
+                ]),
+                // Goal Component with Fallback
+                window.GoalTrackingDashboard ? 
+                    React.createElement(window.GoalTrackingDashboard, {
+                        key: 'goal-tracking',
+                        inputs: inputs,
+                        results: results,
+                        language: language,
+                        workingCurrency: workingCurrency,
+                        onReturnToDashboard: () => setViewMode('dashboard'),
+                        onGoalUpdate: (goal, action) => {
+                            console.log('Goal updated:', goal, action);
+                            // Handle goal updates - could save to localStorage or send to server
+                            if (action === 'added' || action === 'updated') {
+                                // Update inputs with goal-related data if needed
+                                setInputs(prevInputs => ({
+                                    ...prevInputs,
+                                    // Add any goal-related fields that should be persisted
+                                    lastGoalUpdate: new Date().toISOString()
+                                }));
+                            }
+                        }
+                    }) :
+                    React.createElement('div', {
+                        key: 'goals-fallback',
+                        className: 'bg-white p-8 rounded-lg border border-gray-200 text-center'
+                    }, [
+                        React.createElement('div', { key: 'fallback-icon', className: 'text-6xl mb-4' }, '🎯'),
+                        React.createElement('h3', { 
+                            key: 'fallback-title',
+                            className: 'text-xl font-semibold text-gray-700 mb-2'
+                        }, language === 'he' ? 'מעקב יעדים' : 'Goal Tracking'),
+                        React.createElement('p', {
+                            key: 'fallback-text',
+                            className: 'text-gray-600'
+                        }, language === 'he' ? 
+                            'רכיב זה נטען... אנא רענן את הדף אם הבעיה נמשכת.' :
+                            'This component is loading... Please refresh the page if the issue persists.')
+                    ])
+            ]),
 
             // Portfolio Optimization View
-            viewMode === 'optimization' && window.PortfolioOptimizationPanel && React.createElement(window.PortfolioOptimizationPanel, {
-                key: 'portfolio-optimization',
-                inputs: inputs,
-                language: language,
-                workingCurrency: workingCurrency,
-                onReturnToDashboard: () => setViewMode('dashboard'),
-                onRebalance: (rebalancingActions) => {
-                    console.log('Rebalancing actions:', rebalancingActions);
-                    // Handle rebalancing actions - could save to localStorage or trigger notifications
-                    setInputs(prevInputs => ({
-                        ...prevInputs,
-                        lastRebalancing: new Date().toISOString(),
-                        pendingRebalancing: rebalancingActions
-                    }));
-                }
-            }),
+            viewMode === 'optimization' && React.createElement('div', {
+                key: 'optimization-container',
+                className: 'space-y-6'
+            }, [
+                // Back to Dashboard Button
+                React.createElement('div', {
+                    key: 'back-nav',
+                    className: 'flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-200'
+                }, [
+                    React.createElement('button', {
+                        key: 'back-btn',
+                        onClick: () => setViewMode('dashboard'),
+                        className: 'flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors'
+                    }, [
+                        React.createElement('span', { key: 'back-icon', className: 'mr-2' }, '← '),
+                        language === 'he' ? 'חזרה ללוח הבקרה' : 'Back to Dashboard'
+                    ]),
+                    React.createElement('h2', {
+                        key: 'view-title',
+                        className: 'text-xl font-semibold text-gray-800'
+                    }, language === 'he' ? 'אופטימיזציה פרטפוליו' : 'Portfolio Optimization')
+                ]),
+                // Portfolio Component with Fallback
+                window.PortfolioOptimizationPanel ? 
+                    React.createElement(window.PortfolioOptimizationPanel, {
+                        key: 'portfolio-optimization',
+                        inputs: inputs,
+                        language: language,
+                        workingCurrency: workingCurrency,
+                        onReturnToDashboard: () => setViewMode('dashboard'),
+                        onRebalance: (rebalancingActions) => {
+                            console.log('Rebalancing actions:', rebalancingActions);
+                            // Handle rebalancing actions - could save to localStorage or trigger notifications
+                            setInputs(prevInputs => ({
+                                ...prevInputs,
+                                lastRebalancing: new Date().toISOString(),
+                                pendingRebalancing: rebalancingActions
+                            }));
+                        }
+                    }) :
+                    React.createElement('div', {
+                        key: 'optimization-fallback',
+                        className: 'bg-white p-8 rounded-lg border border-gray-200 text-center'
+                    }, [
+                        React.createElement('div', { key: 'fallback-icon', className: 'text-6xl mb-4' }, '⚙️'),
+                        React.createElement('h3', { 
+                            key: 'fallback-title',
+                            className: 'text-xl font-semibold text-gray-700 mb-2'
+                        }, language === 'he' ? 'אופטימיזציה פרטפוליו' : 'Portfolio Optimization'),
+                        React.createElement('p', {
+                            key: 'fallback-text',
+                            className: 'text-gray-600'
+                        }, language === 'he' ? 
+                            'רכיב זה נטען... אנא רענן את הדף אם הבעיה נמשכת.' :
+                            'This component is loading... Please refresh the page if the issue persists.')
+                    ])
+            ]),
 
             // Detailed View
             viewMode === 'detailed' && React.createElement('div', {
-                key: 'detailed-view',
-                className: 'professional-grid professional-grid-2'
+                key: 'detailed-view-container',
+                className: 'space-y-6'
             }, [
-                // Forms Column
+                // Back to Dashboard Button
                 React.createElement('div', {
-                    key: 'forms',
-                    className: 'space-y-6'
+                    key: 'detailed-back-nav',
+                    className: 'flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-200'
                 }, [
+                    React.createElement('button', {
+                        key: 'detailed-back-btn',
+                        onClick: () => setViewMode('dashboard'),
+                        className: 'flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors'
+                    }, [
+                        React.createElement('span', { key: 'back-icon', className: 'mr-2' }, '← '),
+                        language === 'he' ? 'חזרה ללוח הבקרה' : 'Back to Dashboard'
+                    ]),
+                    React.createElement('h2', {
+                        key: 'detailed-view-title',
+                        className: 'text-xl font-semibold text-gray-800'
+                    }, (() => {
+                        const sectionTitles = {
+                            pension: language === 'he' ? 'תכנון פנסיה' : 'Pension Planning',
+                            investments: language === 'he' ? 'תיק השקעות' : 'Investment Portfolio',
+                            partner: language === 'he' ? 'תכנון משותף' : 'Partner Planning',
+                            inheritance: language === 'he' ? 'תכנון ירושה' : 'Inheritance Planning',
+                            taxOptimization: language === 'he' ? 'אופטימיזציה מיסויית' : 'Tax Optimization',
+                            nationalInsurance: language === 'he' ? 'ביטוח לאומי' : 'National Insurance'
+                        };
+                        return sectionTitles[activeSection] || (language === 'he' ? 'מצב מפורט' : 'Detailed View');
+                    })())
+                ]),
+                // Main Content Grid
+                React.createElement('div', {
+                    key: 'detailed-view',
+                    className: 'professional-grid professional-grid-2'
+                }, [
+                    // Forms Column
+                    React.createElement('div', {
+                        key: 'forms',
+                        className: 'space-y-6'
+                    }, [
                     // Section-specific forms based on activeSection
                     activeSection === 'pension' && window.BasicInputs && React.createElement(window.BasicInputs, {
                         key: 'pension-form',
@@ -1738,6 +1894,7 @@ function RetirementPlannerApp() {
                     })
                 ])
             ])
+        ])
         ]),
 
         // Bottom Attribution

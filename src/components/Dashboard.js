@@ -207,14 +207,26 @@ const Dashboard = ({
 
     const hasUserData = inputs && (inputs.currentAge || inputs.currentSalary || inputs.currentSavings);
 
-    // Calculate net worth with currency conversion (only show if user has entered data)
+    // Calculate comprehensive total savings using the global function from WizardStepReview
     const calculateNetWorth = () => {
         if (!hasUserData) return null;
         
-        const baseNetWorth = (inputs?.currentSavings || 0) + 
-                            (inputs?.currentPersonalPortfolio || 0) + 
-                            (inputs?.currentRealEstate || 0) + 
-                            (inputs?.currentCrypto || 0);
+        let baseNetWorth;
+        
+        // Use the comprehensive calculation function if available
+        if (window.calculateTotalCurrentSavings && inputs) {
+            baseNetWorth = window.calculateTotalCurrentSavings(inputs);
+            console.log('Dashboard: Using comprehensive savings calculation:', baseNetWorth);
+        } else {
+            // Fallback to basic calculation
+            baseNetWorth = (inputs?.currentSavings || 0) + 
+                          (inputs?.currentPersonalPortfolio || 0) + 
+                          (inputs?.currentRealEstate || 0) + 
+                          (inputs?.currentCrypto || 0) +
+                          (inputs?.currentTrainingFund || 0) +
+                          (inputs?.currentSavingsAccount || 0);
+            console.log('Dashboard: Using fallback savings calculation:', baseNetWorth);
+        }
         
         if (selectedCurrency === 'ILS') return baseNetWorth;
         return baseNetWorth / (exchangeRates[selectedCurrency] || 1);
