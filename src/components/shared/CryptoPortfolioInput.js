@@ -245,11 +245,39 @@ const DigitalAssetPortfolioInput = ({
                 className: compact ? "text-xs text-gray-500" : "text-sm text-gray-500 text-center"
             }, t.loading),
             
-            // Error state
+            // Error state with enhanced tooltip
             priceError && createElement('div', {
                 key: 'error',
-                className: compact ? "text-xs text-red-600" : "text-sm text-red-600 text-center"
-            }, `${t.error}: ${priceError}`),
+                className: compact ? 
+                    "p-2 bg-orange-50 border border-orange-200 rounded text-xs" :
+                    "p-3 bg-orange-50 border border-orange-200 rounded-lg mb-3",
+                title: `${t.error}: ${priceError}` // Tooltip with full error
+            }, [
+                createElement('div', {
+                    key: 'error-content',
+                    className: 'flex items-center'
+                }, [
+                    createElement('span', { 
+                        key: 'icon', 
+                        className: 'text-orange-600 mr-2' 
+                    }, '⚠️'),
+                    createElement('div', {
+                        key: 'error-text',
+                        className: 'flex-1'
+                    }, [
+                        createElement('div', {
+                            key: 'main-message',
+                            className: compact ? 'text-xs font-medium text-orange-800' : 'text-sm font-medium text-orange-800'
+                        }, t.fallbackPrice),
+                        createElement('div', {
+                            key: 'sub-message',
+                            className: compact ? 'text-xs text-orange-600' : 'text-xs text-orange-600 mt-1'
+                        }, language === 'he' ? 
+                            'מחירים מוערכים בלבד - עשויים להיות לא מדויקים' :
+                            'Estimated prices only - may not be accurate')
+                    ])
+                ])
+            ]),
             
             // Fiat value display
             assetFiatValue > 0 && createElement('div', {

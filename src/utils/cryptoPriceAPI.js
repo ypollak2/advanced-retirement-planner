@@ -49,7 +49,7 @@ const CURRENCY_MAPPING = {
 // Cache management
 let digitalAssetPriceCache = {};
 let lastCacheUpdate = null;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CRYPTO_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 // Fetch digital asset prices from CoinGecko API
 async function fetchDigitalAssetPrices(currency = 'usd') {
@@ -57,7 +57,7 @@ async function fetchDigitalAssetPrices(currency = 'usd') {
     const now = Date.now();
     
     // Return cached data if still valid
-    if (digitalAssetPriceCache[cacheKey] && lastCacheUpdate && (now - lastCacheUpdate < CACHE_DURATION)) {
+    if (digitalAssetPriceCache[cacheKey] && lastCacheUpdate && (now - lastCacheUpdate < CRYPTO_CACHE_DURATION)) {
         console.log('📦 Using cached digital asset prices');
         return digitalAssetPriceCache[cacheKey];
     }

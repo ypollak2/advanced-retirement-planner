@@ -54,7 +54,7 @@ const CurrencySelector = ({
         }
     };
 
-    // Load exchange rates
+    // Load exchange rates with enhanced error handling
     const loadRates = async () => {
         setIsLoading(true);
         setError(null);
@@ -63,9 +63,24 @@ const CurrencySelector = ({
             const exchangeRates = await window.currencyAPI.fetchExchangeRates();
             setRates(exchangeRates);
             setLastUpdated(window.currencyAPI.getLastUpdated());
+            
+            // Check if using fallback rates and update error state
+            const status = window.currencyAPI.getErrorStatus();
+            if (status.usingFallback || status.hasError) {
+                setError(window.currencyAPI.getStatusMessage(language));
+            }
         } catch (err) {
             setError(err.message);
             console.error('Failed to load exchange rates:', err);
+            
+            // Use fallback rates on error
+            setRates({
+                USD: 3.70,
+                EUR: 4.02,
+                GBP: 4.65,
+                BTC: 150000,
+                ETH: 10000
+            });
         } finally {
             setIsLoading(false);
         }
@@ -180,14 +195,42 @@ const CurrencySelector = ({
             }, getTimeSinceUpdate())
         ]),
 
-        // Error display
+        // Error display with enhanced tooltip
         error && React.createElement('div', {
             key: 'error',
-            className: 'currency-error'
+            className: 'currency-error bg-orange-50 border border-orange-200 rounded-lg p-3 mb-4',
+            title: error // Tooltip with full error message
         }, [
-            React.createElement('span', { key: 'icon' }, '⚠️'),
-            ' ',
-            language === 'he' ? 'שגיאה בטעינת שערי החליפין' : 'Error loading exchange rates'
+            React.createElement('div', {
+                key: 'error-content',
+                className: 'flex items-center'
+            }, [
+                React.createElement('span', { 
+                    key: 'icon', 
+                    className: 'text-orange-600 mr-2' 
+                }, '⚠️'),
+                React.createElement('div', {
+                    key: 'error-text',
+                    className: 'flex-1'
+                }, [
+                    React.createElement('div', {
+                        key: 'main-message',
+                        className: 'text-sm font-medium text-orange-800'
+                    }, error),
+                    React.createElement('div', {
+                        key: 'sub-message',
+                        className: 'text-xs text-orange-600 mt-1'
+                    }, language === 'he' ? 
+                        'המחירים מוצגים על בסיס שערים מוערכים ויכולים להיות לא מדויקים.' :
+                        'Prices shown are estimated and may not be accurate.')
+                ]),
+                React.createElement('button', {
+                    key: 'retry',
+                    onClick: loadRates,
+                    className: 'ml-2 px-2 py-1 text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 rounded transition-colors',
+                    disabled: isLoading
+                }, isLoading ? '⟳' : (language === 'he' ? 'נסה שוב' : 'Retry'))
+            ])
         ]),
 
         // Currency grid

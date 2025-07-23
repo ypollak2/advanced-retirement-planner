@@ -1310,10 +1310,7 @@ function RetirementPlannerApp() {
                 inputs: inputs,
                 setInputs: setInputs,
                 onComplete: handleWizardComplete,
-                onReturnToDashboard: () => {
-                    console.log('🔄 Returning to dashboard...');
-                    setViewMode('dashboard');
-                },
+                onReturnToDashboard: () => setViewMode('dashboard'),
                 language: language,
                 workingCurrency: workingCurrency,
                 // Wizard step integration: WizardStepSalary, WizardStepSavings, WizardStepContributions, WizardStepFees
