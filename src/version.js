@@ -1,6 +1,6 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "6.6.2",
+    number: "6.6.3",
     build: "2025-07-22",
     commit: "v6.6.2-update",
     description: "Deployment synchronization and professional README cleanup"
