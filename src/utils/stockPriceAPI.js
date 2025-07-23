@@ -62,7 +62,7 @@ const FALLBACK_PRICES = {
 // Advanced caching system with TTL and refresh strategies
 const priceCache = new Map();
 const refreshingCache = new Set(); // Track symbols being refreshed
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const STOCK_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const STALE_WHILE_REVALIDATE_DURATION = 15 * 60 * 1000; // 15 minutes
 const LOCALSTORAGE_DURATION = 24 * 60 * 60 * 1000; // 24 hours for localStorage
 const MAX_CACHE_SIZE = 100; // Prevent memory leaks
@@ -79,7 +79,7 @@ class CacheEntry {
     }
     
     isExpired() {
-        return Date.now() - this.timestamp > CACHE_DURATION;
+        return Date.now() - this.timestamp > STOCK_CACHE_DURATION;
     }
     
     isStale() {
