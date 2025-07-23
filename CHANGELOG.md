@@ -2,7 +2,54 @@
 
 > **📋 Note**: This document should be updated with every version release and maintained on the [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## Version 6.6.0 (July 22, 2025) - **MAJOR UX OVERHAUL & RUNTIME FIXES** 🚀
+## Version 6.6.3 (July 23, 2025) - **SEMANTIC SECRET SCANNER & SECURITY ENHANCEMENTS** 🛡️
+
+### 🔍 **SEMANTIC SECRET SCANNER**
+- **AST-Based Analysis**: Advanced semantic analysis using Babel AST parsing for JavaScript files
+- **Context-Aware Detection**: Intelligent filtering to distinguish between legitimate crypto usage and auth tokens  
+- **Multi-Format Reporting**: Console, JSON, Markdown, and SARIF output formats for CI/CD integration
+- **Enterprise Patterns**: 50+ detection patterns covering API keys, OAuth tokens, database credentials, and certificates
+
+### 🎯 **ADVANCED CONTEXT FILTERING**
+- **Cryptocurrency Filter**: Recognizes Bitcoin, Ethereum, DeFi terminology to prevent false positives
+- **UI Component Filter**: Filters React component props and UI-related token usage
+- **i18n Pattern Detection**: Recognizes translation files and localized content
+- **Configuration Awareness**: Smart detection of example/template files vs real secrets
+
+### ⚡ **PERFORMANCE & SCALABILITY**
+- **Concurrent Processing**: Configurable concurrency control with semaphore-based throttling
+- **Timeout Protection**: Per-file timeout limits (5s default) to prevent hanging on large files
+- **Entropy Validation**: Shannon entropy calculation for high-confidence secret detection
+- **File Size Limits**: Configurable maximum file size (10MB default) for memory management
+
+### 🚀 **CI/CD INTEGRATION**
+- **Exit Code Strategy**: Non-zero exit codes for high/critical findings to fail CI builds
+- **SARIF Support**: GitHub Security tab integration with actionable security alerts
+- **Configuration System**: .secretignore support with gitignore-style patterns
+- **Performance Metrics**: Detailed statistics including scan duration and file counts
+
+### 🛠️ **CLI INTERFACE**
+```bash
+# Quick security scan of current directory
+npm run security:scan
+
+# Generate comprehensive markdown report
+npm run security:scan-report  
+
+# JSON output for automated processing
+npm run security:scan-json
+
+# Advanced usage with custom options
+node scripts/secret-scanner.js scan --format sarif --severity high --output security.sarif
+```
+
+### 📋 **CONFIGURATION & CUSTOMIZATION**
+- **Rule Definitions**: Comprehensive pattern library in `lib/config/rule-definitions.js`
+- **Custom Patterns**: Support for organization-specific secret patterns
+- **Severity Levels**: Configurable minimum severity filtering (low/medium/high/critical)
+- **Exclusion System**: File-based (.secretignore) and inline comment exclusions
+
+## Version 6.6.2 (July 22, 2025) - **MAJOR UX OVERHAUL & RUNTIME FIXES** 🚀
 
 ### 🎯 **INTELLIGENT RESULTS DISPLAY**
 - **Smart Calculation Results**: Only appear when meaningful financial data is entered

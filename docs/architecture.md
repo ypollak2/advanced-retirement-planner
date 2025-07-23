@@ -1,4 +1,4 @@
-# 🏗️ Advanced Retirement Planner v6.4.0 - System Architecture
+# 🏗️ Advanced Retirement Planner v6.6.3 - System Architecture
 
 ## Overview
 
@@ -29,6 +29,13 @@ The Advanced Retirement Planner v6.0.0 represents a major architectural evolutio
 - **Input Validation**: Comprehensive type checking and sanitization
 - **XSS Prevention**: Safe DOM manipulation through React.createElement
 - **Privacy First**: All calculations performed client-side
+- **Semantic Secret Scanner**: AST-based secret detection with context awareness
+
+### **5. DevSecOps Integration**
+- **Automated Secret Detection**: CI/CD integrated scanning with exit code strategy
+- **Context-Aware Analysis**: Cryptocurrency and UI component filtering
+- **Multi-Format Reporting**: Console, JSON, Markdown, and SARIF outputs
+- **Performance Optimized**: Concurrent processing with timeout protection
 
 ## 📁 Project Structure
 
@@ -76,7 +83,15 @@ advanced-retirement-planner/
 │   ├── partner-planning.md           # Partner planning guide
 │   ├── wizard-interface.md           # Wizard interface documentation
 │   └── ...                           # Additional documentation
+├── 📁 lib/                           # Security and analysis libraries
+│   ├── 📁 core/                      # Core analysis engines
+│   │   └── analyzer.js               # AST-based secret analyzer
+│   ├── 📁 config/                    # Configuration management
+│   │   └── rule-definitions.js       # 50+ secret detection patterns
+│   ├── 📁 filters/                   # Context-aware filters
+│   └── 📁 reports/                   # Multi-format report generators
 └── 📁 scripts/                       # Build and deployment
+    ├── secret-scanner.js             # Semantic secret scanner CLI
     ├── pre-commit-qa.sh              # Quality assurance automation
     └── update-version.js             # Version management
 ```
@@ -452,6 +467,50 @@ const validateInput = (value, type, constraints) => {
   
   return true;
 };
+```
+
+### **Semantic Secret Scanner**
+
+#### **AST-Based Analysis Engine**
+- **JavaScript Parsing**: Uses Babel parser for semantic analysis of JS/JSX/TS files
+- **Context Awareness**: Distinguishes between legitimate crypto usage and auth tokens
+- **Variable Analysis**: Detects suspicious variable names (password, secret, key, token)
+- **String Literal Scanning**: Analyzes string values with entropy validation
+
+#### **Detection Patterns (50+ Rules)**
+```javascript
+// Example pattern definitions
+{
+  name: 'GitHub Token',
+  regex: /gh[pousr]_[A-Za-z0-9_]{36,255}/g,
+  severity: 'high',
+  description: 'GitHub Personal Access Token detected',
+  entropy: 4.5
+}
+```
+
+#### **Context-Aware Filtering**
+- **Cryptocurrency Filter**: Recognizes Bitcoin, Ethereum, DeFi terminology
+- **UI Component Filter**: Excludes React component props and UI-related tokens
+- **i18n Pattern Detection**: Recognizes translation files and localized content
+- **Configuration Awareness**: Distinguishes example files from real secrets
+
+#### **CI/CD Integration**
+- **Exit Code Strategy**: Non-zero exit for high/critical findings
+- **SARIF Output**: GitHub Security tab integration
+- **Performance Metrics**: Concurrent processing with timeout protection
+- **Configuration System**: .secretignore support with gitignore-style patterns
+
+#### **Usage Examples**
+```bash
+# Quick security scan
+npm run security:scan
+
+# Generate markdown report  
+npm run security:scan-report
+
+# CI/CD integration with SARIF output
+node scripts/secret-scanner.js scan --format sarif --severity high --output security.sarif
 ```
 
 ## 🌐 Internationalization Architecture
