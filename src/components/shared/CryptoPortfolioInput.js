@@ -1,7 +1,8 @@
-// CryptoPortfolioInput.js - Enhanced crypto input with token selection and real-time conversion
+// DigitalAssetPortfolioInput.js - Enhanced digital asset input with token selection and real-time conversion
+// PORTFOLIO TRACKING ONLY - NOT A CRYPTOCURRENCY WALLET - NO PRIVATE KEYS OR WALLET FUNCTIONS
 // Created by Yali Pollak (יהלי פולק) - v6.6.2
 
-const CryptoPortfolioInput = ({ 
+const DigitalAssetPortfolioInput = ({ 
     inputs, 
     setInputs, 
     language = 'en', 
@@ -12,30 +13,30 @@ const CryptoPortfolioInput = ({
 }) => {
     const createElement = React.createElement;
     
-    // State for crypto prices and loading
-    const [cryptoPrices, setCryptoPrices] = React.useState({});
+    // State for digital asset prices and loading
+    const [assetPrices, setAssetPrices] = React.useState({});
     const [pricesLoading, setPricesLoading] = React.useState(false);
     const [lastUpdated, setLastUpdated] = React.useState(null);
     const [priceError, setPriceError] = React.useState(null);
     
     // Field names based on prefix
-    const amountField = `${fieldPrefix}CryptoAmount`;
-    const tokenField = `${fieldPrefix}CryptoToken`;
-    const fiatValueField = `${fieldPrefix}CryptoFiatValue`;
+    const amountField = `${fieldPrefix}DigitalAssetAmount`;
+    const tokenField = `${fieldPrefix}DigitalAssetToken`;
+    const fiatValueField = `${fieldPrefix}DigitalAssetFiatValue`;
     
     // Get current values
-    const cryptoAmount = inputs[amountField] || 0;
-    const cryptoToken = inputs[tokenField] || 'BTC';
-    const cryptoFiatValue = inputs[fiatValueField] || 0;
+    const assetAmount = inputs[amountField] || 0;
+    const assetToken = inputs[tokenField] || 'BTC';
+    const assetFiatValue = inputs[fiatValueField] || 0;
     
     // Multi-language content
     const content = {
         he: {
-            cryptocurrency: 'מטבעות דיגיטליים',
+            digitalAsset: 'נכסים דיגיטליים',
             amount: 'כמות',
-            token: 'מטבע',
+            token: 'נכס',
             fiatValue: 'שווי במטבע בסיס',
-            selectToken: 'בחר מטבע דיגיטלי',
+            selectToken: 'בחר נכס דיגיטלי',
             loading: 'טוען מחירים...',
             error: 'שגיאה בטעינת מחירים',
             lastUpdated: 'עודכן לאחרונה',
@@ -43,11 +44,11 @@ const CryptoPortfolioInput = ({
             refreshPrices: 'רענן מחירים'
         },
         en: {
-            cryptocurrency: 'Cryptocurrency',
+            digitalAsset: 'Digital Asset',
             amount: 'Amount',
             token: 'Token',
             fiatValue: 'Fiat Value',
-            selectToken: 'Select cryptocurrency',
+            selectToken: 'Select digital asset',
             loading: 'Loading prices...',
             error: 'Error loading prices',
             lastUpdated: 'Last updated',
@@ -71,11 +72,11 @@ const CryptoPortfolioInput = ({
     
     const currencySymbol = getCurrencySymbol(workingCurrency);
     
-    // Fetch crypto prices on mount and token change
+    // Fetch digital asset prices on mount and token change
     React.useEffect(() => {
         const fetchPrices = async () => {
-            if (!window.fetchCryptoPrices) {
-                console.warn('⚠️ Crypto price API not loaded');
+            if (!window.fetchDigitalAssetPrices) {
+                console.warn('⚠️ Digital asset price API not loaded');
                 return;
             }
             
@@ -83,20 +84,20 @@ const CryptoPortfolioInput = ({
             setPriceError(null);
             
             try {
-                const prices = await window.fetchCryptoPrices(workingCurrency);
-                setCryptoPrices(prices);
+                const prices = await window.fetchDigitalAssetPrices(workingCurrency);
+                setAssetPrices(prices);
                 setLastUpdated(new Date());
                 
                 // Update fiat value if we have amount and token
-                if (cryptoAmount && cryptoToken && prices[cryptoToken]) {
-                    const fiatValue = cryptoAmount * prices[cryptoToken].price;
+                if (assetAmount && assetToken && prices[assetToken]) {
+                    const fiatValue = assetAmount * prices[assetToken].price;
                     setInputs(prev => ({
                         ...prev,
                         [fiatValueField]: Math.round(fiatValue)
                     }));
                 }
             } catch (error) {
-                console.error('Failed to fetch crypto prices:', error);
+                console.error('Failed to fetch digital asset prices:', error);
                 setPriceError(error.message);
             } finally {
                 setPricesLoading(false);
@@ -104,7 +105,7 @@ const CryptoPortfolioInput = ({
         };
         
         fetchPrices();
-    }, [cryptoToken, workingCurrency]);
+    }, [assetToken, workingCurrency]);
     
     // Handle amount change
     const handleAmountChange = (newAmount) => {
@@ -112,8 +113,8 @@ const CryptoPortfolioInput = ({
         setInputs(prev => ({
             ...prev,
             [amountField]: amount,
-            [fiatValueField]: amount && cryptoPrices[cryptoToken] ? 
-                Math.round(amount * cryptoPrices[cryptoToken].price) : 0
+            [fiatValueField]: amount && assetPrices[assetToken] ? 
+                Math.round(amount * assetPrices[assetToken].price) : 0
         }));
     };
     
@@ -122,21 +123,21 @@ const CryptoPortfolioInput = ({
         setInputs(prev => ({
             ...prev,
             [tokenField]: newToken,
-            [fiatValueField]: cryptoAmount && cryptoPrices[newToken] ? 
-                Math.round(cryptoAmount * cryptoPrices[newToken].price) : 0
+            [fiatValueField]: assetAmount && assetPrices[newToken] ? 
+                Math.round(assetAmount * assetPrices[newToken].price) : 0
         }));
     };
     
     // Get current price info
     const getCurrentPrice = () => {
-        const priceInfo = cryptoPrices[cryptoToken];
+        const priceInfo = assetPrices[assetToken];
         if (!priceInfo) return null;
         
         return {
             price: priceInfo.price,
             change24h: priceInfo.change24h,
             isFallback: priceInfo.isFallback,
-            symbol: window.getCryptoSymbol ? window.getCryptoSymbol(cryptoToken) : cryptoToken
+            symbol: window.getDigitalAssetSymbol ? window.getDigitalAssetSymbol(assetToken) : assetToken
         };
     };
     
@@ -152,13 +153,13 @@ const CryptoPortfolioInput = ({
     return createElement('div', { className }, [
         // Title (only if not compact)
         !compact && createElement('label', {
-            key: 'crypto-title',
+            key: 'asset-title',
             className: "block text-lg font-medium text-yellow-700 mb-3"
-        }, t.cryptocurrency),
+        }, t.digitalAsset),
         
         // Main input grid
         createElement('div', {
-            key: 'crypto-inputs',
+            key: 'asset-inputs',
             className: compact ? "grid grid-cols-2 gap-3" : "grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4"
         }, [
             // Amount input
@@ -170,11 +171,11 @@ const CryptoPortfolioInput = ({
                 createElement('input', {
                     key: 'amount-input',
                     type: 'number',
-                    step: cryptoToken === 'BTC' ? '0.00000001' : cryptoToken === 'ETH' ? '0.000001' : '0.0001',
+                    step: assetToken === 'BTC' ? '0.00000001' : assetToken === 'ETH' ? '0.000001' : '0.0001',
                     min: '0',
-                    value: cryptoAmount || '',
+                    value: assetAmount || '',
                     onChange: (e) => handleAmountChange(e.target.value),
-                    placeholder: cryptoToken === 'BTC' ? '0.00000000' : cryptoToken === 'ETH' ? '0.000000' : '0.0000',
+                    placeholder: assetToken === 'BTC' ? '0.00000000' : assetToken === 'ETH' ? '0.000000' : '0.0000',
                     className: compact ? 
                         "w-full p-2 text-base border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500" :
                         "w-full p-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
@@ -189,21 +190,21 @@ const CryptoPortfolioInput = ({
                 }, t.token),
                 createElement('select', {
                     key: 'token-select',
-                    value: cryptoToken,
+                    value: assetToken,
                     onChange: (e) => handleTokenChange(e.target.value),
                     className: compact ? 
                         "w-full p-2 text-base border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500" :
                         "w-full p-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
                 }, [
-                    // Generate options from supported cryptos
-                    ...(window.SUPPORTED_CRYPTOS ? Object.entries(window.SUPPORTED_CRYPTOS).map(([symbol, info]) =>
+                    // Generate options from supported digital assets
+                    ...(window.SUPPORTED_DIGITAL_ASSETS ? Object.entries(window.SUPPORTED_DIGITAL_ASSETS).map(([symbol, info]) =>
                         createElement('option', { 
                             key: symbol, 
                             value: symbol 
                         }, `${info.name} (${symbol})`)
                     ) : [
-                        createElement('option', { key: 'BTC', value: 'BTC' }, 'Bitcoin (BTC)'),
-                        createElement('option', { key: 'ETH', value: 'ETH' }, 'Ethereum (ETH)'),
+                        createElement('option', { key: 'BTC', value: 'BTC' }, 'Digital Gold (BTC)'),
+                        createElement('option', { key: 'ETH', value: 'ETH' }, 'Smart Contract Platform (ETH)'),
                         createElement('option', { key: 'USDT', value: 'USDT' }, 'Tether (USDT)'),
                         createElement('option', { key: 'SOL', value: 'SOL' }, 'Solana (SOL)')
                     ])
@@ -213,7 +214,7 @@ const CryptoPortfolioInput = ({
         
         // Price info and fiat value
         createElement('div', {
-            key: 'crypto-info',
+            key: 'asset-info',
             className: compact ? "mt-2 space-y-2" : "space-y-3"
         }, [
             // Current price display
@@ -224,7 +225,7 @@ const CryptoPortfolioInput = ({
                     "flex justify-between items-center p-2 bg-yellow-100 rounded text-sm"
             }, [
                 createElement('span', { key: 'price-label' }, 
-                    `1 ${cryptoToken} = ${currencySymbol}${formatPrice(currentPrice.price)}`),
+                    `1 ${assetToken} = ${currencySymbol}${formatPrice(currentPrice.price)}`),
                 createElement('div', { key: 'price-meta', className: "flex items-center space-x-2" }, [
                     currentPrice.change24h !== 0 && createElement('span', {
                         key: 'change-24h',
@@ -251,7 +252,7 @@ const CryptoPortfolioInput = ({
             }, `${t.error}: ${priceError}`),
             
             // Fiat value display
-            cryptoFiatValue > 0 && createElement('div', {
+            assetFiatValue > 0 && createElement('div', {
                 key: 'fiat-value',
                 className: compact ? 
                     "p-2 bg-green-50 rounded border text-sm" :
@@ -264,7 +265,7 @@ const CryptoPortfolioInput = ({
                 createElement('div', {
                     key: 'fiat-amount',
                     className: compact ? "text-lg font-bold text-green-800" : "text-2xl font-bold text-green-800"
-                }, `${currencySymbol}${cryptoFiatValue.toLocaleString()}`)
+                }, `${currencySymbol}${assetFiatValue.toLocaleString()}`)
             ]),
             
             // Last updated (only if not compact)
@@ -276,6 +277,7 @@ const CryptoPortfolioInput = ({
     ]);
 };
 
-// Export to window for global access
-window.CryptoPortfolioInput = CryptoPortfolioInput;
-console.log('✅ CryptoPortfolioInput component loaded successfully');
+// Export to window for global access - maintain backward compatibility
+window.CryptoPortfolioInput = DigitalAssetPortfolioInput;
+window.DigitalAssetPortfolioInput = DigitalAssetPortfolioInput;
+console.log('✅ DigitalAssetPortfolioInput component loaded successfully');
