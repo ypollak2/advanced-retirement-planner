@@ -27,7 +27,46 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v6.6.2 - MAJOR UX OVERHAUL & RUNTIME FIXES 🚀
+## 🎨 What's New in v6.6.3 - SEMANTIC SECRET SCANNER & SECURITY ENHANCEMENTS 🛡️
+
+### **🔍 SEMANTIC SECRET SCANNER** (July 2025)
+
+#### **🤖 AST-Based Security Analysis**
+- **Semantic Secret Detection**: Advanced AST parsing for context-aware secret detection
+- **Cryptocurrency Context Filtering**: Intelligent filtering to avoid false positives with crypto terms
+- **Multi-Format Output**: Console, JSON, Markdown, and SARIF reports for CI/CD integration
+- **Enterprise-Grade Patterns**: 50+ detection patterns for API keys, tokens, and credentials
+
+#### **🎯 Advanced Context Analysis**
+- **UI Component Recognition**: Filters out React component props to reduce false positives  
+- **i18n Pattern Detection**: Recognizes translation files and localized content
+- **Configuration File Awareness**: Smart detection of example/template files vs real secrets
+- **Inline Comment Exclusions**: Support for `// security: ignore` style exclusions
+
+#### **⚡ Performance & Scalability**  
+- **Concurrent Processing**: Configurable concurrency with semaphore-based throttling
+- **Timeout Protection**: Per-file timeout limits to prevent hanging on large files
+- **Entropy Validation**: Shannon entropy calculation for high-confidence detection
+- **Custom Rule Support**: Extensible pattern system with JSON configuration
+
+#### **🚀 CI/CD Integration Ready**
+- **Exit Code Strategy**: Non-zero exit for high/critical findings to fail CI builds
+- **SARIF Format Support**: GitHub Security tab integration with actionable alerts
+- **Configuration Management**: .secretignore support similar to .gitignore patterns
+- **Performance Statistics**: Detailed timing and throughput metrics
+
+```bash
+# Quick security scan
+npm run security:scan
+
+# Generate markdown report  
+npm run security:scan-report
+
+# JSON output for CI/CD
+npm run security:scan-json
+```
+
+## 🎨 Previous Release - v6.6.2 - MAJOR UX OVERHAUL & RUNTIME FIXES 🚀
 
 ### **🎯 INTELLIGENT RESULTS DISPLAY** (July 2025)
 
