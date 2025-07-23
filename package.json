@@ -50,6 +50,9 @@
     "qa:full": "npm test && node tests/security-qa-analysis.js && npm run test:components && npm run test:accessibility && npm run test:ux && npm run test:language && npm run test:version && npm run test:currency",
     "qa:security": "node tests/security-qa-analysis.js",
     "security:check": "node scripts/security-check.js",
+    "security:scan": "node scripts/secret-scanner.js scan",
+    "security:scan-json": "node scripts/secret-scanner.js scan --format json",
+    "security:scan-report": "node scripts/secret-scanner.js scan --format markdown --output security-report.md",
     "qa:business-logic": "node tests/business-logic-validator.js",
     "qa:performance": "node tests/performance-validator.js",
     "qa:pre-release": "node scripts/pre-release-qa.js",
@@ -90,10 +93,15 @@
     "npm": ">=8.0.0"
   },
   "devDependencies": {
+    "@babel/parser": "^7.25.0",
+    "@babel/traverse": "^7.25.0",
+    "chalk": "^4.1.2",
+    "commander": "^12.0.0",
     "gh-pages": "^6.0.0",
+    "glob": "^10.3.0",
     "license-checker": "^25.0.1",
-    "vite": "^5.4.10",
-    "puppeteer": "^22.0.0"
+    "puppeteer": "^22.0.0",
+    "vite": "^5.4.10"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
