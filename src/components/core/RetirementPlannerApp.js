@@ -597,11 +597,12 @@ function RetirementPlannerApp() {
     ]);
     
     // Wizard-first flow: redirect to wizard if trying to access dashboard without completion
-    React.useEffect(function() {
-        if (!wizardCompleted && viewMode === 'dashboard') {
-            setViewMode('wizard');
-        }
-    }, [wizardCompleted, viewMode]);
+    // DISABLED to allow "Return to Dashboard" functionality
+    // React.useEffect(function() {
+    //     if (!wizardCompleted && viewMode === 'dashboard') {
+    //         setViewMode('wizard');
+    //     }
+    // }, [wizardCompleted, viewMode]);
     
     // Wizard completion handler
     function handleWizardComplete() {
@@ -1309,7 +1310,10 @@ function RetirementPlannerApp() {
                 inputs: inputs,
                 setInputs: setInputs,
                 onComplete: handleWizardComplete,
-                onReturnToDashboard: () => setViewMode('dashboard'),
+                onReturnToDashboard: () => {
+                    console.log('🔄 Returning to dashboard...');
+                    setViewMode('dashboard');
+                },
                 language: language,
                 workingCurrency: workingCurrency,
                 // Wizard step integration: WizardStepSalary, WizardStepSavings, WizardStepContributions, WizardStepFees
@@ -1324,8 +1328,8 @@ function RetirementPlannerApp() {
                 setCurrentStep: setCurrentStep
             }),
 
-            // Dashboard View with Integrated Control Panel - only after wizard completion
-            viewMode === 'dashboard' && wizardCompleted && React.createElement('div', {
+            // Dashboard View with Integrated Control Panel
+            viewMode === 'dashboard' && React.createElement('div', {
                 key: 'dashboard-view',
                 className: 'grid grid-cols-1 lg:grid-cols-4 gap-6'
             }, [
@@ -1522,7 +1526,38 @@ function RetirementPlannerApp() {
                 React.createElement('div', {
                     key: 'dashboard-content',
                     className: 'lg:col-span-3'
-                }, [
+                }, !wizardCompleted ? [
+                    // Pre-wizard dashboard: Show getting started message
+                    React.createElement('div', {
+                        key: 'getting-started',
+                        className: 'bg-white rounded-xl p-8 shadow-sm border border-gray-200 text-center'
+                    }, [
+                        React.createElement('div', {
+                            key: 'icon',
+                            className: 'text-6xl mb-4'
+                        }, '🧙‍♂️'),
+                        React.createElement('h2', {
+                            key: 'title',
+                            className: 'text-2xl font-bold text-gray-800 mb-4'
+                        }, language === 'he' ? 'ברוכים הבאים לתכנית הפרישה המתקדמת' : 'Welcome to Advanced Retirement Planner'),
+                        React.createElement('p', {
+                            key: 'description',
+                            className: 'text-gray-600 mb-6 max-w-2xl mx-auto'
+                        }, language === 'he' ? 
+                            'השתמש באשף התכנון כדי ליצור תכנית פרישה מותאמת אישית. לחץ על "התחל תכנון" כדי להתחיל.' :
+                            'Use the Planning Wizard to create a personalized retirement plan. Click "Start Planning" to begin.'
+                        ),
+                        React.createElement('button', {
+                            key: 'start-wizard',
+                            onClick: () => setViewMode('wizard'),
+                            className: 'px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg'
+                        }, [
+                            React.createElement('span', { key: 'icon' }, '🚀'),
+                            ' ',
+                            language === 'he' ? 'התחל תכנון' : 'Start Planning'
+                        ])
+                    ])
+                ] : [
                     // Dashboard Component
                     window.Dashboard && React.createElement(window.Dashboard, {
                         key: 'dashboard',
