@@ -14,6 +14,14 @@ const DynamicPartnerCharts = ({
     const [isUpdating, setIsUpdating] = React.useState(false);
     const chartRef = React.useRef(null);
     const chartInstance = React.useRef(null);
+    const [chartDataCache, setChartDataCache] = React.useState(null);
+    
+    // Memoize chart data to prevent unnecessary re-renders
+    const memoizedChartData = React.useMemo(() => {
+        const data = getUnifiedProjectionData();
+        setChartDataCache(data);
+        return data;
+    }, [inputs, chartView]);
 
     // Content translations
     const content = {
@@ -75,43 +83,43 @@ const DynamicPartnerCharts = ({
 
     const t = content[language] || content.en;
 
-    // Use unified partner data generation from retirementCalculations.js
+    // Use new progressive savings calculation engine from retirementCalculations.js
     const getUnifiedProjectionData = () => {
-        if (!window.generateUnifiedPartnerProjections) {
-            console.warn('DynamicPartnerCharts: Unified partner projection function not available');
+        if (!window.calculateProgressiveSavings) {
+            console.warn('DynamicPartnerCharts: Progressive savings calculation function not available');
             return { primary: [], partner: [], combined: [] };
         }
 
         try {
-            return window.generateUnifiedPartnerProjections(
-                inputs,
-                [], // workPeriods - would need to be passed as prop if needed
-                [], // partnerWorkPeriods - would need to be passed as prop if needed
-                [], // pensionIndexAllocation - would need to be passed as prop if needed
-                [], // trainingFundIndexAllocation - would need to be passed as prop if needed
-                {} // historicalReturns - would need to be passed as prop if needed
-            );
+            // Use the new progressive calculation engine for accurate projections
+            return window.calculateProgressiveSavings(inputs, [], []);
         } catch (error) {
-            console.warn('DynamicPartnerCharts: Error generating unified projections:', error);
+            console.warn('DynamicPartnerCharts: Error generating progressive projections:', error);
             return { primary: [], partner: [], combined: [] };
         }
     };
 
-    // Get unified data and format for chart display
+    // Get unified data and format for chart display - use memoized data
     const getChartData = (dataType) => {
-        const unifiedData = getUnifiedProjectionData();
+        const unifiedData = chartDataCache || memoizedChartData;
         return unifiedData[dataType] || [];
     };
 
-    // Chart rendering with real-time updates
+    // Enhanced chart rendering with better state synchronization
     React.useEffect(() => {
         if (!chartRef.current || !window.Chart) return;
 
         setIsUpdating(true);
         
-        // Destroy existing chart
+        // Properly destroy existing chart with error handling
         if (chartInstance.current) {
-            chartInstance.current.destroy();
+            try {
+                chartInstance.current.destroy();
+                chartInstance.current = null;
+            } catch (error) {
+                console.warn('Chart destruction error:', error);
+                chartInstance.current = null;
+            }
         }
 
         const ctx = chartRef.current.getContext('2d');
@@ -119,15 +127,16 @@ const DynamicPartnerCharts = ({
         let datasets = [];
         let chartData = [];
 
-        // Determine what data to show based on chartView using unified data
+        // Determine what data to show based on chartView using progressive data
         if (chartView === 'household' && inputs.planningType === 'couple') {
             chartData = getChartData('combined');
             
-            // Generate inflation baseline for comparison
+            // Generate inflation baseline showing erosion of initial value
             const inflationBaseline = chartData.map(d => {
                 const yearsFromStart = d.age - chartData[0].age;
                 const inflationRate = (inputs?.inflationRate || 3) / 100;
-                return chartData[0].nominal * Math.pow(1 + inflationRate, yearsFromStart);
+                const initialValue = chartData[0].nominal || 1000; // Use actual initial value or fallback
+                return initialValue * Math.pow(1 + inflationRate, yearsFromStart);
             });
             
             datasets = [{
@@ -161,43 +170,52 @@ const DynamicPartnerCharts = ({
             const partnerData = getChartData('partner');
             chartData = primaryData; // Use primary partner ages for x-axis
             
+            // Enhanced comparison view with better visual distinction
             datasets = [{
                 label: `${t.partner1} - ${t.nominalValue}`,
                 data: primaryData.map(d => d.nominal),
                 borderColor: '#3B82F6',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
                 fill: false,
                 tension: 0.4,
-                borderWidth: 2
+                borderWidth: 3,
+                pointRadius: 2,
+                pointHoverRadius: 6
             }, {
                 label: `${t.partner1} - ${t.realValue}`,
                 data: primaryData.map(d => d.real),
                 borderColor: '#1E40AF',
-                backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                backgroundColor: 'rgba(30, 64, 175, 0.2)',
                 fill: false,
                 tension: 0.4,
                 borderWidth: 2,
-                borderDash: [5, 5]
+                borderDash: [8, 4],
+                pointRadius: 2,
+                pointHoverRadius: 6
             }, {
                 label: `${t.partner2} - ${t.nominalValue}`,
                 data: partnerData.map(d => d.nominal),
                 borderColor: '#10B981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                backgroundColor: 'rgba(16, 185, 129, 0.2)',
                 fill: false,
                 tension: 0.4,
-                borderWidth: 2
+                borderWidth: 3,
+                pointRadius: 2,
+                pointHoverRadius: 6
             }, {
                 label: `${t.partner2} - ${t.realValue}`,
                 data: partnerData.map(d => d.real),
                 borderColor: '#047857',
-                backgroundColor: 'rgba(4, 120, 87, 0.1)',
+                backgroundColor: 'rgba(4, 120, 87, 0.2)',
                 fill: false,
                 tension: 0.4,
                 borderWidth: 2,
-                borderDash: [5, 5]
+                borderDash: [8, 4],
+                pointRadius: 2,
+                pointHoverRadius: 6
             }];
         } else {
-            // Single person view using unified primary data
+            // Single person view using progressive primary data
             chartData = getChartData('primary');
             datasets = [{
                 label: t.nominalValue,
@@ -206,7 +224,9 @@ const DynamicPartnerCharts = ({
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 fill: false,
                 tension: 0.4,
-                borderWidth: 3
+                borderWidth: 3,
+                pointRadius: 3,
+                pointHoverRadius: 8
             }, {
                 label: t.realValue,
                 data: chartData.map(d => d.real),
@@ -214,7 +234,9 @@ const DynamicPartnerCharts = ({
                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
                 fill: false,
                 tension: 0.4,
-                borderWidth: 3
+                borderWidth: 3,
+                pointRadius: 3,
+                pointHoverRadius: 8
             }];
         }
         
@@ -238,61 +260,155 @@ const DynamicPartnerCharts = ({
                     },
                     legend: {
                         display: true,
-                        position: 'top'
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        callbacks: {
-                            label: function(context) {
-                                const value = formatCurrency ? formatCurrency(context.parsed.y) : `₪${context.parsed.y.toLocaleString()}`;
-                                return `${context.dataset.label}: ${value}`;
-                            }
-                        }
-                    }
-                },
-                scales: window.standardChartFormatting ? 
-                    window.standardChartFormatting.getStandardScaleConfig(workingCurrency, language) : 
-                    {
-                        x: { title: { display: true, text: t.age } },
-                        y: { title: { display: true, text: t.amount } }
-                    },
-                plugins: {
-                    tooltip: window.standardChartFormatting ? 
-                        window.standardChartFormatting.getStandardTooltipConfig(workingCurrency, language) :
-                        {
-                            mode: 'index',
-                            intersect: false
-                        },
-                    legend: {
-                        display: true,
                         position: 'top',
                         labels: {
                             usePointStyle: true,
                             padding: 15,
                             font: {
                                 size: 12
+                            },
+                            generateLabels: function(chart) {
+                                const original = Chart.defaults.plugins.legend.labels.generateLabels;
+                                const labels = original.call(this, chart);
+                                
+                                // Enhance legend labels with better formatting
+                                labels.forEach(label => {
+                                    if (label.text.includes('Primary Partner') && inputs.partner1Name) {
+                                        label.text = label.text.replace('Primary Partner', inputs.partner1Name);
+                                    }
+                                    if (label.text.includes('Secondary Partner') && inputs.partner2Name) {
+                                        label.text = label.text.replace('Secondary Partner', inputs.partner2Name);
+                                    }
+                                });
+                                
+                                return labels;
+                            }
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#3B82F6',
+                        borderWidth: 1,
+                        displayColors: true,
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const age = tooltipItems[0].label;
+                                return `${t.age}: ${age}`;
+                            },
+                            label: function(context) {
+                                const value = formatCurrency ? formatCurrency(context.parsed.y) : `₪${context.parsed.y.toLocaleString()}`;
+                                const dataIndex = context.dataIndex;
+                                const dataset = context.dataset;
+                                
+                                // Enhanced tooltip with more context
+                                let label = `${dataset.label}: ${value}`;
+                                
+                                // Add inflation impact information for real values
+                                if (dataset.label.includes(t.realValue) || dataset.label.includes('Real Value')) {
+                                    const nominalValue = chartData[dataIndex]?.nominal;
+                                    if (nominalValue && nominalValue !== context.parsed.y) {
+                                        const inflationImpact = ((nominalValue - context.parsed.y) / nominalValue * 100).toFixed(1);
+                                        label += ` (${inflationImpact}% ${language === 'he' ? 'השפעת אינפלציה' : 'inflation impact'})`;
+                                    }
+                                }
+                                
+                                return label;
+                            },
+                            afterBody: function(tooltipItems) {
+                                if (chartData && chartData.length > 0) {
+                                    const dataIndex = tooltipItems[0].dataIndex;
+                                    const point = chartData[dataIndex];
+                                    
+                                    if (point && point.yearlyContributions) {
+                                        const yearlyContrib = formatCurrency ? formatCurrency(point.yearlyContributions) : `₪${point.yearlyContributions.toLocaleString()}`;
+                                        return [``, `${language === 'he' ? 'תרומה שנתית' : 'Annual Contributions'}: ${yearlyContrib}`];
+                                    }
+                                }
+                                return [];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: t.age,
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: `${t.amount} (${workingCurrency === 'ILS' ? '₪' : workingCurrency})`,
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                // Format large numbers with K/M suffixes
+                                if (value >= 1000000) {
+                                    return (value / 1000000).toFixed(1) + 'M';
+                                } else if (value >= 1000) {
+                                    return (value / 1000).toFixed(0) + 'K';
+                                }
+                                return value.toLocaleString();
                             }
                         }
                     }
                 },
                 interaction: {
-                    mode: 'nearest',
+                    mode: 'index',
                     axis: 'x',
                     intersect: false
+                },
+                elements: {
+                    point: {
+                        hoverRadius: 8,
+                        hoverBorderWidth: 3
+                    }
+                },
+                animation: {
+                    duration: 750,
+                    easing: 'easeInOutQuart'
                 }
             }
         });
         
-        setTimeout(() => setIsUpdating(false), 300);
+        // Enhanced chart completion handling
+        const chartCompleteTimeout = setTimeout(() => {
+            setIsUpdating(false);
+        }, 300);
         
-        // Cleanup function
+        // Enhanced cleanup function with proper error handling
         return () => {
+            clearTimeout(chartCompleteTimeout);
             if (chartInstance.current) {
-                chartInstance.current.destroy();
+                try {
+                    chartInstance.current.destroy();
+                    chartInstance.current = null;
+                } catch (error) {
+                    console.warn('Chart cleanup error:', error);
+                    chartInstance.current = null;
+                }
             }
         };
-    }, [inputs, chartView, language, formatCurrency]);
+    }, [inputs, chartView, language, formatCurrency, workingCurrency, results, partnerResults]);
 
     return React.createElement('div', {
         className: 'professional-card animate-fade-in-up'
@@ -433,13 +549,22 @@ const DynamicPartnerCharts = ({
             })
         ]),
 
-        // Real-time update indicator
+        // Enhanced real-time update indicator with loading state
         React.createElement('div', {
             key: 'update-indicator',
             className: 'mt-4 text-sm text-gray-500 flex items-center gap-2'
         }, [
-            React.createElement('span', { key: 'icon' }, '🔄'),
-            'הגרף מתעדכן באופן אוטומטי עם שינויי הנתונים'
+            React.createElement('span', { 
+                key: 'icon',
+                className: isUpdating ? 'animate-spin' : ''
+            }, isUpdating ? '⏳' : '🔄'),
+            React.createElement('span', {
+                key: 'text',
+                className: isUpdating ? 'text-blue-600 font-medium' : ''
+            }, isUpdating ? 
+                (language === 'he' ? 'מעדכן נתונים...' : 'Updating data...') :
+                (language === 'he' ? 'הגרף מתעדכן באופן אוטומטי עם שינויי הנתונים' : 'Chart updates automatically with data changes')
+            )
         ])
     ]);
 };
