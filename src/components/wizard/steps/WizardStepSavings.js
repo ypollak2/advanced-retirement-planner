@@ -258,7 +258,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                     createElement('h4', { 
                         key: 'partner1-title',
                         className: "text-lg font-semibold text-pink-700 mb-4" 
-                    }, inputs.partner1Name || t.partner1Savings),
+                    }, inputs.userName || t.partner1Savings),
                     createElement('div', { key: 'partner1-fields', className: "space-y-4" }, [
                         createElement('div', { key: 'p1-pension' }, [
                             createElement('label', { 
@@ -346,7 +346,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                     createElement('h4', { 
                         key: 'partner2-title',
                         className: "text-lg font-semibold text-purple-700 mb-4" 
-                    }, inputs.partner2Name || t.partner2Savings),
+                    }, inputs.partnerName || t.partner2Savings),
                     createElement('div', { key: 'partner2-fields', className: "space-y-4" }, [
                         createElement('div', { key: 'p2-pension' }, [
                             createElement('label', { 

@@ -359,7 +359,7 @@ const WizardStepRiskProfile = ({ inputs, setInputs, language = 'en' }) => {
                     React.createElement('h4', { 
                         key: 'partner1-risk-title',
                         className: "text-lg font-semibold text-pink-700 mb-4" 
-                    }, inputs.partner1Name || t.partner1Risk),
+                    }, inputs.userName || t.partner1Risk),
                     
                     // Partner 1 Risk Slider
                     React.createElement('div', { 
@@ -414,7 +414,7 @@ const WizardStepRiskProfile = ({ inputs, setInputs, language = 'en' }) => {
                     React.createElement('h4', { 
                         key: 'partner2-risk-title',
                         className: "text-lg font-semibold text-purple-700 mb-4" 
-                    }, inputs.partner2Name || t.partner2Risk),
+                    }, inputs.partnerName || t.partner2Risk),
                     
                     // Partner 2 Risk Slider
                     React.createElement('div', { 

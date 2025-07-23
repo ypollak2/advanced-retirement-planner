@@ -204,7 +204,7 @@ const WizardStepFees = ({ inputs, setInputs, language = 'en' }) => {
                     createElement('h4', { 
                         key: 'partner1-fees-title',
                         className: "text-lg font-semibold text-pink-700 mb-4" 
-                    }, inputs.partner1Name || t.partner1Fees),
+                    }, inputs.userName || t.partner1Fees),
                     createElement('div', { key: 'partner1-fees-inputs', className: "space-y-4" }, [
                         createElement('div', { key: 'partner1-contrib-fees' }, [
                             createElement('label', { 
@@ -259,7 +259,7 @@ const WizardStepFees = ({ inputs, setInputs, language = 'en' }) => {
                     createElement('h4', { 
                         key: 'partner2-fees-title',
                         className: "text-lg font-semibold text-purple-700 mb-4" 
-                    }, inputs.partner2Name || t.partner2Fees),
+                    }, inputs.partnerName || t.partner2Fees),
                     createElement('div', { key: 'partner2-fees-inputs', className: "space-y-4" }, [
                         createElement('div', { key: 'partner2-contrib-fees' }, [
                             createElement('label', { 
@@ -329,7 +329,7 @@ const WizardStepFees = ({ inputs, setInputs, language = 'en' }) => {
                     createElement('h4', { 
                         key: 'partner1-returns-title',
                         className: "text-lg font-semibold text-pink-700 mb-4" 
-                    }, inputs.partner1Name || t.partner1Returns),
+                    }, inputs.userName || t.partner1Returns),
                     createElement('div', { key: 'partner1-returns-inputs', className: "space-y-4" }, [
                         createElement('div', { key: 'partner1-pension-return' }, [
                             createElement('label', { 
@@ -384,7 +384,7 @@ const WizardStepFees = ({ inputs, setInputs, language = 'en' }) => {
                     createElement('h4', { 
                         key: 'partner2-returns-title',
                         className: "text-lg font-semibold text-purple-700 mb-4" 
-                    }, inputs.partner2Name || t.partner2Returns),
+                    }, inputs.partnerName || t.partner2Returns),
                     createElement('div', { key: 'partner2-returns-inputs', className: "space-y-4" }, [
                         createElement('div', { key: 'partner2-pension-return' }, [
                             createElement('label', { 
