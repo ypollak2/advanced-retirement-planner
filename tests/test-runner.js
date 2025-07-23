@@ -33,14 +33,14 @@ function testFileStructure() {
     const requiredFiles = [
         'index.html',
         'version.json',
-        'update-version.js',
+        'scripts/update-version.js',
         'src/translations/multiLanguage.js',
         'src/data/marketConstants.js',
         'src/utils/retirementCalculations.js',
-        'src/components/RetirementPlannerApp.js',
-        'src/components/RetirementBasicForm.js',
-        'src/components/RetirementAdvancedForm.js',
-        'src/components/RetirementResultsPanel.js'
+        'src/components/core/RetirementPlannerApp.js',
+        'src/components/forms/RetirementBasicForm.js',
+        'src/components/forms/RetirementAdvancedForm.js',
+        'src/components/panels/RetirementResultsPanel.js'
     ];
     
     requiredFiles.forEach(file => {
@@ -56,10 +56,10 @@ function testJavaScriptSyntax() {
     
     const jsFiles = [
         'src/utils/retirementCalculations.js',
-        'src/components/RetirementPlannerApp.js',
-        'src/components/RetirementBasicForm.js',
-        'src/components/RetirementAdvancedForm.js',
-        'src/components/RetirementResultsPanel.js'
+        'src/components/core/RetirementPlannerApp.js',
+        'src/components/forms/RetirementBasicForm.js',
+        'src/components/forms/RetirementAdvancedForm.js',
+        'src/components/panels/RetirementResultsPanel.js'
     ];
     
     jsFiles.forEach(file => {
@@ -113,11 +113,11 @@ function testVersionManagement() {
             hasVersion ? `Current version: ${versionData.version}` : 'Invalid version format');
         
         // Test update script
-        const updateScriptExists = fs.existsSync('update-version.js');
+        const updateScriptExists = fs.existsSync('scripts/update-version.js');
         logTest('update-version.js exists', updateScriptExists);
         
         if (updateScriptExists) {
-            const updateScript = fs.readFileSync('update-version.js', 'utf8');
+            const updateScript = fs.readFileSync('scripts/update-version.js', 'utf8');
             const hasVersionLogic = updateScript.includes('version.json') && updateScript.includes('README.md');
             logTest('update-version.js functionality', hasVersionLogic,
                 hasVersionLogic ? 'Script contains version update logic' : 'Missing version update logic');
@@ -198,7 +198,7 @@ function testHtmlStructure() {
             },
             { 
                 name: 'Error boundary', 
-                test: arch.html.includes('Application Loading Error') || fs.existsSync('src/components/RetirementPlannerApp.js') 
+                test: arch.html.includes('Application Loading Error') || fs.existsSync('src/components/core/RetirementPlannerApp.js') 
             },
             { 
                 name: 'Module loading check', 
@@ -237,10 +237,10 @@ function testModuleExports() {
     console.log('\n📦 Testing Module Exports...');
     
     const moduleFiles = [
-        { file: 'src/components/RetirementPlannerApp.js', exports: ['RetirementPlannerApp'] },
-        { file: 'src/components/RetirementBasicForm.js', exports: ['BasicInputs'] },
-        { file: 'src/components/RetirementAdvancedForm.js', exports: ['AdvancedInputs'] },
-        { file: 'src/components/RetirementResultsPanel.js', exports: ['ResultsPanel'] },
+        { file: 'src/components/core/RetirementPlannerApp.js', exports: ['RetirementPlannerApp'] },
+        { file: 'src/components/forms/RetirementBasicForm.js', exports: ['BasicInputs'] },
+        { file: 'src/components/forms/RetirementAdvancedForm.js', exports: ['AdvancedInputs'] },
+        { file: 'src/components/panels/RetirementResultsPanel.js', exports: ['ResultsPanel'] },
         { file: 'src/utils/retirementCalculations.js', exports: ['calculateRetirement', 'formatCurrency'] },
         { file: 'src/translations/multiLanguage.js', exports: ['multiLanguage'] },
         { file: 'src/data/marketConstants.js', exports: ['countryData'] }
@@ -361,8 +361,8 @@ function testGenerateChartDataPartnerLogic() {
     console.log('\n👫 Testing generateChartData Partner Data Logic...');
     
     const chartRelatedFiles = [
-        'src/components/FinancialChart.js',
-        'src/components/RetirementResultsPanel.js',
+        'src/components/charts/FinancialChart.js',
+        'src/components/panels/RetirementResultsPanel.js',
         'src/utils/retirementCalculations.js'
     ];
     
@@ -440,7 +440,7 @@ function testBottomLineTitleTruncation() {
         
         // Check component files for title handling
         const componentFiles = [
-            'src/components/RetirementResultsPanel.js',
+            'src/components/panels/RetirementResultsPanel.js',
             'src/components/RetirementPlannerApp.js'
         ];
         
@@ -505,10 +505,10 @@ function testLayoutResponsiveness() {
         
         // Check component files for responsive handling
         const componentFiles = [
-            'src/components/RetirementPlannerApp.js',
+            'src/components/core/RetirementPlannerApp.js',
             'src/components/RetirementBasicForm.js',
             'src/components/RetirementAdvancedForm.js',
-            'src/components/RetirementResultsPanel.js'
+            'src/components/panels/RetirementResultsPanel.js'
         ];
         
         let responsiveComponentCount = 0;
@@ -584,11 +584,11 @@ function testGitHubActions() {
         
         // Check for critical syntax errors that would break CI/CD
         const jsFiles = [
-            'src/components/FinancialChart.js',
-            'src/components/RetirementPlannerApp.js',
+            'src/components/charts/FinancialChart.js',
+            'src/components/core/RetirementPlannerApp.js',
             'src/components/RetirementBasicForm.js',
             'src/components/RetirementAdvancedForm.js',
-            'src/components/RetirementResultsPanel.js'
+            'src/components/panels/RetirementResultsPanel.js'
         ];
         
         let syntaxErrorCount = 0;
@@ -697,11 +697,11 @@ function testPartnerPlanningFeatures() {
     
     try {
         // Test WizardStepSalary for partner data collection
-        if (fs.existsSync('src/components/WizardStepSalary.js')) {
-            const salaryContent = fs.readFileSync('src/components/WizardStepSalary.js', 'utf8');
+        if (fs.existsSync('src/components/wizard/steps/WizardStepSalary.js')) {
+            const salaryContent = fs.readFileSync('src/components/wizard/steps/WizardStepSalary.js', 'utf8');
             
             // Check for partner name inputs
-            const hasPartnerNames = salaryContent.includes('partner1Name') && salaryContent.includes('partner2Name');
+            const hasPartnerNames = salaryContent.includes('inputs.userName') && salaryContent.includes('inputs.partnerName');
             logTest('WizardStepSalary: Partner name inputs', hasPartnerNames);
             
             // Check for partner salary fields
@@ -721,8 +721,8 @@ function testPartnerPlanningFeatures() {
         }
         
         // Test WizardStepSavings for detailed partner savings breakdown
-        if (fs.existsSync('src/components/WizardStepSavings.js')) {
-            const savingsContent = fs.readFileSync('src/components/WizardStepSavings.js', 'utf8');
+        if (fs.existsSync('src/components/wizard/steps/WizardStepSavings.js')) {
+            const savingsContent = fs.readFileSync('src/components/wizard/steps/WizardStepSavings.js', 'utf8');
             
             // Check for partner savings categories
             const hasPartnerSavingsBreakdown = savingsContent.includes('partner1CurrentPension') && 
@@ -746,8 +746,8 @@ function testPartnerPlanningFeatures() {
         }
         
         // Test WizardStepContributions for country-specific rules
-        if (fs.existsSync('src/components/WizardStepContributions.js')) {
-            const contributionsContent = fs.readFileSync('src/components/WizardStepContributions.js', 'utf8');
+        if (fs.existsSync('src/components/wizard/steps/WizardStepContributions.js')) {
+            const contributionsContent = fs.readFileSync('src/components/wizard/steps/WizardStepContributions.js', 'utf8');
             
             // Check for training fund threshold logic
             const hasThresholdLogic = contributionsContent.includes('calculateTrainingFundRate') &&
@@ -777,8 +777,8 @@ function testPartnerPlanningFeatures() {
         }
         
         // Test WizardStepFees for per-partner fee structures
-        if (fs.existsSync('src/components/WizardStepFees.js')) {
-            const feesContent = fs.readFileSync('src/components/WizardStepFees.js', 'utf8');
+        if (fs.existsSync('src/components/wizard/steps/WizardStepFees.js')) {
+            const feesContent = fs.readFileSync('src/components/wizard/steps/WizardStepFees.js', 'utf8');
             
             // Check for partner fee sections
             const hasPartnerFees = feesContent.includes('partner1ContributionFees') &&
@@ -816,8 +816,8 @@ function testEnhancedCalculationLogic() {
     
     try {
         // Test SummaryPanel for improved calculations
-        if (fs.existsSync('src/components/SummaryPanel.js')) {
-            const summaryContent = fs.readFileSync('src/components/SummaryPanel.js', 'utf8');
+        if (fs.existsSync('src/components/panels/summary/SummaryPanel.js')) {
+            const summaryContent = fs.readFileSync('src/components/panels/summary/SummaryPanel.js', 'utf8');
             
             // Check for comprehensive total income calculation
             const hasTotalIncomeCalculation = summaryContent.includes('totalIncome += (inputs.freelanceIncome') &&
@@ -877,8 +877,8 @@ function testMultiStepWizardUX() {
     
     try {
         // Check main app for wizard integration
-        if (fs.existsSync('src/components/RetirementPlannerApp.js')) {
-            const appContent = fs.readFileSync('src/components/RetirementPlannerApp.js', 'utf8');
+        if (fs.existsSync('src/components/core/RetirementPlannerApp.js')) {
+            const appContent = fs.readFileSync('src/components/core/RetirementPlannerApp.js', 'utf8');
             
             // Check for wizard step components
             const hasWizardSteps = appContent.includes('WizardStepSalary') &&
@@ -903,10 +903,10 @@ function testMultiStepWizardUX() {
         
         // Test for consistent component exports
         const wizardComponents = [
-            'src/components/WizardStepSalary.js',
-            'src/components/WizardStepSavings.js',
-            'src/components/WizardStepContributions.js',
-            'src/components/WizardStepFees.js'
+            'src/components/wizard/steps/WizardStepSalary.js',
+            'src/components/wizard/steps/WizardStepSavings.js',
+            'src/components/wizard/steps/WizardStepContributions.js',
+            'src/components/wizard/steps/WizardStepFees.js'
         ];
         
         let exportedComponents = 0;
@@ -953,11 +953,11 @@ function testDataValidationAndErrorHandling() {
     
     try {
         const componentFiles = [
-            'src/components/WizardStepSalary.js',
-            'src/components/WizardStepSavings.js',
-            'src/components/WizardStepContributions.js',
-            'src/components/WizardStepFees.js',
-            'src/components/SummaryPanel.js'
+            'src/components/wizard/steps/WizardStepSalary.js',
+            'src/components/wizard/steps/WizardStepSavings.js',
+            'src/components/wizard/steps/WizardStepContributions.js',
+            'src/components/wizard/steps/WizardStepFees.js',
+            'src/components/panels/summary/SummaryPanel.js'
         ];
         
         let componentsWithValidation = 0;
@@ -990,18 +990,18 @@ function testDataValidationAndErrorHandling() {
             `${componentsWithErrorHandling}/${componentFiles.length} components have error handling`);
         
         // Test for consistent default value handling
-        if (fs.existsSync('src/components/WizardStepSalary.js')) {
-            const salaryContent = fs.readFileSync('src/components/WizardStepSalary.js', 'utf8');
+        if (fs.existsSync('src/components/wizard/steps/WizardStepSalary.js')) {
+            const salaryContent = fs.readFileSync('src/components/wizard/steps/WizardStepSalary.js', 'utf8');
             const hasDefaultValues = salaryContent.includes('|| 0') && salaryContent.includes('value=');
             logTest('WizardStepSalary: Default value handling', hasDefaultValues);
         }
         
         // Test for number input type enforcement
         const wizardFiles = [
-            'src/components/WizardStepSalary.js',
-            'src/components/WizardStepSavings.js',
-            'src/components/WizardStepContributions.js',
-            'src/components/WizardStepFees.js'
+            'src/components/wizard/steps/WizardStepSalary.js',
+            'src/components/wizard/steps/WizardStepSavings.js',
+            'src/components/wizard/steps/WizardStepContributions.js',
+            'src/components/wizard/steps/WizardStepFees.js'
         ];
         
         let filesWithNumberInputs = 0;
@@ -1027,8 +1027,8 @@ function testAdvancedWizardComponents() {
     console.log('\n🧙‍♂️ Testing Advanced Wizard Components...');
     
     // Test WizardStepInheritance component
-    if (fs.existsSync('src/components/WizardStepInheritance.js')) {
-        const inheritanceContent = fs.readFileSync('src/components/WizardStepInheritance.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepInheritance.js')) {
+        const inheritanceContent = fs.readFileSync('src/components/wizard/steps/WizardStepInheritance.js', 'utf8');
         
         // Test inheritance planning features
         const hasAssetCategories = inheritanceContent.includes('realEstateAssets') &&
@@ -1070,8 +1070,8 @@ function testAdvancedWizardComponents() {
     }
     
     // Test WizardStepTaxes component
-    if (fs.existsSync('src/components/WizardStepTaxes.js')) {
-        const taxesContent = fs.readFileSync('src/components/WizardStepTaxes.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepTaxes.js')) {
+        const taxesContent = fs.readFileSync('src/components/wizard/steps/WizardStepTaxes.js', 'utf8');
         
         const hasTaxCountrySelection = taxesContent.includes('taxCountry') &&
                                       taxesContent.includes('israel') &&
@@ -1105,8 +1105,8 @@ function testAdvancedWizardComponents() {
     }
     
     // Test WizardStepReview component
-    if (fs.existsSync('src/components/WizardStepReview.js')) {
-        const reviewContent = fs.readFileSync('src/components/WizardStepReview.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepReview.js')) {
+        const reviewContent = fs.readFileSync('src/components/wizard/steps/WizardStepReview.js', 'utf8');
         
         const hasFinancialHealthScore = reviewContent.includes('financialHealthScore') &&
                                        reviewContent.includes('calculateHealthScore');
@@ -1143,23 +1143,23 @@ function testWizardIntegrationPipeline() {
     console.log('\n🔄 Testing Wizard Integration Pipeline...');
     
     // Test RetirementWizard main component
-    if (fs.existsSync('src/components/RetirementWizard.js')) {
-        const wizardContent = fs.readFileSync('src/components/RetirementWizard.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/RetirementWizard.js')) {
+        const wizardContent = fs.readFileSync('src/components/wizard/RetirementWizard.js', 'utf8');
         
-        const hasTenStepStructure = wizardContent.includes('totalSteps = 10') ||
-                                   wizardContent.includes('totalSteps: 10');
-        logTest('RetirementWizard: 10-step structure', hasTenStepStructure);
+        const hasEightStepStructure = wizardContent.includes('totalSteps = 8') ||
+                                     wizardContent.includes('totalSteps: 8');
+        logTest('RetirementWizard: 8-step structure', hasEightStepStructure);
         
-        const hasAdvancedStepRefs = wizardContent.includes('WizardStepInheritance') &&
-                                   wizardContent.includes('WizardStepTaxes') &&
-                                   wizardContent.includes('WizardStepReview');
-        logTest('RetirementWizard: Advanced step references', hasAdvancedStepRefs);
+        const hasStreamlinedStepRefs = wizardContent.includes('WizardStepReview') &&
+                                      !wizardContent.includes('case 9:') &&
+                                      !wizardContent.includes('case 10:');
+        logTest('RetirementWizard: Streamlined step references', hasStreamlinedStepRefs);
         
         const hasStepValidation = wizardContent.includes('isCurrentStepValid') &&
                                  wizardContent.includes('case 8') &&
-                                 wizardContent.includes('case 9') &&
-                                 wizardContent.includes('case 10');
-        logTest('RetirementWizard: Advanced step validation', hasStepValidation);
+                                 !wizardContent.includes('case 9:') &&
+                                 !wizardContent.includes('case 10:');
+        logTest('RetirementWizard: Streamlined step validation', hasStepValidation);
         
         const hasStepNavigation = wizardContent.includes('handleNext') &&
                                  wizardContent.includes('handlePrevious') &&
@@ -1177,7 +1177,7 @@ function testWizardIntegrationPipeline() {
     
     // Test data flow integration
     if (fs.existsSync('src/components/RetirementPlannerApp.js')) {
-        const appContent = fs.readFileSync('src/components/RetirementPlannerApp.js', 'utf8');
+        const appContent = fs.readFileSync('src/components/core/RetirementPlannerApp.js', 'utf8');
         
         const hasWizardCompletion = appContent.includes('handleWizardComplete') &&
                                    appContent.includes('setWizardCompleted');
@@ -1242,8 +1242,8 @@ function testWizardIntegrationPipeline() {
 function testWizardSaveResumeFunctionality() {
     console.log('\n💾 Testing Wizard Save/Resume Functionality...');
     
-    if (fs.existsSync('src/components/RetirementWizard.js')) {
-        const wizardContent = fs.readFileSync('src/components/RetirementWizard.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/RetirementWizard.js')) {
+        const wizardContent = fs.readFileSync('src/components/wizard/RetirementWizard.js', 'utf8');
         
         const hasLocalStorageKeys = wizardContent.includes('WIZARD_STORAGE_KEY') &&
                                    wizardContent.includes('WIZARD_INPUTS_KEY');
@@ -1278,7 +1278,7 @@ function testWizardSaveResumeFunctionality() {
     }
     
     if (fs.existsSync('src/components/RetirementPlannerApp.js')) {
-        const appContent = fs.readFileSync('src/components/RetirementPlannerApp.js', 'utf8');
+        const appContent = fs.readFileSync('src/components/core/RetirementPlannerApp.js', 'utf8');
         
         const hasResumeDetection = appContent.includes('localStorage.getItem') &&
                                   appContent.includes('retirementWizardProgress');
@@ -1300,8 +1300,8 @@ function testCurrentSavingsUpdateFunctionality() {
     console.log('\n💰 Testing Current Savings Update Functionality...');
     
     // Test 1: Check WizardStepSavings field name consistency
-    if (fs.existsSync('src/components/WizardStepSavings.js')) {
-        const content = fs.readFileSync('src/components/WizardStepSavings.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepSavings.js')) {
+        const content = fs.readFileSync('src/components/wizard/steps/WizardStepSavings.js', 'utf8');
         
         // Check for corrected field names
         const hasCurrentRealEstate = content.includes('currentRealEstate');
@@ -1326,8 +1326,8 @@ function testCurrentSavingsUpdateFunctionality() {
     }
     
     // Test 2: Check SavingsSummaryPanel field consistency
-    if (fs.existsSync('src/components/SavingsSummaryPanel.js')) {
-        const content = fs.readFileSync('src/components/SavingsSummaryPanel.js', 'utf8');
+    if (fs.existsSync('src/components/panels/summary/SavingsSummaryPanel.js')) {
+        const content = fs.readFileSync('src/components/panels/summary/SavingsSummaryPanel.js', 'utf8');
         
         const hasCorrectTrainingFundField = content.includes('currentTrainingFund') && 
                                            !content.includes('currentTrainingFundSavings');
@@ -1341,8 +1341,8 @@ function testCurrentSavingsUpdateFunctionality() {
 function testCorrectedPensionContributionRates() {
     console.log('\n🏛️ Testing Corrected Pension Contribution Rates...');
     
-    if (fs.existsSync('src/components/WizardStepContributions.js')) {
-        const content = fs.readFileSync('src/components/WizardStepContributions.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepContributions.js')) {
+        const content = fs.readFileSync('src/components/wizard/steps/WizardStepContributions.js', 'utf8');
         
         // Test Israeli rates - Updated to 14.333% employer, 7% employee, total 21.333%
         const hasCorrectIsraeliEmployer = content.includes('employer: 14.333');
@@ -1369,12 +1369,13 @@ function testCorrectedPensionContributionRates() {
 function testRedesignedTrainingFundSystem() {
     console.log('\n📊 Testing Redesigned Training Fund System...');
     
-    if (fs.existsSync('src/components/WizardStepContributions.js')) {
-        const content = fs.readFileSync('src/components/WizardStepContributions.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepContributions.js')) {
+        const content = fs.readFileSync('src/components/wizard/steps/WizardStepContributions.js', 'utf8');
         
-        // Test 1: Simplified checkbox system (corrected pattern)
-        const hasUnlimitedCheckbox = content.includes('trainingFundUnlimited') && 
-                                    content.includes("type: 'checkbox'");
+        // Test 1: Partner-specific checkbox system (updated for enhanced individual partner settings)
+        const hasUnlimitedCheckbox = content.includes('TrainingFundUnlimited') && 
+                                    content.includes("type: 'checkbox'") &&
+                                    content.includes('renderPartnerTrainingFundCard');
         logTest('Training Fund: Unlimited contribution checkbox implemented', hasUnlimitedCheckbox);
         
         // Test 2: 2024 threshold values
@@ -1406,8 +1407,8 @@ function testRedesignedTrainingFundSystem() {
 function testNoDuplicatePartnerContributions() {
     console.log('\n👥 Testing No Duplicate Partner Contributions...');
     
-    if (fs.existsSync('src/components/WizardStepContributions.js')) {
-        const content = fs.readFileSync('src/components/WizardStepContributions.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepContributions.js')) {
+        const content = fs.readFileSync('src/components/wizard/steps/WizardStepContributions.js', 'utf8');
         
         // Count contribution sections - should only have main + partner, not duplicate partner sections
         const contributionSectionMatches = content.match(/key: 'partner.*-contributions'/g) || [];
@@ -1441,8 +1442,8 @@ function testNoDuplicatePartnerContributions() {
 function testManagementFeesUIImprovements() {
     console.log('\n💼 Testing Management Fees UI Improvements...');
     
-    if (fs.existsSync('src/components/WizardStepFees.js')) {
-        const content = fs.readFileSync('src/components/WizardStepFees.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepFees.js')) {
+        const content = fs.readFileSync('src/components/wizard/steps/WizardStepFees.js', 'utf8');
         
         // Test 1: Single mode hidden when couple selected
         const hasCoupleCondition = content.includes("inputs.planningType !== 'couple'");
@@ -1482,8 +1483,8 @@ function testWizardStepsImplementation() {
     console.log('\n🧙‍♂️ Testing Wizard Steps Implementation...');
     
     // Test Investment Preferences (Step 6)
-    if (fs.existsSync('src/components/WizardStepInvestments.js')) {
-        const content = fs.readFileSync('src/components/WizardStepInvestments.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepInvestments.js')) {
+        const content = fs.readFileSync('src/components/wizard/steps/WizardStepInvestments.js', 'utf8');
         
         const hasRiskProfiles = content.includes('conservative') && content.includes('moderate') && 
                                content.includes('aggressive');
@@ -1501,8 +1502,8 @@ function testWizardStepsImplementation() {
     }
     
     // Test Retirement Goals (Step 7)
-    if (fs.existsSync('src/components/WizardStepGoals.js')) {
-        const content = fs.readFileSync('src/components/WizardStepGoals.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepGoals.js')) {
+        const content = fs.readFileSync('src/components/wizard/steps/WizardStepGoals.js', 'utf8');
         
         const hasRetirementGoal = content.includes('retirementGoal');
         const hasMonthlyExpenses = content.includes('currentMonthlyExpenses');
@@ -1520,8 +1521,8 @@ function testWizardStepsImplementation() {
     }
     
     // Test Review and Calculate (Step 10)
-    if (fs.existsSync('src/components/WizardStepReview.js')) {
-        const content = fs.readFileSync('src/components/WizardStepReview.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepReview.js')) {
+        const content = fs.readFileSync('src/components/wizard/steps/WizardStepReview.js', 'utf8');
         
         // Check for actual review sections in the file
         const hasFinancialHealthSection = content.includes('financial-health-score');
@@ -1613,8 +1614,8 @@ function testMobileResponsivenessEnhancements() {
     });
     
     // Test specific components for mobile-specific improvements
-    if (fs.existsSync('src/components/WizardStepPersonal.js')) {
-        const content = fs.readFileSync('src/components/WizardStepPersonal.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepPersonal.js')) {
+        const content = fs.readFileSync('src/components/wizard/steps/WizardStepPersonal.js', 'utf8');
         
         // Planning type cards should use lg:grid-cols-2 instead of md:grid-cols-2
         const hasBetterPlanningTypeLayout = content.includes('lg:grid-cols-2 gap-4 md:gap-6');
@@ -1625,8 +1626,8 @@ function testMobileResponsivenessEnhancements() {
         logTest('Mobile Responsiveness: Planning cards responsive padding', hasResponsivePlanningCards);
     }
     
-    if (fs.existsSync('src/components/WizardStepSalary.js')) {
-        const content = fs.readFileSync('src/components/WizardStepSalary.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepSalary.js')) {
+        const content = fs.readFileSync('src/components/wizard/steps/WizardStepSalary.js', 'utf8');
         
         // Additional income grid should use sm:grid-cols-2
         const hasBetterIncomeGrid = content.includes('sm:grid-cols-2 lg:grid-cols-3');
@@ -1637,8 +1638,8 @@ function testMobileResponsivenessEnhancements() {
         logTest('Mobile Responsiveness: Main salary input mobile-optimized', hasMobileSalaryInput);
     }
     
-    if (fs.existsSync('src/components/WizardStepContributions.js')) {
-        const content = fs.readFileSync('src/components/WizardStepContributions.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepContributions.js')) {
+        const content = fs.readFileSync('src/components/wizard/steps/WizardStepContributions.js', 'utf8');
         
         // Country selection should have better mobile layout
         const hasBetterCountryGrid = content.includes('sm:grid-cols-2 md:grid-cols-3');
@@ -1649,8 +1650,8 @@ function testMobileResponsivenessEnhancements() {
         logTest('Mobile Responsiveness: Country buttons minimum touch height', hasMinHeightButtons);
     }
     
-    if (fs.existsSync('src/components/WizardStepInvestments.js')) {
-        const content = fs.readFileSync('src/components/WizardStepInvestments.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepInvestments.js')) {
+        const content = fs.readFileSync('src/components/wizard/steps/WizardStepInvestments.js', 'utf8');
         
         // Asset allocation should start with single column on mobile
         const hasBetterAllocationGrid = content.includes('grid-cols-1 sm:grid-cols-2 md:grid-cols-4');
@@ -1661,8 +1662,8 @@ function testMobileResponsivenessEnhancements() {
         logTest('Mobile Responsiveness: Investment inputs improved touch targets', hasBetterInvestmentInputs);
     }
     
-    if (fs.existsSync('src/components/WizardStepInheritance.js')) {
-        const content = fs.readFileSync('src/components/WizardStepInheritance.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepInheritance.js')) {
+        const content = fs.readFileSync('src/components/wizard/steps/WizardStepInheritance.js', 'utf8');
         
         // Beneficiaries grid should not exceed 3 columns
         const hasReasonableBeneficiariesGrid = content.includes('md:grid-cols-3 gap-4') && 
@@ -1676,8 +1677,8 @@ function testWizardNavigationAndDataPersistence() {
     console.log('\n🧙 Testing Wizard Navigation and Data Persistence...');
     
     // Test RetirementWizard component exists and has proper navigation
-    if (fs.existsSync('src/components/RetirementWizard.js')) {
-        const content = fs.readFileSync('src/components/RetirementWizard.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/RetirementWizard.js')) {
+        const content = fs.readFileSync('src/components/wizard/RetirementWizard.js', 'utf8');
         
         // Should have step navigation controls
         const hasStepNavigation = content.includes('currentStep') && 
@@ -1719,7 +1720,7 @@ function testWizardNavigationAndDataPersistence() {
     
     // Test automatic calculation integration
     if (fs.existsSync('src/components/RetirementPlannerApp.js')) {
-        const content = fs.readFileSync('src/components/RetirementPlannerApp.js', 'utf8');
+        const content = fs.readFileSync('src/components/core/RetirementPlannerApp.js', 'utf8');
         
         // Should have wizard completion handler  
         const hasWizardCompletion = content.includes('handleWizardComplete') || content.includes('wizardCompleted');
@@ -1737,8 +1738,8 @@ function testTrainingFundCalculationLogic() {
     console.log('\n💰 Testing Training Fund Calculation Logic...');
     
     // Test calculateTrainingFundRate function
-    if (fs.existsSync('src/components/WizardStepContributions.js')) {
-        const content = fs.readFileSync('src/components/WizardStepContributions.js', 'utf8');
+    if (fs.existsSync('src/components/wizard/steps/WizardStepContributions.js')) {
+        const content = fs.readFileSync('src/components/wizard/steps/WizardStepContributions.js', 'utf8');
         
         // Should have calculateTrainingFundRate function defined
         const hasFunctionDefinition = (content.includes('function calculateTrainingFundRate') || 
@@ -1759,7 +1760,7 @@ function testTrainingFundCalculationLogic() {
     
     // Test enhanced calculation integration  
     if (fs.existsSync('src/components/RetirementPlannerApp.js')) {
-        const content = fs.readFileSync('src/components/RetirementPlannerApp.js', 'utf8');
+        const content = fs.readFileSync('src/components/core/RetirementPlannerApp.js', 'utf8');
         
         // Should use calculateTrainingFundRate for Israeli calculations
         const usesEnhancedCalculation = content.includes('window.calculateTrainingFundRate') &&
@@ -1799,7 +1800,7 @@ function testCoupleSingleModeStateManagement() {
     
     // Test automatic calculation triggering
     if (fs.existsSync('src/components/RetirementPlannerApp.js')) {
-        const content = fs.readFileSync('src/components/RetirementPlannerApp.js', 'utf8');
+        const content = fs.readFileSync('src/components/core/RetirementPlannerApp.js', 'utf8');
         
         // Should have useEffect for automatic calculations
         const hasAutoCalculationTrigger = content.includes('React.useEffect(function()') && 

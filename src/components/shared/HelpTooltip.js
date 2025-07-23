@@ -81,6 +81,43 @@ const HelpTooltip = ({ term, children, language = 'en', position = 'top' }) => {
                 content: 'תכנון השקעות ומשיכות באופן שממזער את הנטל המס הכולל.',
                 example: 'השקעה בקרן פנסיה מפחיתה מס עכשיו, אבל תשלם מס על המשיכה בפרישה.',
                 tips: ['כדאי לפזר משיכות על כמה שנים', 'לשקול מתזמון של השקעות ומשיכות']
+            },
+            // Financial Health Score Components
+            'savings-rate-score': {
+                title: 'ציון שיעור החיסכון',
+                content: 'מודד את אחוז ההכנסה החודשית שאתה מחסיף לפנסיה. ציון גבוה יותר = חיסכון גבוה יותר.',
+                example: 'אם אתה מחסיף 3,000₪ מתוך הכנסה של 15,000₪, שיעור החיסכון הוא 20% (ציון מצוין).',
+                tips: ['מטרה: לפחות 15-20% מההכנסה', 'התחל בשיעור נמוך והגדל בהדרגה', 'השתמש בהעברה אוטומטית']
+            },
+            'retirement-readiness-score': {
+                title: 'ציון מוכנות לפנסיה',
+                content: 'מודד עד כמה אתה צפוי להגיע ליעד הפנסיה שלך בהתבסס על החיסכון הנוכחי.',
+                example: 'אם יעד הפנסיה הוא 2 מיליון ₪ ואתה צפוי להגיע ל-1.8 מיליון ₪, הציון הוא 90%.',
+                tips: ['ציון מתחת ל-70% דורש תיקונים', 'כל שנת עבודה נוספת משפרת משמעותית', 'שקול להקטין הוצאות בפנסיה']
+            },
+            'risk-alignment-score': {
+                title: 'ציון התאמת סיכון',
+                content: 'מודד עד כמה חלוקת ההשקעות מתאימה לגילך ולזמן שנותר עד הפנסיה.',
+                example: 'בגיל 30: 70% מניות, 30% אג"ח. בגיל 60: 40% מניות, 60% אג"ח.',
+                tips: ['צעירים יכולים לקחת יותר סיכון', 'מבוגרים צריכים יותר ביטחון', 'עדכן חלוקה כל 5 שנים']
+            },
+            'tax-efficiency-score': {
+                title: 'ציון יעילות מס',
+                content: 'מודד עד כמה אתה מנצל כלי חיסכון מוטבי מס כמו קרן פנסיה וקרן השתלמות.',
+                example: 'ציון גבוה = מקסום הפקדות לקרן פנסיה וקרן השתלמות עד התקרה.',
+                tips: ['מקסם קודם קרן פנסיה', 'אחר כך קרן השתלמות', 'לבסוף חיסכון רגיל']
+            },
+            'diversification-score': {
+                title: 'ציון פיזור השקעות',
+                content: 'מודד עד כמה ההשקעות מפוזרות בין נכסים, מטבעות ושווקים שונים.',
+                example: 'פיזור טוב: 40% מניות ישראל, 30% מניות עולם, 20% אג"ח, 10% נדל"ן.',
+                tips: ['אל תשקיע הכל במקום אחד', 'פזר בין גיאוגרפיות', 'השתמש בקרנות מדד']
+            },
+            'financial-health-score': {
+                title: 'ציון בריאות פיננסית',
+                content: 'ציון כולל המשלב את כל ההיבטים: חיסכון, מוכנות לפנסיה, סיכון, מס ופיזור.',
+                example: 'ציון 85+ = מצוין, 70-84 = טוב, 50-69 = בינוני, מתחת ל-50 = דורש שיפור.',
+                tips: ['התמקד בנושא עם הציון הנמוך ביותר', 'שיפור קטן בכל תחום = שיפור גדול בכלל', 'עדכן תכנון כל שנה']
             }
         },
         en: {
@@ -157,6 +194,43 @@ const HelpTooltip = ({ term, children, language = 'en', position = 'top' }) => {
                 content: 'Planning investments and withdrawals to minimize overall tax burden.',
                 example: 'Pension fund investment reduces tax now, but you\'ll pay tax on withdrawal at retirement.',
                 tips: ['Worth spreading withdrawals over several years', 'Consider timing of investments and withdrawals']
+            },
+            // Financial Health Score Components
+            'savings-rate-score': {
+                title: 'Savings Rate Score',
+                content: 'Measures the percentage of monthly income you save for retirement. Higher score = higher savings rate.',
+                example: 'If you save 3,000₪ from 15,000₪ income, savings rate is 20% (excellent score).',
+                tips: ['Target: at least 15-20% of income', 'Start low and increase gradually', 'Use automatic transfers']
+            },
+            'retirement-readiness-score': {
+                title: 'Retirement Readiness Score',
+                content: 'Measures how likely you are to reach your retirement goal based on current savings.',
+                example: 'If retirement goal is 2 million ₪ and you\'re projected to reach 1.8 million ₪, score is 90%.',
+                tips: ['Score below 70% requires adjustments', 'Each extra work year helps significantly', 'Consider reducing retirement expenses']
+            },
+            'risk-alignment-score': {
+                title: 'Risk Alignment Score',
+                content: 'Measures how well your investment allocation matches your age and time to retirement.',
+                example: 'Age 30: 70% stocks, 30% bonds. Age 60: 40% stocks, 60% bonds.',
+                tips: ['Young people can take more risk', 'Older people need more security', 'Rebalance every 5 years']
+            },
+            'tax-efficiency-score': {
+                title: 'Tax Efficiency Score',
+                content: 'Measures how well you utilize tax-advantaged savings tools like pension and training funds.',
+                example: 'High score = maximizing pension fund and training fund contributions up to ceiling.',
+                tips: ['Maximize pension fund first', 'Then training fund', 'Finally regular savings']
+            },
+            'diversification-score': {
+                title: 'Diversification Score',
+                content: 'Measures how well investments are spread across different assets, currencies, and markets.',
+                example: 'Good diversification: 40% Israeli stocks, 30% global stocks, 20% bonds, 10% real estate.',
+                tips: ['Don\'t put all eggs in one basket', 'Diversify geographically', 'Use index funds']
+            },
+            'financial-health-score': {
+                title: 'Financial Health Score',
+                content: 'Overall score combining all aspects: savings, retirement readiness, risk, tax, and diversification.',
+                example: 'Score 85+ = excellent, 70-84 = good, 50-69 = fair, below 50 = needs improvement.',
+                tips: ['Focus on lowest scoring area', 'Small improvement in each area = big overall improvement', 'Review plan annually']
             }
         }
     };

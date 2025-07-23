@@ -392,6 +392,48 @@ This means:
 npm test  # Includes version consistency validation
 ```
 
+## CRITICAL REQUIREMENT: Cache Busting Parameters
+
+**⚠️ MANDATORY: The update-version.js script MUST update ALL cache busting parameters**
+
+### Files That Must Be Updated by update-version.js:
+1. **version.json** → Main version file
+2. **package.json** → Package version
+3. **src/version.js** → Runtime version
+4. **index.html** → Page title AND all cache busting parameters
+5. **README.md** → Documentation version
+
+### Cache Busting Parameters in index.html:
+- **All JavaScript files** → `src/file.js?v=X.Y.Z`
+- **All CSS files** → `src/styles/file.css?v=X.Y.Z`  
+- **Fallback version** → `window.APP_VERSION = 'X.Y.Z'`
+
+**Current Issue Found**: The update-version.js script was NOT updating the 62+ cache busting parameters in index.html, causing deployment validation failures.
+
+### Immediate Fix Required:
+```bash
+# Manual fix for cache busting (temporary)
+sed -i '' 's/v=OLD_VERSION/v=NEW_VERSION/g' index.html
+
+# Long-term: update-version.js must be enhanced to handle ALL cache busting
+```
+
+### Version Update Protocol:
+```bash
+# 1. Run version update script
+node update-version.js X.Y.Z
+
+# 2. Verify ALL files are updated (including cache busting)
+grep -c "v=X.Y.Z" index.html  # Should match expected count
+grep -c "v=OLD_VERSION" index.html  # Should be 0
+
+# 3. If cache busting failed, manual fix:
+sed -i '' 's/v=OLD_VERSION/v=X.Y.Z/g' index.html
+
+# 4. Always verify before commit
+npm run validate:pre-push
+```
+
 ### Manual Version Consistency Check:
 ```bash
 echo "🏷️ Checking Version Consistency"

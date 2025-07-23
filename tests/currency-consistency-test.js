@@ -40,7 +40,7 @@ class CurrencyConsistencyTester {
 
     // Test 1: CurrencyValue Component Implementation
     testCurrencyValueComponent() {
-        const appPath = path.join(__dirname, '../src/components/RetirementPlannerApp.js');
+        const appPath = path.join(__dirname, '../src/components/core/RetirementPlannerApp.js');
         const appContent = fs.readFileSync(appPath, 'utf8');
         
         // Check for CurrencyValue component
@@ -67,11 +67,11 @@ class CurrencyConsistencyTester {
     // Test 2: Currency Parameter Propagation
     testCurrencyParameterPropagation() {
         const files = [
-            '../src/components/SummaryPanel.js',
+            '../src/components/panels/summary/SummaryPanel.js',
             '../src/components/StressTestInterface.js',
-            '../src/components/DynamicPartnerCharts.js',
-            '../src/components/FinancialChart.js',
-            '../src/components/RetirementResultsPanel.js'
+            '../src/components/charts/DynamicPartnerCharts.js',
+            '../src/components/charts/FinancialChart.js',
+            '../src/components/panels/RetirementResultsPanel.js'
         ];
 
         for (const file of files) {
@@ -132,8 +132,8 @@ class CurrencyConsistencyTester {
     // Test 4: Chart Components Currency Integration
     testChartCurrencyIntegration() {
         const chartFiles = [
-            '../src/components/FinancialChart.js',
-            '../src/components/DynamicPartnerCharts.js'
+            '../src/components/charts/FinancialChart.js',
+            '../src/components/charts/DynamicPartnerCharts.js'
         ];
 
         for (const file of chartFiles) {
@@ -151,7 +151,7 @@ class CurrencyConsistencyTester {
 
     // Test 5: Dashboard Currency Parameter Passing
     testDashboardCurrencyPassing() {
-        const dashboardPath = path.join(__dirname, '../src/components/Dashboard.js');
+        const dashboardPath = path.join(__dirname, '../src/components/core/Dashboard.js');
         const dashboardContent = fs.readFileSync(dashboardPath, 'utf8');
         
         // Check that Dashboard receives workingCurrency

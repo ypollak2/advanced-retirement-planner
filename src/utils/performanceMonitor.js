@@ -8,6 +8,12 @@ class PerformanceMonitor {
         this.isEnabled = true;
         this.startTime = performance.now();
         
+        // Size management configuration
+        this.maxMetricsPerType = 50; // Maximum entries per metric type
+        this.maxPayloadSize = 1024 * 1024; // 1MB max payload size
+        this.lastSaveTime = 0;
+        this.saveInterval = 30000; // Save every 30 seconds minimum
+        
         this.initializeObservers();
         this.setupEventListeners();
     }
@@ -86,21 +92,27 @@ class PerformanceMonitor {
         }
     }
 
-    // Setup custom event listeners
+    // Setup custom event listeners with smart saving
     setupEventListeners() {
-        // Page visibility changes
+        // Page visibility changes - smart saving
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') {
                 this.recordMetric('session_duration', performance.now() - this.startTime);
-                this.sendMetrics();
+                // Only save if enough time has passed since last save
+                this.smartSave();
             }
         });
 
-        // Window unload
+        // Window unload - force save
         window.addEventListener('beforeunload', () => {
             this.recordMetric('session_duration', performance.now() - this.startTime);
-            this.sendMetrics();
+            this.sendMetrics(true); // Force save on unload
         });
+
+        // Periodic saving every 30 seconds
+        setInterval(() => {
+            this.smartSave();
+        }, this.saveInterval);
 
         // React component lifecycle tracking
         this.setupReactMonitoring();
@@ -153,7 +165,7 @@ class PerformanceMonitor {
         }
     }
 
-    // Record custom metrics
+    // Record custom metrics with size management
     recordMetric(name, value, tags = {}) {
         if (!this.isEnabled) return;
 
@@ -163,21 +175,28 @@ class PerformanceMonitor {
             timestamp: Date.now(),
             tags: {
                 ...tags,
-                url: window.location.pathname,
-                userAgent: navigator.userAgent.slice(0, 100),
+                url: window.location.pathname.slice(0, 50), // Limit URL length
+                userAgent: navigator.userAgent.slice(0, 50), // Reduce userAgent length
                 connection: this.getConnectionInfo()
             }
         };
 
-        // Store metric
+        // Store metric with size management
         if (!this.metrics.has(name)) {
             this.metrics.set(name, []);
         }
-        this.metrics.get(name).push(metric);
+        
+        const metricsArray = this.metrics.get(name);
+        metricsArray.push(metric);
+        
+        // Implement FIFO cleanup - keep only latest entries
+        if (metricsArray.length > this.maxMetricsPerType) {
+            metricsArray.splice(0, metricsArray.length - this.maxMetricsPerType);
+        }
 
-        // Console logging for development
-        if (value > 100) { // Only log significant metrics
-            console.log(`📊 ${name}: ${Math.round(value)}ms`, tags);
+        // Console logging for development (reduced verbosity)
+        if (value > 200) { // Only log more significant metrics
+            console.log(`📊 ${name}: ${Math.round(value)}ms`);
         }
     }
 
@@ -222,12 +241,12 @@ class PerformanceMonitor {
         });
     }
 
-    // Record error metrics
+    // Record error metrics with reduced payload size
     recordError(error, context = {}) {
         this.recordMetric('error_count', 1, {
-            message: error.message || error,
-            stack: error.stack ? error.stack.slice(0, 500) : '',
-            context: JSON.stringify(context).slice(0, 200),
+            message: (error.message || error).slice(0, 100), // Reduce message length
+            stack: error.stack ? error.stack.slice(0, 100) : '', // Reduce stack trace length
+            context: JSON.stringify(context).slice(0, 50), // Reduce context length
             timestamp: Date.now()
         });
     }
@@ -252,34 +271,120 @@ class PerformanceMonitor {
         return summary;
     }
 
-    // Send metrics to analytics endpoint (if configured)
-    sendMetrics() {
-        if (!this.isEnabled || this.metrics.size === 0) return;
+    // Smart save - only save if enough time has passed
+    smartSave() {
+        const now = Date.now();
+        if (now - this.lastSaveTime < this.saveInterval) {
+            return; // Too soon since last save
+        }
+        this.sendMetrics();
+    }
 
+    // Send metrics with storage quota management
+    sendMetrics(forceSave = false) {
+        if (!this.isEnabled || (!forceSave && this.metrics.size === 0)) return;
+
+        // Create optimized payload with essential info only
         const payload = {
             session_id: this.generateSessionId(),
             timestamp: Date.now(),
-            metrics: Object.fromEntries(this.metrics),
-            summary: this.getPerformanceSummary(),
+            summary: this.getPerformanceSummary(), // Only summary, not full metrics
             browser_info: {
-                userAgent: navigator.userAgent,
                 language: navigator.language,
-                cookieEnabled: navigator.cookieEnabled,
-                platform: navigator.platform,
+                platform: navigator.platform.slice(0, 20),
                 screen: {
                     width: screen.width,
-                    height: screen.height,
-                    colorDepth: screen.colorDepth
+                    height: screen.height
                 }
             }
         };
 
-        // Store locally for now (could be sent to analytics service)
+        // Check payload size before saving
+        const payloadString = JSON.stringify(payload);
+        const payloadSize = new Blob([payloadString]).size;
+
+        if (payloadSize > this.maxPayloadSize) {
+            console.warn('📊 Payload too large, skipping save:', Math.round(payloadSize / 1024) + 'KB');
+            this.clearOldMetrics(); // Clear old data
+            return;
+        }
+
+        // Store locally with error recovery
         try {
-            localStorage.setItem('retirement_planner_metrics', JSON.stringify(payload));
-            console.log('📊 Performance metrics saved locally', this.getPerformanceSummary());
+            // Check available localStorage space
+            this.checkLocalStorageQuota();
+            
+            localStorage.setItem('retirement_planner_metrics', payloadString);
+            this.lastSaveTime = Date.now();
+            console.log('📊 Performance metrics saved:', Math.round(payloadSize / 1024) + 'KB');
         } catch (error) {
-            console.warn('Failed to save metrics:', error);
+            this.handleStorageError(error);
+        }
+    }
+
+    // Check localStorage quota and availability
+    checkLocalStorageQuota() {
+        try {
+            // Estimate current localStorage usage
+            let totalSize = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    totalSize += localStorage[key].length + key.length;
+                }
+            }
+            
+            // If approaching 4MB (browsers typically limit to 5-10MB), clear old data
+            if (totalSize > 4 * 1024 * 1024) {
+                console.warn('📊 localStorage approaching quota, clearing old metrics');
+                this.clearOldMetrics();
+            }
+        } catch (error) {
+            console.warn('📊 Could not check localStorage quota:', error);
+        }
+    }
+
+    // Handle storage errors with graceful recovery
+    handleStorageError(error) {
+        if (error.name === 'QuotaExceededError') {
+            console.warn('📊 localStorage quota exceeded, clearing old data and disabling metrics');
+            
+            // Clear old metrics data
+            this.clearOldMetrics();
+            
+            // Try one more time with minimal data
+            try {
+                const minimalPayload = {
+                    session_id: this.generateSessionId(),
+                    timestamp: Date.now(),
+                    summary: { status: 'quota_exceeded' }
+                };
+                localStorage.setItem('retirement_planner_metrics', JSON.stringify(minimalPayload));
+                console.log('📊 Minimal metrics saved after quota error');
+            } catch (retryError) {
+                console.warn('📊 Complete localStorage failure, disabling performance monitoring');
+                this.setEnabled(false);
+            }
+        } else {
+            console.warn('📊 Failed to save metrics:', error);
+        }
+    }
+
+    // Clear old metrics data to free up space
+    clearOldMetrics() {
+        // Clear in-memory metrics, keeping only recent data
+        for (const [name, metrics] of this.metrics.entries()) {
+            if (metrics.length > 10) {
+                // Keep only the last 10 entries for each metric
+                this.metrics.set(name, metrics.slice(-10));
+            }
+        }
+        
+        // Remove old localStorage entries
+        try {
+            localStorage.removeItem('retirement_planner_metrics');
+            console.log('📊 Old metrics data cleared');
+        } catch (error) {
+            console.warn('📊 Could not clear old metrics:', error);
         }
     }
 
@@ -296,7 +401,7 @@ class PerformanceMonitor {
         }
     }
 
-    // Cleanup observers
+    // Cleanup observers and metrics data
     cleanup() {
         this.observers.forEach(observer => {
             try {
@@ -306,6 +411,45 @@ class PerformanceMonitor {
             }
         });
         this.observers = [];
+        
+        // Clear metrics data
+        this.metrics.clear();
+        
+        // Clear localStorage metrics
+        try {
+            localStorage.removeItem('retirement_planner_metrics');
+        } catch (error) {
+            console.warn('Could not clear localStorage metrics:', error);
+        }
+    }
+
+    // Get storage information
+    getStorageInfo() {
+        try {
+            let totalSize = 0;
+            let metricsSize = 0;
+            
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    const itemSize = localStorage[key].length + key.length;
+                    totalSize += itemSize;
+                    
+                    if (key === 'retirement_planner_metrics') {
+                        metricsSize = itemSize;
+                    }
+                }
+            }
+            
+            return {
+                totalUsed: Math.round(totalSize / 1024) + 'KB',
+                metricsUsed: Math.round(metricsSize / 1024) + 'KB',
+                metricsCount: this.metrics.size,
+                lastSave: new Date(this.lastSaveTime).toLocaleTimeString(),
+                enabled: this.isEnabled
+            };
+        } catch (error) {
+            return { error: 'Could not access localStorage' };
+        }
     }
 
     // Get real-time performance info
@@ -384,5 +528,7 @@ window.PerformanceMonitor = performanceMonitor;
 window.recordUserAction = (action, details) => performanceMonitor.recordUserAction(action, details);
 window.recordAPICall = (endpoint, duration, success) => performanceMonitor.recordAPICall(endpoint, duration, success);
 window.getPerformanceInfo = () => performanceMonitor.getRealTimeInfo();
+window.getStorageInfo = () => performanceMonitor.getStorageInfo();
+window.clearPerformanceMetrics = () => performanceMonitor.clearOldMetrics();
 
 console.log('📊 Performance Monitor initialized');

@@ -6,7 +6,7 @@ function RetirementPlannerApp() {
     var language = languageState[0];
     var setLanguage = languageState[1];
     
-    var viewModeState = React.useState('dashboard');
+    var viewModeState = React.useState('wizard'); // Start with wizard-first flow
     var viewMode = viewModeState[0];
     var setViewMode = viewModeState[1];
     
@@ -124,7 +124,7 @@ function RetirementPlannerApp() {
     var inputsState = React.useState({
         currentAge: 30,
         retirementAge: 67,
-        currentSavings: 50000,
+        currentSavings: 0,
         inflationRate: 3,
         currentMonthlyExpenses: 12000,
         targetReplacement: 75,
@@ -371,6 +371,20 @@ function RetirementPlannerApp() {
     // Enhanced calculate function with full wizard data integration
     function handleCalculate() {
         try {
+            // Check for meaningful data before calculating
+            const hasMeaningfulData = inputs && (
+                (inputs.currentAge && inputs.currentAge > 0) ||
+                (inputs.currentSalary && inputs.currentSalary > 0) ||
+                (inputs.currentMonthlySalary && inputs.currentMonthlySalary > 0) ||
+                (inputs.currentSavings && inputs.currentSavings > 0)
+            );
+            
+            if (!hasMeaningfulData) {
+                console.log('No meaningful data for calculation - clearing results');
+                setResults(null);
+                return;
+            }
+            
             if (window.calculateRetirement) {
                 // Sync wizard data with workPeriods
                 var updatedWorkPeriods = [...workPeriods];
@@ -581,6 +595,14 @@ function RetirementPlannerApp() {
         workingCurrency,
         wizardCompleted
     ]);
+    
+    // Wizard-first flow: redirect to wizard if trying to access dashboard without completion
+    // DISABLED to allow "Return to Dashboard" functionality
+    // React.useEffect(function() {
+    //     if (!wizardCompleted && viewMode === 'dashboard') {
+    //         setViewMode('wizard');
+    //     }
+    // }, [wizardCompleted, viewMode]);
     
     // Wizard completion handler
     function handleWizardComplete() {
@@ -1245,12 +1267,13 @@ function RetirementPlannerApp() {
             key: 'container',
             className: 'max-w-7xl mx-auto px-4 py-8'
         }, [
-            // View Mode Toggle
-            wizardCompleted && React.createElement('div', {
+            // View Mode Toggle - Show wizard tab always, others only after completion
+            React.createElement('div', {
                 key: 'view-toggle',
                 className: 'professional-tabs mb-6'
             }, [
-                React.createElement('button', {
+                // Dashboard tab - only show if wizard is completed
+                wizardCompleted && React.createElement('button', {
                     key: 'dashboard',
                     onClick: function() { setViewMode('dashboard'); },
                     className: 'professional-tab' + (viewMode === 'dashboard' ? ' active' : '')
@@ -1259,7 +1282,7 @@ function RetirementPlannerApp() {
                     ' ',
                     language === 'en' ? 'Dashboard' : (t.dashboard || 'Dashboard')
                 ]),
-                React.createElement('button', {
+                wizardCompleted && React.createElement('button', {
                     key: 'detailed', 
                     onClick: function() { setViewMode('detailed'); },
                     className: 'professional-tab' + (viewMode === 'detailed' ? ' active' : '')
@@ -1268,6 +1291,7 @@ function RetirementPlannerApp() {
                     ' ',
                     language === 'en' ? 'Detailed View' : (t.detailed || 'Detailed View')
                 ]),
+                // Wizard tab - always show, but restart wizard if clicked when completed
                 React.createElement('button', {
                     key: 'wizard', 
                     onClick: function() { setViewMode('wizard'); setWizardCompleted(false); setCurrentStep(1); },
@@ -1281,7 +1305,7 @@ function RetirementPlannerApp() {
             
             // Wizard View with lazy-loaded components
             // Includes: WizardStepSalary, WizardStepSavings, WizardStepContributions, WizardStepFees
-            viewMode === 'wizard' && React.createElement(window.LazyWizard, {
+            viewMode === 'wizard' && React.createElement(window.RetirementWizard, {
                 key: 'wizard',
                 inputs: inputs,
                 setInputs: setInputs,
@@ -1499,7 +1523,38 @@ function RetirementPlannerApp() {
                 React.createElement('div', {
                     key: 'dashboard-content',
                     className: 'lg:col-span-3'
-                }, [
+                }, !wizardCompleted ? [
+                    // Pre-wizard dashboard: Show getting started message
+                    React.createElement('div', {
+                        key: 'getting-started',
+                        className: 'bg-white rounded-xl p-8 shadow-sm border border-gray-200 text-center'
+                    }, [
+                        React.createElement('div', {
+                            key: 'icon',
+                            className: 'text-6xl mb-4'
+                        }, '🧙‍♂️'),
+                        React.createElement('h2', {
+                            key: 'title',
+                            className: 'text-2xl font-bold text-gray-800 mb-4'
+                        }, language === 'he' ? 'ברוכים הבאים לתכנית הפרישה המתקדמת' : 'Welcome to Advanced Retirement Planner'),
+                        React.createElement('p', {
+                            key: 'description',
+                            className: 'text-gray-600 mb-6 max-w-2xl mx-auto'
+                        }, language === 'he' ? 
+                            'השתמש באשף התכנון כדי ליצור תכנית פרישה מותאמת אישית. לחץ על "התחל תכנון" כדי להתחיל.' :
+                            'Use the Planning Wizard to create a personalized retirement plan. Click "Start Planning" to begin.'
+                        ),
+                        React.createElement('button', {
+                            key: 'start-wizard',
+                            onClick: () => setViewMode('wizard'),
+                            className: 'px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg'
+                        }, [
+                            React.createElement('span', { key: 'icon' }, '🚀'),
+                            ' ',
+                            language === 'he' ? 'התחל תכנון' : 'Start Planning'
+                        ])
+                    ])
+                ] : [
                     // Dashboard Component
                     window.Dashboard && React.createElement(window.Dashboard, {
                         key: 'dashboard',

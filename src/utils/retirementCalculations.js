@@ -314,12 +314,17 @@ window.calculateRetirement = (
     
     // Get social security from last valid country or default
     let socialSecurity = 0;
+    let lastCountry = null;
     if (sortedPeriods.length > 0) {
         const lastPeriod = sortedPeriods[sortedPeriods.length - 1];
         if (lastPeriod && lastPeriod.country && countryData[lastPeriod.country]) {
-            const lastCountry = countryData[lastPeriod.country];
+            lastCountry = countryData[lastPeriod.country];
             socialSecurity = lastCountry.socialSecurity;
         }
+    }
+    // Default to Israel if no country data available
+    if (!lastCountry) {
+        lastCountry = countryData.israel || { socialSecurity: 0 };
     }
     
     // Calculate partner income (if applicable)
@@ -592,7 +597,131 @@ window.generateRetirementChartData = (inputs, workPeriods, partnerWorkPeriods, c
 };
 
 // Unified Partner Data Generation Function
-// This function ensures all chart components use the same calculation logic
+// Progressive Savings Calculation Engine - Fixes all graph issues
+window.calculateProgressiveSavings = (inputs, workPeriods = [], partnerWorkPeriods = []) => {
+    if (!inputs || !inputs.currentAge || !inputs.retirementAge) {
+        console.warn('calculateProgressiveSavings: Invalid inputs provided.');
+        return { primary: [], partner: [], combined: [] };
+    }
+
+    const currentAge = inputs.currentAge;
+    const retirementAge = inputs.retirementAge;
+    const inflationRate = (inputs.inflationRate || 3) / 100;
+    
+    // Extract rates and contributions
+    const pensionReturn = (inputs.pensionReturn || 6) / 100;  // Annual return rate
+    const trainingFundReturn = (inputs.trainingFundReturn || 6) / 100;
+    const personalPortfolioReturn = (inputs.personalPortfolioReturn || 7) / 100;
+    
+    // Monthly contributions
+    const monthlyPensionContrib = parseFloat(inputs.monthlyContribution || inputs.pensionContribution || 0);
+    const monthlyTrainingContrib = parseFloat(inputs.trainingFundContribution || 0);
+    const monthlyPersonalContrib = parseFloat(inputs.personalSavings || inputs.personalPortfolioMonthly || 0);
+    
+    // Initial amounts
+    let primaryPension = parseFloat(inputs.currentSavings || 0);
+    let primaryTraining = parseFloat(inputs.currentTrainingFund || 0);
+    let primaryPersonal = parseFloat(inputs.currentPersonalPortfolio || 0);
+    
+    // Partner data extraction
+    let partnerPension = 0;
+    let partnerTraining = 0;
+    let partnerPersonal = 0;
+    let partnerMonthlyPensionContrib = 0;
+    let partnerMonthlyTrainingContrib = 0;
+    let partnerMonthlyPersonalContrib = 0;
+    
+    if (inputs.planningType === 'couple') {
+        partnerPension = parseFloat(inputs.partner2CurrentSavings || inputs.partnerCurrentSavings || 0);
+        partnerTraining = parseFloat(inputs.partner2CurrentTrainingFund || inputs.partnerCurrentTrainingFund || 0);
+        partnerPersonal = parseFloat(inputs.partner2CurrentPersonalPortfolio || inputs.partnerCurrentPersonalPortfolio || 0);
+        
+        // Extract partner contributions
+        const partner2Salary = parseFloat(inputs.partner2Salary || 0);
+        if (partner2Salary > 0) {
+            const partner2PensionRate = parseFloat(inputs.partner2EmployeePensionRate || inputs.employeePensionRate || 7) / 100;
+            const partner2EmployerRate = parseFloat(inputs.partner2EmployerPensionRate || inputs.employerPensionRate || 14.333) / 100;
+            partnerMonthlyPensionContrib = partner2Salary * (partner2PensionRate + partner2EmployerRate);
+            
+            const partner2TrainingRate = parseFloat(inputs.partner2TrainingFundRate || inputs.trainingFundContributionRate || 10) / 100;
+            partnerMonthlyTrainingContrib = partner2Salary * partner2TrainingRate;
+        }
+        partnerMonthlyPersonalContrib = parseFloat(inputs.partner2PersonalSavings || inputs.partner2PersonalPortfolioMonthly || 0);
+    }
+
+    const projections = { primary: [], partner: [], combined: [] };
+
+    // Year-by-year progressive calculation with proper compound growth
+    for (let age = currentAge; age <= retirementAge; age++) {
+        const yearsFromStart = age - currentAge;
+        
+        // Apply compound growth to existing amounts (monthly compounding)
+        if (yearsFromStart > 0) {
+            const monthlyPensionReturn = pensionReturn / 12;
+            const monthlyTrainingReturn = trainingFundReturn / 12;
+            const monthlyPersonalReturn = personalPortfolioReturn / 12;
+            
+            // Primary partner growth with monthly contributions
+            primaryPension = primaryPension * (1 + monthlyPensionReturn) + monthlyPensionContrib;
+            primaryTraining = primaryTraining * (1 + monthlyTrainingReturn) + monthlyTrainingContrib;
+            primaryPersonal = primaryPersonal * (1 + monthlyPersonalReturn) + monthlyPersonalContrib;
+            
+            // Partner growth with monthly contributions
+            if (inputs.planningType === 'couple') {
+                partnerPension = partnerPension * (1 + monthlyPensionReturn) + partnerMonthlyPensionContrib;
+                partnerTraining = partnerTraining * (1 + monthlyTrainingReturn) + partnerMonthlyTrainingContrib;
+                partnerPersonal = partnerPersonal * (1 + monthlyPersonalReturn) + partnerMonthlyPersonalContrib;
+            }
+        }
+        
+        // Calculate totals
+        const primaryTotal = primaryPension + primaryTraining + primaryPersonal;
+        const partnerTotal = partnerPension + partnerTraining + partnerPersonal;
+        const combinedTotal = primaryTotal + partnerTotal;
+        
+        // CORRECT real value calculation: Apply inflation to the nominal value
+        const inflationAdjuster = Math.pow(1 + inflationRate, yearsFromStart);
+        
+        // Primary partner data
+        projections.primary.push({
+            age: age,
+            nominal: Math.round(primaryTotal),
+            real: Math.round(primaryTotal / inflationAdjuster),
+            pensionSavings: Math.round(primaryPension),
+            trainingFund: Math.round(primaryTraining),
+            personalPortfolio: Math.round(primaryPersonal),
+            yearlyContributions: Math.round((monthlyPensionContrib + monthlyTrainingContrib + monthlyPersonalContrib) * 12)
+        });
+
+        // Partner data
+        projections.partner.push({
+            age: age,
+            nominal: Math.round(partnerTotal),
+            real: Math.round(partnerTotal / inflationAdjuster),
+            pensionSavings: Math.round(partnerPension),
+            trainingFund: Math.round(partnerTraining),
+            personalPortfolio: Math.round(partnerPersonal),
+            yearlyContributions: Math.round((partnerMonthlyPensionContrib + partnerMonthlyTrainingContrib + partnerMonthlyPersonalContrib) * 12)
+        });
+
+        // Combined household data
+        projections.combined.push({
+            age: age,
+            nominal: Math.round(combinedTotal),
+            real: Math.round(combinedTotal / inflationAdjuster),
+            primaryTotal: Math.round(primaryTotal),
+            partnerTotal: Math.round(partnerTotal),
+            totalYearlyContributions: Math.round((
+                monthlyPensionContrib + monthlyTrainingContrib + monthlyPersonalContrib +
+                partnerMonthlyPensionContrib + partnerMonthlyTrainingContrib + partnerMonthlyPersonalContrib
+            ) * 12)
+        });
+    }
+
+    return projections;
+};
+
+// Enhanced unified projections using the new progressive engine
 window.generateUnifiedPartnerProjections = (
     inputs, 
     workPeriods = [], 
@@ -601,87 +730,8 @@ window.generateUnifiedPartnerProjections = (
     trainingFundIndexAllocation = [],
     historicalReturns = {}
 ) => {
-    const projections = {
-        primary: [],
-        partner: [],
-        combined: []
-    };
-
-    if (!inputs || !inputs.currentAge || !inputs.retirementAge) {
-        console.warn('generateUnifiedPartnerProjections: Invalid inputs provided.');
-        return projections;
-    }
-
-    const currentAge = inputs.currentAge;
-    const retirementAge = inputs.retirementAge;
-    const inflationRate = (inputs.inflationRate || 3) / 100;
-
-    // Generate year-by-year projections using the main calculation logic
-    for (let age = currentAge; age <= retirementAge; age++) {
-        const yearsFromStart = age - currentAge;
-        const tempInputs = { ...inputs, currentAge: age };
-        
-        try {
-            // Calculate using the main retirement calculation function
-            const results = window.calculateRetirement(
-                tempInputs, 
-                workPeriods, 
-                pensionIndexAllocation,
-                trainingFundIndexAllocation,
-                historicalReturns,
-                inputs.monthlyTrainingFund || 0,
-                partnerWorkPeriods
-            );
-
-            if (results) {
-                const inflationAdjuster = Math.pow(1 + inflationRate, yearsFromStart);
-                
-                // Primary partner data
-                const primaryTotal = results.totalSavings || 0;
-                projections.primary.push({
-                    age: age,
-                    nominal: Math.round(primaryTotal),
-                    real: Math.round(primaryTotal / inflationAdjuster),
-                    pensionSavings: Math.round(results.totalSavings || 0),
-                    trainingFund: Math.round(results.trainingFundValue || 0),
-                    personalPortfolio: Math.round(results.personalPortfolioValue || 0),
-                    crypto: Math.round(results.currentCrypto || 0),
-                    realEstate: Math.round(results.currentRealEstate || 0)
-                });
-
-                // Partner data (if available)
-                let partnerTotal = 0;
-                if (results.partnerResults) {
-                    partnerTotal = (results.partnerResults.totalPensionSavings || 0) +
-                                  (results.partnerResults.totalTrainingFund || 0) +
-                                  (results.partnerResults.totalPersonalPortfolio || 0);
-                }
-
-                projections.partner.push({
-                    age: age,
-                    nominal: Math.round(partnerTotal),
-                    real: Math.round(partnerTotal / inflationAdjuster),
-                    pensionSavings: Math.round(results.partnerResults?.totalPensionSavings || 0),
-                    trainingFund: Math.round(results.partnerResults?.totalTrainingFund || 0),
-                    personalPortfolio: Math.round(results.partnerResults?.totalPersonalPortfolio || 0)
-                });
-
-                // Combined household data
-                const combinedTotal = primaryTotal + partnerTotal;
-                projections.combined.push({
-                    age: age,
-                    nominal: Math.round(combinedTotal),
-                    real: Math.round(combinedTotal / inflationAdjuster),
-                    primaryTotal: Math.round(primaryTotal),
-                    partnerTotal: Math.round(partnerTotal)
-                });
-            }
-        } catch (error) {
-            console.warn(`generateUnifiedPartnerProjections: Error calculating for age ${age}:`, error);
-        }
-    }
-
-    return projections;
+    // Use the new progressive calculation engine
+    return window.calculateProgressiveSavings(inputs, workPeriods, partnerWorkPeriods);
 };
 
 // Export the unified function for chart components to use

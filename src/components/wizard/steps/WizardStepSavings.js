@@ -67,7 +67,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             const currentTrainingFund = inputs.currentTrainingFund || 0;
             const currentPersonalPortfolio = inputs.currentPersonalPortfolio || 0;
             const currentRealEstate = inputs.currentRealEstate || 0;
-            const currentCrypto = inputs.currentCrypto || 0;
+            const currentCrypto = inputs.currentCryptoFiatValue || inputs.currentCrypto || 0;
             const currentSavingsAccount = inputs.currentSavingsAccount || 0;
             
             // Partner savings if couple
@@ -75,12 +75,12 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             const partner1TrainingFund = inputs.partner1CurrentTrainingFund || 0;
             const partner1Portfolio = inputs.partner1PersonalPortfolio || 0;
             const partner1RealEstate = inputs.partner1RealEstate || 0;
-            const partner1Crypto = inputs.partner1Crypto || 0;
+            const partner1Crypto = inputs.partner1CryptoFiatValue || inputs.partner1Crypto || 0;
             const partner2Pension = inputs.partner2CurrentPension || 0;
             const partner2TrainingFund = inputs.partner2CurrentTrainingFund || 0;
             const partner2Portfolio = inputs.partner2PersonalPortfolio || 0;
             const partner2RealEstate = inputs.partner2RealEstate || 0;
-            const partner2Crypto = inputs.partner2Crypto || 0;
+            const partner2Crypto = inputs.partner2CryptoFiatValue || inputs.partner2Crypto || 0;
             
             const total = currentSavings + currentTrainingFund + currentPersonalPortfolio + 
                          currentRealEstate + currentCrypto + currentSavingsAccount +
@@ -191,9 +191,17 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                     })
                 ]),
                 
-                // Cryptocurrency
-                createElement('div', { 
-                    key: 'cryptocurrency',
+                // Enhanced Cryptocurrency with Token Selection
+                window.CryptoPortfolioInput ? createElement(window.CryptoPortfolioInput, {
+                    key: 'crypto-portfolio',
+                    inputs,
+                    setInputs,
+                    language,
+                    workingCurrency,
+                    fieldPrefix: 'current',
+                    className: "bg-yellow-50 rounded-xl p-6 border border-yellow-200"
+                }) : createElement('div', { 
+                    key: 'cryptocurrency-fallback',
                     className: "bg-yellow-50 rounded-xl p-6 border border-yellow-200" 
                 }, [
                     createElement('label', { 
@@ -304,7 +312,17 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                 className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
                             })
                         ]),
-                        createElement('div', { key: 'p1-crypto' }, [
+                        // Enhanced Partner 1 Crypto with Token Selection
+                        window.CryptoPortfolioInput ? createElement(window.CryptoPortfolioInput, {
+                            key: 'p1-crypto-portfolio',
+                            inputs,
+                            setInputs,
+                            language,
+                            workingCurrency,
+                            fieldPrefix: 'partner1',
+                            compact: true,
+                            className: "w-full"
+                        }) : createElement('div', { key: 'p1-crypto-fallback' }, [
                             createElement('label', { 
                                 key: 'p1-crypto-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
@@ -382,7 +400,17 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                 className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
                             })
                         ]),
-                        createElement('div', { key: 'p2-crypto' }, [
+                        // Enhanced Partner 2 Crypto with Token Selection
+                        window.CryptoPortfolioInput ? createElement(window.CryptoPortfolioInput, {
+                            key: 'p2-crypto-portfolio',
+                            inputs,
+                            setInputs,
+                            language,
+                            workingCurrency,
+                            fieldPrefix: 'partner2',
+                            compact: true,
+                            className: "w-full"
+                        }) : createElement('div', { key: 'p2-crypto-fallback' }, [
                             createElement('label', { 
                                 key: 'p2-crypto-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 

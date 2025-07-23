@@ -13,7 +13,7 @@ const path = require('path');
 const getDeploymentUrls = () => {
     const baseUrls = [
         'https://ypollak2.github.io/advanced-retirement-planner', // Production
-        'https://advanced-retirement-planner.netlify.app'         // Production Mirror
+        'https://advanced-pension-planner.netlify.app'           // Production Mirror
     ];
     
     // Add stage URL if testing stage environment
@@ -29,8 +29,8 @@ const DEPLOYMENT_URLS = getDeploymentUrls();
 const CRITICAL_FILES = [
     '/version.json',
     '/index.html',
-    '/src/components/RetirementPlannerApp.js',
-    '/src/components/Dashboard.js'
+    '/src/components/core/RetirementPlannerApp.js',
+    '/src/components/core/Dashboard.js'
 ];
 
 async function fetchUrl(url) {
@@ -93,7 +93,7 @@ async function validateDeployment() {
             }
             
             // Check critical navigation fixes
-            const hasBackNav = indexContent.includes('RetirementPlannerApp.js?v=' + localVersion);
+            const hasBackNav = indexContent.includes('src/components/core/RetirementPlannerApp.js?v=' + localVersion);
             if (hasBackNav) {
                 console.log(`✅ Critical Component: RetirementPlannerApp.js loaded with correct version`);
             } else {
@@ -107,7 +107,7 @@ async function validateDeployment() {
         
         // Check if navigation fixes are present
         try {
-            const appRes = await fetchUrl(`${baseUrl}/src/components/RetirementPlannerApp.js`);
+            const appRes = await fetchUrl(`${baseUrl}/src/components/core/RetirementPlannerApp.js`);
             const appContent = appRes.data;
             
             const hasBackNavigation = appContent.includes('back-nav');

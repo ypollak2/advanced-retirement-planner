@@ -1,5 +1,5 @@
 // Currency Exchange Rate API - Live rates with fallback system
-// Created by Yali Pollak (יהלי פולק) - v5.3.1
+// Created by Yali Pollak (יהלי פולק) - v6.6.1
 
 class CurrencyAPI {
     constructor() {
@@ -91,26 +91,77 @@ class CurrencyAPI {
         }
     }
 
-    // Fetch exchange rates with fallback (CORS-safe version)
+    // Fetch exchange rates with improved fallback system
     async fetchExchangeRates() {
-        // Always use fallback rates to avoid CORS issues
-        console.log('CurrencyAPI: Using fallback rates (API calls disabled to prevent CORS errors)');
-        const rates = { 
-            USD: 3.70,      // 1 ILS = 0.27 USD
-            EUR: 4.02,      // 1 ILS = 0.25 EUR  
-            GBP: 4.65,      // 1 ILS = 0.21 GBP
-            BTC: 150000     // 1 ILS = 0.0000067 BTC (Bitcoin ~$45k)
+        // Try to get cached rates first
+        const cachedRates = this.getCachedRates();
+        if (cachedRates) {
+            return cachedRates;
+        }
+
+        // Try CORS-friendly APIs with timeout and error handling
+        for (const endpoint of this.apiEndpoints.slice(0, -1)) { // Skip fallback endpoint in loop
+            try {
+                console.log(`CurrencyAPI: Attempting to fetch from ${endpoint.name}...`);
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+                
+                const response = await fetch(endpoint.url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'User-Agent': 'Advanced-Retirement-Planner/6.6.3'
+                    },
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                const rates = endpoint.parse(data);
+                
+                // Update cache with fetched rates
+                this.cache.clear();
+                Object.entries(rates).forEach(([currency, rate]) => {
+                    this.cache.set(currency, rate);
+                });
+                this.lastUpdated = Date.now();
+                this.lastError = null;
+
+                console.log(`CurrencyAPI: Successfully fetched rates from ${endpoint.name}`);
+                return rates;
+                
+            } catch (error) {
+                console.warn(`CurrencyAPI: ${endpoint.name} failed:`, error.message);
+                this.lastError = error.message;
+                continue; // Try next endpoint
+            }
+        }
+        
+        // All APIs failed, use fallback rates
+        console.log('CurrencyAPI: All APIs failed, using fallback rates');
+        const fallbackRates = { 
+            USD: 3.70,      // Updated July 2025 rates
+            EUR: 4.02,      
+            GBP: 4.65,      
+            BTC: 150000,    // ~$40,000 per BTC
+            ETH: 10000      // ~$2,700 per ETH
         };
 
-        // Update cache
+        // Update cache with fallback rates
         this.cache.clear();
-        Object.entries(rates).forEach(([currency, rate]) => {
+        Object.entries(fallbackRates).forEach(([currency, rate]) => {
             this.cache.set(currency, rate);
         });
         this.lastUpdated = Date.now();
+        this.usingFallback = true;
 
-        console.log('CurrencyAPI: Updated rates using fallback values');
-        return rates;
+        return fallbackRates;
     }
 
     // Get specific currency rate
@@ -174,6 +225,42 @@ class CurrencyAPI {
         return await this.fetchExchangeRates();
     }
 
+    // Get error status for user-friendly display
+    getErrorStatus() {
+        return {
+            hasError: !!this.lastError,
+            errorMessage: this.lastError,
+            usingFallback: !!this.usingFallback,
+            lastUpdated: this.lastUpdated,
+            cacheValid: this.isCacheValid()
+        };
+    }
+
+    // Get user-friendly status message
+    getStatusMessage(language = 'en') {
+        const status = this.getErrorStatus();
+        
+        if (!status.hasError && !status.usingFallback) {
+            return language === 'he' ? 
+                'שערי החליפין מעודכנים' : 
+                'Exchange rates are current';
+        }
+        
+        if (status.usingFallback) {
+            return language === 'he' ? 
+                'משתמש בשערים מוערכים (API לא זמין)' : 
+                'Using estimated rates (API unavailable)';
+        }
+        
+        if (status.hasError) {
+            return language === 'he' ? 
+                'שגיאה בקבלת שערי חליפין - משתמש בערכים מוערכים' : 
+                'Error fetching exchange rates - using estimated values';
+        }
+        
+        return language === 'he' ? 'מעמד לא ידוע' : 'Unknown status';
+    }
+
     // Get cache status
     getCacheStatus() {
         return {
@@ -204,4 +291,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-console.log('CurrencyAPI v5.3.1 loaded successfully');
+console.log('CurrencyAPI v6.6.1 loaded successfully');

@@ -123,7 +123,7 @@ const AdvancedInputs = ({
                             React.createElement('input', {
                                 key: 'input',
                                 type: "number",
-                                value: inputs.currentSavings || 50000,
+                                value: inputs.currentSavings || 0,
                                 onChange: (e) => setInputs({...inputs, currentSavings: parseInt(e.target.value) || 0}),
                                 className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                             })

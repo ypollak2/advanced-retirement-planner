@@ -447,7 +447,7 @@ function testMobileResponsiveness() {
 
 // Main test execution
 function runStressTestSuite() {
-    console.log('🧪 Advanced Retirement Planner - Stress Testing QA Suite v5.3.0');
+    console.log('🧪 Advanced Retirement Planner - Stress Testing QA Suite v6.6.1');
     console.log('═'.repeat(80));
     
     // Run all test categories

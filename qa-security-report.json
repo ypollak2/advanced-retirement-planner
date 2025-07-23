@@ -1,0 +1,38 @@
+{
+  "totalChecks": 3,
+  "passedChecks": 3,
+  "failedChecks": 0,
+  "successRate": 100,
+  "findings": [
+    {
+      "category": "security",
+      "severity": "medium",
+      "title": "CSP allows unsafe-inline",
+      "description": "Content Security Policy allows unsafe-inline which may enable XSS attacks",
+      "file": "index.html",
+      "line": "",
+      "timestamp": "2025-07-22T18:58:47.872Z"
+    },
+    {
+      "category": "security",
+      "severity": "medium",
+      "title": "innerHTML usage detected",
+      "description": "Direct innerHTML usage can lead to XSS vulnerabilities",
+      "file": "src/app.js",
+      "line": 345,
+      "timestamp": "2025-07-22T18:58:47.875Z"
+    },
+    {
+      "category": "security",
+      "severity": "medium",
+      "title": "innerHTML usage detected",
+      "description": "Direct innerHTML usage can lead to XSS vulnerabilities",
+      "file": "src/components/core/RetirementPlannerApp.js",
+      "line": 1195,
+      "timestamp": "2025-07-22T18:58:47.877Z"
+    }
+  ],
+  "criticalIssues": 0,
+  "highIssues": 0,
+  "readyForRelease": true
+}

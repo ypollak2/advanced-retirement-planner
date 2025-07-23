@@ -166,8 +166,8 @@ function validateCriticalFiles() {
     
     const criticalFiles = [
         'index.html',
-        'src/components/RetirementPlannerApp.js',
-        'src/components/Dashboard.js',
+        'src/components/core/RetirementPlannerApp.js',
+        'src/components/core/Dashboard.js',
         'src/utils/retirementCalculations.js',
         'package.json',
         'README.md'

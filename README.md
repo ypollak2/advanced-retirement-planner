@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v6.5.2 ✨
+# 🚀 Advanced Retirement Planner v6.6.3 ✨
 
-[![Version](https://img.shields.io/badge/version-6.5.2-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-6.6.3-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -8,8 +8,12 @@
 [![UX](https://img.shields.io/badge/UX-92.8%25-brightgreen.svg)](tests/user-experience-test.js)
 [![Deployment](https://img.shields.io/badge/deployment-Netlify%20%2B%20GitHub%20Pages-4078c0.svg)](https://advanced-pension-planner.netlify.app/)
 
-> **🌟 The Most Intelligent, Transparent, and Empowering Retirement Planner on the Web**
-> Complete professional-grade retirement planning with advanced partner planning, wizard-based interface, and comprehensive export functionality.
+**Professional-grade retirement planning application with:**
+- Advanced partner planning and joint financial projections
+- Wizard-based interface for guided data collection  
+- Comprehensive investment tracking across multiple asset classes
+- Real-time calculations with intelligent results display
+- Export functionality for reports and analysis
 
 ## 🌐 Live Deployments
 
@@ -17,11 +21,35 @@
 |-------------|--------|-----|---------|
 | **🚀 Production** | [![Production](https://img.shields.io/badge/status-live-brightgreen.svg)](https://ypollak2.github.io/advanced-retirement-planner) | [https://ypollak2.github.io/advanced-retirement-planner](https://ypollak2.github.io/advanced-retirement-planner) | **Main live version for users** |
 | **🧪 Stage** | [![Stage](https://img.shields.io/badge/status-testing-orange.svg)](https://ypollak2.github.io/advanced-retirement-planner/stage/) | [https://ypollak2.github.io/advanced-retirement-planner/stage/](https://ypollak2.github.io/advanced-retirement-planner/stage/) | **Latest features for testing** |
-| **🔄 Mirror** | [![Mirror](https://img.shields.io/badge/status-synced-blue.svg)](https://advanced-pension-planner.netlify.app/) | [https://advanced-pension-planner.netlify.app/](https://advanced-pension-planner.netlify.app/) | **Production backup on Netlify** |
+| **🔄 Netlify** | [![Mirror](https://img.shields.io/badge/status-rebuilding-yellow.svg)](https://advanced-pension-planner.netlify.app/) | [https://advanced-pension-planner.netlify.app/](https://advanced-pension-planner.netlify.app/) | **Mirror deployment (rebuilding)** |
+
+> **📋 Deployment Status**: GitHub Pages is the primary deployment and is fully operational with the reorganized component structure. Netlify is currently rebuilding after the repository reorganization and should be available shortly.
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v6.5.2 - NAVIGATION FIXES & STAGE DEPLOYMENT 🎯
+## 🎨 What's New in v6.6.2 - MAJOR UX OVERHAUL & RUNTIME FIXES 🚀
+
+### **🎯 INTELLIGENT RESULTS DISPLAY** (July 2025)
+
+#### **🧠 Smart Calculation Engine**
+- **Intelligent Results Display**: Calculation Results section only appears when meaningful financial data is entered
+- **Conditional Readiness Score**: Retirement Readiness Score only shows with real user inputs (no more hardcoded 50,000 defaults)
+- **Clean Empty State**: Dashboard shows ₪0 Net Worth instead of incorrect ₪75,000 when no inputs
+- **Meaningful Data Validation**: Enhanced detection of when users have entered sufficient data for calculations
+
+#### **🐛 Critical Runtime Error Fixes**
+- **Training Fund Calculator**: Fixed `calculateTrainingFundRate is not defined` error preventing calculations
+- **Retirement Calculations**: Fixed `lastCountry is not defined` error breaking retirement projections
+- **Portfolio Data Structure**: Fixed `Cannot read properties of undefined (reading 'forEach')` in scenario comparisons
+- **Inheritance Planning**: Fixed input blocking issues preventing estate planning data entry
+
+#### **✨ Enhanced User Experience**
+- **No More Demo Values**: Eliminated hardcoded defaults (50,000 savings, 15,000 income, ages 30/67)
+- **Progressive Disclosure**: Components only appear when relevant and useful to the user
+- **Clean First Load**: Fresh dashboard without misleading placeholder data
+- **Real Data Focus**: All calculations and scores based on actual user input
+
+## 🎨 Previous Updates - v6.5.x - NAVIGATION FIXES & STAGE DEPLOYMENT 🎯
 
 ### **🧠 ADVANCED PORTFOLIO INTELLIGENCE** (July 2025)
 
