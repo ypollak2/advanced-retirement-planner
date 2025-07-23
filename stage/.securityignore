@@ -1,0 +1,52 @@
+# Security Scan Exclusions
+# Files and directories to exclude from security scans
+
+# Dependencies and build artifacts
+node_modules/
+package-lock.json
+
+# Build outputs
+dist/
+build/
+deployment/
+
+# Minified and vendor files
+*vendor*.js
+*bundle*.js
+*chunk*.js
+*.min.js
+
+# Development files that may contain test patterns
+tests/
+test/
+spec/
+
+# Documentation that may reference security patterns
+*.md
+docs/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git files
+.git/
+.gitignore
+
+# CI/CD files that may contain legitimate references
+.github/
+.gitlab-ci.yml
+azure-pipelines.yml
+
+# Allowed security test files (exceptions)
+# These files are allowed to contain security patterns for testing
+!security-qa-analysis.js
+!comprehensive-qa-test.js
+!training-fund-tests.js
+!quick-qa-test.js

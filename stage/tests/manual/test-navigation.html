@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Navigation Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        iframe { width: 100%; height: 600px; border: 2px solid #ccc; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>Testing Navigation Fixes Locally</h1>
+    
+    <div id="version-check" class="test-result info">Checking version...</div>
+    <div id="navigation-test" class="test-result info">Testing navigation components...</div>
+    
+    <h2>Live App Preview:</h2>
+    <iframe id="app-frame" src="index.html"></iframe>
+    
+    <h2>Test Results:</h2>
+    <div id="test-results"></div>
+
+    <script>
+        function testNavigation() {
+            const frame = document.getElementById('app-frame');
+            const results = document.getElementById('test-results');
+            
+            frame.onload = function() {
+                const frameDoc = frame.contentDocument || frame.contentWindow.document;
+                const frameWin = frame.contentWindow;
+                
+                // Check version
+                const versionEl = frameDoc.getElementById('version-indicator');
+                const version = versionEl ? versionEl.textContent : 'Unknown';
+                document.getElementById('version-check').innerHTML = 
+                    `Version: ${version} ${version.includes('6.5.1') ? '✅' : '❌ (Should be v6.5.1)'}`;
+                
+                // Wait for app to initialize
+                setTimeout(() => {
+                    // Check if RetirementPlannerApp exists
+                    const appExists = frameWin.RetirementPlannerApp ? '✅ App loaded' : '❌ App not loaded';
+                    
+                    // Check for navigation components in the source
+                    fetch('src/components/RetirementPlannerApp.js')
+                        .then(r => r.text())
+                        .then(code => {
+                            const hasBackNav = code.includes('back-nav') ? '✅' : '❌';
+                            const hasFallback = code.includes('scenario-fallback') ? '✅' : '❌';
+                            const hasDetailedNav = code.includes('detailed-back-nav') ? '✅' : '❌';
+                            
+                            results.innerHTML = `
+                                <div class="test-result ${hasBackNav === '✅' ? 'success' : 'error'}">
+                                    Back Navigation Code: ${hasBackNav} ${hasBackNav === '✅' ? 'Found' : 'Not Found'}
+                                </div>
+                                <div class="test-result ${hasFallback === '✅' ? 'success' : 'error'}">
+                                    Fallback Components: ${hasFallback} ${hasFallback === '✅' ? 'Found' : 'Not Found'}
+                                </div>
+                                <div class="test-result ${hasDetailedNav === '✅' ? 'success' : 'error'}">
+                                    Detailed View Navigation: ${hasDetailedNav} ${hasDetailedNav === '✅' ? 'Found' : 'Not Found'}
+                                </div>
+                                <div class="test-result info">
+                                    ${appExists} - Check the iframe above and try clicking on Partner Planning, Goal Tracking, or Scenario Testing
+                                </div>
+                            `;
+                            
+                            // Log the actual navigation sections found
+                            const navMatches = code.match(/key:\s*['"]back-nav['"]/g);
+                            console.log('Found navigation instances:', navMatches ? navMatches.length : 0);
+                        });
+                }, 2000);
+            };
+        }
+        
+        // Start test
+        testNavigation();
+    </script>
+</body>
+</html>
