@@ -46,13 +46,29 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
 
     const currencySymbol = getCurrencySymbol(workingCurrency);
 
+    // Auto-calculate net salary from gross using country-specific tax calculations
+    const calculateNetFromGross = (grossSalary, country = 'israel') => {
+        if (!grossSalary || grossSalary <= 0) return 0;
+        if (!window.TaxCalculators || !window.TaxCalculators.calculateNetSalary) {
+            // Fallback calculation if TaxCalculators not available
+            return Math.round(grossSalary * 0.66); // ~66% take-home for Israel
+        }
+        const result = window.TaxCalculators.calculateNetSalary(grossSalary, country);
+        return result.netSalary || Math.round(grossSalary * 0.66);
+    };
+
     // Multi-language content
     const content = {
         he: {
             mainSalary: 'משכורת חודשית עיקרית',
             grossSalary: `משכורת ברוטו לפני מסים (${currencySymbol})`,
-            netSalary: `משכורת נטו (${currencySymbol})`,
+            netSalary: `משכורת נטו אחרי מסים (${currencySymbol})`,
+            netSalaryInfo: 'הכנסה בפועל שנשארת לך אחרי כל הניכויים (מסים, ביטוח לאומי, פנסיה)',
             salaryInfo: 'הזן את המשכורת הברוטו לפני מסים והפרשות. זה הסכום שמופיע בחוזה העבודה שלך',
+            autoCalculated: 'מחושב אוטומטית',
+            manualOverride: 'עריכה ידנית',
+            switchToManual: 'החלף לעריכה ידנית',
+            switchToAuto: 'חזור לחישוב אוטומטי',
             additionalIncome: 'הכנסות נוספות',
             mainAdditionalIncome: 'הכנסות נוספות עיקריות',
             partnerAdditionalIncome: 'הכנסות נוספות בני הזוג',
@@ -77,8 +93,13 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
         en: {
             mainSalary: 'Main Monthly Salary',
             grossSalary: `Gross Salary Before Taxes (${currencySymbol})`,
-            netSalary: `Net Salary (${currencySymbol})`,
+            netSalary: `Net Salary After Taxes (${currencySymbol})`,
+            netSalaryInfo: 'Actual take-home income after all deductions (taxes, social security, pension)',
             salaryInfo: 'Enter your gross salary before taxes and deductions. This is the amount in your employment contract',
+            autoCalculated: 'Auto-calculated',
+            manualOverride: 'Manual Override',
+            switchToManual: 'Switch to Manual Entry',
+            switchToAuto: 'Switch to Auto-calculation',
             additionalIncome: 'Additional Income Sources',
             mainAdditionalIncome: 'Main Additional Income',
             partnerAdditionalIncome: 'Partner Additional Income',
@@ -190,7 +211,62 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                 createElement('p', { 
                     key: 'salary-help',
                     className: "mt-2 text-sm text-blue-600" 
-                }, t.salaryInfo)
+                }, t.salaryInfo),
+                
+                // Net Salary Input (Auto-calculated with manual override)
+                createElement('div', { 
+                    key: 'net-salary-section',
+                    className: "mt-4 pt-4 border-t border-blue-200" 
+                }, [
+                    createElement('div', { 
+                        key: 'net-salary-header',
+                        className: "flex items-center justify-between mb-2" 
+                    }, [
+                        createElement('label', { 
+                            key: 'net-salary-label',
+                            className: "block text-lg font-medium text-green-700" 
+                        }, t.netSalary),
+                        createElement('button', {
+                            key: 'toggle-manual',
+                            type: 'button',
+                            onClick: () => setInputs({...inputs, manualNetSalary: !inputs.manualNetSalary}),
+                            className: "text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-600"
+                        }, inputs.manualNetSalary ? t.switchToAuto : t.switchToManual)
+                    ]),
+                    createElement('input', {
+                        key: 'net-salary-input',
+                        type: 'number',
+                        value: inputs.manualNetSalary ? 
+                            (inputs.currentNetSalary || 0) : 
+                            calculateNetFromGross(inputs.currentMonthlySalary || 15000, inputs.country),
+                        onChange: (e) => {
+                            if (inputs.manualNetSalary) {
+                                const value = parseInt(e.target.value) || 0;
+                                setInputs({...inputs, currentNetSalary: value});
+                            }
+                        },
+                        readOnly: !inputs.manualNetSalary,
+                        placeholder: inputs.manualNetSalary ? "10000" : "Auto-calculated",
+                        className: `w-full p-3 md:p-4 text-base md:text-lg border-2 rounded-lg focus:ring-2 ${
+                            inputs.manualNetSalary ? 
+                            'border-green-300 focus:ring-green-500 focus:border-green-500 bg-white' : 
+                            'border-green-200 bg-green-50 text-green-700 cursor-not-allowed'
+                        }`
+                    }),
+                    createElement('div', { 
+                        key: 'net-salary-help',
+                        className: "mt-2 flex items-center text-sm"
+                    }, [
+                        createElement('span', {
+                            key: 'net-help-icon',
+                            className: "mr-1 text-green-600"
+                        }, '💰'),
+                        createElement('span', {
+                            key: 'net-help-text',
+                            className: inputs.manualNetSalary ? "text-green-600" : "text-green-500"
+                        }, inputs.manualNetSalary ? t.manualOverride : `${t.autoCalculated} - ${t.netSalaryInfo}`)
+                    ])
+                ])
             ])
         ]),
 
@@ -225,7 +301,55 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                     createElement('p', { 
                         key: 'partner1-salary-help',
                         className: "mt-2 text-sm text-blue-600" 
-                    }, language === 'he' ? 'הזן משכורת ברוטו לפני מסים והפרשות' : 'Enter gross salary before taxes and deductions')
+                    }, language === 'he' ? 'הזן משכורת ברוטו לפני מסים והפרשות' : 'Enter gross salary before taxes and deductions'),
+                    
+                    // Partner 1 Net Salary
+                    createElement('div', { 
+                        key: 'partner1-net-salary-section',
+                        className: "mt-4 pt-4 border-t border-blue-200" 
+                    }, [
+                        createElement('div', { 
+                            key: 'partner1-net-salary-header',
+                            className: "flex items-center justify-between mb-2" 
+                        }, [
+                            createElement('label', { 
+                                key: 'partner1-net-salary-label',
+                                className: "block text-lg font-medium text-green-700" 
+                            }, `${inputs.userName || (language === 'he' ? 'בן/בת זוג' : 'Partner')} - ${t.netSalary}`),
+                            createElement('button', {
+                                key: 'partner1-toggle-manual',
+                                type: 'button',
+                                onClick: () => setInputs({...inputs, manualPartner1NetSalary: !inputs.manualPartner1NetSalary}),
+                                className: "text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-600"
+                            }, inputs.manualPartner1NetSalary ? t.switchToAuto : t.switchToManual)
+                        ]),
+                        createElement('input', {
+                            key: 'partner1-net-salary-input',
+                            type: 'number',
+                            value: inputs.manualPartner1NetSalary ? 
+                                (inputs.partner1NetSalary || 0) : 
+                                calculateNetFromGross(inputs.partner1Salary || 0, inputs.country),
+                            onChange: (e) => {
+                                if (inputs.manualPartner1NetSalary) {
+                                    const value = parseInt(e.target.value) || 0;
+                                    setInputs({...inputs, partner1NetSalary: value});
+                                }
+                            },
+                            readOnly: !inputs.manualPartner1NetSalary,
+                            className: `w-full p-3 text-base border-2 rounded-lg focus:ring-2 ${
+                                inputs.manualPartner1NetSalary ? 
+                                'border-green-300 focus:ring-green-500 focus:border-green-500 bg-white' : 
+                                'border-green-200 bg-green-50 text-green-700 cursor-not-allowed'
+                            }`
+                        }),
+                        createElement('p', { 
+                            key: 'partner1-net-help',
+                            className: "mt-1 text-xs text-green-600 flex items-center" 
+                        }, [
+                            createElement('span', { key: 'icon', className: "mr-1" }, '💰'),
+                            inputs.manualPartner1NetSalary ? t.manualOverride : t.autoCalculated
+                        ])
+                    ])
                 ]),
                 createElement('div', { 
                     key: 'partner2-salary',
@@ -245,7 +369,55 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                     createElement('p', { 
                         key: 'partner2-salary-help',
                         className: "mt-2 text-sm text-blue-600" 
-                    }, language === 'he' ? 'הזן משכורת ברוטו לפני מסים והפרשות' : 'Enter gross salary before taxes and deductions')
+                    }, language === 'he' ? 'הזן משכורת ברוטו לפני מסים והפרשות' : 'Enter gross salary before taxes and deductions'),
+                    
+                    // Partner 2 Net Salary
+                    createElement('div', { 
+                        key: 'partner2-net-salary-section',
+                        className: "mt-4 pt-4 border-t border-blue-200" 
+                    }, [
+                        createElement('div', { 
+                            key: 'partner2-net-salary-header',
+                            className: "flex items-center justify-between mb-2" 
+                        }, [
+                            createElement('label', { 
+                                key: 'partner2-net-salary-label',
+                                className: "block text-lg font-medium text-green-700" 
+                            }, `${inputs.partnerName || (language === 'he' ? 'בן/בת זוג נוסף' : 'Additional Partner')} - ${t.netSalary}`),
+                            createElement('button', {
+                                key: 'partner2-toggle-manual',
+                                type: 'button',
+                                onClick: () => setInputs({...inputs, manualPartner2NetSalary: !inputs.manualPartner2NetSalary}),
+                                className: "text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-600"
+                            }, inputs.manualPartner2NetSalary ? t.switchToAuto : t.switchToManual)
+                        ]),
+                        createElement('input', {
+                            key: 'partner2-net-salary-input',
+                            type: 'number',
+                            value: inputs.manualPartner2NetSalary ? 
+                                (inputs.partner2NetSalary || 0) : 
+                                calculateNetFromGross(inputs.partner2Salary || 0, inputs.country),
+                            onChange: (e) => {
+                                if (inputs.manualPartner2NetSalary) {
+                                    const value = parseInt(e.target.value) || 0;
+                                    setInputs({...inputs, partner2NetSalary: value});
+                                }
+                            },
+                            readOnly: !inputs.manualPartner2NetSalary,
+                            className: `w-full p-3 text-base border-2 rounded-lg focus:ring-2 ${
+                                inputs.manualPartner2NetSalary ? 
+                                'border-green-300 focus:ring-green-500 focus:border-green-500 bg-white' : 
+                                'border-green-200 bg-green-50 text-green-700 cursor-not-allowed'
+                            }`
+                        }),
+                        createElement('p', { 
+                            key: 'partner2-net-help',
+                            className: "mt-1 text-xs text-green-600 flex items-center" 
+                        }, [
+                            createElement('span', { key: 'icon', className: "mr-1" }, '💰'),
+                            inputs.manualPartner2NetSalary ? t.manualOverride : t.autoCalculated
+                        ])
+                    ])
                 ])
             ])
         ]),
