@@ -145,11 +145,12 @@ const ResultsPanel = ({
             
             return hasMeaningfulDataForScore && ReadinessScore && React.createElement(ReadinessScore, {
                 key: 'readiness-score',
+                inputs: inputs, // Pass the full inputs object for comprehensive data access
                 currentAge: inputs?.currentAge || effectiveResults.currentAge || 30,
                 retirementAge: inputs?.retirementAge || effectiveResults.retirementAge || 67,
-                currentSavings: inputs?.currentSavings || 0, // Changed from 50000 to 0
+                currentSavings: inputs?.currentSavings || 0,
                 monthlyContribution: (inputs?.monthlyContribution || 0) + (inputs?.trainingFundMonthly || 0),
-                targetRetirementIncome: inputs?.currentMonthlyExpenses || effectiveResults.monthlyIncome || 0, // Changed from 15000 to 0
+                targetRetirementIncome: inputs?.currentMonthlyExpenses || effectiveResults.monthlyIncome || 0,
                 workingCurrency: workingCurrency,
                 language: language
             });
