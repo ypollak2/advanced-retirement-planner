@@ -293,9 +293,16 @@ const Dashboard = ({
             key: 'main-content',
             className: 'space-y-6'
         }, [
-            // Financial Health Meter
-            React.createElement('div', {
-                key: 'health-meter',
+            // Enhanced Financial Health Meter
+            window.EnhancedFinancialHealthMeter ? React.createElement(window.EnhancedFinancialHealthMeter, {
+                key: 'enhanced-health-meter',
+                inputs: inputs,
+                language: language,
+                workingCurrency: workingCurrency,
+                compact: false,
+                showDetails: true
+            }) : React.createElement('div', {
+                key: 'fallback-health-meter',
                 className: 'professional-card text-center'
             }, [
                 React.createElement('h2', {
@@ -306,53 +313,261 @@ const Dashboard = ({
                     ' ',
                     t.healthMeter
                 ]),
+                React.createElement('div', {
+                    key: 'simple-score',
+                    className: 'text-6xl font-bold text-green-600 mb-2'
+                }, healthScore),
+                React.createElement('div', {
+                    key: 'simple-status',
+                    className: 'text-lg text-gray-600'
+                }, t[healthStatus.status])
+            ]),
+
+            // Net Worth Display (keeping existing functionality)
+            React.createElement('div', {
+                key: 'net-worth-display',
+                className: 'professional-card'
+            }, [
+                React.createElement('h3', {
+                    key: 'breakdown-title',
+                    className: 'text-lg font-semibold text-gray-800 mb-4'
+                }, language === 'he' ? 'פירוט ציוני הבריאות הפיננסית' : 'Financial Health Score Breakdown'),
                 
                 React.createElement('div', {
-                    key: 'meter-container',
-                    className: 'financial-health-meter'
+                    key: 'score-components',
+                    className: 'grid grid-cols-2 md:grid-cols-5 gap-4'
                 }, [
-                    React.createElement('svg', {
-                        key: 'meter-svg',
-                        className: 'health-meter-circle'
-                    }, [
-                        React.createElement('circle', {
-                            key: 'background',
-                            className: 'health-meter-background',
-                            cx: '140',
-                            cy: '140',
-                            r: radius,
-                            strokeDasharray: strokeDasharray
-                        }),
-                        React.createElement('circle', {
-                            key: 'progress',
-                            className: `health-meter-progress ${healthStatus.class.split(' ')[0]}`,
-                            cx: '140',
-                            cy: '140',
-                            r: radius,
-                            strokeDasharray: strokeDasharray,
-                            strokeDashoffset: strokeDashoffset
-                        })
-                    ]),
+                    // Savings Rate Score
                     React.createElement('div', {
-                        key: 'meter-center',
-                        className: 'health-meter-center'
+                        key: 'savings-rate',
+                        className: 'text-center'
                     }, [
-                        React.createElement('div', {
-                            key: 'score',
-                            className: 'health-score-value'
-                        }, healthScore),
-                        React.createElement('div', {
-                            key: 'label',
-                            className: 'health-score-label'
-                        }, t.financialHealth),
-                        React.createElement('div', {
-                            key: 'status',
-                            className: `health-score-status ${healthStatus.class.split(' ')[1]}`
-                        }, t[healthStatus.status])
+                        window.HelpTooltip ? React.createElement(window.HelpTooltip, {
+                            key: 'savings-help',
+                            term: 'savings-rate-score',
+                            language: language,
+                            position: 'top'
+                        }, React.createElement('div', {
+                            key: 'savings-content',
+                            className: 'cursor-help'
+                        }, [
+                            React.createElement('div', {
+                                key: 'savings-score',
+                                className: 'text-2xl font-bold text-green-600'
+                            }, Math.min(Math.round((inputs?.monthlyContribution || 2000) * 12 / ((inputs?.currentSalary || 20000) * 12) * 500), 100)),
+                            React.createElement('div', {
+                                key: 'savings-label',
+                                className: 'text-sm text-gray-600 mt-1'
+                            }, language === 'he' ? 'שיעור החיסכון' : 'Savings Rate Score')
+                        ])) : React.createElement('div', {
+                            key: 'savings-content'
+                        }, [
+                            React.createElement('div', {
+                                key: 'savings-score',
+                                className: 'text-2xl font-bold text-green-600'
+                            }, Math.min(Math.round((inputs?.monthlyContribution || 2000) * 12 / ((inputs?.currentSalary || 20000) * 12) * 500), 100)),
+                            React.createElement('div', {
+                                key: 'savings-label',
+                                className: 'text-sm text-gray-600 mt-1'
+                            }, language === 'he' ? 'שיעור החיסכון' : 'Savings Rate Score')
+                        ])
+                    ]),
+
+                    // Retirement Readiness Score
+                    React.createElement('div', {
+                        key: 'retirement-readiness',
+                        className: 'text-center'
+                    }, [
+                        window.HelpTooltip ? React.createElement(window.HelpTooltip, {
+                            key: 'readiness-help',
+                            term: 'retirement-readiness-score',
+                            language: language,
+                            position: 'top'
+                        }, React.createElement('div', {
+                            key: 'readiness-content',
+                            className: 'cursor-help'
+                        }, [
+                            React.createElement('div', {
+                                key: 'readiness-score',
+                                className: 'text-2xl font-bold text-green-600'
+                            }, Math.min(Math.round(((inputs?.currentAge || 30) * (inputs?.currentSalary || 20000) * 0.012) > 0 ? (inputs?.currentSavings || 0) / ((inputs?.currentAge || 30) * (inputs?.currentSalary || 20000) * 0.012) * 100 : 50), 100)),
+                            React.createElement('div', {
+                                key: 'readiness-label',
+                                className: 'text-sm text-gray-600 mt-1'
+                            }, language === 'he' ? 'מוכנות לפנסיה' : 'Retirement Readiness')
+                        ])) : React.createElement('div', {
+                            key: 'readiness-content'
+                        }, [
+                            React.createElement('div', {
+                                key: 'readiness-score',
+                                className: 'text-2xl font-bold text-green-600'
+                            }, Math.min(Math.round(((inputs?.currentAge || 30) * (inputs?.currentSalary || 20000) * 0.012) > 0 ? (inputs?.currentSavings || 0) / ((inputs?.currentAge || 30) * (inputs?.currentSalary || 20000) * 0.012) * 100 : 50), 100)),
+                            React.createElement('div', {
+                                key: 'readiness-label',
+                                className: 'text-sm text-gray-600 mt-1'
+                            }, language === 'he' ? 'מוכנות לפנסיה' : 'Retirement Readiness')
+                        ])
+                    ]),
+
+                    // Risk Alignment Score  
+                    React.createElement('div', {
+                        key: 'risk-alignment',
+                        className: 'text-center'
+                    }, [
+                        window.HelpTooltip ? React.createElement(window.HelpTooltip, {
+                            key: 'risk-help',
+                            term: 'risk-alignment-score',
+                            language: language,
+                            position: 'top'
+                        }, React.createElement('div', {
+                            key: 'risk-content',
+                            className: 'cursor-help'
+                        }, [
+                            React.createElement('div', {
+                                key: 'risk-score',
+                                className: 'text-2xl font-bold text-yellow-600'
+                            }, (() => {
+                                const age = inputs?.currentAge || 30;
+                                const yearsToRetirement = (inputs?.retirementAge || 67) - age;
+                                const riskTolerance = inputs?.riskTolerance || 'moderate';
+                                let score = yearsToRetirement > 20 ? 90 : (yearsToRetirement / 20) * 90;
+                                if (riskTolerance === 'aggressive' && yearsToRetirement < 10) score -= 20;
+                                if (riskTolerance === 'conservative' && yearsToRetirement > 20) score -= 20;
+                                return Math.round(Math.max(30, Math.min(100, score)));
+                            })()),
+                            React.createElement('div', {
+                                key: 'risk-label',
+                                className: 'text-sm text-gray-600 mt-1'
+                            }, language === 'he' ? 'התאמת סיכון' : 'Risk Alignment')
+                        ])) : React.createElement('div', {
+                            key: 'risk-content'
+                        }, [
+                            React.createElement('div', {
+                                key: 'risk-score',
+                                className: 'text-2xl font-bold text-yellow-600'
+                            }, (() => {
+                                const age = inputs?.currentAge || 30;
+                                const yearsToRetirement = (inputs?.retirementAge || 67) - age;
+                                const riskTolerance = inputs?.riskTolerance || 'moderate';
+                                let score = yearsToRetirement > 20 ? 90 : (yearsToRetirement / 20) * 90;
+                                if (riskTolerance === 'aggressive' && yearsToRetirement < 10) score -= 20;
+                                if (riskTolerance === 'conservative' && yearsToRetirement > 20) score -= 20;
+                                return Math.round(Math.max(30, Math.min(100, score)));
+                            })()),
+                            React.createElement('div', {
+                                key: 'risk-label',
+                                className: 'text-sm text-gray-600 mt-1'
+                            }, language === 'he' ? 'התאמת סיכון' : 'Risk Alignment')
+                        ])
+                    ]),
+
+                    // Tax Efficiency Score
+                    React.createElement('div', {
+                        key: 'tax-efficiency',
+                        className: 'text-center'
+                    }, [
+                        window.HelpTooltip ? React.createElement(window.HelpTooltip, {
+                            key: 'tax-help',
+                            term: 'tax-efficiency-score',
+                            language: language,
+                            position: 'top'
+                        }, React.createElement('div', {
+                            key: 'tax-content',
+                            className: 'cursor-help'
+                        }, [
+                            React.createElement('div', {
+                                key: 'tax-score',
+                                className: 'text-2xl font-bold text-green-600'
+                            }, (() => {
+                                let score = 0;
+                                if (inputs?.pensionContribution > 0) score += 40;
+                                if (inputs?.trainingFundContribution > 0) score += 30;
+                                if (inputs?.optimizedPensionRate) score += 20;
+                                if (inputs?.optimizedTrainingFundRate) score += 10;
+                                return Math.min(100, score);
+                            })()),
+                            React.createElement('div', {
+                                key: 'tax-label',
+                                className: 'text-sm text-gray-600 mt-1'
+                            }, language === 'he' ? 'יעילות מס' : 'Tax Efficiency')
+                        ])) : React.createElement('div', {
+                            key: 'tax-content'
+                        }, [
+                            React.createElement('div', {
+                                key: 'tax-score',
+                                className: 'text-2xl font-bold text-green-600'
+                            }, (() => {
+                                let score = 0;
+                                if (inputs?.pensionContribution > 0) score += 40;
+                                if (inputs?.trainingFundContribution > 0) score += 30;
+                                if (inputs?.optimizedPensionRate) score += 20;
+                                if (inputs?.optimizedTrainingFundRate) score += 10;
+                                return Math.min(100, score);
+                            })()),
+                            React.createElement('div', {
+                                key: 'tax-label',
+                                className: 'text-sm text-gray-600 mt-1'
+                            }, language === 'he' ? 'יעילות מס' : 'Tax Efficiency')
+                        ])
+                    ]),
+
+                    // Diversification Score
+                    React.createElement('div', {
+                        key: 'diversification',
+                        className: 'text-center'
+                    }, [
+                        window.HelpTooltip ? React.createElement(window.HelpTooltip, {
+                            key: 'diversification-help',
+                            term: 'diversification-score',
+                            language: language,
+                            position: 'top'
+                        }, React.createElement('div', {
+                            key: 'diversification-content',
+                            className: 'cursor-help'
+                        }, [
+                            React.createElement('div', {
+                                key: 'diversification-score',
+                                className: 'text-2xl font-bold text-green-600'
+                            }, (() => {
+                                let score = 0;
+                                const assetTypes = [
+                                    inputs?.currentSavingsAccount > 0,
+                                    inputs?.currentPersonalPortfolio > 0,
+                                    inputs?.currentRealEstate > 0,
+                                    inputs?.currentCrypto > 0,
+                                    inputs?.currentTrainingFund > 0
+                                ].filter(Boolean).length;
+                                return Math.min(100, assetTypes * 20);
+                            })()),
+                            React.createElement('div', {
+                                key: 'diversification-label',
+                                className: 'text-sm text-gray-600 mt-1'
+                            }, language === 'he' ? 'פיזור השקעות' : 'Diversification')
+                        ])) : React.createElement('div', {
+                            key: 'diversification-content'
+                        }, [
+                            React.createElement('div', {
+                                key: 'diversification-score',
+                                className: 'text-2xl font-bold text-green-600'
+                            }, (() => {
+                                let score = 0;
+                                const assetTypes = [
+                                    inputs?.currentSavingsAccount > 0,
+                                    inputs?.currentPersonalPortfolio > 0,
+                                    inputs?.currentRealEstate > 0,
+                                    inputs?.currentCrypto > 0,
+                                    inputs?.currentTrainingFund > 0
+                                ].filter(Boolean).length;
+                                return Math.min(100, assetTypes * 20);
+                            })()),
+                            React.createElement('div', {
+                                key: 'diversification-label',
+                                className: 'text-sm text-gray-600 mt-1'
+                            }, language === 'he' ? 'פיזור השקעות' : 'Diversification')
+                        ])
                     ])
                 ])
             ]),
-
 
             // Net Worth Tracker (only show if user has entered data)
             hasUserData && netWorth !== null && React.createElement('div', {
