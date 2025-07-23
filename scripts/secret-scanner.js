@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Semantic Secret Scanner CLI
+ * Semantic Credential Scanner CLI
  * 
- * Advanced AST-based secret detection with context awareness
+ * Advanced AST-based credential detection with context awareness
  * Designed for fintech/crypto applications with intelligent filtering
  * 
  * Features:
@@ -11,7 +11,7 @@
  * - Cryptocurrency context filtering
  * - UI component prop recognition
  * - i18n/translation pattern detection
- * - .secretignore support
+ * - .credignore support
  * - Multiple output formats (JSON, Markdown, SARIF)
  * - CI/CD integration ready
  * 
@@ -19,28 +19,28 @@
  */
 
 const { program } = require('commander');
-const SecretScanner = require('../lib/core/analyzer');
+const CredentialScanner = require('../lib/core/analyzer');
 const chalk = require('chalk');
 const fs = require('fs');
 const path = require('path');
 
 // CLI Configuration
 program
-  .name('secret-scanner')
-  .description('Semantic secret detection with context awareness')
+  .name('credential-scanner')
+  .description('Semantic credential detection with context awareness')
   .version('1.0.0');
 
 // Main scan command
 program
   .command('scan')
-  .description('Scan files for secrets and credentials')
+  .description('Scan files for auth and credentials')
   .option('-p, --path <path>', 'Path to scan (file or directory)', '.')
   .option('-i, --include <pattern>', 'Include files matching pattern')
   .option('-e, --exclude <pattern>', 'Exclude files matching pattern')
   .option('-f, --format <format>', 'Output format (console|json|markdown|sarif)', 'console')
   .option('-o, --output <file>', 'Output file path')
   .option('-s, --severity <level>', 'Minimum severity level (low|medium|high|critical)', 'medium')
-  .option('-c, --config <file>', 'Configuration file path', '.secret-scanner.json')
+  .option('-c, --config <file>', 'Configuration file path', '.credential-scanner.json')
   .option('--no-crypto-filter', 'Disable cryptocurrency context filtering')
   .option('--no-ui-filter', 'Disable UI component filtering')
   .option('--no-i18n-filter', 'Disable i18n/translation filtering')
@@ -50,13 +50,13 @@ program
   .option('--stats', 'Show performance statistics')
   .action(async (options) => {
     try {
-      console.log(chalk.blue('🔍 Semantic Secret Scanner v1.0.0'));
+      console.log(chalk.blue('🔍 Semantic Credential Scanner v1.0.0'));
       console.log(chalk.gray('━'.repeat(50)));
       
       const startTime = Date.now();
       
       // Initialize scanner with options
-      const scanner = new SecretScanner(options);
+      const scanner = new CredentialScanner(options);
       
       // Load configuration if exists
       if (fs.existsSync(options.config)) {
@@ -108,7 +108,7 @@ program
   .description('Initialize configuration file')
   .option('-f, --force', 'Overwrite existing configuration')
   .action((options) => {
-    const configPath = '.secret-scanner.json';
+    const configPath = '.credential-scanner.json';
     
     if (fs.existsSync(configPath) && !options.force) {
       console.log(chalk.yellow('⚠️  Configuration file already exists. Use --force to overwrite.'));
@@ -116,7 +116,7 @@ program
     }
     
     const exampleConfig = fs.readFileSync(
-      path.join(__dirname, '..', '.secret-scanner.example.json'),
+      path.join(__dirname, '..', '.credential-scanner.example.json'),
       'utf8'
     );
     
@@ -128,7 +128,7 @@ program
 program
   .command('validate')
   .description('Validate configuration file')
-  .option('-c, --config <file>', 'Configuration file path', '.secret-scanner.json')
+  .option('-c, --config <file>', 'Configuration file path', '.credential-scanner.json')
   .action((options) => {
     try {
       if (!fs.existsSync(options.config)) {
