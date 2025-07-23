@@ -1146,20 +1146,20 @@ function testWizardIntegrationPipeline() {
     if (fs.existsSync('src/components/wizard/RetirementWizard.js')) {
         const wizardContent = fs.readFileSync('src/components/wizard/RetirementWizard.js', 'utf8');
         
-        const hasTenStepStructure = wizardContent.includes('totalSteps = 10') ||
-                                   wizardContent.includes('totalSteps: 10');
-        logTest('RetirementWizard: 10-step structure', hasTenStepStructure);
+        const hasEightStepStructure = wizardContent.includes('totalSteps = 8') ||
+                                     wizardContent.includes('totalSteps: 8');
+        logTest('RetirementWizard: 8-step structure', hasEightStepStructure);
         
-        const hasAdvancedStepRefs = wizardContent.includes('WizardStepInheritance') &&
-                                   wizardContent.includes('WizardStepTaxes') &&
-                                   wizardContent.includes('WizardStepReview');
-        logTest('RetirementWizard: Advanced step references', hasAdvancedStepRefs);
+        const hasStreamlinedStepRefs = wizardContent.includes('WizardStepReview') &&
+                                      !wizardContent.includes('case 9:') &&
+                                      !wizardContent.includes('case 10:');
+        logTest('RetirementWizard: Streamlined step references', hasStreamlinedStepRefs);
         
         const hasStepValidation = wizardContent.includes('isCurrentStepValid') &&
                                  wizardContent.includes('case 8') &&
-                                 wizardContent.includes('case 9') &&
-                                 wizardContent.includes('case 10');
-        logTest('RetirementWizard: Advanced step validation', hasStepValidation);
+                                 !wizardContent.includes('case 9:') &&
+                                 !wizardContent.includes('case 10:');
+        logTest('RetirementWizard: Streamlined step validation', hasStepValidation);
         
         const hasStepNavigation = wizardContent.includes('handleNext') &&
                                  wizardContent.includes('handlePrevious') &&
