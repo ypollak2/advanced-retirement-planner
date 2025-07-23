@@ -34,15 +34,18 @@ const RetirementWizard = ({
         return null;
     };
     
+    const totalSteps = 8;
     const savedProgress = loadSavedProgress();
     
-    const [currentStep, setCurrentStep] = React.useState(savedProgress?.currentStep || 1);
+    // Ensure saved step doesn't exceed new total (fixing 10->8 step reduction)
+    const initialStep = savedProgress?.currentStep ? 
+        Math.min(savedProgress.currentStep, totalSteps) : 1;
+    
+    const [currentStep, setCurrentStep] = React.useState(initialStep);
     const [completedSteps, setCompletedSteps] = React.useState(savedProgress?.completedSteps || []);
     const [skippedSteps, setSkippedSteps] = React.useState(savedProgress?.skippedSteps || []);
     const [showSaveNotification, setShowSaveNotification] = React.useState(false);
     const [lastSaved, setLastSaved] = React.useState(savedProgress?.lastSaved || null);
-
-    const totalSteps = 8;
     
     // Auto-save progress to localStorage
     React.useEffect(() => {
@@ -149,7 +152,7 @@ const RetirementWizard = ({
     const handleNext = () => {
         if (currentStep < totalSteps) {
             setCompletedSteps(prev => [...new Set([...prev, currentStep])]);
-            setCurrentStep(currentStep + 1);
+            setCurrentStep(Math.min(currentStep + 1, totalSteps));
         } else {
             // Final step - complete wizard
             clearSavedProgress();
@@ -159,14 +162,14 @@ const RetirementWizard = ({
 
     const handlePrevious = () => {
         if (currentStep > 1) {
-            setCurrentStep(currentStep - 1);
+            setCurrentStep(Math.max(currentStep - 1, 1));
         }
     };
 
     const handleSkip = () => {
         if (currentStep < totalSteps) {
             setSkippedSteps(prev => [...new Set([...prev, currentStep])]);
-            setCurrentStep(currentStep + 1);
+            setCurrentStep(Math.min(currentStep + 1, totalSteps));
         }
     };
 
@@ -407,8 +410,8 @@ const RetirementWizard = ({
             key: 'current-step',
             stepNumber: currentStep,
             totalSteps: totalSteps,
-            title: t.steps[currentStep].title,
-            subtitle: t.steps[currentStep].subtitle,
+            title: t.steps[currentStep]?.title || 'Step ' + currentStep,
+            subtitle: t.steps[currentStep]?.subtitle || '',
             onNext: handleNext,
             onPrevious: handlePrevious,
             onSkip: handleSkip,
