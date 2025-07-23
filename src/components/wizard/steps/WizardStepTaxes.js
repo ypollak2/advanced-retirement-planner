@@ -268,8 +268,61 @@ const WizardStepTaxes = ({ inputs, setInputs, language = 'en', workingCurrency =
         return contribution * marginalRate;
     };
 
+    const calculateNetSalary = () => {
+        const grossMonthly = parseFloat(inputs.currentMonthlySalary || 0);
+        const grossAnnual = grossMonthly * 12;
+        
+        if (grossAnnual <= 0) {
+            return {
+                grossMonthly: 0,
+                netMonthly: 0,
+                totalDeductions: 0,
+                pensionDeduction: 0,
+                trainingFundDeduction: 0,
+                taxDeduction: 0,
+                socialInsuranceDeduction: 0
+            };
+        }
+
+        // Calculate deductions
+        const pensionRate = parseFloat(inputs.pensionContributionRate || 0) / 100;
+        const trainingFundRate = parseFloat(inputs.trainingFundContributionRate || 0) / 100;
+        
+        const pensionDeduction = grossMonthly * pensionRate;
+        const trainingFundDeduction = grossMonthly * trainingFundRate;
+        
+        // Calculate tax (simplified - using effective rate)
+        const effectiveTaxRate = calculateEffectiveTaxRate(grossAnnual);
+        const taxDeduction = grossMonthly * effectiveTaxRate;
+        
+        // Social insurance (Israeli Bituach Leumi - approximately 12% combined)
+        const socialInsuranceRate = selectedCountry === 'israel' ? 0.12 : 
+                                  selectedCountry === 'uk' ? 0.12 : 
+                                  selectedCountry === 'us' ? 0.0765 : 0.10;
+        const socialInsuranceDeduction = grossMonthly * socialInsuranceRate;
+        
+        const totalDeductions = pensionDeduction + trainingFundDeduction + taxDeduction + socialInsuranceDeduction;
+        const netMonthly = grossMonthly - totalDeductions;
+
+        return {
+            grossMonthly,
+            netMonthly: Math.max(0, netMonthly),
+            totalDeductions,
+            pensionDeduction,
+            trainingFundDeduction,
+            taxDeduction,
+            socialInsuranceDeduction
+        };
+    };
+
     const calculateTaxEfficiency = () => {
         const currentIncome = parseFloat(inputs.currentMonthlySalary || 0) * 12;
+        
+        // Handle zero or invalid income cases
+        if (currentIncome <= 0) {
+            return 0;
+        }
+        
         const pensionContribution = parseFloat(inputs.pensionContributionRate || 0) / 100 * currentIncome;
         const trainingFundContribution = parseFloat(inputs.trainingFundContributionRate || 0) / 100 * currentIncome;
         
@@ -280,6 +333,11 @@ const WizardStepTaxes = ({ inputs, setInputs, language = 'en', workingCurrency =
         
         const totalSavings = pensionSavings + trainingFundSavings;
         const maxPossibleSavings = currentIncome * 0.15; // Assume 15% max tax-efficient contribution
+        
+        // Prevent division by zero
+        if (maxPossibleSavings === 0) {
+            return 0;
+        }
         
         return Math.min(100, (totalSavings / maxPossibleSavings) * 100);
     };
@@ -510,6 +568,119 @@ const WizardStepTaxes = ({ inputs, setInputs, language = 'en', workingCurrency =
         ]);
     };
 
+    // Render net salary breakdown
+    const renderNetSalaryBreakdown = () => {
+        const salaryData = calculateNetSalary();
+        
+        return createElement('div', {
+            key: 'net-salary-breakdown',
+            className: "bg-gradient-to-r from-green-50 to-teal-50 rounded-xl p-6 border border-green-200 mb-8"
+        }, [
+            createElement('h3', {
+                key: 'salary-title',
+                className: "text-xl font-semibold text-green-700 mb-6 flex items-center"
+            }, [
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💰'),
+                language === 'he' ? 'פירוט משכורת נטו' : 'Net Salary Breakdown'
+            ]),
+            
+            createElement('div', { key: 'salary-summary', className: "grid grid-cols-1 md:grid-cols-2 gap-6" }, [
+                // Gross vs Net comparison
+                createElement('div', { key: 'salary-comparison', className: "bg-white rounded-lg p-4 border border-green-200" }, [
+                    createElement('div', {
+                        key: 'gross-salary',
+                        className: "flex justify-between items-center mb-3 pb-2 border-b border-gray-200"
+                    }, [
+                        createElement('span', { key: 'gross-label', className: "text-gray-600" }, 
+                            language === 'he' ? 'משכורת ברוטו' : 'Gross Salary'),
+                        createElement('span', { key: 'gross-value', className: "font-semibold text-gray-800" }, 
+                            `${rules.currency}${salaryData.grossMonthly.toLocaleString()}`)
+                    ]),
+                    createElement('div', {
+                        key: 'total-deductions',
+                        className: "flex justify-between items-center mb-3 pb-2 border-b border-gray-200"
+                    }, [
+                        createElement('span', { key: 'deductions-label', className: "text-red-600" }, 
+                            language === 'he' ? 'סה"כ ניכויים' : 'Total Deductions'),
+                        createElement('span', { key: 'deductions-value', className: "font-semibold text-red-600" }, 
+                            `${rules.currency}${salaryData.totalDeductions.toLocaleString()}`)
+                    ]),
+                    createElement('div', {
+                        key: 'net-salary',
+                        className: "flex justify-between items-center p-3 bg-green-50 rounded border border-green-200"
+                    }, [
+                        createElement('span', { key: 'net-label', className: "font-semibold text-green-700" }, 
+                            language === 'he' ? 'משכורת נטו' : 'Net Salary'),
+                        createElement('span', { key: 'net-value', className: "font-bold text-green-800 text-lg" }, 
+                            `${rules.currency}${salaryData.netMonthly.toLocaleString()}`)
+                    ])
+                ]),
+                
+                // Deduction breakdown
+                createElement('div', { key: 'deduction-breakdown', className: "bg-white rounded-lg p-4 border border-green-200" }, [
+                    createElement('h4', {
+                        key: 'breakdown-title',
+                        className: "font-medium text-gray-700 mb-4"
+                    }, language === 'he' ? 'פירוט ניכויים' : 'Deduction Breakdown'),
+                    
+                    createElement('div', { key: 'deductions-list', className: "space-y-2 text-sm" }, [
+                        createElement('div', {
+                            key: 'pension-deduction',
+                            className: "flex justify-between"
+                        }, [
+                            createElement('span', { key: 'pension-label', className: "text-gray-600" }, 
+                                language === 'he' ? 'פנסיה' : 'Pension'),
+                            createElement('span', { key: 'pension-amount' }, 
+                                `${rules.currency}${salaryData.pensionDeduction.toLocaleString()}`)
+                        ]),
+                        
+                        selectedCountry === 'israel' && createElement('div', {
+                            key: 'training-fund-deduction',
+                            className: "flex justify-between"
+                        }, [
+                            createElement('span', { key: 'training-label', className: "text-gray-600" }, 
+                                language === 'he' ? 'קרן השתלמות' : 'Training Fund'),
+                            createElement('span', { key: 'training-amount' }, 
+                                `${rules.currency}${salaryData.trainingFundDeduction.toLocaleString()}`)
+                        ]),
+                        
+                        createElement('div', {
+                            key: 'tax-deduction',
+                            className: "flex justify-between"
+                        }, [
+                            createElement('span', { key: 'tax-label', className: "text-gray-600" }, 
+                                language === 'he' ? 'מס הכנסה' : 'Income Tax'),
+                            createElement('span', { key: 'tax-amount' }, 
+                                `${rules.currency}${salaryData.taxDeduction.toLocaleString()}`)
+                        ]),
+                        
+                        createElement('div', {
+                            key: 'social-deduction',
+                            className: "flex justify-between"
+                        }, [
+                            createElement('span', { key: 'social-label', className: "text-gray-600" }, 
+                                language === 'he' ? 'ביטוח לאומי' : 'Social Insurance'),
+                            createElement('span', { key: 'social-amount' }, 
+                                `${rules.currency}${salaryData.socialInsuranceDeduction.toLocaleString()}`)
+                        ])
+                    ])
+                ])
+            ]),
+            
+            createElement('div', {
+                key: 'take-home-info',
+                className: "mt-4 p-3 bg-white bg-opacity-60 rounded-lg border border-green-300"
+            }, [
+                createElement('p', {
+                    key: 'take-home-text',
+                    className: "text-sm text-green-700 text-center"
+                }, language === 'he' ? 
+                    `💡 משכורתך הביתה: ${rules.currency}${salaryData.netMonthly.toLocaleString()} (${((salaryData.netMonthly / salaryData.grossMonthly) * 100).toFixed(1)}% מהברוטו)` :
+                    `💡 Your take-home salary: ${rules.currency}${salaryData.netMonthly.toLocaleString()} (${((salaryData.netMonthly / salaryData.grossMonthly) * 100).toFixed(1)}% of gross)`)
+            ])
+        ]);
+    };
+
     // Render contribution optimization
     const renderContributionOptimization = () => {
         const currentIncome = parseFloat(inputs.currentMonthlySalary || 0) * 12;
@@ -621,6 +792,9 @@ const WizardStepTaxes = ({ inputs, setInputs, language = 'en', workingCurrency =
 
         // Tax efficiency dashboard
         renderTaxEfficiencyDashboard(),
+
+        // Net salary breakdown
+        renderNetSalaryBreakdown(),
 
         // Tax rate inputs section
         createElement('div', {

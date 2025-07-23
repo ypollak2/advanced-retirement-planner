@@ -42,7 +42,7 @@ const RetirementWizard = ({
     const [showSaveNotification, setShowSaveNotification] = React.useState(false);
     const [lastSaved, setLastSaved] = React.useState(savedProgress?.lastSaved || null);
 
-    const totalSteps = 10;
+    const totalSteps = 8;
     
     // Auto-save progress to localStorage
     React.useEffect(() => {
@@ -114,9 +114,7 @@ const RetirementWizard = ({
                 5: { title: 'דמי ניהול', subtitle: 'עמלות ועלויות ניהול השקעות' },
                 6: { title: 'העדפות השקעה', subtitle: 'סיכון, תשואה וחלוקת נכסים' },
                 7: { title: 'יעדי פרישה', subtitle: 'הכנסה רצויה בפרישה ותכנון אורח חיים' },
-                8: { title: 'תכנון ירושה', subtitle: 'עזבון, צוואה ובטוח חיים לפי מדינה' },
-                9: { title: 'אופטימיזציה מיסויית', subtitle: 'תכנון מס וחיסכון מיסויי מתקדם' },
-                10: { title: 'סקירה מקיפה', subtitle: 'ניתוח מלא עם המלצות והערכת בריאות פיננסית' }
+                8: { title: 'סקירה מקיפה', subtitle: 'ניתוח מלא עם המלצות והערכת בריאות פיננסית' }
             }
         },
         en: {
@@ -135,9 +133,7 @@ const RetirementWizard = ({
                 5: { title: 'Management Fees', subtitle: 'Investment fees and management costs' },
                 6: { title: 'Investment Preferences', subtitle: 'Risk tolerance, returns, and asset allocation' },
                 7: { title: 'Retirement Goals', subtitle: 'Target retirement income and lifestyle planning' },
-                8: { title: 'Inheritance Planning', subtitle: 'Estate planning, wills, and life insurance by country' },
-                9: { title: 'Tax Optimization', subtitle: 'Advanced tax planning and optimization strategies' },
-                10: { title: 'Comprehensive Review', subtitle: 'Complete analysis with recommendations and financial health scoring' }
+                8: { title: 'Comprehensive Review', subtitle: 'Complete analysis with recommendations and financial health scoring' }
             }
         }
     };
@@ -242,14 +238,6 @@ const RetirementWizard = ({
                        (inputs.currentMonthlyExpenses || 0) > 0;
             
             case 8: 
-                // Inheritance planning - proper validation
-                return validateBeneficiarySection(inputs);
-            
-            case 9: 
-                // Tax optimization - basic validation
-                return true; // Optional step, always valid
-            
-            case 10: 
                 // Final review step - check if we have minimum required data
                 return inputs.currentAge && inputs.retirementAge && 
                        (inputs.currentMonthlySalary || inputs.partner1Salary || inputs.partner2Salary);
@@ -319,20 +307,6 @@ const RetirementWizard = ({
                         'Retirement Goals Step - To be implemented');
                 }
             case 8:
-                if (window.WizardStepInheritance) {
-                    return React.createElement(window.WizardStepInheritance, stepProps);
-                } else {
-                    return React.createElement('div', { className: 'text-center p-8' }, 
-                        'Inheritance Planning Step - Loading...');
-                }
-            case 9:
-                if (window.WizardStepTaxes) {
-                    return React.createElement(window.WizardStepTaxes, stepProps);
-                } else {
-                    return React.createElement('div', { className: 'text-center p-8' }, 
-                        'Tax Optimization Step - Loading...');
-                }
-            case 10:
                 if (window.WizardStepReview) {
                     return React.createElement(window.WizardStepReview, stepProps);
                 } else {
@@ -439,7 +413,7 @@ const RetirementWizard = ({
             onPrevious: handlePrevious,
             onSkip: handleSkip,
             isValid: isCurrentStepValid(),
-            canSkip: currentStep !== 10, // Can't skip final review step
+            canSkip: currentStep !== 8, // Can't skip final review step
             isFirst: currentStep === 1,
             isLast: currentStep === totalSteps,
             language: language,
