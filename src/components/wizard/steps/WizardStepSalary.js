@@ -8,27 +8,87 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
     // Validation state for salary inputs
     const [validationErrors, setValidationErrors] = React.useState({});
     
-    // Salary validation rules
+    // Enhanced salary validation rules
     const validateSalary = (salary) => {
         if (salary < 0) return language === 'he' ? 'משכורת לא יכולה להיות שלילית' : 'Salary cannot be negative';
         if (salary > 500000) return language === 'he' ? 'משכורת גבוהה מדי (מקסימום 500,000)' : 'Salary too high (max 500,000)';
         return null;
     };
     
+    // Net salary validation with logical checks
+    const validateNetSalary = (netSalary, grossSalary) => {
+        if (netSalary < 0) {
+            return language === 'he' ? 'משכורת נטו לא יכולה להיות שלילית' : 'Net salary cannot be negative';
+        }
+        if (netSalary > grossSalary) {
+            return language === 'he' ? 'משכורת נטו לא יכולה להיות גבוהה ממשכורת ברוטו' : 'Net salary cannot be higher than gross salary';
+        }
+        if (grossSalary > 0 && netSalary > 0) {
+            const takeHomePercentage = (netSalary / grossSalary) * 100;
+            if (takeHomePercentage < 30) {
+                return language === 'he' ? 'משכורת נטו נמוכה מדי (פחות מ-30% ממשכורת ברוטו)' : 'Net salary too low (less than 30% of gross)';
+            }
+            if (takeHomePercentage > 95) {
+                return language === 'he' ? 'משכורת נטו גבוהה מדי (יותר מ-95% ממשכורת ברוטו)' : 'Net salary too high (more than 95% of gross)';
+            }
+        }
+        return null;
+    };
+    
     const handleSalaryChange = (salary, field) => {
-        const numericSalary = parseFloat(salary) || 0; // Add default value handling
+        const numericSalary = parseFloat(salary) || 0;
         const error = validateSalary(numericSalary);
         setValidationErrors(prev => ({...prev, [field]: error}));
         setInputs({...inputs, [field]: numericSalary});
+        
+        // Auto-update net salary if not in manual mode
+        if (field === 'currentMonthlySalary' && !inputs.manualNetSalary) {
+            const autoNetSalary = calculateNetFromGross(numericSalary, inputs.country);
+            setInputs(prev => ({...prev, currentMonthlySalary: numericSalary, currentNetSalary: autoNetSalary}));
+        }
+        if (field === 'partner1Salary' && !inputs.manualPartner1NetSalary) {
+            const autoNetSalary = calculateNetFromGross(numericSalary, inputs.country);
+            setInputs(prev => ({...prev, partner1Salary: numericSalary, partner1NetSalary: autoNetSalary}));
+        }
+        if (field === 'partner2Salary' && !inputs.manualPartner2NetSalary) {
+            const autoNetSalary = calculateNetFromGross(numericSalary, inputs.country);
+            setInputs(prev => ({...prev, partner2Salary: numericSalary, partner2NetSalary: autoNetSalary}));
+        }
     };
     
-    // Helper function for input styling
-    const getInputClassName = (fieldName, baseClassName) => {
+    // Handle net salary changes with validation
+    const handleNetSalaryChange = (netSalary, grossSalary, netField, grossField) => {
+        const numericNetSalary = parseFloat(netSalary) || 0;
+        const numericGrossSalary = parseFloat(grossSalary) || 0;
+        const error = validateNetSalary(numericNetSalary, numericGrossSalary);
+        setValidationErrors(prev => ({...prev, [netField]: error}));
+        setInputs(prev => ({...prev, [netField]: numericNetSalary}));
+    };
+    
+    // Helper function for input styling with validation states
+    const getInputClassName = (fieldName, baseClassName, isNetSalary = false) => {
         const error = validationErrors[fieldName];
         if (error) {
             return `${baseClassName} border-red-500 focus:ring-red-500 focus:border-red-500`;
         }
+        if (isNetSalary) {
+            return `${baseClassName} border-green-300 focus:ring-green-500 focus:border-green-500`;
+        }
         return `${baseClassName} border-gray-300 focus:ring-blue-500 focus:border-blue-500`;
+    };
+    
+    // Calculate take-home percentage for display
+    const calculateTakeHomePercentage = (netSalary, grossSalary) => {
+        if (!grossSalary || !netSalary || grossSalary === 0) return 0;
+        return Math.round((netSalary / grossSalary) * 100);
+    };
+    
+    // Format percentage with color coding
+    const getPercentageDisplay = (percentage) => {
+        if (percentage === 0) return { text: '', color: 'text-gray-500' };
+        if (percentage < 50) return { text: `${percentage}%`, color: 'text-red-600' };
+        if (percentage < 70) return { text: `${percentage}%`, color: 'text-yellow-600' };
+        return { text: `${percentage}%`, color: 'text-green-600' };
     };
 
     // Currency symbol helper
@@ -69,6 +129,12 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             manualOverride: 'עריכה ידנית',
             switchToManual: 'החלף לעריכה ידנית',
             switchToAuto: 'חזור לחישוב אוטומטי',
+            takeHomePercentage: 'אחוז המשכורת שנשאר',
+            validationWarning: 'אזהרה',
+            reasonableRange: 'טווח סביר: 50%-85%',
+            netSalaryTooHigh: 'משכורת נטו גבוהה מדי',
+            netSalaryTooLow: 'משכורת נטו נמוכה מדי',
+            checkCalculation: 'בדוק את החישוב',
             additionalIncome: 'הכנסות נוספות',
             mainAdditionalIncome: 'הכנסות נוספות עיקריות',
             partnerAdditionalIncome: 'הכנסות נוספות בני הזוג',
@@ -100,6 +166,12 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             manualOverride: 'Manual Override',
             switchToManual: 'Switch to Manual Entry',
             switchToAuto: 'Switch to Auto-calculation',
+            takeHomePercentage: 'Take-home percentage',
+            validationWarning: 'Warning',
+            reasonableRange: 'Reasonable range: 50%-85%',
+            netSalaryTooHigh: 'Net salary too high',
+            netSalaryTooLow: 'Net salary too low',
+            checkCalculation: 'Please check calculation',
             additionalIncome: 'Additional Income Sources',
             mainAdditionalIncome: 'Main Additional Income',
             partnerAdditionalIncome: 'Partner Additional Income',
@@ -241,30 +313,73 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                             calculateNetFromGross(inputs.currentMonthlySalary || 15000, inputs.country),
                         onChange: (e) => {
                             if (inputs.manualNetSalary) {
-                                const value = parseInt(e.target.value) || 0;
-                                setInputs({...inputs, currentNetSalary: value});
+                                handleNetSalaryChange(e.target.value, inputs.currentMonthlySalary || 0, 'currentNetSalary', 'currentMonthlySalary');
                             }
                         },
                         readOnly: !inputs.manualNetSalary,
                         placeholder: inputs.manualNetSalary ? "10000" : "Auto-calculated",
-                        className: `w-full p-3 md:p-4 text-base md:text-lg border-2 rounded-lg focus:ring-2 ${
-                            inputs.manualNetSalary ? 
-                            'border-green-300 focus:ring-green-500 focus:border-green-500 bg-white' : 
-                            'border-green-200 bg-green-50 text-green-700 cursor-not-allowed'
-                        }`
+                        className: inputs.manualNetSalary ? 
+                            getInputClassName('currentNetSalary', 'w-full p-3 md:p-4 text-base md:text-lg border-2 rounded-lg focus:ring-2 bg-white', true) :
+                            'w-full p-3 md:p-4 text-base md:text-lg border-2 border-green-200 bg-green-50 text-green-700 cursor-not-allowed rounded-lg'
                     }),
+                    // Enhanced help text with validation and percentage display
                     createElement('div', { 
                         key: 'net-salary-help',
-                        className: "mt-2 flex items-center text-sm"
+                        className: "mt-2 space-y-1"
                     }, [
-                        createElement('span', {
-                            key: 'net-help-icon',
-                            className: "mr-1 text-green-600"
-                        }, '💰'),
-                        createElement('span', {
-                            key: 'net-help-text',
-                            className: inputs.manualNetSalary ? "text-green-600" : "text-green-500"
-                        }, inputs.manualNetSalary ? t.manualOverride : `${t.autoCalculated} - ${t.netSalaryInfo}`)
+                        // Main help text
+                        createElement('div', {
+                            key: 'net-help-main',
+                            className: "flex items-center text-sm"
+                        }, [
+                            createElement('span', {
+                                key: 'net-help-icon',
+                                className: "mr-1 text-green-600"
+                            }, '💰'),
+                            createElement('span', {
+                                key: 'net-help-text',
+                                className: inputs.manualNetSalary ? "text-green-600" : "text-green-500"
+                            }, inputs.manualNetSalary ? t.manualOverride : `${t.autoCalculated} - ${t.netSalaryInfo}`)
+                        ]),
+                        // Take-home percentage display
+                        (() => {
+                            const grossSalary = inputs.currentMonthlySalary || 15000;
+                            const netSalary = inputs.manualNetSalary ? 
+                                (inputs.currentNetSalary || 0) : 
+                                calculateNetFromGross(grossSalary, inputs.country);
+                            const percentage = calculateTakeHomePercentage(netSalary, grossSalary);
+                            const percentageDisplay = getPercentageDisplay(percentage);
+                            
+                            return createElement('div', {
+                                key: 'percentage-display',
+                                className: "flex items-center text-xs"
+                            }, [
+                                createElement('span', {
+                                    key: 'percentage-label',
+                                    className: "text-gray-500 mr-2"
+                                }, `${t.takeHomePercentage}: `),
+                                createElement('span', {
+                                    key: 'percentage-value',
+                                    className: `font-medium ${percentageDisplay.color}`
+                                }, percentageDisplay.text || '0%'),
+                                percentage > 0 && percentage < 50 && createElement('span', {
+                                    key: 'warning-text',
+                                    className: "ml-2 text-red-500 text-xs"
+                                }, `⚠️ ${t.netSalaryTooLow}`),
+                                percentage > 90 && createElement('span', {
+                                    key: 'high-warning',
+                                    className: "ml-2 text-yellow-600 text-xs"
+                                }, `⚠️ ${t.checkCalculation}`)
+                            ]);
+                        })()
+                    ]),
+                    // Validation error display
+                    validationErrors.currentNetSalary && createElement('div', {
+                        key: 'net-salary-error',
+                        className: "mt-1 text-sm text-red-600 flex items-center"
+                    }, [
+                        createElement('span', { key: 'error-icon', className: "mr-1" }, '❌'),
+                        validationErrors.currentNetSalary
                     ])
                 ])
             ])
@@ -331,23 +446,47 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                                 calculateNetFromGross(inputs.partner1Salary || 0, inputs.country),
                             onChange: (e) => {
                                 if (inputs.manualPartner1NetSalary) {
-                                    const value = parseInt(e.target.value) || 0;
-                                    setInputs({...inputs, partner1NetSalary: value});
+                                    handleNetSalaryChange(e.target.value, inputs.partner1Salary || 0, 'partner1NetSalary', 'partner1Salary');
                                 }
                             },
                             readOnly: !inputs.manualPartner1NetSalary,
-                            className: `w-full p-3 text-base border-2 rounded-lg focus:ring-2 ${
-                                inputs.manualPartner1NetSalary ? 
-                                'border-green-300 focus:ring-green-500 focus:border-green-500 bg-white' : 
-                                'border-green-200 bg-green-50 text-green-700 cursor-not-allowed'
-                            }`
+                            className: inputs.manualPartner1NetSalary ? 
+                                getInputClassName('partner1NetSalary', 'w-full p-3 text-base border-2 rounded-lg focus:ring-2 bg-white', true) :
+                                'w-full p-3 text-base border-2 border-green-200 bg-green-50 text-green-700 cursor-not-allowed rounded-lg'
                         }),
-                        createElement('p', { 
+                        // Enhanced partner 1 help with percentage
+                        createElement('div', { 
                             key: 'partner1-net-help',
-                            className: "mt-1 text-xs text-green-600 flex items-center" 
+                            className: "mt-1 space-y-1" 
                         }, [
-                            createElement('span', { key: 'icon', className: "mr-1" }, '💰'),
-                            inputs.manualPartner1NetSalary ? t.manualOverride : t.autoCalculated
+                            createElement('div', {
+                                key: 'partner1-help-main',
+                                className: "text-xs text-green-600 flex items-center"
+                            }, [
+                                createElement('span', { key: 'icon', className: "mr-1" }, '💰'),
+                                inputs.manualPartner1NetSalary ? t.manualOverride : t.autoCalculated
+                            ]),
+                            (() => {
+                                const grossSalary = inputs.partner1Salary || 0;
+                                const netSalary = inputs.manualPartner1NetSalary ? 
+                                    (inputs.partner1NetSalary || 0) : 
+                                    calculateNetFromGross(grossSalary, inputs.country);
+                                const percentage = calculateTakeHomePercentage(netSalary, grossSalary);
+                                const percentageDisplay = getPercentageDisplay(percentage);
+                                
+                                return grossSalary > 0 && createElement('div', {
+                                    key: 'partner1-percentage',
+                                    className: `text-xs ${percentageDisplay.color}`
+                                }, `${t.takeHomePercentage}: ${percentageDisplay.text}`);
+                            })()
+                        ]),
+                        // Validation error for partner 1 net salary
+                        validationErrors.partner1NetSalary && createElement('div', {
+                            key: 'partner1-net-error',
+                            className: "mt-1 text-xs text-red-600 flex items-center"
+                        }, [
+                            createElement('span', { key: 'error-icon', className: "mr-1" }, '❌'),
+                            validationErrors.partner1NetSalary
                         ])
                     ])
                 ]),
@@ -399,23 +538,47 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                                 calculateNetFromGross(inputs.partner2Salary || 0, inputs.country),
                             onChange: (e) => {
                                 if (inputs.manualPartner2NetSalary) {
-                                    const value = parseInt(e.target.value) || 0;
-                                    setInputs({...inputs, partner2NetSalary: value});
+                                    handleNetSalaryChange(e.target.value, inputs.partner2Salary || 0, 'partner2NetSalary', 'partner2Salary');
                                 }
                             },
                             readOnly: !inputs.manualPartner2NetSalary,
-                            className: `w-full p-3 text-base border-2 rounded-lg focus:ring-2 ${
-                                inputs.manualPartner2NetSalary ? 
-                                'border-green-300 focus:ring-green-500 focus:border-green-500 bg-white' : 
-                                'border-green-200 bg-green-50 text-green-700 cursor-not-allowed'
-                            }`
+                            className: inputs.manualPartner2NetSalary ? 
+                                getInputClassName('partner2NetSalary', 'w-full p-3 text-base border-2 rounded-lg focus:ring-2 bg-white', true) :
+                                'w-full p-3 text-base border-2 border-green-200 bg-green-50 text-green-700 cursor-not-allowed rounded-lg'
                         }),
-                        createElement('p', { 
+                        // Enhanced partner 2 help with percentage
+                        createElement('div', { 
                             key: 'partner2-net-help',
-                            className: "mt-1 text-xs text-green-600 flex items-center" 
+                            className: "mt-1 space-y-1" 
                         }, [
-                            createElement('span', { key: 'icon', className: "mr-1" }, '💰'),
-                            inputs.manualPartner2NetSalary ? t.manualOverride : t.autoCalculated
+                            createElement('div', {
+                                key: 'partner2-help-main',
+                                className: "text-xs text-green-600 flex items-center"
+                            }, [
+                                createElement('span', { key: 'icon', className: "mr-1" }, '💰'),
+                                inputs.manualPartner2NetSalary ? t.manualOverride : t.autoCalculated
+                            ]),
+                            (() => {
+                                const grossSalary = inputs.partner2Salary || 0;
+                                const netSalary = inputs.manualPartner2NetSalary ? 
+                                    (inputs.partner2NetSalary || 0) : 
+                                    calculateNetFromGross(grossSalary, inputs.country);
+                                const percentage = calculateTakeHomePercentage(netSalary, grossSalary);
+                                const percentageDisplay = getPercentageDisplay(percentage);
+                                
+                                return grossSalary > 0 && createElement('div', {
+                                    key: 'partner2-percentage',
+                                    className: `text-xs ${percentageDisplay.color}`
+                                }, `${t.takeHomePercentage}: ${percentageDisplay.text}`);
+                            })()
+                        ]),
+                        // Validation error for partner 2 net salary
+                        validationErrors.partner2NetSalary && createElement('div', {
+                            key: 'partner2-net-error',
+                            className: "mt-1 text-xs text-red-600 flex items-center"
+                        }, [
+                            createElement('span', { key: 'error-icon', className: "mr-1" }, '❌'),
+                            validationErrors.partner2NetSalary
                         ])
                     ])
                 ])
