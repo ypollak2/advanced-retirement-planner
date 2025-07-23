@@ -68,8 +68,8 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             yearly: 'שנתי',
             otherIncome: `הכנסות אחרות (${currencySymbol})`,
             partnerSalaries: 'משכורות בני הזוג',
-            partner1Salary: 'משכורת ברוטו בן/בת זוג 1 (לפני מסים)',
-            partner2Salary: 'משכורת ברוטו בן/בת זוג 2 (לפני מסים)',
+            partner1Salary: 'משכורת ברוטו בן/בת זוג (לפני מסים)',
+            partner2Salary: 'משכורת ברוטו בן/בת זוג נוסף (לפני מסים)',
             optional: 'אופציונלי',
             totalMonthlyIncome: 'סך הכנסה חודשית',
             incomeBreakdown: 'פירוט ההכנסות'
@@ -94,8 +94,8 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             yearly: 'Yearly',
             otherIncome: `Other Income (${currencySymbol})`,
             partnerSalaries: 'Partner Salaries',
-            partner1Salary: 'Partner 1 Gross Salary (Before Taxes)',
-            partner2Salary: 'Partner 2 Gross Salary (Before Taxes)',
+            partner1Salary: 'Partner Gross Salary (Before Taxes)',
+            partner2Salary: 'Additional Partner Gross Salary (Before Taxes)',
             optional: 'Optional',
             totalMonthlyIncome: 'Total Monthly Income',
             incomeBreakdown: 'Income Breakdown'
@@ -214,7 +214,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                     createElement('label', { 
                         key: 'partner1-salary-label',
                         className: "block text-lg font-medium text-gray-700 mb-2" 
-                    }, `${inputs.partner1Name || t.partner1Salary} (${currencySymbol})`),
+                    }, `${inputs.userName || t.partner1Salary} (${currencySymbol})`),
                     createElement('input', {
                         key: 'partner1-salary-input',
                         type: 'number',
@@ -234,7 +234,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                     createElement('label', { 
                         key: 'partner2-salary-label',
                         className: "block text-lg font-medium text-gray-700 mb-2" 
-                    }, `${inputs.partner2Name || t.partner2Salary} (${currencySymbol})`),
+                    }, `${inputs.partnerName || t.partner2Salary} (${currencySymbol})`),
                     createElement('input', {
                         key: 'partner2-salary-input',
                         type: 'number',

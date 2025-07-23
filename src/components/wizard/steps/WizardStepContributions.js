@@ -155,7 +155,8 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
     };
 
     // Calculate training fund contribution and tax treatment based on 2024 Israeli regulations
-    const calculateTrainingFundContribution = (monthlySalary) => {
+    // Enhanced to support partner-specific parameters
+    const calculateTrainingFundContribution = (monthlySalary, isUnlimited = false, employeeRate = 2.5, employerRate = 7.5) => {
         if (selectedCountry !== 'israel') return {
             totalContribution: monthlySalary * (defaultRates.trainingFund / 100),
             taxDeductible: monthlySalary * (defaultRates.trainingFund / 100),
@@ -165,10 +166,24 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
         
         const threshold = defaultRates.trainingFundThreshold || 15792;
         const maxContribution = defaultRates.maxMonthlyContribution || 1579;
-        const rate = defaultRates.trainingFundBelowThreshold / 100 || 0.10;
+        const totalRate = (employeeRate + employerRate) / 100 || 0.10;
+        
+        // If unlimited contribution is enabled, apply rate to full salary
+        if (isUnlimited) {
+            const totalContribution = monthlySalary * totalRate;
+            return {
+                totalContribution,
+                taxDeductible: totalContribution,
+                taxableAmount: 0,
+                effectiveRate: employeeRate + employerRate,
+                salaryStatus: 'unlimited',
+                employeeRate,
+                employerRate
+            };
+        }
         
         // Calculate total contribution (employer continues to contribute above threshold)
-        const totalContribution = monthlySalary * rate;
+        const totalContribution = monthlySalary * totalRate;
         
         if (monthlySalary <= threshold) {
             // Below threshold: full tax benefits
@@ -176,8 +191,10 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                 totalContribution,
                 taxDeductible: totalContribution,
                 taxableAmount: 0,
-                effectiveRate: defaultRates.trainingFundBelowThreshold,
-                salaryStatus: 'below_threshold'
+                effectiveRate: employeeRate + employerRate,
+                salaryStatus: 'below_threshold',
+                employeeRate,
+                employerRate
             };
         } else {
             // Above threshold: only contribution up to threshold gets tax benefits
@@ -191,22 +208,28 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                 effectiveRate: (totalContribution / monthlySalary) * 100,
                 salaryStatus: 'above_threshold',
                 threshold: threshold,
-                excessSalary: monthlySalary - threshold
+                excessSalary: monthlySalary - threshold,
+                employeeRate,
+                employerRate
             };
         }
     };
 
-    // Get detailed salary status for display
-    const getSalaryStatus = (monthlySalary) => {
+    // Get detailed salary status for display - enhanced for partner-specific parameters
+    const getSalaryStatus = (monthlySalary, isUnlimited = false, employeeRate = 2.5, employerRate = 7.5) => {
         if (selectedCountry !== 'israel') return '';
         
-        const contribution = calculateTrainingFundContribution(monthlySalary);
+        const contribution = calculateTrainingFundContribution(monthlySalary, isUnlimited, employeeRate, employerRate);
         const threshold = defaultRates.trainingFundThreshold || 15792;
         
-        if (contribution.salaryStatus === 'below_threshold') {
+        if (contribution.salaryStatus === 'unlimited') {
             return language === 'he' ? 
-                `מתחת לסף (₪${threshold.toLocaleString()}) - 10% מוטב מס` : 
-                `Below threshold (₪${threshold.toLocaleString()}) - 10% tax-benefited`;
+                `על כל הכנסה - ${employeeRate + employerRate}% מוטב מס` : 
+                `On full salary - ${employeeRate + employerRate}% tax-benefited`;
+        } else if (contribution.salaryStatus === 'below_threshold') {
+            return language === 'he' ? 
+                `מתחת לסף (₪${threshold.toLocaleString()}) - ${employeeRate + employerRate}% מוטב מס` : 
+                `Below threshold (₪${threshold.toLocaleString()}) - ${employeeRate + employerRate}% tax-benefited`;
         } else {
             const taxableAmount = contribution.taxableAmount || 0;
             return language === 'he' ? 
@@ -223,6 +246,122 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
             pensionContributionRate: rates.pension,
             trainingFundContributionRate: rates.trainingFund
         });
+    };
+
+    // Helper function to render partner-specific Training Fund card
+    const renderPartnerTrainingFundCard = (partnerKey, partnerName, partnerSalary, colorScheme) => {
+        const unlimitedField = `${partnerKey}TrainingFundUnlimited`;
+        const employeeRateField = `${partnerKey}TrainingFundEmployeeRate`;
+        const employerRateField = `${partnerKey}TrainingFundEmployerRate`;
+        
+        const isUnlimited = inputs[unlimitedField] || false;
+        const employeeRate = inputs[employeeRateField] || 2.5;
+        const employerRate = inputs[employerRateField] || 7.5;
+        
+        const statusText = getSalaryStatus(partnerSalary, isUnlimited, employeeRate, employerRate);
+        
+        return createElement('div', {
+            key: `${partnerKey}-training-fund-card`,
+            className: `bg-gradient-to-r ${colorScheme.background} rounded-xl p-6 border ${colorScheme.border}`
+        }, [
+            // Partner name header
+            createElement('h4', {
+                key: 'partner-header',
+                className: `text-lg font-semibold ${colorScheme.text} mb-4 flex items-center`
+            }, [
+                createElement('span', { key: 'icon', className: "mr-2 text-xl" }, '📊'),
+                partnerName || (partnerKey === 'partner1' ? 
+                    (language === 'he' ? 'בן/בת זוג ראשי' : 'Primary Partner') :
+                    (language === 'he' ? 'בן/בת זוג שני' : 'Secondary Partner'))
+            ]),
+            
+            // Unlimited contribution checkbox
+            createElement('div', {
+                key: 'unlimited-checkbox',
+                className: "mb-4"
+            }, [
+                createElement('label', {
+                    key: 'checkbox-label',
+                    className: "flex items-center cursor-pointer"
+                }, [
+                    createElement('input', {
+                        key: 'checkbox-input',
+                        type: 'checkbox',
+                        checked: isUnlimited,
+                        onChange: (e) => setInputs({...inputs, [unlimitedField]: e.target.checked}),
+                        className: `mr-3 w-4 h-4 ${colorScheme.checkbox} rounded focus:ring-2 focus:ring-opacity-50`
+                    }),
+                    createElement('span', {
+                        key: 'checkbox-text',
+                        className: "text-sm font-medium text-gray-700"
+                    }, language === 'he' ? 
+                        'הפקדה על כל הכנסה (ללא הגבלת סף)' : 
+                        'Contribute on full salary (no salary cap)')
+                ])
+            ]),
+            
+            // Contribution rates
+            createElement('div', {
+                key: 'contribution-rates',
+                className: "bg-white rounded-lg p-4 border border-gray-200"
+            }, [
+                createElement('h5', {
+                    key: 'rates-title',
+                    className: "text-sm font-semibold text-gray-700 mb-3"
+                }, language === 'he' ? 'שיעורי הפקדה:' : 'Contribution Rates:'),
+                
+                createElement('div', {
+                    key: 'rates-grid',
+                    className: "grid grid-cols-2 gap-3"
+                }, [
+                    // Employee rate
+                    createElement('div', {
+                        key: 'employee-rate',
+                        className: `text-center p-3 ${colorScheme.employeeBox} rounded-lg`
+                    }, [
+                        createElement('div', { 
+                            key: 'employee-label', 
+                            className: `text-xs ${colorScheme.employeeText}` 
+                        }, language === 'he' ? 'עובד' : 'Employee'),
+                        createElement('div', { 
+                            key: 'employee-value', 
+                            className: `text-lg font-bold ${colorScheme.employeeText}` 
+                        }, `${employeeRate}%`)
+                    ]),
+                    
+                    // Employer rate
+                    createElement('div', {
+                        key: 'employer-rate',
+                        className: `text-center p-3 ${colorScheme.employerBox} rounded-lg`
+                    }, [
+                        createElement('div', { 
+                            key: 'employer-label', 
+                            className: `text-xs ${colorScheme.employerText}` 
+                        }, language === 'he' ? 'מעביד' : 'Employer'),
+                        createElement('div', { 
+                            key: 'employer-value', 
+                            className: `text-lg font-bold ${colorScheme.employerText}` 
+                        }, `${employerRate}%`)
+                    ])
+                ])
+            ]),
+            
+            // Current salary status
+            createElement('div', {
+                key: 'salary-status',
+                className: "mt-4 p-3 bg-gray-50 rounded-lg"
+            }, [
+                createElement('h6', {
+                    key: 'status-title',
+                    className: "text-xs font-semibold text-gray-700 mb-1"
+                }, t.currentSalaryStatus),
+                createElement('div', {
+                    key: 'status-text',
+                    className: `text-sm ${isUnlimited ? colorScheme.statusBlue : 
+                        (partnerSalary > 15792 ? 'text-red-600' : 'text-green-600')}`
+                }, statusText)
+            ])
+        ]);
     };
 
     // Using React.createElement pattern for component rendering
@@ -564,135 +703,83 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
             ])
         ]),
 
-        // Training Fund System (Israel only, simplified)
-        selectedCountry === 'israel' && createElement('div', { key: 'training-fund-system' }, [
+        // Enhanced Training Fund System (Israel only) - Individual Partner Settings
+        selectedCountry === 'israel' && inputs.planningType === 'couple' && createElement('div', { key: 'partner-training-fund-system' }, [
             createElement('h3', { 
-                key: 'training-fund-title',
-                className: "text-xl font-semibold text-gray-700 mb-4 flex items-center" 
+                key: 'partner-training-fund-title',
+                className: "text-xl font-semibold text-gray-700 mb-6 flex items-center" 
             }, [
                 createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '📊'),
                 t.trainingFundLimits
             ]),
             
-            createElement('div', { 
-                key: 'training-fund-settings',
-                className: "bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-6 border border-blue-200" 
+            createElement('div', {
+                key: 'partner-training-fund-grid',
+                className: "grid grid-cols-1 lg:grid-cols-2 gap-6"
             }, [
-                // Checkbox for unlimited contributions
-                createElement('div', { 
-                    key: 'unlimited-checkbox',
-                    className: "mb-6" 
-                }, [
-                    createElement('label', { 
-                        key: 'checkbox-label',
-                        className: "flex items-center cursor-pointer" 
-                    }, [
-                        createElement('input', {
-                            key: 'checkbox-input',
-                            type: 'checkbox',
-                            checked: inputs.trainingFundUnlimited || false,
-                            onChange: (e) => setInputs({...inputs, trainingFundUnlimited: e.target.checked}),
-                            className: "mr-3 w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                        }),
-                        createElement('span', { 
-                            key: 'checkbox-text',
-                            className: "text-lg font-medium text-gray-700" 
-                        }, language === 'he' ? 
-                            'הפקדה על כל הכנסה (ללא הגבלת סף)' : 
-                            'Contribute on full salary (no salary cap)')
-                    ])
-                ]),
+                // Partner 1 Training Fund Card
+                renderPartnerTrainingFundCard(
+                    'partner1',
+                    inputs.userName,
+                    inputs.partner1Salary || 0,
+                    {
+                        background: 'from-blue-50 to-blue-100',
+                        border: 'border-blue-200',
+                        text: 'text-blue-700',
+                        checkbox: 'text-blue-600',
+                        employeeBox: 'bg-blue-50',
+                        employeeText: 'text-blue-600',
+                        employerBox: 'bg-blue-100',
+                        employerText: 'text-blue-700',
+                        statusBlue: 'text-blue-600'
+                    }
+                ),
                 
-                // Explanation of rates
-                createElement('div', { 
-                    key: 'rates-explanation',
-                    className: "bg-white rounded-lg p-4 border border-gray-200" 
-                }, [
-                    createElement('h4', { 
-                        key: 'rates-title',
-                        className: "text-md font-semibold text-gray-700 mb-3" 
-                    }, language === 'he' ? 'שיעורי הפקדה:' : 'Contribution Rates:'),
-                    
-                    createElement('div', { 
-                        key: 'rates-grid',
-                        className: "grid grid-cols-2 gap-4" 
-                    }, [
-                        // Employee rate
-                        createElement('div', { 
-                            key: 'employee-rate',
-                            className: "text-center p-3 bg-blue-50 rounded-lg" 
-                        }, [
-                            createElement('div', { key: 'employee-label', className: "text-sm text-blue-600" }, 
-                                language === 'he' ? 'עובד' : 'Employee'),
-                            createElement('div', { key: 'employee-value', className: "text-xl font-bold text-blue-700" }, 
-                                '2.5%')
-                        ]),
-                        
-                        // Employer rate
-                        createElement('div', { 
-                            key: 'employer-rate',
-                            className: "text-center p-3 bg-green-50 rounded-lg" 
-                        }, [
-                            createElement('div', { key: 'employer-label', className: "text-sm text-green-600" }, 
-                                language === 'he' ? 'מעביד' : 'Employer'),
-                            createElement('div', { key: 'employer-value', className: "text-xl font-bold text-green-700" }, 
-                                '7.5%')
-                        ])
-                    ])
-                ]),
-                
-                // Status display
-                createElement('div', { 
-                    key: 'current-status',
-                    className: "mt-4 p-4 bg-gray-50 rounded-lg" 
-                }, [
-                    createElement('h4', { 
-                        key: 'status-title',
-                        className: "text-sm font-semibold text-gray-700 mb-2" 
-                    }, t.currentSalaryStatus),
-                    
-                    createElement('div', { 
-                        key: 'status-content',
-                        className: "space-y-2" 
-                    }, [
-                        // Main salary status
-                        inputs.currentMonthlySalary && createElement('div', { 
-                            key: 'main-status',
-                            className: "flex justify-between items-center" 
-                        }, [
-                            createElement('span', { key: 'main-label' }, 
-                                language === 'he' ? 'בן/בת זוג 1' : 'Partner 1'),
-                            createElement('span', { 
-                                key: 'main-value',
-                                className: inputs.trainingFundUnlimited ? 'text-blue-600' : 
-                                    (inputs.currentMonthlySalary > 15792 ? 'text-red-600' : 'text-green-600')
-                            }, inputs.trainingFundUnlimited ? 
-                                (language === 'he' ? 'על כל הכנסה - 10%' : 'On full salary - 10%') :
-                                (inputs.currentMonthlySalary > 15792 ? 
-                                    (language === 'he' ? `מעל הסף - עד ₪15,792` : `Above threshold - up to ₪15,792`) :
-                                    (language === 'he' ? 'תחת הסף - 10%' : 'Below threshold - 10%')))
-                        ]),
-                        
-                        // Partner 2 salary status (if couple)
-                        inputs.planningType === 'couple' && inputs.partner2Salary && createElement('div', { 
-                            key: 'partner2-status',
-                            className: "flex justify-between items-center" 
-                        }, [
-                            createElement('span', { key: 'partner2-label' }, 
-                                language === 'he' ? 'בן/בת זוג 2' : 'Partner 2'),
-                            createElement('span', { 
-                                key: 'partner2-value',
-                                className: inputs.trainingFundUnlimited ? 'text-blue-600' : 
-                                    (inputs.partner2Salary > 15792 ? 'text-red-600' : 'text-green-600')
-                            }, inputs.trainingFundUnlimited ? 
-                                (language === 'he' ? 'על כל הכנסה - 10%' : 'On full salary - 10%') :
-                                (inputs.partner2Salary > 15792 ? 
-                                    (language === 'he' ? `מעל הסף - עד ₪15,792` : `Above threshold - up to ₪15,792`) :
-                                    (language === 'he' ? 'תחת הסף - 10%' : 'Below threshold - 10%')))
-                        ])
-                    ])
-                ])
+                // Partner 2 Training Fund Card
+                renderPartnerTrainingFundCard(
+                    'partner2',
+                    inputs.partnerName,
+                    inputs.partner2Salary || 0,
+                    {
+                        background: 'from-green-50 to-green-100',
+                        border: 'border-green-200',
+                        text: 'text-green-700',
+                        checkbox: 'text-green-600',
+                        employeeBox: 'bg-green-50',
+                        employeeText: 'text-green-600',
+                        employerBox: 'bg-green-100',
+                        employerText: 'text-green-700',
+                        statusBlue: 'text-green-600'
+                    }
+                )
             ])
+        ]),
+
+        // Single User Training Fund System (Israel only) - Simplified for single mode
+        selectedCountry === 'israel' && inputs.planningType !== 'couple' && createElement('div', { key: 'single-training-fund-system' }, [
+            createElement('h3', { 
+                key: 'single-training-fund-title',
+                className: "text-xl font-semibold text-gray-700 mb-4 flex items-center" 
+            }, [
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '📊'),
+                t.trainingFundLimits
+            ]),
+            renderPartnerTrainingFundCard(
+                'current',
+                inputs.userName,
+                inputs.currentMonthlySalary || 0,
+                {
+                    background: 'from-blue-50 to-purple-50',
+                    border: 'border-blue-200',
+                    text: 'text-blue-700',
+                    checkbox: 'text-blue-600',
+                    employeeBox: 'bg-blue-50',
+                    employeeText: 'text-blue-600',
+                    employerBox: 'bg-purple-50',
+                    employerText: 'text-purple-700',
+                    statusBlue: 'text-blue-600'
+                }
+            )
         ]),
 
     ]);

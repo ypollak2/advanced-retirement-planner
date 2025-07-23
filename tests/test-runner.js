@@ -701,7 +701,7 @@ function testPartnerPlanningFeatures() {
             const salaryContent = fs.readFileSync('src/components/wizard/steps/WizardStepSalary.js', 'utf8');
             
             // Check for partner name inputs
-            const hasPartnerNames = salaryContent.includes('partner1Name') && salaryContent.includes('partner2Name');
+            const hasPartnerNames = salaryContent.includes('inputs.userName') && salaryContent.includes('inputs.partnerName');
             logTest('WizardStepSalary: Partner name inputs', hasPartnerNames);
             
             // Check for partner salary fields
@@ -1372,9 +1372,10 @@ function testRedesignedTrainingFundSystem() {
     if (fs.existsSync('src/components/wizard/steps/WizardStepContributions.js')) {
         const content = fs.readFileSync('src/components/wizard/steps/WizardStepContributions.js', 'utf8');
         
-        // Test 1: Simplified checkbox system (corrected pattern)
-        const hasUnlimitedCheckbox = content.includes('trainingFundUnlimited') && 
-                                    content.includes("type: 'checkbox'");
+        // Test 1: Partner-specific checkbox system (updated for enhanced individual partner settings)
+        const hasUnlimitedCheckbox = content.includes('TrainingFundUnlimited') && 
+                                    content.includes("type: 'checkbox'") &&
+                                    content.includes('renderPartnerTrainingFundCard');
         logTest('Training Fund: Unlimited contribution checkbox implemented', hasUnlimitedCheckbox);
         
         // Test 2: 2024 threshold values

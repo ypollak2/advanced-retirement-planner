@@ -353,7 +353,7 @@ const ReadinessScore = ({
             ])
         ]),
 
-        // Score Details
+        // Score Details with Tooltips
         React.createElement('div', { key: 'score-details', className: 'mb-6' }, [
             React.createElement('h4', {
                 key: 'factors-title',
@@ -364,22 +364,58 @@ const ReadinessScore = ({
                 className: 'grid grid-cols-1 md:grid-cols-2 gap-3'
             }, Object.keys(scoreDetails).filter(key => 
                 ['savingsRate', 'timeHorizon', 'currentSavings', 'retirementGoal', 'riskManagement'].includes(key)
-            ).map(key => 
-                React.createElement('div', {
+            ).map(key => {
+                const helpTermMap = {
+                    'savingsRate': 'savings-rate-score',
+                    'timeHorizon': 'retirement-readiness-score', 
+                    'currentSavings': 'retirement-readiness-score',
+                    'retirementGoal': 'retirement-readiness-score',
+                    'riskManagement': 'risk-alignment-score'
+                };
+                
+                return React.createElement('div', {
                     key: key,
-                    className: 'flex justify-between items-center p-2 bg-gray-50 rounded'
+                    className: 'flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors'
                 }, [
-                    React.createElement('span', {
+                    // Factor name with tooltip
+                    window.HelpTooltip ? React.createElement(window.HelpTooltip, {
+                        key: 'factor-help',
+                        term: helpTermMap[key],
+                        language: language,
+                        position: 'top'
+                    }, React.createElement('span', {
                         key: 'factor-name',
-                        className: 'text-sm text-gray-700'
+                        className: 'text-sm text-gray-700 font-medium'
+                    }, t.factors[key] || key)) : React.createElement('span', {
+                        key: 'factor-name',
+                        className: 'text-sm text-gray-700 font-medium'
                     }, t.factors[key] || key),
-                    React.createElement('span', {
-                        key: 'factor-score',
-                        className: 'text-sm font-semibold',
-                        style: { color: scoreDetails[key] >= 70 ? '#10B981' : scoreDetails[key] >= 50 ? '#F59E0B' : '#EF4444' }
-                    }, `${Math.round(scoreDetails[key] || 0)}%`)
-                ])
-            ))
+                    
+                    // Score with explanation
+                    React.createElement('div', {
+                        key: 'score-container',
+                        className: 'flex items-center gap-2'
+                    }, [
+                        React.createElement('span', {
+                            key: 'factor-score',
+                            className: 'text-sm font-bold px-2 py-1 rounded-full text-white',
+                            style: { 
+                                backgroundColor: scoreDetails[key] >= 70 ? '#10B981' : 
+                                               scoreDetails[key] >= 50 ? '#F59E0B' : '#EF4444' 
+                            }
+                        }, `${Math.round(scoreDetails[key] || 0)}`),
+                        window.ScoreExplanation && React.createElement('button', {
+                            key: 'info-btn',
+                            className: 'text-blue-500 hover:text-blue-700 text-xs',
+                            onClick: (e) => {
+                                e.stopPropagation();
+                                // Could trigger modal or tooltip
+                            },
+                            'aria-label': language === 'he' ? 'מידע נוסף' : 'More info'
+                        }, 'ℹ️')
+                    ])
+                ]);
+            }))
         ]),
 
         // Recommendations
