@@ -12,6 +12,10 @@ window.SecureInput = function(props) {
         errorClassName = 'text-red-500 text-sm mt-1',
         showError = true,
         debounceDelay = 300,
+        label,
+        'aria-label': ariaLabel,
+        'aria-labelledby': ariaLabelledBy,
+        required = false,
         ...otherProps
     } = props;
 
@@ -120,28 +124,69 @@ window.SecureInput = function(props) {
         return validProps;
     };
 
-    return React.createElement('div', { className: 'secure-input-wrapper' }, [
+    // Generate unique IDs for accessibility
+    const inputId = otherProps.id || `input-${Math.random().toString(36).substr(2, 9)}`;
+    const errorId = `${inputId}-error`;
+    const labelId = `${inputId}-label`;
+    
+    const wrapperElements = [];
+    
+    // Add label if provided
+    if (label) {
+        wrapperElements.push(
+            React.createElement('label', {
+                key: 'input-label',
+                id: labelId,
+                htmlFor: inputId,
+                className: 'block text-sm font-medium text-gray-700 mb-2 touch-target'
+            }, [
+                label,
+                required && React.createElement('span', {
+                    key: 'required-indicator',
+                    className: 'text-red-500 ml-1',
+                    'aria-label': 'required'
+                }, '*')
+            ])
+        );
+    }
+    
+    // Create accessible input
+    wrapperElements.push(
         React.createElement('input', {
             ...otherProps,
             ...getValidationProps(),
+            id: inputId,
             type: getInputType(),
             value: internalValue,
             onChange: handleChange,
-            className: `${className} ${error ? 'border-red-500' : ''}`,
+            className: `professional-input touch-target ${className} ${error ? 'border-red-500' : ''}`,
             'aria-invalid': !!error,
-            'aria-describedby': error ? `${otherProps.id || 'input'}-error` : undefined
+            'aria-describedby': error ? errorId : undefined,
+            'aria-labelledby': label ? labelId : ariaLabelledBy,
+            'aria-label': !label && !ariaLabelledBy ? ariaLabel : undefined,
+            'aria-required': required,
+            key: 'secure-input'
         }),
         
         showError && error && React.createElement('div', {
-            id: `${otherProps.id || 'input'}-error`,
+            id: errorId,
             className: errorClassName,
-            role: 'alert'
+            role: 'alert',
+            'aria-live': 'polite',
+            key: 'error-message'
         }, error),
 
         isValidating && React.createElement('div', {
-            className: 'text-gray-500 text-sm mt-1'
+            className: 'text-gray-500 text-sm mt-1',
+            'aria-live': 'polite',
+            key: 'validation-status'
         }, 'Validating...')
-    ]);
+    );
+    
+    return React.createElement('div', { 
+        className: 'secure-input-wrapper',
+        key: 'secure-input-wrapper'
+    }, wrapperElements);
 };
 
 // Example usage patterns for documentation

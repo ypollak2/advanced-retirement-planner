@@ -283,6 +283,80 @@ window.InputValidation = (function() {
         };
     }
 
+    // Check if required fields are present and valid
+    function validateRequiredFields(formData, requiredFields, language = 'en') {
+        const errors = {};
+        let isValid = true;
+        
+        const messages = {
+            en: {
+                required: 'This field is required',
+                mustBeNumber: 'Must be a valid number',
+                mustBePositive: 'Must be a positive number',
+                ageTooLow: 'Age must be at least 18',
+                ageTooHigh: 'Age must be less than 100',
+                retirementAgeInvalid: 'Retirement age must be higher than current age'
+            },
+            he: {
+                required: 'שדה זה נדרש',
+                mustBeNumber: 'חייב להיות מספר תקין',
+                mustBePositive: 'חייב להיות מספר חיובי',
+                ageTooLow: 'גיל חייב להיות לפחות 18',
+                ageTooHigh: 'גיל חייב להיות פחות מ-100',
+                retirementAgeInvalid: 'גיל פרישה חייב להיות גבוה מהגיל הנוכחי'
+            }
+        };
+        
+        const t = messages[language] || messages.en;
+        
+        for (const field of requiredFields) {
+            const value = formData[field];
+            
+            // Check if field exists and has a value
+            if (value === undefined || value === null || value === '' || 
+                (typeof value === 'string' && value.trim() === '')) {
+                errors[field] = t.required;
+                isValid = false;
+                continue;
+            }
+            
+            // Specific validation for age fields
+            if (field.toLowerCase().includes('age')) {
+                const age = parseInt(value);
+                if (isNaN(age)) {
+                    errors[field] = t.mustBeNumber;
+                    isValid = false;
+                } else if (age < 18) {
+                    errors[field] = t.ageTooLow;
+                    isValid = false;
+                } else if (age > 100) {
+                    errors[field] = t.ageTooHigh;
+                    isValid = false;
+                } else if (field.toLowerCase().includes('retirement')) {
+                    const currentAge = parseInt(formData.currentAge) || 0;
+                    if (age <= currentAge) {
+                        errors[field] = t.retirementAgeInvalid;
+                        isValid = false;
+                    }
+                }
+            }
+            
+            // Specific validation for salary/currency fields
+            if (field.toLowerCase().includes('salary') || field.toLowerCase().includes('income')) {
+                const salary = parseFloat(value);
+                if (isNaN(salary)) {
+                    errors[field] = t.mustBeNumber;
+                    isValid = false;
+                } else if (salary < 0) {
+                    errors[field] = t.mustBePositive;
+                    isValid = false;
+                }
+            }
+        }
+        
+        return { isValid, errors };
+    }
+
     // Validate and sanitize form data
     function validateForm(formData, schema) {
         const results = {};
@@ -327,6 +401,7 @@ window.InputValidation = (function() {
         stripHtmlTags: stripHtmlTags,
         sanitizeInputs: sanitizeInputs,
         validateForm: validateForm,
+        validateRequiredFields: validateRequiredFields,
         createDebouncedValidator: createDebouncedValidator,
         
         // Convenience methods for common validations

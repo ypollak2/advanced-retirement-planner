@@ -5,6 +5,7 @@ const ClaudeRecommendations = ({ inputs, results, partnerResults, language = 'en
     const [recommendations, setRecommendations] = React.useState([]);
     const [isGenerating, setIsGenerating] = React.useState(false);
     const [showExportPrompt, setShowExportPrompt] = React.useState(false);
+    const timeoutRef = React.useRef(null); // MEMORY LEAK FIX: Track timeout for cleanup
 
     const content = {
         he: {
@@ -63,9 +64,14 @@ const ClaudeRecommendations = ({ inputs, results, partnerResults, language = 'en
 
     // Generate recommendations based on user data
     const generateRecommendations = React.useCallback(() => {
+        // MEMORY LEAK FIX: Clear any existing timeout
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+        
         setIsGenerating(true);
         
-        setTimeout(() => {
+        timeoutRef.current = setTimeout(() => {
             const newRecommendations = [];
 
             // Analyze current financial situation
@@ -211,8 +217,18 @@ const ClaudeRecommendations = ({ inputs, results, partnerResults, language = 'en
 
             setRecommendations(newRecommendations);
             setIsGenerating(false);
+            timeoutRef.current = null; // Clear reference after completion
         }, 1500); // Simulate processing time
     }, [inputs, results, partnerResults, language]);
+    
+    // MEMORY LEAK FIX: Cleanup timeout on unmount
+    React.useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
 
     // Calculate portfolio breakdown helper
     const calculatePortfolioBreakdown = () => {

@@ -473,7 +473,9 @@ function generateImprovementSuggestions(scoreBreakdown) {
         .sort((a, b) => a[1].score - b[1].score);
     
     factors.forEach(([factorName, factorData]) => {
-        if (factorData.details.status === 'critical' || factorData.details.status === 'poor') {
+        // CRITICAL FIX: Add null safety checks to prevent "Cannot read properties of undefined (reading 'status')" error
+        const status = factorData?.details?.status || 'unknown';
+        if (status === 'critical' || status === 'poor') {
             switch (factorName) {
                 case 'savingsRate':
                     suggestions.push({

@@ -114,6 +114,9 @@
     <script src="src/utils/goalSuggestionEngine.js?v=6.6.4&t=20250723-smart-goals"></script>
     <script src="src/utils/financialHealthEngine.js?v=6.6.4&t=20250723-enhanced-health"></script>
     
+    <!-- Error Boundary (loaded first for error handling) -->
+    <script src="src/components/shared/ErrorBoundary.js?v=6.6.4"></script>
+    
     <!-- Base Components (loaded first) -->
     <script src="src/components/forms/SecureInput.js?v=6.6.4"></script>
     <script src="src/components/shared/EnhancedRSUCompanySelector.js?v=6.6.4"></script>
@@ -201,25 +204,44 @@
 
         // Initialize the complete RetirementPlannerApp after all components load
         document.addEventListener('DOMContentLoaded', function() {
-            try {
-                // Wait a bit for all scripts to load
-                setTimeout(() => {
+            // Enhanced component loading with retry logic
+            function attemptInitialization(attempt = 1, maxAttempts = 10) {
+                try {
                     if (window.RetirementPlannerApp && validateComponents()) {
                         if (ReactDOM.createRoot) {
                             const root = ReactDOM.createRoot(document.getElementById('root'));
                             root.render(React.createElement(window.RetirementPlannerApp));
-                            console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '6.6.1'} initialized successfully`);
+                            console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '6.6.4'} initialized successfully`);
                         } else if (ReactDOM.render) {
                             ReactDOM.render(
                                 React.createElement(window.RetirementPlannerApp),
                                 document.getElementById('root')
                             );
-                            console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '6.6.1'} initialized (React 17 mode)`);
+                            console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '6.6.4'} initialized (React 17 mode)`);
                         }
                     } else {
-                        throw new Error('Required components not loaded');
+                        if (attempt < maxAttempts) {
+                            console.log(`⏳ Waiting for components to load... (attempt ${attempt}/${maxAttempts})`);
+                            // Progressive delay: 100ms, 200ms, 400ms, 800ms, etc.
+                            const delay = Math.min(100 * Math.pow(1.5, attempt - 1), 2000);
+                            setTimeout(() => attemptInitialization(attempt + 1, maxAttempts), delay);
+                        } else {
+                            throw new Error('Required components failed to load after multiple attempts');
+                        }
                     }
-                }, 100);
+                } catch (error) {
+                    if (attempt < maxAttempts) {
+                        console.warn(`⚠️ Initialization attempt ${attempt} failed, retrying...`, error.message);
+                        const delay = Math.min(200 * attempt, 2000);
+                        setTimeout(() => attemptInitialization(attempt + 1, maxAttempts), delay);
+                    } else {
+                        throw error;
+                    }
+                }
+            }
+
+            try {
+                attemptInitialization();
             } catch (error) {
                 console.error('❌ Application initialization error:', error);
                 document.getElementById('root').innerHTML = `

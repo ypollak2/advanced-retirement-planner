@@ -70,6 +70,25 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
     // Validation functions
     const isValidAge = (age) => age >= 18 && age <= 100;
     const isValidRetirementAge = (retAge, currentAge) => retAge > currentAge && retAge <= 100;
+    
+    // Required fields validation using InputValidation utility
+    const validateStepRequiredFields = () => {
+        if (!window.InputValidation) return { isValid: true, errors: {} };
+        
+        const requiredFields = isCoupleMode 
+            ? ['currentAge', 'retirementAge', 'partnerAge', 'partnerRetirementAge'] 
+            : ['currentAge', 'retirementAge'];
+            
+        return window.InputValidation.validateRequiredFields(inputs, requiredFields, language);
+    };
+    
+    // Add this validation to window for external access (e.g., from wizard navigation)
+    React.useEffect(() => {
+        window.validateWizardStepPersonal = validateStepRequiredFields;
+        return () => {
+            delete window.validateWizardStepPersonal;
+        };
+    }, [inputs, isCoupleMode, language]);
 
     return React.createElement('div', { 
         className: "personal-info-step space-y-8" 
@@ -81,21 +100,33 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
         }, [
             React.createElement('h3', {
                 key: 'planning-type-title',
-                className: "text-xl font-semibold text-gray-800 mb-4"
+                className: "text-xl font-semibold text-gray-800 mb-4",
+                'aria-label': t.planningModeLabel,
+                role: 'heading'
             }, t.planningModeLabel),
             
             React.createElement('div', {
                 key: 'planning-type-options',
-                className: "grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6"
+                className: "grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6",
+                role: 'radiogroup',
+                'aria-labelledby': 'planning-type-title'
             }, [
                 // Single Planning Option
                 React.createElement('label', {
                     key: 'single-option',
-                    className: `cursor-pointer border-2 rounded-lg p-4 md:p-6 transition-all duration-200 ${
+                    className: `cursor-pointer border-2 rounded-lg p-4 md:p-6 transition-all duration-200 min-h-[44px] touch-target ${
                         inputs.planningType === 'single' 
                             ? 'border-blue-500 bg-blue-50' 
                             : 'border-gray-300 hover:border-gray-400'
-                    }`
+                    }`,
+                    'aria-label': `${t.single}: ${t.singleDescription}`,
+                    tabIndex: 0,
+                    onKeyDown: (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handlePlanningTypeChange('single');
+                        }
+                    }
                 }, [
                     React.createElement('input', {
                         key: 'single-radio',
@@ -104,7 +135,8 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                         value: 'single',
                         checked: inputs.planningType === 'single',
                         onChange: () => handlePlanningTypeChange('single'),
-                        className: "sr-only"
+                        className: "sr-only",
+                        'aria-describedby': 'single-desc'
                     }),
                     React.createElement('div', {
                         key: 'single-content',
@@ -128,11 +160,19 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                 // Couple Planning Option
                 React.createElement('label', {
                     key: 'couple-option',
-                    className: `cursor-pointer border-2 rounded-lg p-4 md:p-6 transition-all duration-200 ${
+                    className: `cursor-pointer border-2 rounded-lg p-4 md:p-6 transition-all duration-200 min-h-[44px] touch-target ${
                         inputs.planningType === 'couple' 
                             ? 'border-blue-500 bg-blue-50' 
                             : 'border-gray-300 hover:border-gray-400'
-                    }`
+                    }`,
+                    'aria-label': `${t.couple}: ${t.coupleDescription}`,
+                    tabIndex: 0,
+                    onKeyDown: (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handlePlanningTypeChange('couple');
+                        }
+                    }
                 }, [
                     React.createElement('input', {
                         key: 'couple-radio',
@@ -141,7 +181,8 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                         value: 'couple',
                         checked: inputs.planningType === 'couple',
                         onChange: () => handlePlanningTypeChange('couple'),
-                        className: "sr-only"
+                        className: "sr-only",
+                        'aria-describedby': 'couple-desc'
                     }),
                     React.createElement('div', {
                         key: 'couple-content',

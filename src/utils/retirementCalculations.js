@@ -12,7 +12,8 @@ window.formatCurrency = (amount) => {
 window.convertCurrency = (amount, currency, exchangeRates) => {
     // Critical fix: Add null/zero check to prevent division by zero errors
     if (!exchangeRates || !exchangeRates[currency] || exchangeRates[currency] === 0) {
-        console.warn(`Exchange rate for ${currency} is invalid:`, exchangeRates[currency]);
+        const rateValue = exchangeRates ? exchangeRates[currency] : 'null object';
+        console.warn(`Exchange rate for ${currency} is invalid:`, rateValue);
         return 'N/A';
     }
     

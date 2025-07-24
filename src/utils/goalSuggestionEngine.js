@@ -6,6 +6,19 @@
  * and provides intelligent retirement goal recommendations
  */
 
+// Value caps to prevent extreme scenarios from producing unrealistic calculations
+const VALUE_CAPS = {
+    maxInflationRate: 0.15,        // 15% maximum inflation rate
+    maxReturnRate: 0.20,           // 20% maximum return rate
+    minReturnRate: 0.01,           // 1% minimum return rate
+    maxYearsToRetirement: 50,      // 50 years maximum planning horizon
+    minYearsToRetirement: 1,       // 1 year minimum planning horizon
+    maxMonthlyIncome: 500000,      // ₪500,000 maximum monthly income
+    maxSavingsGoal: 100000000,     // ₪100M maximum savings goal
+    maxEmergencyFund: 5000000,     // ₪5M maximum emergency fund
+    maxCurrentSavings: 50000000    // ₪50M maximum current savings
+};
+
 // Lifestyle multipliers for retirement expense calculation
 const LIFESTYLE_MULTIPLIERS = {
     basic: 0.7,      // 70% of current income
@@ -29,6 +42,31 @@ const EMERGENCY_FUND_MONTHS = {
     'GBR': 6,   // UK - 6 months
     'EUR': 8    // Europe - 8 months
 };
+
+/**
+ * Apply value caps to prevent extreme calculations
+ */
+function applyValueCaps(value, capType, inputName = 'value') {
+    const cap = VALUE_CAPS[capType];
+    if (!cap) return value;
+    
+    if (value > cap) {
+        console.warn(`⚠️ ${inputName} (${value}) exceeds maximum cap (${cap}), applying cap`);
+        return cap;
+    }
+    
+    // Apply minimum caps for certain types
+    if (capType === 'minReturnRate' && value < cap) {
+        console.warn(`⚠️ ${inputName} (${value}) below minimum cap (${cap}), applying cap`);
+        return cap;
+    }
+    if (capType === 'minYearsToRetirement' && value < cap) {
+        console.warn(`⚠️ ${inputName} (${value}) below minimum cap (${cap}), applying cap`);
+        return cap;
+    }
+    
+    return value;
+}
 
 /**
  * Calculate total current savings across all asset types
@@ -60,7 +98,8 @@ function calculateTotalCurrentSavings(inputs) {
         });
     }
     
-    return total;
+    // Apply maximum cap to prevent extreme calculations
+    return applyValueCaps(total, 'maxCurrentSavings', 'total current savings');
 }
 
 /**
@@ -76,7 +115,8 @@ function calculateMonthlyIncome(inputs) {
         income += parseFloat(inputs.currentMonthlySalary) || 0;
     }
     
-    return income;
+    // Apply maximum cap to prevent extreme calculations
+    return applyValueCaps(income, 'maxMonthlyIncome', 'monthly income');
 }
 
 /**
@@ -115,9 +155,16 @@ function suggestMonthlyRetirementExpenses(inputs) {
     // Base suggestion on current income adjusted for lifestyle
     const suggestedExpenses = Math.round(monthlyIncome * multiplier);
     
-    // Add inflation adjustment for future purchasing power
-    const yearsToRetirement = (inputs.retirementAge || 67) - (inputs.currentAge || 30);
-    const inflationRate = parseFloat(inputs.inflationRate) || 0.025; // 2.5% default
+    // Add inflation adjustment for future purchasing power with value caps
+    const rawYearsToRetirement = (inputs.retirementAge || 67) - (inputs.currentAge || 30);
+    const yearsToRetirement = Math.max(
+        applyValueCaps(rawYearsToRetirement, 'minYearsToRetirement', 'years to retirement'),
+        applyValueCaps(rawYearsToRetirement, 'maxYearsToRetirement', 'years to retirement')
+    );
+    
+    const rawInflationRate = parseFloat(inputs.inflationRate) || 0.025; // 2.5% default
+    const inflationRate = applyValueCaps(rawInflationRate, 'maxInflationRate', 'inflation rate');
+    
     const inflationAdjustedExpenses = Math.round(suggestedExpenses * Math.pow(1 + inflationRate, yearsToRetirement));
     
     return {
@@ -137,23 +184,29 @@ function suggestRetirementSavingsGoal(inputs) {
     const retirementAge = inputs.retirementAge || 67;
     const safeWithdrawalRate = getSafeWithdrawalRate(retirementAge);
     
-    // Calculate required savings using safe withdrawal rate
+    // Calculate required savings using safe withdrawal rate with caps
     const requiredSavings = Math.round(annualExpenses / safeWithdrawalRate);
+    const cappedRequiredSavings = applyValueCaps(requiredSavings, 'maxSavingsGoal', 'required savings');
     
-    // Project current savings growth
+    // Project current savings growth with caps
     const currentSavings = calculateTotalCurrentSavings(inputs);
-    const yearsToRetirement = retirementAge - (inputs.currentAge || 30);
+    const rawYearsToRetirement = retirementAge - (inputs.currentAge || 30);
+    const yearsToRetirement = Math.max(
+        applyValueCaps(rawYearsToRetirement, 'minYearsToRetirement', 'years to retirement'),
+        applyValueCaps(rawYearsToRetirement, 'maxYearsToRetirement', 'years to retirement')
+    );
     
     // Use blended return rate from pension and portfolio allocations
     const expectedReturn = calculateBlendedReturnRate(inputs);
     const projectedCurrentSavings = projectFutureValue(currentSavings, expectedReturn, yearsToRetirement);
     
-    // Suggested goal is the larger of: required savings or projected current savings + buffer
-    const suggestedGoal = Math.max(requiredSavings, Math.round(projectedCurrentSavings * 1.2));
+    // Suggested goal is the larger of: required savings or projected current savings + buffer, with caps
+    const rawSuggestedGoal = Math.max(cappedRequiredSavings, Math.round(projectedCurrentSavings * 1.2));
+    const suggestedGoal = applyValueCaps(rawSuggestedGoal, 'maxSavingsGoal', 'suggested retirement goal');
     
     return {
         amount: suggestedGoal,
-        requiredSavings: requiredSavings,
+        requiredSavings: cappedRequiredSavings,
         projectedSavings: Math.round(projectedCurrentSavings),
         safeWithdrawalRate: safeWithdrawalRate,
         explanation: `Based on ${(safeWithdrawalRate * 100).toFixed(1)}% safe withdrawal rate for age ${retirementAge} retirement`
@@ -164,9 +217,18 @@ function suggestRetirementSavingsGoal(inputs) {
  * Calculate blended expected return rate from user's allocations
  */
 function calculateBlendedReturnRate(inputs) {
-    // Default conservative estimates if no specific returns provided
-    const pensionReturn = parseFloat(inputs.pensionReturn) || 0.06;  // 6% default
-    const portfolioReturn = parseFloat(inputs.portfolioReturn) || 0.07; // 7% default
+    // Default conservative estimates if no specific returns provided, with caps
+    const rawPensionReturn = parseFloat(inputs.pensionReturn) || 0.06;  // 6% default
+    const rawPortfolioReturn = parseFloat(inputs.portfolioReturn) || 0.07; // 7% default
+    
+    const pensionReturn = Math.max(
+        applyValueCaps(rawPensionReturn, 'minReturnRate', 'pension return'),
+        applyValueCaps(rawPensionReturn, 'maxReturnRate', 'pension return')
+    );
+    const portfolioReturn = Math.max(
+        applyValueCaps(rawPortfolioReturn, 'minReturnRate', 'portfolio return'),
+        applyValueCaps(rawPortfolioReturn, 'maxReturnRate', 'portfolio return')
+    );
     
     const currentSavings = calculateTotalCurrentSavings(inputs);
     const pensionSavings = parseFloat(inputs.currentSavings) || 0;
@@ -192,7 +254,8 @@ function suggestEmergencyFund(inputs) {
     const country = inputs.country || 'ISR';
     const months = EMERGENCY_FUND_MONTHS[country] || 6;
     
-    const suggestedAmount = Math.round(monthlyIncome * months);
+    const rawSuggestedAmount = Math.round(monthlyIncome * months);
+    const suggestedAmount = applyValueCaps(rawSuggestedAmount, 'maxEmergencyFund', 'emergency fund');
     
     return {
         amount: suggestedAmount,
@@ -207,7 +270,11 @@ function suggestEmergencyFund(inputs) {
  */
 function calculateGapAnalysis(inputs, suggestions) {
     const currentSavings = calculateTotalCurrentSavings(inputs);
-    const yearsToRetirement = (inputs.retirementAge || 67) - (inputs.currentAge || 30);
+    const rawYearsToRetirement = (inputs.retirementAge || 67) - (inputs.currentAge || 30);
+    const yearsToRetirement = Math.max(
+        applyValueCaps(rawYearsToRetirement, 'minYearsToRetirement', 'years to retirement'),
+        applyValueCaps(rawYearsToRetirement, 'maxYearsToRetirement', 'years to retirement')
+    );
     const expectedReturn = calculateBlendedReturnRate(inputs);
     
     const projectedSavings = projectFutureValue(currentSavings, expectedReturn, yearsToRetirement);
@@ -281,6 +348,8 @@ function shouldRefreshSuggestions(previousInputs, currentInputs) {
 
 // Export functions to window for global access
 window.generateGoalSuggestions = generateGoalSuggestions;
+window.applyValueCaps = applyValueCaps;
+window.VALUE_CAPS = VALUE_CAPS;
 window.shouldRefreshSuggestions = shouldRefreshSuggestions;
 window.calculateTotalCurrentSavings = calculateTotalCurrentSavings;
 window.calculateMonthlyIncome = calculateMonthlyIncome;
