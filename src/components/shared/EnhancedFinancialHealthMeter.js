@@ -210,8 +210,8 @@ const EnhancedFinancialHealthMeter = ({
                 ]),
                 createElement('div', {
                     key: 'status-text',
-                    className: `text-xs font-medium mt-1 px-2 py-1 rounded ${getStatusColor(scoreData.status)}`
-                }, t[scoreData.status] || t.needsWork)
+                    className: `text-xs font-medium mt-1 px-2 py-1 rounded ${getStatusColor(scoreData?.status || 'needsWork')}`
+                }, t[scoreData?.status] || t.needsWork)
             ])
         ]),
         
@@ -280,8 +280,8 @@ const EnhancedFinancialHealthMeter = ({
                     }, [
                         createElement('div', {
                             key: 'status-indicator',
-                            className: `inline-block px-2 py-1 rounded text-xs font-medium ${getStatusColor(factorData.details.status)}`
-                        }, t[factorData.details.status] || factorData.details.status),
+                            className: `inline-block px-2 py-1 rounded text-xs font-medium ${getStatusColor(factorData?.details?.status || 'unknown')}`
+                        }, t[factorData?.details?.status] || factorData?.details?.status || 'Unknown'),
                         
                         // Factor-specific details
                         factorName === 'savingsRate' && factorData.details.rate !== undefined && createElement('div', {

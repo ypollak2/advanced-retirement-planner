@@ -14,10 +14,10 @@ const DynamicPartnerCharts = ({
     const [isUpdating, setIsUpdating] = React.useState(false);
     const chartRef = React.useRef(null);
     const chartInstance = React.useRef(null);
-    const [chartDataCache, setChartDataCache] = React.useState(null);
     
     // Use new progressive savings calculation engine from retirementCalculations.js
-    const getUnifiedProjectionData = React.useCallback(() => {
+    // Memoize chart data to prevent unnecessary re-renders
+    const memoizedChartData = React.useMemo(() => {
         if (!window.calculateProgressiveSavings) {
             console.warn('DynamicPartnerCharts: Progressive savings calculation function not available');
             return { primary: [], partner: [], combined: [] };
@@ -30,14 +30,7 @@ const DynamicPartnerCharts = ({
             console.warn('DynamicPartnerCharts: Error generating progressive projections:', error);
             return { primary: [], partner: [], combined: [] };
         }
-    }, [inputs]);
-    
-    // Memoize chart data to prevent unnecessary re-renders
-    const memoizedChartData = React.useMemo(() => {
-        const data = getUnifiedProjectionData();
-        setChartDataCache(data);
-        return data;
-    }, [getUnifiedProjectionData, chartView]);
+    }, [inputs, chartView]);
 
     // Content translations
     const content = {
@@ -101,8 +94,7 @@ const DynamicPartnerCharts = ({
 
     // Get unified data and format for chart display - use memoized data
     const getChartData = (dataType) => {
-        const unifiedData = chartDataCache || memoizedChartData;
-        return unifiedData[dataType] || [];
+        return memoizedChartData[dataType] || [];
     };
 
     // Enhanced chart rendering with better state synchronization
