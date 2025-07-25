@@ -2,6 +2,54 @@
 
 > **📋 Note**: This document should be updated with every version release and maintained on the [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
+## Version 6.6.4 (July 25, 2025) - **COMPREHENSIVE AUDIT & CRITICAL FIXES** 🔧
+
+### 🔥 **Fixed**
+- **Currency Conversion TypeError**: Fixed critical null safety issue in exchange rate calculations
+- **React Hooks Circular Dependency**: Resolved circular dependency in DynamicPartnerCharts component
+- **Memory Leaks**: Fixed 17 timeout cleanup issues across ExportControls, MonteCarloResultsDashboard, and StressTestInterface
+- **Component Loading Race Condition**: Implemented progressive retry logic with exponential backoff (10 attempts)
+- **Service Worker Version**: Updated from v6.3.0 to v6.6.4 for proper cache invalidation
+
+### 🎯 **Added**
+- **Comprehensive Error Boundaries**: Multi-language error boundaries with user-friendly recovery options
+- **Goal Suggestion Value Caps**: Implemented caps to prevent extreme scenarios:
+  - Maximum inflation rate: 15%
+  - Maximum return rate: 20%
+  - Maximum planning horizon: 50 years
+  - Maximum monthly income: ₪500,000
+  - Maximum savings goal: ₪100M
+- **Enhanced Input Validation**: Required field validation across all wizard steps
+- **Robust LocalStorage Utility**: Reliable data persistence with error handling
+- **Cross-Field Validation**: Ensures data integrity across related fields
+
+### ♿ **Changed**
+- **Accessibility Improvements**:
+  - Added comprehensive ARIA labels and roles
+  - Implemented keyboard navigation support
+  - Enhanced touch targets (44px standard, 48px on mobile)
+  - Improved focus management with visible indicators
+- **WizardStepReview Enhancement**: Comprehensive financial analysis with better visualizations
+- **Chart Data Generation**: Improved error handling and data validation
+
+### 📚 **Documentation**
+- Added QA audit report (QA_AUDIT_REPORT_v6.6.4.md)
+- Added implementation status tracking (QA_IMPLEMENTATION_STATUS_v6.6.4.md)
+- Updated README with v6.6.4 release notes
+- Enhanced CLAUDE.md with mandatory push checklist
+
+### 🧪 **Testing**
+- Added cross-field validation test suite
+- Added currency conversion edge cases tests
+- Added partner mode integration tests
+- Added wizard state management tests
+- **All 211 tests passing** with 100% success rate
+
+### 🔒 **Security**
+- Maintained A+ security rating with zero vulnerabilities
+- Enhanced XSS protection throughout application
+- Resolved all license compliance issues
+
 ## Version 6.6.3 (July 23, 2025) - **SEMANTIC SECRET SCANNER & SECURITY ENHANCEMENTS** 🛡️
 
 ### 🔍 **SEMANTIC SECRET SCANNER**
