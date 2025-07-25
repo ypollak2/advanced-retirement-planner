@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v6.6.5 ✨
+# 🚀 Advanced Retirement Planner v6.6.3 ✨
 
-[![Version](https://img.shields.io/badge/version-6.6.5-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-6.6.3-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -27,89 +27,7 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v6.6.4 - COMPREHENSIVE AUDIT & CRITICAL FIXES 🔧
-
-### **🛡️ PRODUCTION STABILITY IMPROVEMENTS** (July 2025)
-
-#### **🔥 Critical Runtime Fixes**
-- **Currency Conversion Safety**: Fixed critical TypeError in exchange rate calculations with null safety checks
-- **React Hooks Fix**: Resolved circular dependency in DynamicPartnerCharts preventing proper rendering
-- **Memory Leak Prevention**: Fixed 17 timeout cleanup issues across multiple components
-- **Component Loading**: Implemented progressive retry logic with exponential backoff (10 retry attempts)
-
-#### **🎯 Enhanced Error Handling**
-- **Comprehensive Error Boundaries**: Multi-language error boundaries with user-friendly recovery options
-- **API Failure Protection**: Graceful degradation when external APIs are unavailable
-- **Input Validation**: Enhanced validation with required field checks across all wizard steps
-- **XSS Protection**: Maintained comprehensive input sanitization throughout the application
-
-#### **📊 Goal Suggestion Engine Improvements**
-- **Value Caps Implementation**: Prevents extreme scenarios from producing unrealistic calculations
-  - Maximum inflation rate: 15%
-  - Maximum return rate: 20%
-  - Maximum planning horizon: 50 years
-  - Maximum monthly income: ₪500,000
-  - Maximum savings goal: ₪100M
-- **Intelligent Boundaries**: Smart caps ensure realistic financial projections
-
-#### **♿ Accessibility Enhancements**
-- **ARIA Labels**: Comprehensive ARIA support for screen readers
-- **Touch Targets**: Minimum 44px touch targets (48px on mobile devices)
-- **Keyboard Navigation**: Full keyboard support with visible focus indicators
-- **Focus Management**: Enhanced focus styles with proper contrast ratios
-
-### **📈 Test Coverage & Quality**
-- **211 Tests**: 100% pass rate across all test suites
-- **Zero Security Vulnerabilities**: A+ security rating maintained
-- **License Compliance**: Resolved all dependency licensing issues
-- **Production Ready**: All critical issues resolved and verified
-
-#### **🚀 CI/CD Integration Ready**
-- **Exit Code Strategy**: Non-zero exit for high/critical findings to fail CI builds
-- **SARIF Format Support**: GitHub Security tab integration with actionable alerts
-- **Configuration Management**: .secretignore support similar to .gitignore patterns
-- **Performance Statistics**: Detailed timing and throughput metrics
-
-```bash
-# Quick security scan
-npm run security:scan
-
-# Generate markdown report  
-npm run security:scan-report
-
-# JSON output for CI/CD
-npm run security:scan-json
-```
-
-## 🎨 Current Release - v6.6.5 - EXPENSE TRACKING & ANALYSIS 💰
-
-### **📊 COMPREHENSIVE EXPENSE TRACKING** (July 2025)
-
-#### **💸 Monthly Expense Management**
-- **5 Main Categories**: Housing & Utilities, Transportation, Food & Daily Living, Insurance & Healthcare, Other Expenses
-- **Category-Specific Analysis**: Visual breakdown with progress bars and percentage allocations
-- **Smart Recommendations**: Personalized expense optimization suggestions based on income ratios
-- **Savings Rate Tracking**: Real-time calculation of monthly savings percentage with color-coded indicators
-
-#### **📈 Expense Projections & Analysis**
-- **Yearly Adjustment Predictions**: Category-specific inflation adjustments (housing +1%, healthcare +3%, etc.)
-- **Retirement Planning Integration**: Expenses automatically factored into retirement calculations
-- **Savings Potential Calculator**: Shows how much extra could be saved through expense optimization
-- **Multi-Language Support**: Full Hebrew and English translations for all expense features
-
-#### **🧙 Enhanced Wizard Experience**
-- **New Step 3**: Dedicated expense tracking step in the retirement planning wizard
-- **Expense Analysis in Review**: Comprehensive expense breakdown in the final review step
-- **Visual Progress Indicators**: Color-coded status for each expense category (good/acceptable/high)
-- **Actionable Insights**: Specific recommendations for reducing high expense categories
-
-#### **🔧 Technical Improvements**
-- **New Utility Functions**: `expenseCalculations.js` for projections and analysis
-- **Enhanced Calculations**: `retirementCalculations.js` now includes expense data in projections
-- **Improved Data Flow**: Expense breakdown data available throughout the application
-- **Test Coverage**: Updated test suite to include 9-step wizard structure
-
-## 🎨 Previous Release - v6.6.2 - MAJOR UX OVERHAUL & RUNTIME FIXES 🚀
+## 🎨 What's New in v6.6.2 - MAJOR UX OVERHAUL & RUNTIME FIXES 🚀
 
 ### **🎯 INTELLIGENT RESULTS DISPLAY** (July 2025)
 

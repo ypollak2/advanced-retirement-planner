@@ -149,14 +149,3 @@
             }
         };
     };
-
-    // Export to window for global access
-    if (typeof window !== 'undefined') {
-        window.TaxCalculators = {
-            calculateNetSalary,
-            calculateIsraeliTax,
-            calculateUKTax,
-            calculateUSTax
-        };
-        console.log('✅ TaxCalculators loaded and available globally');
-    }

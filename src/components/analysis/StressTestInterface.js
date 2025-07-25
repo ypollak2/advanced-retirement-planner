@@ -15,18 +15,6 @@ const StressTestInterface = ({
     const [isCalculating, setIsCalculating] = React.useState(false);
     const [comparisonData, setComparisonData] = React.useState(null);
     const [showClaudeTranslator, setShowClaudeTranslator] = React.useState(false);
-    
-    // Ref for timeout cleanup
-    const stressTestTimeoutRef = React.useRef(null);
-    
-    // Cleanup timeout on unmount
-    React.useEffect(() => {
-        return () => {
-            if (stressTestTimeoutRef.current) {
-                clearTimeout(stressTestTimeoutRef.current);
-            }
-        };
-    }, []);
 
     // Content translations
     const content = {
@@ -167,14 +155,10 @@ const StressTestInterface = ({
         
         setIsCalculating(true);
         
-        if (stressTestTimeoutRef.current) {
-            clearTimeout(stressTestTimeoutRef.current);
-        }
-        stressTestTimeoutRef.current = setTimeout(() => {
+        setTimeout(() => {
             const comparison = window.generateStressTestComparison(inputs, workPeriods, language);
             setComparisonData(comparison);
             setIsCalculating(false);
-            stressTestTimeoutRef.current = null;
         }, 1000);
     };
 

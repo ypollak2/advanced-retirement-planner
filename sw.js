@@ -1,9 +1,9 @@
 // Service Worker for Advanced Retirement Planner
-// Created by Yali Pollak (יהלי פולק) - v6.6.4
+// Created by Yali Pollak (יהלי פולק) - v6.3.0
 
-const CACHE_NAME = 'retirement-planner-v6.6.4';
-const STATIC_CACHE_NAME = 'retirement-planner-static-v6.6.4';
-const DYNAMIC_CACHE_NAME = 'retirement-planner-dynamic-v6.6.4';
+const CACHE_NAME = 'retirement-planner-v6.3.0';
+const STATIC_CACHE_NAME = 'retirement-planner-static-v6.3.0';
+const DYNAMIC_CACHE_NAME = 'retirement-planner-dynamic-v6.3.0';
 
 // Files to cache immediately on install
 const STATIC_ASSETS = [
@@ -13,10 +13,7 @@ const STATIC_ASSETS = [
     './src/components/wizard/RetirementWizard.js',
     './src/components/core/Dashboard.js',
     './src/components/panels/settings/PermanentSidePanel.js',
-    './src/components/analysis/ReadinessScore.js',
-    './src/components/charts/ScenarioChart.js',
     './src/utils/retirementCalculations.js',
-    './src/utils/TaxCalculators.js',
     './src/utils/stockPriceAPI.js',
     './src/utils/currencyAPI.js',
     './src/data/marketConstants.js',

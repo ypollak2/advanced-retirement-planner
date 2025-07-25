@@ -112,18 +112,6 @@ const MonteCarloResultsDashboard = ({ inputs, results, language = 'en' }) => {
     });
     const [showSettings, setShowSettings] = React.useState(false);
     
-    // Ref for timeout cleanup
-    const simulationTimeoutRef = React.useRef(null);
-    
-    // Cleanup timeout on unmount
-    React.useEffect(() => {
-        return () => {
-            if (simulationTimeoutRef.current) {
-                clearTimeout(simulationTimeoutRef.current);
-            }
-        };
-    }, []);
-    
     // Auto-run simulation when component mounts or inputs change significantly
     React.useEffect(() => {
         if (results && window.monteCarloSimulation && !simulationResults) {
@@ -142,10 +130,7 @@ const MonteCarloResultsDashboard = ({ inputs, results, language = 'en' }) => {
         
         try {
             // Run simulation asynchronously to avoid blocking UI
-            if (simulationTimeoutRef.current) {
-                clearTimeout(simulationTimeoutRef.current);
-            }
-            simulationTimeoutRef.current = setTimeout(() => {
+            setTimeout(() => {
                 const results = window.runMonteCarloSimulation(
                     inputs,
                     simulationParams.projectionYears,
@@ -154,7 +139,6 @@ const MonteCarloResultsDashboard = ({ inputs, results, language = 'en' }) => {
                 );
                 setSimulationResults(results);
                 setIsRunning(false);
-                simulationTimeoutRef.current = null;
             }, 100);
             
         } catch (error) {

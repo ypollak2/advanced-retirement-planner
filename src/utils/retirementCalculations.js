@@ -12,8 +12,7 @@ window.formatCurrency = (amount) => {
 window.convertCurrency = (amount, currency, exchangeRates) => {
     // Critical fix: Add null/zero check to prevent division by zero errors
     if (!exchangeRates || !exchangeRates[currency] || exchangeRates[currency] === 0) {
-        const rateValue = exchangeRates ? exchangeRates[currency] : 'null object';
-        console.warn(`Exchange rate for ${currency} is invalid:`, rateValue);
+        console.warn(`Exchange rate for ${currency} is invalid:`, exchangeRates[currency]);
         return 'N/A';
     }
     
@@ -379,30 +378,11 @@ window.calculateRetirement = (
     const individualNetIncome = netPension + netTrainingFundIncome + socialSecurity + netPersonalPortfolioIncome + netCryptoIncome + netRealEstateIncome + additionalIncomeTotal;
     const totalNetIncome = individualNetIncome + partnerNetIncome + partnerAdditionalIncome;
     
-    // Calculate expenses using detailed tracking or fallback to simple estimate
-    let baseExpenses = 0;
-    let expenseBreakdown = null;
-    let yearlyAdjustment = inputs.inflationRate || 2.5;
-    
-    if (inputs.expenses && window.calculateTotalExpenses) {
-        // Use detailed expense tracking
-        baseExpenses = window.calculateTotalExpenses(inputs.expenses);
-        yearlyAdjustment = inputs.expenses.yearlyAdjustment || inputs.inflationRate || 2.5;
-        
-        // Generate expense summary for retirement
-        if (window.generateExpenseSummaryForRetirement) {
-            const expenseSummary = window.generateExpenseSummaryForRetirement(inputs, yearsToRetirement);
-            baseExpenses = expenseSummary.currentMonthlyExpenses;
-            expenseBreakdown = expenseSummary.categoryBreakdown;
-        }
-    } else {
-        // Fallback to simple expense tracking
-        baseExpenses = inputs.partnerPlanningEnabled && inputs.jointMonthlyExpenses > 0 
-            ? inputs.jointMonthlyExpenses 
-            : inputs.currentMonthlyExpenses || 0;
-    }
-    
-    const futureMonthlyExpenses = baseExpenses * Math.pow(1 + yearlyAdjustment / 100, yearsToRetirement);
+    // Calculate expenses (joint if partner enabled, individual otherwise)
+    const baseExpenses = inputs.partnerPlanningEnabled && inputs.jointMonthlyExpenses > 0 
+        ? inputs.jointMonthlyExpenses 
+        : inputs.currentMonthlyExpenses;
+    const futureMonthlyExpenses = baseExpenses * Math.pow(1 + inputs.inflationRate / 100, yearsToRetirement);
     const remainingAfterExpenses = totalNetIncome - futureMonthlyExpenses;
 
     const finalSalary = workPeriods.length > 0 ? workPeriods[workPeriods.length - 1].salary : 0;
@@ -563,13 +543,7 @@ window.calculateRetirement = (
             if (incomeRatio >= 0.6) return 50;
             if (incomeRatio >= 0.4) return 30;
             return 20;
-        })(),
-        
-        // Expense tracking data
-        baseExpenses: safeMoney(baseExpenses),
-        expenseBreakdown: expenseBreakdown,
-        yearlyExpenseAdjustment: yearlyAdjustment,
-        hasDetailedExpenses: !!(inputs.expenses && Object.keys(inputs.expenses).length > 1)
+        })()
     };
 };
 
@@ -687,16 +661,16 @@ window.calculateProgressiveSavings = (inputs, workPeriods = [], partnerWorkPerio
             const monthlyTrainingReturn = trainingFundReturn / 12;
             const monthlyPersonalReturn = personalPortfolioReturn / 12;
             
-            // Primary partner growth with monthly contributions and bounds checking
-            primaryPension = Math.min(primaryPension * (1 + monthlyPensionReturn) + monthlyPensionContrib, 50000000);
-            primaryTraining = Math.min(primaryTraining * (1 + monthlyTrainingReturn) + monthlyTrainingContrib, 20000000);
-            primaryPersonal = Math.min(primaryPersonal * (1 + monthlyPersonalReturn) + monthlyPersonalContrib, 100000000);
+            // Primary partner growth with monthly contributions
+            primaryPension = primaryPension * (1 + monthlyPensionReturn) + monthlyPensionContrib;
+            primaryTraining = primaryTraining * (1 + monthlyTrainingReturn) + monthlyTrainingContrib;
+            primaryPersonal = primaryPersonal * (1 + monthlyPersonalReturn) + monthlyPersonalContrib;
             
             // Partner growth with monthly contributions
             if (inputs.planningType === 'couple') {
-                partnerPension = Math.min(partnerPension * (1 + monthlyPensionReturn) + partnerMonthlyPensionContrib, 50000000);
-                partnerTraining = Math.min(partnerTraining * (1 + monthlyTrainingReturn) + partnerMonthlyTrainingContrib, 20000000);
-                partnerPersonal = Math.min(partnerPersonal * (1 + monthlyPersonalReturn) + partnerMonthlyPersonalContrib, 100000000);
+                partnerPension = partnerPension * (1 + monthlyPensionReturn) + partnerMonthlyPensionContrib;
+                partnerTraining = partnerTraining * (1 + monthlyTrainingReturn) + partnerMonthlyTrainingContrib;
+                partnerPersonal = partnerPersonal * (1 + monthlyPersonalReturn) + partnerMonthlyPersonalContrib;
             }
         }
         

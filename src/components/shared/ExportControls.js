@@ -10,29 +10,6 @@ const ExportControls = ({
     const [isExporting, setIsExporting] = React.useState(false);
     const [exportStatus, setExportStatus] = React.useState(null);
     const [showClaudePrompt, setShowClaudePrompt] = React.useState(false);
-    
-    // Refs for timeout cleanup
-    const timeoutRef = React.useRef(null);
-    
-    // Clear status with proper cleanup
-    const clearStatusWithTimeout = (delay = 3000) => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-        }
-        timeoutRef.current = setTimeout(() => {
-            setExportStatus(null);
-            timeoutRef.current = null;
-        }, delay);
-    };
-    
-    // Cleanup timeout on unmount
-    React.useEffect(() => {
-        return () => {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-            }
-        };
-    }, []);
 
     // Content translations
     const content = {
@@ -111,8 +88,8 @@ const ExportControls = ({
             console.error(`❌ ${format.toUpperCase()} export failed:`, error);
         } finally {
             setIsExporting(false);
-            // Clear status after 3 seconds with proper cleanup
-            clearStatusWithTimeout(3000);
+            // Clear status after 3 seconds
+            setTimeout(() => setExportStatus(null), 3000);
         }
     };
 
@@ -141,7 +118,7 @@ const ExportControls = ({
             console.error('❌ LLM export failed:', error);
         } finally {
             setIsExporting(false);
-            clearStatusWithTimeout(3000);
+            setTimeout(() => setExportStatus(null), 3000);
         }
     };
 
@@ -170,7 +147,7 @@ const ExportControls = ({
             console.error('❌ Claude prompt copy failed:', error);
         } finally {
             setIsExporting(false);
-            clearStatusWithTimeout(3000);
+            setTimeout(() => setExportStatus(null), 3000);
         }
     };
 

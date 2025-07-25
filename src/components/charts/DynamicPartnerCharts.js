@@ -14,22 +14,13 @@ const DynamicPartnerCharts = ({
     const [isUpdating, setIsUpdating] = React.useState(false);
     const chartRef = React.useRef(null);
     const chartInstance = React.useRef(null);
+    const [chartDataCache, setChartDataCache] = React.useState(null);
     
-    // Use new progressive savings calculation engine from retirementCalculations.js
     // Memoize chart data to prevent unnecessary re-renders
     const memoizedChartData = React.useMemo(() => {
-        if (!window.calculateProgressiveSavings) {
-            console.warn('DynamicPartnerCharts: Progressive savings calculation function not available');
-            return { primary: [], partner: [], combined: [] };
-        }
-
-        try {
-            // Use the new progressive calculation engine for accurate projections
-            return window.calculateProgressiveSavings(inputs, [], []);
-        } catch (error) {
-            console.warn('DynamicPartnerCharts: Error generating progressive projections:', error);
-            return { primary: [], partner: [], combined: [] };
-        }
+        const data = getUnifiedProjectionData();
+        setChartDataCache(data);
+        return data;
     }, [inputs, chartView]);
 
     // Content translations
@@ -39,8 +30,8 @@ const DynamicPartnerCharts = ({
             subtitle: 'מעקב אחר התקדמות החיסכון לפנסיה',
             household: 'סך הכל משקי בית',
             comparison: 'השוואת בני זוג',
-            partner1: inputs.userName || 'בן/בת זוג ראשי',
-            partner2: inputs.partnerName || 'בן/בת זוג שני',
+            partner1: inputs.partner1Name || 'בן/בת זוג ראשי',
+            partner2: inputs.partner2Name || 'בן/בת זוג שני',
             nominalValue: 'ערך נומינלי',
             realValue: 'ערך ריאלי (מותאם לאינפלציה)',
             age: 'גיל',
@@ -66,8 +57,8 @@ const DynamicPartnerCharts = ({
             subtitle: 'Track retirement savings progress over time',
             household: 'Household Total',
             comparison: 'Partner Comparison',
-            partner1: inputs.userName || 'Primary Partner',
-            partner2: inputs.partnerName || 'Secondary Partner',
+            partner1: inputs.partner1Name || 'Primary Partner',
+            partner2: inputs.partner2Name || 'Secondary Partner',
             nominalValue: 'Nominal Value',
             realValue: 'Real Value (inflation-adjusted)',
             age: 'Age',
@@ -92,9 +83,26 @@ const DynamicPartnerCharts = ({
 
     const t = content[language] || content.en;
 
+    // Use new progressive savings calculation engine from retirementCalculations.js
+    const getUnifiedProjectionData = () => {
+        if (!window.calculateProgressiveSavings) {
+            console.warn('DynamicPartnerCharts: Progressive savings calculation function not available');
+            return { primary: [], partner: [], combined: [] };
+        }
+
+        try {
+            // Use the new progressive calculation engine for accurate projections
+            return window.calculateProgressiveSavings(inputs, [], []);
+        } catch (error) {
+            console.warn('DynamicPartnerCharts: Error generating progressive projections:', error);
+            return { primary: [], partner: [], combined: [] };
+        }
+    };
+
     // Get unified data and format for chart display - use memoized data
     const getChartData = (dataType) => {
-        return memoizedChartData[dataType] || [];
+        const unifiedData = chartDataCache || memoizedChartData;
+        return unifiedData[dataType] || [];
     };
 
     // Enhanced chart rendering with better state synchronization
@@ -265,11 +273,11 @@ const DynamicPartnerCharts = ({
                                 
                                 // Enhance legend labels with better formatting
                                 labels.forEach(label => {
-                                    if (label.text.includes('Primary Partner') && inputs.userName) {
-                                        label.text = label.text.replace('Primary Partner', inputs.userName);
+                                    if (label.text.includes('Primary Partner') && inputs.partner1Name) {
+                                        label.text = label.text.replace('Primary Partner', inputs.partner1Name);
                                     }
-                                    if (label.text.includes('Secondary Partner') && inputs.partnerName) {
-                                        label.text = label.text.replace('Secondary Partner', inputs.partnerName);
+                                    if (label.text.includes('Secondary Partner') && inputs.partner2Name) {
+                                        label.text = label.text.replace('Secondary Partner', inputs.partner2Name);
                                     }
                                 });
                                 
