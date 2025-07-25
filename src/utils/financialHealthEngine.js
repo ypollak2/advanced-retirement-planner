@@ -120,9 +120,24 @@ const COUNTRY_FACTORS = {
  */
 function calculateSavingsRateScore(inputs) {
     const monthlyIncome = parseFloat(inputs.currentMonthlySalary || inputs.partner1Salary || 0);
-    const monthlyContributions = parseFloat(inputs.monthlyContribution || 0);
     
-    if (monthlyIncome === 0) return { score: 0, details: { rate: 0, status: 'unknown' } };
+    // Calculate monthly contributions from multiple sources with better field mapping
+    let monthlyContributions = parseFloat(inputs.monthlyContribution || 0);
+    
+    // If monthlyContribution is not set, calculate from pension/training fund rates
+    if (monthlyContributions === 0 && monthlyIncome > 0) {
+        const pensionRate = parseFloat(inputs.pensionContributionRate || inputs.employeePensionRate || inputs.pensionEmployee || 0);
+        const trainingFundRate = parseFloat(inputs.trainingFundContributionRate || inputs.trainingFundEmployeeRate || inputs.trainingFundEmployee || 0);
+        
+        // Calculate contributions as percentage of salary
+        monthlyContributions = monthlyIncome * (pensionRate + trainingFundRate) / 100;
+        
+        // Also include additional savings if available
+        const additionalSavings = parseFloat(inputs.additionalMonthlySavings || inputs.monthlyInvestment || 0);
+        monthlyContributions += additionalSavings;
+    }
+    
+    if (monthlyIncome === 0) return { score: 0, details: { rate: 0, status: 'unknown', monthlyAmount: 0 } };
     
     const savingsRate = (monthlyContributions / monthlyIncome) * 100;
     const maxScore = SCORE_FACTORS.savingsRate.weight;
@@ -152,9 +167,12 @@ function calculateSavingsRateScore(inputs) {
         details: {
             rate: savingsRate,
             monthlyAmount: monthlyContributions,
+            monthlyIncome: monthlyIncome,
             status: status,
             target: SCORE_FACTORS.savingsRate.benchmarks.good,
-            improvement: Math.max(0, (SCORE_FACTORS.savingsRate.benchmarks.good - savingsRate) * monthlyIncome / 100)
+            improvement: Math.max(0, (SCORE_FACTORS.savingsRate.benchmarks.good - savingsRate) * monthlyIncome / 100),
+            calculationMethod: monthlyContributions > 0 ? 
+                (inputs.monthlyContribution ? 'direct' : 'calculated_from_rates') : 'no_contributions'
         }
     };
 }
@@ -335,24 +353,40 @@ function calculateDiversificationScore(inputs) {
  * Calculate tax efficiency score
  */
 function calculateTaxEfficiencyScore(inputs) {
-    const pensionRate = parseFloat(inputs.pensionContributionRate || inputs.employeePensionRate || 0);
-    const trainingFundRate = parseFloat(inputs.trainingFundContributionRate || inputs.trainingFundEmployeeRate || 0);
-    const country = inputs.country || 'ISR';
+    // Better field name mapping for pension and training fund rates
+    const pensionRate = parseFloat(
+        inputs.pensionContributionRate || 
+        inputs.employeePensionRate || 
+        inputs.pensionEmployee || 
+        inputs.pensionRate ||
+        inputs.employeeContribution || 
+        7 // Default Israeli pension rate if not found
+    );
+    
+    const trainingFundRate = parseFloat(
+        inputs.trainingFundContributionRate || 
+        inputs.trainingFundEmployeeRate || 
+        inputs.trainingFundEmployee ||
+        inputs.trainingFundRate ||
+        2.5 // Default Israeli training fund rate if not found
+    );
+    
+    const country = (inputs.country || 'ISR').toLowerCase();
     
     // Calculate tax-advantaged contribution rate
     const totalTaxAdvantaged = pensionRate + trainingFundRate;
     
     let efficiencyScore = 0;
     
-    // Country-specific optimal rates
+    // Country-specific optimal rates with better mapping
     const optimalRates = {
-        'ISR': 21.333, // Israeli pension + training fund
-        'USA': 15,     // 401k + IRA
-        'GBR': 12,     // Workplace pension
-        'EUR': 10      // Average European pension
+        'isr': 21.333, 'israel': 21.333, // Israeli pension + training fund
+        'usa': 15, 'us': 15, 'united states': 15,     // 401k + IRA
+        'gbr': 12, 'uk': 12, 'united kingdom': 12,     // Workplace pension
+        'eur': 10, 'germany': 10, 'france': 10, 'europe': 10      // Average European pension
     };
     
-    const optimalRate = optimalRates[country] || optimalRates['ISR'];
+    const optimalRate = optimalRates[country] || optimalRates['isr'];
     efficiencyScore = Math.min(100, (totalTaxAdvantaged / optimalRate) * 100);
     
     const maxScore = SCORE_FACTORS.taxEfficiency.weight;
@@ -371,7 +405,11 @@ function calculateTaxEfficiencyScore(inputs) {
             currentRate: totalTaxAdvantaged,
             optimalRate: optimalRate,
             efficiencyScore: efficiencyScore,
-            status: status
+            status: status,
+            pensionRate: pensionRate,
+            trainingFundRate: trainingFundRate,
+            country: country,
+            calculationMethod: (pensionRate > 0 || trainingFundRate > 0) ? 'rates_found' : 'using_defaults'
         }
     };
 }
@@ -560,6 +598,13 @@ function getPeerComparison(inputs, totalScore) {
  */
 function calculateFinancialHealthScore(inputs) {
     try {
+        // Debug logging for input validation
+        console.log('🔍 Financial Health Score Calculation Started');
+        console.log('📊 Available input fields:', Object.keys(inputs).filter(key => 
+            key.includes('salary') || key.includes('pension') || key.includes('training') || 
+            key.includes('contribution') || key.includes('savings')
+        ));
+        
         const factors = {
             savingsRate: calculateSavingsRateScore(inputs),
             retirementReadiness: calculateRetirementReadinessScore(inputs),
@@ -571,6 +616,12 @@ function calculateFinancialHealthScore(inputs) {
             debtManagement: calculateDebtManagementScore(inputs)
         };
         
+        // Debug logging for factor scores
+        console.log('📈 Factor Scores Breakdown:');
+        Object.entries(factors).forEach(([name, factor]) => {
+            console.log(`  ${name}: ${factor.score}/${window.SCORE_FACTORS[name]?.weight || 'unknown'} (${factor.details?.status || 'no status'})`);
+        });
+        
         const totalScore = Object.values(factors).reduce((sum, factor) => sum + factor.score, 0);
         
         const scoreBreakdown = {
@@ -581,10 +632,18 @@ function calculateFinancialHealthScore(inputs) {
                    totalScore >= 50 ? 'needsWork' : 'critical',
             suggestions: generateImprovementSuggestions({ factors }),
             peerComparison: getPeerComparison(inputs, totalScore),
-            generatedAt: new Date().toISOString()
+            generatedAt: new Date().toISOString(),
+            debugInfo: {
+                inputFieldsFound: Object.keys(inputs).length,
+                calculationMethod: 'enhanced_field_mapping',
+                zeroScoreFactors: Object.entries(factors)
+                    .filter(([_, factor]) => factor.score === 0)
+                    .map(([name, factor]) => ({ name, reason: factor.details?.calculationMethod || 'unknown' }))
+            }
         };
         
-        console.log('✅ Financial health score calculated:', scoreBreakdown);
+        console.log('✅ Financial health score calculated:', scoreBreakdown.totalScore, scoreBreakdown.status);
+        console.log('⚠️ Zero score factors:', scoreBreakdown.debugInfo.zeroScoreFactors);
         return scoreBreakdown;
         
     } catch (error) {
