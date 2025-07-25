@@ -106,6 +106,133 @@ window.InputValidation = (function() {
                 default: 0
             });
         },
+        
+        // Retirement-specific currency validation (smaller reasonable limits)
+        retirementCurrency: function(value, options = {}) {
+            return validators.number(value, {
+                min: 0,
+                max: options.max || 10000000, // ₪10M max for individual savings categories
+                decimals: 2,
+                default: 0
+            });
+        },
+        
+        // Expected return validation (0-12% reasonable range)
+        expectedReturn: function(value) {
+            const result = validators.number(value, {
+                min: 0,
+                max: 12, // 12% maximum reasonable return
+                decimals: 2,
+                default: 7
+            });
+            
+            // Add reality check warnings
+            if (result.valid && result.value > 10) {
+                result.warning = 'Returns above 10% are historically rare and may lead to unrealistic projections';
+            } else if (result.valid && result.value > 8) {
+                result.warning = 'Returns above 8% should be used cautiously for long-term planning';
+            }
+            
+            return result;
+        },
+        
+        // Savings rate validation with reality checks
+        savingsRate: function(value, monthlyIncome = 0) {
+            const result = validators.number(value, {
+                min: 0,
+                max: 50, // 50% maximum savings rate
+                decimals: 2,
+                default: 10
+            });
+            
+            // Reality check based on income level
+            if (result.valid && monthlyIncome > 0) {
+                const monthlySavings = (monthlyIncome * result.value) / 100;
+                
+                if (result.value > 30) {
+                    result.warning = 'Savings rates above 30% are extremely difficult to maintain long-term';
+                } else if (result.value > 20) {
+                    result.warning = 'High savings rate - ensure this is sustainable with your lifestyle';
+                } else if (monthlySavings > monthlyIncome * 0.8) {
+                    result.warning = 'Saving more than 80% of income is typically unrealistic';
+                }
+            }
+            
+            return result;
+        },
+        
+        // Retirement projection reality check
+        retirementProjectionInputs: function(inputs) {
+            const warnings = [];
+            const errors = [];
+            
+            const currentAge = parseInt(inputs.currentAge || 30);
+            const retirementAge = parseInt(inputs.retirementAge || 67);
+            const expectedReturn = parseFloat(inputs.expectedAnnualReturn || 7);
+            const savingsRate = (parseFloat(inputs.pensionContributionRate || 0) + parseFloat(inputs.trainingFundContributionRate || 0));
+            const yearsToRetirement = retirementAge - currentAge;
+            
+            // Check for unrealistic combinations
+            if ((expectedReturn > 8 && yearsToRetirement > 30) || (expectedReturn > 10 && yearsToRetirement > 20)) {
+                warnings.push('High expected returns over long time periods may produce unrealistic projections');
+            }
+            
+            if (savingsRate > 25 && expectedReturn > 8) {
+                warnings.push('Combination of high savings rate and high returns may be overly optimistic');
+            }
+            
+            if (yearsToRetirement > 40) {
+                warnings.push('Very long investment horizons increase projection uncertainty');
+            }
+            
+            // Check for extremely conservative scenarios
+            if (expectedReturn < 3 && savingsRate < 5) {
+                warnings.push('Very conservative assumptions may underestimate retirement readiness');
+            }
+            
+            return {
+                isValid: errors.length === 0,
+                warnings: warnings,
+                errors: errors,
+                riskLevel: this.calculateAssumptionRiskLevel(inputs)
+            };
+        },
+        
+        // Calculate risk level of assumptions
+        calculateAssumptionRiskLevel: function(inputs) {
+            const expectedReturn = parseFloat(inputs.expectedAnnualReturn || 7);
+            const savingsRate = (parseFloat(inputs.pensionContributionRate || 0) + parseFloat(inputs.trainingFundContributionRate || 0));
+            const yearsToRetirement = (parseInt(inputs.retirementAge || 67)) - (parseInt(inputs.currentAge || 30));
+            
+            let riskScore = 0;
+            
+            // Return rate risk
+            if (expectedReturn > 10) riskScore += 3;
+            else if (expectedReturn > 8) riskScore += 2;
+            else if (expectedReturn > 6) riskScore += 1;
+            
+            // Savings rate risk
+            if (savingsRate > 25) riskScore += 2;
+            else if (savingsRate > 15) riskScore += 1;
+            
+            // Time horizon risk
+            if (yearsToRetirement > 35) riskScore += 2;
+            else if (yearsToRetirement > 25) riskScore += 1;
+            
+            if (riskScore >= 5) return 'high';
+            if (riskScore >= 3) return 'medium';
+            return 'low';
+        },
+        
+        // Retirement age validation with reasonable bounds
+        retirementAge: function(value, currentAge = 30) {
+            return validators.number(value, {
+                min: currentAge + 5, // At least 5 years from current age
+                max: 75, // Maximum reasonable retirement age
+                integer: true,
+                default: 67
+            });
+        },
 
         // String validation with XSS protection
         string: function(value, options = {}) {

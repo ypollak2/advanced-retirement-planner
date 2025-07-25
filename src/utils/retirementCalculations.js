@@ -662,16 +662,16 @@ window.calculateProgressiveSavings = (inputs, workPeriods = [], partnerWorkPerio
             const monthlyTrainingReturn = trainingFundReturn / 12;
             const monthlyPersonalReturn = personalPortfolioReturn / 12;
             
-            // Primary partner growth with monthly contributions
-            primaryPension = primaryPension * (1 + monthlyPensionReturn) + monthlyPensionContrib;
-            primaryTraining = primaryTraining * (1 + monthlyTrainingReturn) + monthlyTrainingContrib;
-            primaryPersonal = primaryPersonal * (1 + monthlyPersonalReturn) + monthlyPersonalContrib;
+            // Primary partner growth with monthly contributions and bounds checking
+            primaryPension = Math.min(primaryPension * (1 + monthlyPensionReturn) + monthlyPensionContrib, 50000000);
+            primaryTraining = Math.min(primaryTraining * (1 + monthlyTrainingReturn) + monthlyTrainingContrib, 20000000);
+            primaryPersonal = Math.min(primaryPersonal * (1 + monthlyPersonalReturn) + monthlyPersonalContrib, 100000000);
             
             // Partner growth with monthly contributions
             if (inputs.planningType === 'couple') {
-                partnerPension = partnerPension * (1 + monthlyPensionReturn) + partnerMonthlyPensionContrib;
-                partnerTraining = partnerTraining * (1 + monthlyTrainingReturn) + partnerMonthlyTrainingContrib;
-                partnerPersonal = partnerPersonal * (1 + monthlyPersonalReturn) + partnerMonthlyPersonalContrib;
+                partnerPension = Math.min(partnerPension * (1 + monthlyPensionReturn) + partnerMonthlyPensionContrib, 50000000);
+                partnerTraining = Math.min(partnerTraining * (1 + monthlyTrainingReturn) + partnerMonthlyTrainingContrib, 20000000);
+                partnerPersonal = Math.min(partnerPersonal * (1 + monthlyPersonalReturn) + partnerMonthlyPersonalContrib, 100000000);
             }
         }
         
