@@ -2,6 +2,41 @@
 
 > **📋 Note**: This document should be updated with every version release and maintained on the [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
+## Version 6.6.5 (July 25, 2025) - **EXPENSE TRACKING & ANALYSIS** 💰
+
+### 🚀 **Added**
+- **Comprehensive Expense Tracking System**:
+  - 5 main expense categories: Housing & Utilities, Transportation, Food & Daily Living, Insurance & Healthcare, Other Expenses
+  - Monthly expense tracking with yearly adjustment predictions (0-10% range)
+  - Category-specific inflation adjustments (housing +1%, healthcare +3%, etc.)
+  - Visual expense breakdown with progress bars and percentage allocations
+  - Real-time savings rate calculation with color-coded indicators
+  - Savings potential calculator showing optimization opportunities
+- **New Wizard Step 3**: Dedicated expense tracking step with intuitive UI
+- **Enhanced Review Step**: Comprehensive expense analysis section with:
+  - Visual category breakdown with status indicators
+  - Personalized expense optimization recommendations
+  - Savings analysis with potential improvements
+  - Multi-language support (Hebrew/English)
+- **New Components**:
+  - `WizardStepExpenses.js` - Main expense input component
+  - `expenseCalculations.js` - Utility functions for projections and analysis
+
+### 🎯 **Changed**
+- Updated wizard structure from 8 to 9 steps to accommodate expense tracking
+- Enhanced `retirementCalculations.js` to incorporate expense data in projections
+- Added expense breakdown data to calculation results
+- Updated test suite to validate 9-step wizard structure
+- Improved data flow to make expense data available throughout application
+
+### 🧪 **Testing**
+- Updated wizard integration tests for 9-step structure
+- **All 211 tests passing** with 100% success rate
+
+### 📚 **Documentation**
+- Updated README with v6.6.5 expense tracking features
+- Enhanced CHANGELOG with detailed feature descriptions
+
 ## Version 6.6.4 (July 25, 2025) - **COMPREHENSIVE AUDIT & CRITICAL FIXES** 🔧
 
 ### 🔥 **Fixed**

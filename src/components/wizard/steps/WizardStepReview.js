@@ -510,6 +510,21 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
 
     // Render financial health score dashboard
     const renderFinancialHealthScore = () => {
+        // Use the enhanced Financial Health Score component if available
+        if (window.FinancialHealthScoreEnhanced) {
+            return createElement('div', {
+                key: 'financial-health-score-wrapper',
+                className: "mb-8"
+            }, [
+                createElement(window.FinancialHealthScoreEnhanced, {
+                    key: 'enhanced-score',
+                    inputs: inputs,
+                    language: language
+                })
+            ]);
+        }
+        
+        // Fallback to basic implementation if enhanced component not loaded
         const overallScore = calculateOverallFinancialHealthScore();
         const savingsScore = calculateSavingsRateScore();
         const readinessScore = calculateRetirementReadinessScore();
@@ -1027,45 +1042,87 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                     
                     createElement('div', {
                         key: 'chart-controls',
-                        className: "flex space-x-2"
+                        className: "flex items-center space-x-3"
                     }, [
+                        // Info about nominal vs real
+                        createElement('div', {
+                            key: 'info-icon',
+                            className: "relative group"
+                        }, [
+                            createElement('span', {
+                                key: 'icon',
+                                className: "text-gray-400 hover:text-gray-600 cursor-help"
+                            }, 'ℹ️'),
+                            createElement('div', {
+                                key: 'tooltip',
+                                className: "absolute right-0 top-6 w-64 p-3 bg-gray-800 text-white text-xs rounded-lg shadow-lg hidden group-hover:block z-10"
+                            }, [
+                                createElement('div', { key: 'nominal-info', className: "mb-2" }, 
+                                    language === 'he' ? 
+                                    '💰 נומינלי: ערכים עתידיים ללא התאמה לאינפלציה' : 
+                                    '💰 Nominal: Future values without inflation adjustment'),
+                                createElement('div', { key: 'real-info' }, 
+                                    language === 'he' ? 
+                                    '📊 ריאלי: ערכים מותאמים לאינפלציה (כוח קנייה של היום)' : 
+                                    '📊 Real: Inflation-adjusted values (today\'s purchasing power)')
+                            ])
+                        ]),
+                        
                         createElement('button', {
                             key: 'toggle-nominal',
                             id: 'toggle-nominal',
-                            className: "px-3 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded border hover:bg-blue-200",
-                            onClick: () => {
+                            className: "px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200",
+                            'data-active': 'true',
+                            onClick: (e) => {
+                                const button = e.currentTarget;
+                                const isActive = button.getAttribute('data-active') === 'true';
                                 const nominalLines = document.querySelectorAll('[data-line="nominal"]');
-                                const button = document.getElementById('toggle-nominal');
-                                const isHidden = nominalLines[0]?.style.display === 'none';
                                 
                                 nominalLines.forEach(line => {
-                                    line.style.display = isHidden ? 'block' : 'none';
+                                    line.style.display = isActive ? 'none' : 'block';
                                 });
                                 
-                                button.textContent = isHidden ? 
-                                    (language === 'he' ? 'הסתר נומינלי' : 'Hide Nominal') :
-                                    (language === 'he' ? 'הצג נומינלי' : 'Show Nominal');
-                            }
-                        }, language === 'he' ? 'הסתר נומינלי' : 'Hide Nominal'),
+                                button.setAttribute('data-active', !isActive);
+                                
+                                // Update button styles
+                                if (isActive) {
+                                    button.className = "px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 bg-gray-100 text-gray-400 border-gray-300";
+                                    button.innerHTML = `<span style="text-decoration: line-through;">${language === 'he' ? 'נומינלי' : 'Nominal'}</span>`;
+                                } else {
+                                    button.className = "px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 bg-blue-100 text-blue-700 border-blue-300 hover:bg-blue-200";
+                                    button.innerHTML = language === 'he' ? 'נומינלי' : 'Nominal';
+                                }
+                            },
+                            style: { backgroundColor: '#dbeafe', color: '#1d4ed8', borderColor: '#93c5fd' }
+                        }, language === 'he' ? 'נומינלי' : 'Nominal'),
                         
                         createElement('button', {
                             key: 'toggle-real',
                             id: 'toggle-real',
-                            className: "px-3 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded border hover:bg-purple-200",
-                            onClick: () => {
+                            className: "px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200",
+                            'data-active': 'true',
+                            onClick: (e) => {
+                                const button = e.currentTarget;
+                                const isActive = button.getAttribute('data-active') === 'true';
                                 const realLines = document.querySelectorAll('[data-line="real"]');
-                                const button = document.getElementById('toggle-real');
-                                const isHidden = realLines[0]?.style.display === 'none';
                                 
                                 realLines.forEach(line => {
-                                    line.style.display = isHidden ? 'block' : 'none';
+                                    line.style.display = isActive ? 'none' : 'block';
                                 });
                                 
-                                button.textContent = isHidden ? 
-                                    (language === 'he' ? 'הסתר ריאלי' : 'Hide Real') :
-                                    (language === 'he' ? 'הצג ריאלי' : 'Show Real');
-                            }
-                        }, language === 'he' ? 'הסתר ריאלי' : 'Hide Real')
+                                button.setAttribute('data-active', !isActive);
+                                
+                                // Update button styles
+                                if (isActive) {
+                                    button.className = "px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 bg-gray-100 text-gray-400 border-gray-300";
+                                    button.innerHTML = `<span style="text-decoration: line-through;">${language === 'he' ? 'ריאלי' : 'Real'}</span>`;
+                                } else {
+                                    button.className = "px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 bg-purple-100 text-purple-700 border-purple-300 hover:bg-purple-200";
+                                    button.innerHTML = language === 'he' ? 'ריאלי' : 'Real';
+                                }
+                            },
+                            style: { backgroundColor: '#f3e8ff', color: '#6b21a8', borderColor: '#c084fc' }
+                        }, language === 'he' ? 'ריאלי' : 'Real')
                     ])
                 ]),
                 
@@ -1140,10 +1197,28 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         const maxMonthly = Math.max(...chartData.map(d => d.monthlyIncome));
         const chartWidth = 800;
         const chartHeight = 400;
-        const margin = { top: 20, right: 60, bottom: 40, left: 80 };
+        const margin = { top: 30, right: 100, bottom: 60, left: 100 };
         const innerWidth = chartWidth - margin.left - margin.right;
         const innerHeight = chartHeight - margin.top - margin.bottom;
 
+        // Get min and max ages from chart data
+        const minAge = Math.min(...chartData.map(d => d.age));
+        const maxAge = Math.max(...chartData.map(d => d.age));
+        
+        // Calculate axis tick intervals
+        const xTickInterval = 5; // Show age every 5 years
+        const yTickCount = 6; // Number of Y-axis ticks
+        
+        // Format currency values for display
+        const formatCurrency = (value) => {
+            if (value >= 1000000) {
+                return `${currency}${(value / 1000000).toFixed(1)}M`;
+            } else if (value >= 1000) {
+                return `${currency}${Math.round(value / 1000)}K`;
+            }
+            return `${currency}${Math.round(value)}`;
+        };
+        
         // Generate path data
         const createPath = (data, valueKey, maxValue) => {
             return data.map((point, index) => {
@@ -1164,10 +1239,100 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         const retirementX = retirementIndex >= 0 ? 
             margin.left + (retirementIndex / (chartData.length - 1)) * innerWidth : null;
 
+        // State for tooltip
+        const [tooltipData, setTooltipData] = React.useState(null);
+        const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
+        
+        // Find closest data point to mouse position
+        const handleMouseMove = (e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left - margin.left;
+            const y = e.clientY - rect.top;
+            
+            if (x >= 0 && x <= innerWidth && y >= 0 && y <= chartHeight) {
+                const dataIndex = Math.round((x / innerWidth) * (chartData.length - 1));
+                const dataPoint = chartData[Math.max(0, Math.min(dataIndex, chartData.length - 1))];
+                
+                setTooltipData(dataPoint);
+                setMousePosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+            }
+        };
+        
+        const handleMouseLeave = () => {
+            setTooltipData(null);
+        };
+        
         return createElement('div', {
             key: 'chart-svg-container',
-            className: "w-full overflow-x-auto"
+            className: "w-full overflow-x-auto relative",
+            onMouseMove: handleMouseMove,
+            onMouseLeave: handleMouseLeave
         }, [
+            // Tooltip
+            tooltipData && createElement('div', {
+                key: 'tooltip',
+                className: "absolute z-20 pointer-events-none",
+                style: {
+                    left: `${mousePosition.x + 10}px`,
+                    top: `${mousePosition.y - 10}px`,
+                    transform: mousePosition.x > chartWidth / 2 ? 'translateX(-100%)' : 'translateX(0)'
+                }
+            }, [
+                createElement('div', {
+                    key: 'tooltip-content',
+                    className: "bg-gray-900 text-white p-3 rounded-lg shadow-xl text-xs min-w-[200px]"
+                }, [
+                    createElement('div', {
+                        key: 'age',
+                        className: "font-bold text-yellow-300 mb-2"
+                    }, `${language === 'he' ? 'גיל' : 'Age'}: ${tooltipData.age}`),
+                    
+                    createElement('div', { key: 'divider1', className: "border-t border-gray-700 my-2" }),
+                    
+                    createElement('div', {
+                        key: 'accumulation-nominal',
+                        className: "flex justify-between mb-1",
+                        'data-line': 'nominal'
+                    }, [
+                        createElement('span', { key: 'label' }, language === 'he' ? 'צבירה (נומינלי):' : 'Accumulation (Nominal):'),
+                        createElement('span', { key: 'value', className: "font-medium text-blue-300" }, 
+                            formatCurrency(tooltipData.totalAccumulation))
+                    ]),
+                    
+                    createElement('div', {
+                        key: 'accumulation-real',
+                        className: "flex justify-between mb-1",
+                        'data-line': 'real'
+                    }, [
+                        createElement('span', { key: 'label' }, language === 'he' ? 'צבירה (ריאלי):' : 'Accumulation (Real):'),
+                        createElement('span', { key: 'value', className: "font-medium text-purple-300" }, 
+                            formatCurrency(tooltipData.inflationAdjustedTotal))
+                    ]),
+                    
+                    createElement('div', { key: 'divider2', className: "border-t border-gray-700 my-2" }),
+                    
+                    createElement('div', {
+                        key: 'income-nominal',
+                        className: "flex justify-between mb-1",
+                        'data-line': 'nominal'
+                    }, [
+                        createElement('span', { key: 'label' }, language === 'he' ? 'הכנסה חודשית (נומינלי):' : 'Monthly Income (Nominal):'),
+                        createElement('span', { key: 'value', className: "font-medium text-green-300" }, 
+                            formatCurrency(tooltipData.monthlyIncome))
+                    ]),
+                    
+                    createElement('div', {
+                        key: 'income-real',
+                        className: "flex justify-between",
+                        'data-line': 'real'
+                    }, [
+                        createElement('span', { key: 'label' }, language === 'he' ? 'הכנסה חודשית (ריאלי):' : 'Monthly Income (Real):'),
+                        createElement('span', { key: 'value', className: "font-medium text-red-300" }, 
+                            formatCurrency(tooltipData.inflationAdjustedMonthlyIncome))
+                    ])
+                ])
+            ]),
+            
             createElement('svg', {
                 key: 'projection-chart',
                 width: chartWidth,
@@ -1187,20 +1352,60 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                     strokeWidth: 1
                 }),
 
-                // Grid lines
-                ...Array.from({length: 6}, (_, i) => {
-                    const y = margin.top + (i / 5) * innerHeight;
-                    return createElement('line', {
-                        key: `grid-${i}`,
-                        x1: margin.left,
-                        y1: y,
-                        x2: margin.left + innerWidth,  
-                        y2: y,
-                        stroke: '#e5e7eb',
-                        strokeWidth: 0.5,
-                        opacity: 0.5
-                    });
-                }),
+                // Y-axis grid lines and labels
+                ...Array.from({length: yTickCount}, (_, i) => {
+                    const y = margin.top + (i / (yTickCount - 1)) * innerHeight;
+                    const value = maxTotal * (1 - i / (yTickCount - 1));
+                    return [
+                        createElement('line', {
+                            key: `grid-y-${i}`,
+                            x1: margin.left,
+                            y1: y,
+                            x2: margin.left + innerWidth,  
+                            y2: y,
+                            stroke: '#e5e7eb',
+                            strokeWidth: 0.5,
+                            opacity: 0.5
+                        }),
+                        createElement('text', {
+                            key: `y-label-${i}`,
+                            x: margin.left - 10,
+                            y: y + 4,
+                            fill: '#6b7280',
+                            fontSize: '11',
+                            textAnchor: 'end'
+                        }, formatCurrency(value))
+                    ];
+                }).flat(),
+                
+                // X-axis grid lines and labels (age)
+                ...chartData.filter((_, index) => {
+                    const age = chartData[index].age;
+                    return age % xTickInterval === 0;
+                }).map((point, _, filteredArray) => {
+                    const index = chartData.findIndex(d => d.age === point.age);
+                    const x = margin.left + (index / (chartData.length - 1)) * innerWidth;
+                    return [
+                        createElement('line', {
+                            key: `grid-x-${point.age}`,
+                            x1: x,
+                            y1: margin.top,
+                            x2: x,
+                            y2: margin.top + innerHeight,
+                            stroke: '#e5e7eb',
+                            strokeWidth: 0.5,
+                            opacity: 0.3
+                        }),
+                        createElement('text', {
+                            key: `x-label-${point.age}`,
+                            x: x,
+                            y: margin.top + innerHeight + 20,
+                            fill: '#6b7280',
+                            fontSize: '11',
+                            textAnchor: 'middle'
+                        }, point.age)
+                    ];
+                }).flat(),
 
                 // Retirement year line
                 retirementX && createElement('line', {
@@ -1221,7 +1426,8 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                     fill: 'none',
                     stroke: '#2563eb',
                     strokeWidth: 3,
-                    'data-line': 'nominal'
+                    'data-line': 'nominal',
+                    'data-chart-line': 'total-accumulation'
                 }),
 
                 // Inflation-adjusted total
@@ -1232,7 +1438,8 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                     stroke: '#7c3aed',
                     strokeWidth: 3,
                     strokeDasharray: '8,4',
-                    'data-line': 'real'
+                    'data-line': 'real',
+                    'data-chart-line': 'inflation-adjusted-total'
                 }),
 
                 // Monthly income (scaled to fit)
@@ -1242,7 +1449,8 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                     fill: 'none',
                     stroke: '#059669',
                     strokeWidth: 2,
-                    'data-line': 'nominal'
+                    'data-line': 'nominal',
+                    'data-chart-line': 'monthly-income'
                 }),
 
                 // Inflation-adjusted monthly
@@ -1253,27 +1461,30 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                     stroke: '#dc2626',
                     strokeWidth: 2,
                     strokeDasharray: '4,2',
-                    'data-line': 'real'
+                    'data-line': 'real',
+                    'data-chart-line': 'inflation-adjusted-monthly'
                 }),
 
                 // Y-axis label
                 createElement('text', {
                     key: 'y-axis-label',
-                    x: 20,
+                    x: 25,
                     y: margin.top + innerHeight / 2,
                     fill: '#374151',
-                    fontSize: '12',
+                    fontSize: '14',
+                    fontWeight: 'bold',
                     textAnchor: 'middle',
-                    transform: `rotate(-90, 20, ${margin.top + innerHeight / 2})`
-                }, `${currency} Amount`),
+                    transform: `rotate(-90, 25, ${margin.top + innerHeight / 2})`
+                }, language === 'he' ? `סכום ${currency}` : `${currency} Amount`),
 
                 // X-axis label
                 createElement('text', {
                     key: 'x-axis-label',
                     x: margin.left + innerWidth / 2,
-                    y: chartHeight - 10,
+                    y: chartHeight - 5,
                     fill: '#374151',
-                    fontSize: '12',
+                    fontSize: '14',
+                    fontWeight: 'bold',
                     textAnchor: 'middle'
                 }, language === 'he' ? 'גיל' : 'Age'),
 
@@ -1296,8 +1507,22 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
             }, [
                 createElement('div', {
                     key: 'legend-total',
-                    className: "flex items-center",
-                    'data-line': 'nominal'
+                    className: "flex items-center cursor-pointer px-3 py-1 rounded-lg hover:bg-gray-100 transition-colors",
+                    'data-line': 'nominal',
+                    'data-line-id': 'total-accumulation',
+                    onClick: (e) => {
+                        const lineId = 'total-accumulation';
+                        const line = document.querySelector(`[data-chart-line="${lineId}"]`);
+                        const legendItem = e.currentTarget;
+                        const isHidden = line?.style.display === 'none';
+                        
+                        if (line) {
+                            line.style.display = isHidden ? 'block' : 'none';
+                        }
+                        
+                        // Update legend item style
+                        legendItem.style.opacity = isHidden ? '1' : '0.4';
+                    }
                 }, [
                     createElement('div', { 
                         key: 'legend-total-line',
@@ -1308,8 +1533,22 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                 ]),
                 createElement('div', {
                     key: 'legend-adjusted-total',
-                    className: "flex items-center",
-                    'data-line': 'real'
+                    className: "flex items-center cursor-pointer px-3 py-1 rounded-lg hover:bg-gray-100 transition-colors",
+                    'data-line': 'real',
+                    'data-line-id': 'inflation-adjusted-total',
+                    onClick: (e) => {
+                        const lineId = 'inflation-adjusted-total';
+                        const line = document.querySelector(`[data-chart-line="${lineId}"]`);
+                        const legendItem = e.currentTarget;
+                        const isHidden = line?.style.display === 'none';
+                        
+                        if (line) {
+                            line.style.display = isHidden ? 'block' : 'none';
+                        }
+                        
+                        // Update legend item style
+                        legendItem.style.opacity = isHidden ? '1' : '0.4';
+                    }
                 }, [
                     createElement('div', { 
                         key: 'legend-adjusted-line',
@@ -1321,8 +1560,22 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                 ]),
                 createElement('div', {
                     key: 'legend-monthly',
-                    className: "flex items-center",
-                    'data-line': 'nominal'
+                    className: "flex items-center cursor-pointer px-3 py-1 rounded-lg hover:bg-gray-100 transition-colors",
+                    'data-line': 'nominal',
+                    'data-line-id': 'monthly-income',
+                    onClick: (e) => {
+                        const lineId = 'monthly-income';
+                        const line = document.querySelector(`[data-chart-line="${lineId}"]`);
+                        const legendItem = e.currentTarget;
+                        const isHidden = line?.style.display === 'none';
+                        
+                        if (line) {
+                            line.style.display = isHidden ? 'block' : 'none';
+                        }
+                        
+                        // Update legend item style
+                        legendItem.style.opacity = isHidden ? '1' : '0.4';
+                    }
                 }, [
                     createElement('div', { 
                         key: 'legend-monthly-line',
@@ -1333,8 +1586,22 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                 ]),
                 createElement('div', {
                     key: 'legend-adjusted-monthly',
-                    className: "flex items-center",
-                    'data-line': 'real'
+                    className: "flex items-center cursor-pointer px-3 py-1 rounded-lg hover:bg-gray-100 transition-colors",
+                    'data-line': 'real',
+                    'data-line-id': 'inflation-adjusted-monthly',
+                    onClick: (e) => {
+                        const lineId = 'inflation-adjusted-monthly';
+                        const line = document.querySelector(`[data-chart-line="${lineId}"]`);
+                        const legendItem = e.currentTarget;
+                        const isHidden = line?.style.display === 'none';
+                        
+                        if (line) {
+                            line.style.display = isHidden ? 'block' : 'none';
+                        }
+                        
+                        // Update legend item style
+                        legendItem.style.opacity = isHidden ? '1' : '0.4';
+                    }
                 }, [
                     createElement('div', { 
                         key: 'legend-adjusted-monthly-line',
@@ -1344,6 +1611,219 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                     createElement('span', { key: 'legend-adjusted-monthly-text' }, 
                         language === 'he' ? 'הכנסה חודשית (ריאלי)' : 'Monthly Income (Real)')
                 ])
+            ])
+        ]);
+    };
+
+    // Render expense analysis
+    const renderExpenseAnalysis = () => {
+        // Check if expense data exists
+        if (!inputs.expenses || !window.analyzeExpenseRatios) {
+            return null;
+        }
+
+        const monthlyIncome = parseFloat(inputs.currentMonthlySalary || 0) + 
+                             parseFloat(inputs.partner1Salary || 0) + 
+                             parseFloat(inputs.partner2Salary || 0);
+        
+        const expenseAnalysis = window.analyzeExpenseRatios(inputs.expenses, monthlyIncome, language);
+        const expenseBreakdown = window.calculateExpenseBreakdown(inputs.expenses);
+        const savingsPotential = window.calculateSavingsPotential(inputs.expenses, monthlyIncome);
+        
+        // Category colors
+        const categoryColors = {
+            housing: '#3B82F6',      // blue
+            transportation: '#10B981', // green
+            food: '#F59E0B',         // yellow
+            insurance: '#EF4444',    // red
+            other: '#8B5CF6'         // purple
+        };
+        
+        // Category icons
+        const categoryIcons = {
+            housing: '🏠',
+            transportation: '🚗',
+            food: '🛒',
+            insurance: '🏥',
+            other: '💳'
+        };
+        
+        // Category labels
+        const categoryLabels = language === 'he' ? {
+            housing: 'דיור',
+            transportation: 'תחבורה',
+            food: 'מזון',
+            insurance: 'ביטוח ובריאות',
+            other: 'אחר'
+        } : {
+            housing: 'Housing',
+            transportation: 'Transportation',
+            food: 'Food',
+            insurance: 'Insurance',
+            other: 'Other'
+        };
+
+        return createElement('div', {
+            key: 'expense-analysis',
+            className: "bg-white rounded-xl p-6 border border-gray-200 mb-8"
+        }, [
+            createElement('h3', {
+                key: 'expense-title',
+                className: "text-xl font-semibold text-gray-700 mb-6 flex items-center"
+            }, [
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💰'),
+                language === 'he' ? 'ניתוח הוצאות' : 'Expense Analysis'
+            ]),
+            
+            // Expense breakdown chart
+            createElement('div', { 
+                key: 'expense-breakdown',
+                className: "mb-6"
+            }, [
+                createElement('h4', {
+                    key: 'breakdown-title',
+                    className: "text-sm font-medium text-gray-600 mb-3"
+                }, language === 'he' ? 'פילוח הוצאות חודשיות' : 'Monthly Expense Breakdown'),
+                
+                createElement('div', {
+                    key: 'expense-bars',
+                    className: "space-y-3"
+                }, Object.keys(categoryLabels).map(category => {
+                    const amount = parseFloat(inputs.expenses[category] || 0);
+                    const percentage = expenseBreakdown[category] || 0;
+                    const analysis = expenseAnalysis.analysis[category];
+                    
+                    return createElement('div', {
+                        key: `expense-${category}`,
+                        className: "flex items-center"
+                    }, [
+                        createElement('div', {
+                            key: 'icon',
+                            className: "w-8 text-center mr-3"
+                        }, categoryIcons[category]),
+                        
+                        createElement('div', {
+                            key: 'bar-container',
+                            className: "flex-1"
+                        }, [
+                            createElement('div', {
+                                key: 'label-row',
+                                className: "flex justify-between text-sm mb-1"
+                            }, [
+                                createElement('span', { 
+                                    key: 'label',
+                                    className: "font-medium text-gray-700"
+                                }, categoryLabels[category]),
+                                createElement('span', { 
+                                    key: 'amount',
+                                    className: "text-gray-600"
+                                }, `${workingCurrency}${amount.toLocaleString()} (${percentage.toFixed(1)}%)`)
+                            ]),
+                            
+                            createElement('div', {
+                                key: 'progress-bar',
+                                className: "w-full bg-gray-200 rounded-full h-2"
+                            }, [
+                                createElement('div', {
+                                    key: 'progress-fill',
+                                    className: "h-2 rounded-full transition-all duration-300",
+                                    style: {
+                                        width: `${percentage}%`,
+                                        backgroundColor: categoryColors[category]
+                                    }
+                                })
+                            ])
+                        ]),
+                        
+                        // Status indicator
+                        analysis && createElement('div', {
+                            key: 'status',
+                            className: `ml-3 w-6 h-6 rounded-full flex items-center justify-center ${
+                                analysis.status === 'good' ? 'bg-green-100' : 
+                                analysis.status === 'acceptable' ? 'bg-yellow-100' : 'bg-red-100'
+                            }`
+                        }, analysis.status === 'good' ? '✓' : 
+                           analysis.status === 'acceptable' ? '!' : '×')
+                    ]);
+                }))
+            ]),
+            
+            // Savings analysis
+            createElement('div', {
+                key: 'savings-analysis',
+                className: "bg-gray-50 rounded-lg p-4 mb-4"
+            }, [
+                createElement('div', {
+                    key: 'savings-header',
+                    className: "flex justify-between items-center mb-2"
+                }, [
+                    createElement('h4', {
+                        key: 'savings-title',
+                        className: "text-sm font-medium text-gray-700"
+                    }, language === 'he' ? 'ניתוח חיסכון' : 'Savings Analysis'),
+                    createElement('span', {
+                        key: 'savings-rate',
+                        className: `text-lg font-bold ${
+                            expenseAnalysis.savingsRate >= 20 ? 'text-green-600' :
+                            expenseAnalysis.savingsRate >= 10 ? 'text-yellow-600' : 'text-red-600'
+                        }`
+                    }, `${expenseAnalysis.savingsRate.toFixed(1)}%`)
+                ]),
+                
+                createElement('p', {
+                    key: 'savings-info',
+                    className: "text-sm text-gray-600"
+                }, language === 'he' ? 
+                    `אתה חוסך ${workingCurrency}${expenseAnalysis.analysis.savings.amount.toLocaleString()} מתוך ${workingCurrency}${monthlyIncome.toLocaleString()} הכנסה חודשית` :
+                    `You save ${workingCurrency}${expenseAnalysis.analysis.savings.amount.toLocaleString()} out of ${workingCurrency}${monthlyIncome.toLocaleString()} monthly income`)
+            ]),
+            
+            // Expense recommendations
+            expenseAnalysis.recommendations.length > 0 && createElement('div', {
+                key: 'expense-recommendations',
+                className: "space-y-2"
+            }, [
+                createElement('h4', {
+                    key: 'recommendations-title',
+                    className: "text-sm font-medium text-gray-700 mb-2"
+                }, language === 'he' ? 'המלצות להוצאות' : 'Expense Recommendations'),
+                
+                ...expenseAnalysis.recommendations.map((rec, index) => 
+                    createElement('div', {
+                        key: `recommendation-${index}`,
+                        className: `p-3 rounded-lg border ${
+                            rec.type === 'critical' ? 'bg-red-50 border-red-200' : 
+                            rec.type === 'warning' ? 'bg-yellow-50 border-yellow-200' : 
+                            'bg-blue-50 border-blue-200'
+                        }`
+                    }, [
+                        createElement('p', {
+                            key: 'rec-message',
+                            className: `text-sm ${
+                                rec.type === 'critical' ? 'text-red-700' : 
+                                rec.type === 'warning' ? 'text-yellow-700' : 
+                                'text-blue-700'
+                            }`
+                        }, rec.message)
+                    ])
+                )
+            ]),
+            
+            // Savings potential
+            savingsPotential.total > 0 && createElement('div', {
+                key: 'savings-potential',
+                className: "mt-4 p-4 bg-green-50 rounded-lg border border-green-200"
+            }, [
+                createElement('h4', {
+                    key: 'potential-title',
+                    className: "text-sm font-medium text-green-800 mb-2"
+                }, language === 'he' ? 'פוטנציאל חיסכון' : 'Savings Potential'),
+                createElement('p', {
+                    key: 'potential-amount',
+                    className: "text-sm text-green-700"
+                }, language === 'he' ? 
+                    `על ידי אופטימיזציה של ההוצאות שלך, תוכל לחסוך עוד ${workingCurrency}${Math.round(savingsPotential.total).toLocaleString()} בחודש (${savingsPotential.additionalSavingsRate.toFixed(1)}% נוספים)` :
+                    `By optimizing your expenses, you could save an additional ${workingCurrency}${Math.round(savingsPotential.total).toLocaleString()} per month (${savingsPotential.additionalSavingsRate.toFixed(1)}% more)`)
             ])
         ]);
     };
@@ -1460,6 +1940,9 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
 
         // Retirement Projections
         renderRetirementProjections(),
+
+        // Expense Analysis
+        renderExpenseAnalysis(),
 
         // Action Items
         renderActionItems(),

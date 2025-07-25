@@ -1,9 +1,9 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "6.6.4",
-    build: "2025-07-22",
-    commit: "v6.6.2-update",
-    description: "Deployment synchronization and professional README cleanup"
+    number: "6.6.5",
+    build: "2025-07-25",
+    commit: "v6.6.5-expense-tracking",
+    description: "Comprehensive expense tracking with category analysis and projections"
 };
 
 // Export version for use in other modules

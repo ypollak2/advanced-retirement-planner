@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v6.6.4 ✨
+# 🚀 Advanced Retirement Planner v6.6.5 ✨
 
-[![Version](https://img.shields.io/badge/version-6.6.4-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-6.6.5-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -80,6 +80,34 @@ npm run security:scan-report
 # JSON output for CI/CD
 npm run security:scan-json
 ```
+
+## 🎨 Current Release - v6.6.5 - EXPENSE TRACKING & ANALYSIS 💰
+
+### **📊 COMPREHENSIVE EXPENSE TRACKING** (July 2025)
+
+#### **💸 Monthly Expense Management**
+- **5 Main Categories**: Housing & Utilities, Transportation, Food & Daily Living, Insurance & Healthcare, Other Expenses
+- **Category-Specific Analysis**: Visual breakdown with progress bars and percentage allocations
+- **Smart Recommendations**: Personalized expense optimization suggestions based on income ratios
+- **Savings Rate Tracking**: Real-time calculation of monthly savings percentage with color-coded indicators
+
+#### **📈 Expense Projections & Analysis**
+- **Yearly Adjustment Predictions**: Category-specific inflation adjustments (housing +1%, healthcare +3%, etc.)
+- **Retirement Planning Integration**: Expenses automatically factored into retirement calculations
+- **Savings Potential Calculator**: Shows how much extra could be saved through expense optimization
+- **Multi-Language Support**: Full Hebrew and English translations for all expense features
+
+#### **🧙 Enhanced Wizard Experience**
+- **New Step 3**: Dedicated expense tracking step in the retirement planning wizard
+- **Expense Analysis in Review**: Comprehensive expense breakdown in the final review step
+- **Visual Progress Indicators**: Color-coded status for each expense category (good/acceptable/high)
+- **Actionable Insights**: Specific recommendations for reducing high expense categories
+
+#### **🔧 Technical Improvements**
+- **New Utility Functions**: `expenseCalculations.js` for projections and analysis
+- **Enhanced Calculations**: `retirementCalculations.js` now includes expense data in projections
+- **Improved Data Flow**: Expense breakdown data available throughout the application
+- **Test Coverage**: Updated test suite to include 9-step wizard structure
 
 ## 🎨 Previous Release - v6.6.2 - MAJOR UX OVERHAUL & RUNTIME FIXES 🚀
 
