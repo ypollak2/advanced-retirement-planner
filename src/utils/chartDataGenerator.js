@@ -101,3 +101,90 @@ window.generateChartData = (
 
     return chartPoints;
 };
+
+// Generate retirement projection chart data for year-by-year visualization
+window.generateRetirementProjectionChart = (inputs) => {
+    const currentAge = parseFloat(inputs.currentAge || 30);
+    const retirementAge = parseFloat(inputs.retirementAge || 67);
+    const monthlyIncome = parseFloat(inputs.currentMonthlySalary || inputs.currentSalary || 0);
+    const savingsRate = (parseFloat(inputs.pensionContributionRate || 0) + parseFloat(inputs.trainingFundContributionRate || 0)) / 100;
+    const expectedReturn = parseFloat(inputs.expectedAnnualReturn || 7) / 100;
+    const inflationRate = 0.03;
+    
+    const yearsToRetirement = retirementAge - currentAge;
+    const annualSavings = monthlyIncome * 12 * savingsRate;
+    
+    // Calculate current total savings
+    let currentSavings = 0;
+    currentSavings += parseFloat(inputs.currentSavings || 0);
+    currentSavings += parseFloat(inputs.currentTrainingFund || 0);
+    currentSavings += parseFloat(inputs.currentPersonalPortfolio || 0);
+    currentSavings += parseFloat(inputs.currentRealEstate || 0);
+    currentSavings += parseFloat(inputs.currentCrypto || 0);
+    currentSavings += parseFloat(inputs.currentSavingsAccount || 0);
+    
+    // Partner savings if couple mode
+    if (inputs.planningType === 'couple') {
+        currentSavings += parseFloat(inputs.partner1CurrentPension || 0);
+        currentSavings += parseFloat(inputs.partner1CurrentTrainingFund || 0);
+        currentSavings += parseFloat(inputs.partner1PersonalPortfolio || 0);
+        currentSavings += parseFloat(inputs.partner1RealEstate || 0);
+        currentSavings += parseFloat(inputs.partner1Crypto || 0);
+        currentSavings += parseFloat(inputs.partner2CurrentPension || 0);
+        currentSavings += parseFloat(inputs.partner2CurrentTrainingFund || 0);
+        currentSavings += parseFloat(inputs.partner2PersonalPortfolio || 0);
+        currentSavings += parseFloat(inputs.partner2RealEstate || 0);
+        currentSavings += parseFloat(inputs.partner2Crypto || 0);
+    }
+    
+    const chartData = [];
+    let runningTotal = currentSavings;
+    let cumulativeInflation = 1.0;
+    
+    // Generate year-by-year data points
+    for (let year = 0; year <= yearsToRetirement; year++) {
+        const currentYearAge = currentAge + year;
+        
+        if (year > 0) {
+            // Apply return to existing savings
+            runningTotal *= (1 + expectedReturn);
+            
+            // Add annual contributions (only during working years)
+            if (year < yearsToRetirement) {
+                runningTotal += annualSavings;
+            }
+            
+            // Update cumulative inflation
+            cumulativeInflation *= (1 + inflationRate);
+        }
+        
+        // Calculate inflation-adjusted values
+        const inflationAdjustedTotal = runningTotal / cumulativeInflation;
+        
+        // Calculate monthly income (4% withdrawal rule)
+        let withdrawalRate = 0.04;
+        if (runningTotal > 20000000) {
+            withdrawalRate = 0.035;
+        } else if (runningTotal > 10000000) {
+            withdrawalRate = 0.038;
+        }
+        
+        const monthlyIncome = (runningTotal * withdrawalRate) / 12;
+        const inflationAdjustedMonthlyIncome = monthlyIncome / cumulativeInflation;
+        
+        chartData.push({
+            year: year,
+            age: currentYearAge,
+            totalAccumulation: safeMoney(runningTotal),
+            inflationAdjustedTotal: safeMoney(inflationAdjustedTotal),
+            monthlyIncome: safeMoney(monthlyIncome),
+            inflationAdjustedMonthlyIncome: safeMoney(inflationAdjustedMonthlyIncome),
+            isRetirementYear: currentYearAge === retirementAge,
+            yearLabel: year === 0 ? `Today (Age ${currentAge})` : 
+                      currentYearAge === retirementAge ? `Retirement (Age ${retirementAge})` :
+                      `Age ${currentYearAge}`
+        });
+    }
+    
+    return chartData;
+};

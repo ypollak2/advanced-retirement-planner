@@ -267,7 +267,7 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         return t.critical;
     };
 
-    // Calculate retirement projections
+    // Calculate retirement projections with enhanced realism
     const calculateRetirementProjections = () => {
         const currentAge = parseFloat(inputs.currentAge || 30);
         const retirementAge = parseFloat(inputs.retirementAge || 67);
@@ -303,26 +303,98 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         
         const currentSavings = calculateTotalCurrentSavings();
         const savingsRate = (parseFloat(inputs.pensionContributionRate || 0) + parseFloat(inputs.trainingFundContributionRate || 0)) / 100;
-        const expectedReturn = parseFloat(inputs.expectedAnnualReturn || 7) / 100;
+        let expectedReturn = parseFloat(inputs.expectedAnnualReturn || 7) / 100;
         const inflationRate = 0.03; // 3% inflation assumption
         
         const yearsToRetirement = retirementAge - currentAge;
         const annualSavings = monthlyIncome * 12 * savingsRate;
         
-        // Future value calculation
-        const futureValueCurrentSavings = currentSavings * Math.pow(1 + expectedReturn, yearsToRetirement);
-        const futureValueAnnualSavings = expectedReturn > 0 ? 
-            annualSavings * (Math.pow(1 + expectedReturn, yearsToRetirement) - 1) / expectedReturn : 
-            annualSavings * yearsToRetirement;
-        const totalAccumulation = futureValueCurrentSavings + futureValueAnnualSavings;
+        // Apply conservative adjustments for extreme scenarios
+        const applyConservativeGrowth = (returnRate, years, savingsAmount, currentAmount) => {
+            // Reduce returns for very high initial expectations
+            if (returnRate > 0.10) {
+                returnRate = 0.10 + (returnRate - 0.10) * 0.5; // 50% haircut on returns above 10%
+            } else if (returnRate > 0.08) {
+                returnRate = 0.08 + (returnRate - 0.08) * 0.7; // 30% haircut on returns above 8%
+            }
+            
+            // Apply market volatility drag for long time horizons
+            if (years > 30) {
+                const volatilityDrag = Math.min(0.015, (years - 30) * 0.0005); // Max 1.5% drag
+                returnRate = Math.max(0.02, returnRate - volatilityDrag);
+            }
+            
+            // Account for sequence of returns risk
+            if (years > 20) {
+                const sequenceRisk = Math.min(0.01, (years - 20) * 0.0002); // Max 1% drag
+                returnRate = Math.max(0.02, returnRate - sequenceRisk);
+            }
+            
+            return returnRate;
+        };
         
-        // Safe withdrawal rate (4% rule)
-        const annualRetirementIncome = totalAccumulation * 0.04;
+        // Apply conservative adjustments
+        const adjustedReturn = applyConservativeGrowth(expectedReturn, yearsToRetirement, annualSavings, currentSavings);
+        
+        // Future value calculation with enhanced realism
+        const rawFutureValueCurrentSavings = currentSavings * Math.pow(1 + adjustedReturn, yearsToRetirement);
+        const rawFutureValueAnnualSavings = adjustedReturn > 0 ? 
+            annualSavings * (Math.pow(1 + adjustedReturn, yearsToRetirement) - 1) / adjustedReturn : 
+            annualSavings * yearsToRetirement;
+        const rawTotalAccumulation = rawFutureValueCurrentSavings + rawFutureValueAnnualSavings;
+        
+        // Enhanced multi-tier reality checking
+        const warningThreshold = inputs.planningType === 'couple' ? 20000000 : 10000000; // ₪10M/₪20M warning
+        const conservativeLimit = inputs.planningType === 'couple' ? 50000000 : 25000000; // ₪25M/₪50M conservative limit
+        const absoluteMax = inputs.planningType === 'couple' ? 100000000 : 50000000; // ₪50M/₪100M absolute cap
+        
+        const exceedsWarning = rawTotalAccumulation > warningThreshold;
+        const exceedsConservative = rawTotalAccumulation > conservativeLimit;
+        const exceedsAbsolute = rawTotalAccumulation > absoluteMax;
+        
+        // Apply progressive dampening with multiple tiers
+        let totalAccumulation = rawTotalAccumulation;
+        let dampeningApplied = 'none';
+        
+        if (exceedsAbsolute) {
+            // Severe dampening for extreme values
+            const excess = rawTotalAccumulation - absoluteMax;
+            const dampenedExcess = Math.log(1 + excess / absoluteMax) * absoluteMax * 0.2; // Reduced to 20%
+            totalAccumulation = absoluteMax + dampenedExcess;
+            dampeningApplied = 'severe';
+        } else if (exceedsConservative) {
+            // Moderate dampening for high values
+            const excess = rawTotalAccumulation - conservativeLimit;
+            const dampenedExcess = Math.log(1 + excess / conservativeLimit) * conservativeLimit * 0.4;
+            totalAccumulation = conservativeLimit + dampenedExcess;
+            dampeningApplied = 'moderate';
+        } else if (exceedsWarning) {
+            // Light dampening for moderately high values
+            const excess = rawTotalAccumulation - warningThreshold;
+            const dampenedExcess = excess * 0.8; // 20% reduction
+            totalAccumulation = warningThreshold + dampenedExcess;
+            dampeningApplied = 'light';
+        }
+        
+        // Safe withdrawal rate (4% rule with adjustments for large portfolios)
+        let withdrawalRate = 0.04;
+        if (totalAccumulation > 20000000) {
+            withdrawalRate = 0.035; // 3.5% for very large portfolios
+        } else if (totalAccumulation > 10000000) {
+            withdrawalRate = 0.038; // 3.8% for large portfolios
+        }
+        
+        const annualRetirementIncome = totalAccumulation * withdrawalRate;
         const monthlyRetirementIncome = annualRetirementIncome / 12;
         
         // Inflation-adjusted values
         const inflationAdjustedTotal = totalAccumulation / Math.pow(1 + inflationRate, yearsToRetirement);
         const inflationAdjustedMonthly = monthlyRetirementIncome / Math.pow(1 + inflationRate, yearsToRetirement);
+        
+        // Run input validation
+        const inputValidation = window.InputValidation ? 
+            window.InputValidation.validators.retirementProjectionInputs(inputs) : 
+            { warnings: [], riskLevel: 'medium' };
         
         return {
             totalAccumulation: isNaN(totalAccumulation) ? 0 : totalAccumulation,
@@ -333,7 +405,34 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
             yearsToRetirement,
             projectedIncome: isNaN(monthlyRetirementIncome) ? 0 : monthlyRetirementIncome,
             retirementAge: parseFloat(inputs.retirementAge || 67),
-            currentSavings
+            currentSavings,
+            // Enhanced calculation details
+            calculationDetails: {
+                originalExpectedReturn: expectedReturn * 100,
+                adjustedExpectedReturn: adjustedReturn * 100,
+                withdrawalRate: withdrawalRate * 100,
+                dampeningApplied: dampeningApplied,
+                inputValidation: inputValidation
+            },
+            // Enhanced warning information
+            calculationWarnings: {
+                isUnrealistic: exceedsAbsolute,
+                exceedsReasonableLimit: exceedsWarning,
+                exceedsConservativeLimit: exceedsConservative,
+                rawTotal: rawTotalAccumulation,
+                dampened: dampeningApplied !== 'none',
+                dampeningLevel: dampeningApplied,
+                extremeInputs: {
+                    highCurrentSavings: currentSavings > 5000000, // ₪5M+
+                    highExpectedReturn: expectedReturn > 0.10, // 10%+
+                    longTimeHorizon: yearsToRetirement > 35, // 35+ years
+                    highSavingsRate: savingsRate > 0.15, // 15%+
+                    veryHighExpectedReturn: expectedReturn > 0.12, // 12%+
+                    extremeTimeHorizon: yearsToRetirement > 40 // 40+ years
+                },
+                inputWarnings: inputValidation.warnings || [],
+                assumptionRiskLevel: inputValidation.riskLevel || 'medium'
+            }
         };
     };
 
@@ -622,6 +721,12 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     // Render retirement projections
     const renderRetirementProjections = () => {
         const projections = calculateRetirementProjections();
+        const warnings = projections.calculationWarnings;
+        
+        // Determine if we should show warnings
+        const showWarnings = warnings.isUnrealistic || warnings.exceedsReasonableLimit;
+        const warningLevel = warnings.isUnrealistic ? 'high' : 'medium';
+        const warningColor = warningLevel === 'high' ? 'red' : 'yellow';
         
         return createElement('div', {
             key: 'retirement-projections',
@@ -635,26 +740,251 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                 t.retirementProjections
             ]),
             
+            // Warning banner if projections are extreme
+            showWarnings && createElement('div', {
+                key: 'projection-warning',
+                className: `bg-${warningColor}-100 border border-${warningColor}-300 rounded-lg p-4 mb-6`
+            }, [
+                createElement('div', {
+                    key: 'warning-header',
+                    className: "flex items-center mb-2"
+                }, [
+                    createElement('span', { 
+                        key: 'warning-icon', 
+                        className: "mr-2 text-lg" 
+                    }, warningLevel === 'high' ? '⚠️' : '📊'),
+                    createElement('span', {
+                        key: 'warning-title',
+                        className: `font-semibold text-${warningColor}-800`
+                    }, language === 'he' ? 'הזהרת תוצאות חישוב' : 'Projection Warning')
+                ]),
+                createElement('p', {
+                    key: 'warning-message',
+                    className: `text-${warningColor}-700 text-sm mb-3`
+                }, warnings.isUnrealistic ? 
+                    (language === 'he' ? 
+                        `התוצאות המוצגות גבוהות מאוד (${currency}${Math.round(warnings.rawTotal / 1000000)}M) ועשויות להיות לא ריאליות בהתבסס על הנתונים שהוזנו.` :
+                        `The projected values are extremely high (${currency}${Math.round(warnings.rawTotal / 1000000)}M) and may be unrealistic based on the inputs provided.`) :
+                    (language === 'he' ? 
+                        `התוצאות גבוהות מהרגיל (${currency}${Math.round(projections.totalAccumulation / 1000000)}M). אנא בדוק את ההנחות שלך.` :
+                        `Results are higher than typical (${currency}${Math.round(projections.totalAccumulation / 1000000)}M). Please review your assumptions.`)
+                ),
+                
+                // Show contributing factors
+                (warnings.extremeInputs.highCurrentSavings || warnings.extremeInputs.highExpectedReturn || 
+                 warnings.extremeInputs.longTimeHorizon || warnings.extremeInputs.highSavingsRate) && 
+                createElement('div', {
+                    key: 'contributing-factors',
+                    className: "text-sm"
+                }, [
+                    createElement('p', {
+                        key: 'factors-title',
+                        className: `font-medium text-${warningColor}-800 mb-1`
+                    }, language === 'he' ? 'גורמים תורמים:' : 'Contributing factors:'),
+                    createElement('ul', {
+                        key: 'factors-list',
+                        className: `text-${warningColor}-700 list-disc list-inside space-y-1`
+                    }, [
+                        warnings.extremeInputs.highCurrentSavings && createElement('li', {
+                            key: 'high-savings'
+                        }, language === 'he' ? `חיסכון נוכחי גבוה: ${currency}${Math.round(projections.currentSavings / 1000000)}M` : 
+                            `High current savings: ${currency}${Math.round(projections.currentSavings / 1000000)}M`),
+                        
+                        warnings.extremeInputs.highExpectedReturn && createElement('li', {
+                            key: 'high-return'
+                        }, language === 'he' ? `תשואה צפויה גבוהה: ${Math.round((parseFloat(inputs.expectedAnnualReturn || 7)))}%` : 
+                            `High expected return: ${Math.round((parseFloat(inputs.expectedAnnualReturn || 7)))}%`),
+                        
+                        warnings.extremeInputs.longTimeHorizon && createElement('li', {
+                            key: 'long-horizon'
+                        }, language === 'he' ? `אופק זמן ארוך: ${projections.yearsToRetirement} שנים` : 
+                            `Long time horizon: ${projections.yearsToRetirement} years`),
+                        
+                        warnings.extremeInputs.highSavingsRate && createElement('li', {
+                            key: 'high-rate'
+                        }, language === 'he' ? 'שיעור חיסכון גבוה מאוד (15%+)' : 
+                            'Very high savings rate (15%+)')
+                    ].filter(Boolean))
+                ]),
+                
+                // Input diagnostics dashboard
+                createElement('div', {
+                    key: 'input-diagnostics',
+                    className: `mt-3 p-3 bg-gray-50 rounded border border-gray-200`
+                }, [
+                    createElement('div', {
+                        key: 'diagnostics-header',
+                        className: "flex items-center mb-2"
+                    }, [
+                        createElement('span', { key: 'diagnostics-icon', className: "mr-2" }, '🔍'),
+                        createElement('span', {
+                            key: 'diagnostics-title',
+                            className: "font-medium text-gray-800 text-sm"
+                        }, language === 'he' ? 'אבחון נתונים:' : 'Input Diagnostics:')
+                    ]),
+                    
+                    createElement('div', {
+                        key: 'diagnostics-grid',
+                        className: "grid grid-cols-2 gap-3 text-xs"
+                    }, [
+                        // Expected return diagnostic
+                        createElement('div', {
+                            key: 'return-diagnostic',
+                            className: `p-2 rounded border ${warnings.extremeInputs.veryHighExpectedReturn ? 'bg-red-50 border-red-200' : 
+                                      warnings.extremeInputs.highExpectedReturn ? 'bg-yellow-50 border-yellow-200' : 
+                                      'bg-green-50 border-green-200'}`
+                        }, [
+                            createElement('div', { key: 'return-label', className: "font-medium" }, 
+                                language === 'he' ? 'תשואה צפויה:' : 'Expected Return:'),
+                            createElement('div', { key: 'return-value' }, 
+                                `${projections.calculationDetails.originalExpectedReturn.toFixed(1)}%`),
+                            createElement('div', { 
+                                key: 'return-status',
+                                className: `text-xs ${warnings.extremeInputs.veryHighExpectedReturn ? 'text-red-600' : 
+                                           warnings.extremeInputs.highExpectedReturn ? 'text-yellow-600' : 
+                                           'text-green-600'}`
+                            }, warnings.extremeInputs.veryHighExpectedReturn ? 
+                                (language === 'he' ? 'גבוה מאוד' : 'Very High') :
+                                warnings.extremeInputs.highExpectedReturn ? 
+                                (language === 'he' ? 'גבוה' : 'High') :
+                                (language === 'he' ? 'סביר' : 'Reasonable'))
+                        ]),
+                        
+                        // Time horizon diagnostic
+                        createElement('div', {
+                            key: 'horizon-diagnostic',
+                            className: `p-2 rounded border ${warnings.extremeInputs.extremeTimeHorizon ? 'bg-red-50 border-red-200' : 
+                                      warnings.extremeInputs.longTimeHorizon ? 'bg-yellow-50 border-yellow-200' : 
+                                      'bg-green-50 border-green-200'}`
+                        }, [
+                            createElement('div', { key: 'horizon-label', className: "font-medium" }, 
+                                language === 'he' ? 'שנים לפרישה:' : 'Years to Retirement:'),
+                            createElement('div', { key: 'horizon-value' }, 
+                                `${projections.yearsToRetirement} ${language === 'he' ? 'שנים' : 'years'}`),
+                            createElement('div', { 
+                                key: 'horizon-status',
+                                className: `text-xs ${warnings.extremeInputs.extremeTimeHorizon ? 'text-red-600' : 
+                                           warnings.extremeInputs.longTimeHorizon ? 'text-yellow-600' : 
+                                           'text-green-600'}`
+                            }, warnings.extremeInputs.extremeTimeHorizon ? 
+                                (language === 'he' ? 'ארוך מאוד' : 'Very Long') :
+                                warnings.extremeInputs.longTimeHorizon ? 
+                                (language === 'he' ? 'ארוך' : 'Long') :
+                                (language === 'he' ? 'סביר' : 'Reasonable'))
+                        ]),
+                        
+                        // Current savings diagnostic
+                        createElement('div', {
+                            key: 'savings-diagnostic',
+                            className: `p-2 rounded border ${warnings.extremeInputs.highCurrentSavings ? 'bg-yellow-50 border-yellow-200' : 
+                                      'bg-green-50 border-green-200'}`
+                        }, [
+                            createElement('div', { key: 'savings-label', className: "font-medium" }, 
+                                language === 'he' ? 'חיסכון נוכחי:' : 'Current Savings:'),
+                            createElement('div', { key: 'savings-value' }, 
+                                `${currency}${Math.round(projections.currentSavings / 1000)}K`),
+                            createElement('div', { 
+                                key: 'savings-status',
+                                className: `text-xs ${warnings.extremeInputs.highCurrentSavings ? 'text-yellow-600' : 'text-green-600'}`
+                            }, warnings.extremeInputs.highCurrentSavings ? 
+                                (language === 'he' ? 'גבוה' : 'High') :
+                                (language === 'he' ? 'סביר' : 'Reasonable'))
+                        ]),
+                        
+                        // Savings rate diagnostic
+                        createElement('div', {
+                            key: 'rate-diagnostic',
+                            className: `p-2 rounded border ${warnings.extremeInputs.highSavingsRate ? 'bg-yellow-50 border-yellow-200' : 
+                                      'bg-green-50 border-green-200'}`
+                        }, [
+                            createElement('div', { key: 'rate-label', className: "font-medium" }, 
+                                language === 'he' ? 'שיעור חיסכון:' : 'Savings Rate:'),
+                            createElement('div', { key: 'rate-value' }, 
+                                `${((parseFloat(inputs.pensionContributionRate || 0) + parseFloat(inputs.trainingFundContributionRate || 0))).toFixed(1)}%`),
+                            createElement('div', { 
+                                key: 'rate-status',
+                                className: `text-xs ${warnings.extremeInputs.highSavingsRate ? 'text-yellow-600' : 'text-green-600'}`
+                            }, warnings.extremeInputs.highSavingsRate ? 
+                                (language === 'he' ? 'גבוה' : 'High') :
+                                (language === 'he' ? 'סביר' : 'Reasonable'))
+                        ])
+                    ])
+                ]),
+                
+                // Overall risk assessment
+                createElement('div', {
+                    key: 'risk-assessment',
+                    className: `mt-3 p-3 rounded border ${warnings.assumptionRiskLevel === 'high' ? 'bg-red-50 border-red-200' : 
+                              warnings.assumptionRiskLevel === 'medium' ? 'bg-yellow-50 border-yellow-200' : 
+                              'bg-green-50 border-green-200'}`
+                }, [
+                    createElement('div', {
+                        key: 'risk-header',
+                        className: "flex items-center mb-2"
+                    }, [
+                        createElement('span', { 
+                            key: 'risk-icon', 
+                            className: "mr-2" 
+                        }, warnings.assumptionRiskLevel === 'high' ? '⚠️' : 
+                           warnings.assumptionRiskLevel === 'medium' ? '📊' : '✅'),
+                        createElement('span', {
+                            key: 'risk-title',
+                            className: `font-medium text-sm ${warnings.assumptionRiskLevel === 'high' ? 'text-red-800' : 
+                                      warnings.assumptionRiskLevel === 'medium' ? 'text-yellow-800' : 
+                                      'text-green-800'}`
+                        }, language === 'he' ? 'הערכת סיכון כוללת:' : 'Overall Risk Assessment:')
+                    ]),
+                    createElement('div', {
+                        key: 'risk-level',
+                        className: `text-sm font-medium ${warnings.assumptionRiskLevel === 'high' ? 'text-red-700' : 
+                                  warnings.assumptionRiskLevel === 'medium' ? 'text-yellow-700' : 
+                                  'text-green-700'}`
+                    }, warnings.assumptionRiskLevel === 'high' ? 
+                        (language === 'he' ? 'סיכון גבוה - הנחות אופטימיות מאוד' : 'High Risk - Very optimistic assumptions') :
+                        warnings.assumptionRiskLevel === 'medium' ? 
+                        (language === 'he' ? 'סיכון בינוני - הנחות אגרסיביות' : 'Medium Risk - Aggressive assumptions') :
+                        (language === 'he' ? 'סיכון נמוך - הנחות סבירות' : 'Low Risk - Reasonable assumptions'))
+                ]),
+                
+                // Suggestion to review inputs
+                createElement('div', {
+                    key: 'suggestion',
+                    className: `mt-3 p-3 bg-${warningColor}-50 rounded border border-${warningColor}-200`
+                }, [
+                    createElement('p', {
+                        key: 'suggestion-text',
+                        className: `text-${warningColor}-800 text-sm font-medium`
+                    }, language === 'he' ? 
+                        '💡 המלצה: עבור לצעדים הקודמים ובדוק את ההנחות שלך (תשואות צפויות, שיעורי הפקדה) לקבלת תוצאות ריאליות יותר.' :
+                        '💡 Recommendation: Go back to previous steps and review your assumptions (expected returns, contribution rates) for more realistic projections.')
+                ])
+            ]),
+            
             createElement('div', { key: 'projections-grid', className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" }, [
                 createElement('div', { key: 'total-accumulation', className: "text-center" }, [
                     createElement('div', {
                         key: 'accumulation-value',
-                        className: "text-2xl font-bold text-blue-800"
+                        className: `text-2xl font-bold ${showWarnings ? 'text-orange-800' : 'text-blue-800'}`
                     }, `${currency}${Math.round(projections.totalAccumulation).toLocaleString()}`),
                     createElement('div', {
                         key: 'accumulation-label',
-                        className: "text-sm text-blue-600"
-                    }, t.totalAccumulation)
+                        className: `text-sm ${showWarnings ? 'text-orange-600' : 'text-blue-600'}`
+                    }, t.totalAccumulation),
+                    // Show dampening indicator for extreme values
+                    warnings.dampened && createElement('div', {
+                        key: 'dampened-indicator',
+                        className: "text-xs text-gray-500 mt-1"
+                    }, language === 'he' ? '(מותאם)' : '(adjusted)')
                 ]),
                 
                 createElement('div', { key: 'monthly-income', className: "text-center" }, [
                     createElement('div', {
                         key: 'monthly-value',
-                        className: "text-2xl font-bold text-green-800"
+                        className: `text-2xl font-bold ${showWarnings ? 'text-orange-800' : 'text-green-800'}`
                     }, `${currency}${Math.round(projections.monthlyRetirementIncome).toLocaleString()}`),
                     createElement('div', {
                         key: 'monthly-label',
-                        className: "text-sm text-green-600"
+                        className: `text-sm ${showWarnings ? 'text-orange-600' : 'text-green-600'}`
                     }, t.monthlyRetirementIncome)
                 ]),
                 
@@ -678,6 +1008,341 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                         key: 'adjusted-monthly-label',
                         className: "text-sm text-orange-600"
                     }, `${t.monthlyRetirementIncome} (${t.inflationAdjusted})`)
+                ])
+            ]),
+            
+            // Year-by-year projection chart
+            createElement('div', {
+                key: 'projection-chart',
+                className: "mt-6 border-t border-blue-200 pt-6"
+            }, [
+                createElement('div', {
+                    key: 'chart-header',
+                    className: "flex items-center justify-between mb-4"
+                }, [
+                    createElement('h4', {
+                        key: 'chart-title',
+                        className: "text-lg font-semibold text-blue-800"
+                    }, language === 'he' ? 'תחזית שנתית מפורטת' : 'Year-by-Year Projection'),
+                    
+                    createElement('div', {
+                        key: 'chart-controls',
+                        className: "flex space-x-2"
+                    }, [
+                        createElement('button', {
+                            key: 'toggle-nominal',
+                            id: 'toggle-nominal',
+                            className: "px-3 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded border hover:bg-blue-200",
+                            onClick: () => {
+                                const nominalLines = document.querySelectorAll('[data-line="nominal"]');
+                                const button = document.getElementById('toggle-nominal');
+                                const isHidden = nominalLines[0]?.style.display === 'none';
+                                
+                                nominalLines.forEach(line => {
+                                    line.style.display = isHidden ? 'block' : 'none';
+                                });
+                                
+                                button.textContent = isHidden ? 
+                                    (language === 'he' ? 'הסתר נומינלי' : 'Hide Nominal') :
+                                    (language === 'he' ? 'הצג נומינלי' : 'Show Nominal');
+                            }
+                        }, language === 'he' ? 'הסתר נומינלי' : 'Hide Nominal'),
+                        
+                        createElement('button', {
+                            key: 'toggle-real',
+                            id: 'toggle-real',
+                            className: "px-3 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded border hover:bg-purple-200",
+                            onClick: () => {
+                                const realLines = document.querySelectorAll('[data-line="real"]');
+                                const button = document.getElementById('toggle-real');
+                                const isHidden = realLines[0]?.style.display === 'none';
+                                
+                                realLines.forEach(line => {
+                                    line.style.display = isHidden ? 'block' : 'none';
+                                });
+                                
+                                button.textContent = isHidden ? 
+                                    (language === 'he' ? 'הסתר ריאלי' : 'Hide Real') :
+                                    (language === 'he' ? 'הצג ריאלי' : 'Show Real');
+                            }
+                        }, language === 'he' ? 'הסתר ריאלי' : 'Hide Real')
+                    ])
+                ]),
+                
+                // Generate chart using existing chart infrastructure
+                window.generateRetirementProjectionChart && createElement('div', {
+                    key: 'chart-container',
+                    className: "bg-white rounded-lg border border-blue-200 p-4"
+                }, [
+                    renderRetirementProjectionChart(projections)
+                ])
+            ]),
+            
+            // Show calculation transparency toggle
+            (warnings.isUnrealistic || warnings.exceedsReasonableLimit) && createElement('div', {
+                key: 'calculation-details',
+                className: "mt-6 border-t border-blue-200 pt-4"
+            }, [
+                createElement('button', {
+                    key: 'toggle-details',
+                    className: "text-blue-600 hover:text-blue-800 text-sm font-medium underline",
+                    onClick: () => {
+                        const detailsEl = document.getElementById('calculation-breakdown');
+                        if (detailsEl) {
+                            detailsEl.style.display = detailsEl.style.display === 'none' ? 'block' : 'none';
+                        }
+                    }
+                }, language === 'he' ? 'הצג פירוט חישוב מפורט' : 'Show detailed calculation breakdown'),
+                
+                createElement('div', {
+                    key: 'calculation-breakdown',
+                    id: 'calculation-breakdown',
+                    className: "mt-3 p-4 bg-blue-100 rounded-lg text-sm",
+                    style: { display: 'none' }
+                }, [
+                    createElement('div', { key: 'breakdown-title', className: "font-semibold text-blue-800 mb-2" }, 
+                        language === 'he' ? 'פירוט חישוב:' : 'Calculation Breakdown:'),
+                    createElement('div', { key: 'raw-calculation', className: "text-blue-700 mb-1" }, 
+                        `${language === 'he' ? 'תוצאה גולמית:' : 'Raw calculation:'} ${currency}${Math.round(warnings.rawTotal).toLocaleString()}`),
+                    createElement('div', { key: 'adjusted-return', className: "text-blue-700 mb-1" }, 
+                        `${language === 'he' ? 'תשואה מותאמת:' : 'Adjusted return:'} ${projections.calculationDetails.adjustedExpectedReturn.toFixed(2)}% (${language === 'he' ? 'מקורי:' : 'original:'} ${projections.calculationDetails.originalExpectedReturn.toFixed(2)}%)`),
+                    createElement('div', { key: 'withdrawal-rate', className: "text-blue-700 mb-1" }, 
+                        `${language === 'he' ? 'שיעור משיכה:' : 'Withdrawal rate:'} ${projections.calculationDetails.withdrawalRate.toFixed(2)}%`),
+                    createElement('div', { key: 'dampening-info', className: "text-blue-700 mb-1" }, 
+                        `${language === 'he' ? 'רמת הנחתה:' : 'Dampening level:'} ${warnings.dampeningLevel} ${warnings.dampened ? '(applied)' : '(none)'}`),
+                    createElement('div', { key: 'final-result', className: "text-blue-700 font-medium" }, 
+                        `${language === 'he' ? 'תוצאה סופית:' : 'Final result:'} ${currency}${Math.round(projections.totalAccumulation).toLocaleString()}`)
+                ])
+            ])
+        ]);
+    };
+
+    // Render retirement projection chart
+    const renderRetirementProjectionChart = (projections) => {
+        if (!window.generateRetirementProjectionChart) {
+            return createElement('div', {
+                key: 'chart-loading',
+                className: "text-center py-8 text-gray-500"
+            }, language === 'he' ? 'טוען גרף...' : 'Loading chart...');
+        }
+
+        const chartData = window.generateRetirementProjectionChart(inputs);
+        
+        if (!chartData || chartData.length === 0) {
+            return createElement('div', {
+                key: 'chart-no-data',
+                className: "text-center py-8 text-gray-500"
+            }, language === 'he' ? 'אין נתונים לתצוגה' : 'No data to display');
+        }
+
+        // Create a simple line chart using SVG (fallback if Chart.js not available)
+        const maxTotal = Math.max(...chartData.map(d => d.totalAccumulation));
+        const maxMonthly = Math.max(...chartData.map(d => d.monthlyIncome));
+        const chartWidth = 800;
+        const chartHeight = 400;
+        const margin = { top: 20, right: 60, bottom: 40, left: 80 };
+        const innerWidth = chartWidth - margin.left - margin.right;
+        const innerHeight = chartHeight - margin.top - margin.bottom;
+
+        // Generate path data
+        const createPath = (data, valueKey, maxValue) => {
+            return data.map((point, index) => {
+                const x = margin.left + (index / (data.length - 1)) * innerWidth;
+                const y = margin.top + innerHeight - (point[valueKey] / maxValue) * innerHeight;
+                return index === 0 ? `M ${x} ${y}` : `L ${x} ${y}`;
+            }).join(' ');
+        };
+
+        const totalAccumulationPath = createPath(chartData, 'totalAccumulation', maxTotal);
+        const inflationAdjustedPath = createPath(chartData, 'inflationAdjustedTotal', maxTotal);
+        const monthlyIncomePath = createPath(chartData, 'monthlyIncome', maxMonthly);
+        const inflationAdjustedMonthlyPath = createPath(chartData, 'inflationAdjustedMonthlyIncome', maxMonthly);
+
+        // Find retirement year for vertical line
+        const retirementPoint = chartData.find(d => d.isRetirementYear);
+        const retirementIndex = chartData.findIndex(d => d.isRetirementYear);
+        const retirementX = retirementIndex >= 0 ? 
+            margin.left + (retirementIndex / (chartData.length - 1)) * innerWidth : null;
+
+        return createElement('div', {
+            key: 'chart-svg-container',
+            className: "w-full overflow-x-auto"
+        }, [
+            createElement('svg', {
+                key: 'projection-chart',
+                width: chartWidth,
+                height: chartHeight,
+                viewBox: `0 0 ${chartWidth} ${chartHeight}`,
+                className: "w-full h-auto"
+            }, [
+                // Background
+                createElement('rect', {
+                    key: 'background',
+                    x: margin.left,
+                    y: margin.top,
+                    width: innerWidth,
+                    height: innerHeight,
+                    fill: '#fafafa',
+                    stroke: '#e5e7eb',
+                    strokeWidth: 1
+                }),
+
+                // Grid lines
+                ...Array.from({length: 6}, (_, i) => {
+                    const y = margin.top + (i / 5) * innerHeight;
+                    return createElement('line', {
+                        key: `grid-${i}`,
+                        x1: margin.left,
+                        y1: y,
+                        x2: margin.left + innerWidth,  
+                        y2: y,
+                        stroke: '#e5e7eb',
+                        strokeWidth: 0.5,
+                        opacity: 0.5
+                    });
+                }),
+
+                // Retirement year line
+                retirementX && createElement('line', {
+                    key: 'retirement-line',
+                    x1: retirementX,
+                    y1: margin.top,
+                    x2: retirementX,
+                    y2: margin.top + innerHeight,
+                    stroke: '#dc2626',
+                    strokeWidth: 2,
+                    strokeDasharray: '5,5'
+                }),
+
+                // Total accumulation (nominal)
+                createElement('path', {
+                    key: 'total-accumulation',
+                    d: totalAccumulationPath,
+                    fill: 'none',
+                    stroke: '#2563eb',
+                    strokeWidth: 3,
+                    'data-line': 'nominal'
+                }),
+
+                // Inflation-adjusted total
+                createElement('path', {
+                    key: 'inflation-adjusted-total',
+                    d: inflationAdjustedPath,
+                    fill: 'none',
+                    stroke: '#7c3aed',
+                    strokeWidth: 3,
+                    strokeDasharray: '8,4',
+                    'data-line': 'real'
+                }),
+
+                // Monthly income (scaled to fit)
+                createElement('path', {
+                    key: 'monthly-income',
+                    d: monthlyIncomePath,
+                    fill: 'none',
+                    stroke: '#059669',
+                    strokeWidth: 2,
+                    'data-line': 'nominal'
+                }),
+
+                // Inflation-adjusted monthly
+                createElement('path', {
+                    key: 'inflation-adjusted-monthly',
+                    d: inflationAdjustedMonthlyPath,
+                    fill: 'none',
+                    stroke: '#dc2626',
+                    strokeWidth: 2,
+                    strokeDasharray: '4,2',
+                    'data-line': 'real'
+                }),
+
+                // Y-axis label
+                createElement('text', {
+                    key: 'y-axis-label',
+                    x: 20,
+                    y: margin.top + innerHeight / 2,
+                    fill: '#374151',
+                    fontSize: '12',
+                    textAnchor: 'middle',
+                    transform: `rotate(-90, 20, ${margin.top + innerHeight / 2})`
+                }, `${currency} Amount`),
+
+                // X-axis label
+                createElement('text', {
+                    key: 'x-axis-label',
+                    x: margin.left + innerWidth / 2,
+                    y: chartHeight - 10,
+                    fill: '#374151',
+                    fontSize: '12',
+                    textAnchor: 'middle'
+                }, language === 'he' ? 'גיל' : 'Age'),
+
+                // Retirement marker
+                retirementX && createElement('text', {
+                    key: 'retirement-marker',
+                    x: retirementX,
+                    y: margin.top - 5,
+                    fill: '#dc2626',
+                    fontSize: '11',
+                    textAnchor: 'middle',
+                    fontWeight: 'bold'
+                }, language === 'he' ? 'פרישה' : 'Retirement')
+            ]),
+
+            // Legend
+            createElement('div', {
+                key: 'chart-legend',
+                className: "mt-4 flex flex-wrap justify-center gap-4 text-sm"
+            }, [
+                createElement('div', {
+                    key: 'legend-total',
+                    className: "flex items-center",
+                    'data-line': 'nominal'
+                }, [
+                    createElement('div', { 
+                        key: 'legend-total-line',
+                        className: "w-6 h-0.5 bg-blue-600 mr-2"
+                    }),
+                    createElement('span', { key: 'legend-total-text' }, 
+                        language === 'he' ? 'צבירה כוללת (נומינלי)' : 'Total Accumulation (Nominal)')
+                ]),
+                createElement('div', {
+                    key: 'legend-adjusted-total',
+                    className: "flex items-center",
+                    'data-line': 'real'
+                }, [
+                    createElement('div', { 
+                        key: 'legend-adjusted-line',
+                        className: "w-6 h-0.5 bg-purple-600 mr-2",
+                        style: { borderTop: '2px dashed' }
+                    }),
+                    createElement('span', { key: 'legend-adjusted-text' }, 
+                        language === 'he' ? 'צבירה כוללת (ריאלי)' : 'Total Accumulation (Real)')
+                ]),
+                createElement('div', {
+                    key: 'legend-monthly',
+                    className: "flex items-center",
+                    'data-line': 'nominal'
+                }, [
+                    createElement('div', { 
+                        key: 'legend-monthly-line',
+                        className: "w-6 h-0.5 bg-green-600 mr-2"
+                    }),
+                    createElement('span', { key: 'legend-monthly-text' }, 
+                        language === 'he' ? 'הכנסה חודשית (נומינלי)' : 'Monthly Income (Nominal)')
+                ]),
+                createElement('div', {
+                    key: 'legend-adjusted-monthly',
+                    className: "flex items-center",
+                    'data-line': 'real'
+                }, [
+                    createElement('div', { 
+                        key: 'legend-adjusted-monthly-line',
+                        className: "w-6 h-0.5 bg-red-600 mr-2",
+                        style: { borderTop: '2px dashed' }
+                    }),
+                    createElement('span', { key: 'legend-adjusted-monthly-text' }, 
+                        language === 'he' ? 'הכנסה חודשית (ריאלי)' : 'Monthly Income (Real)')
                 ])
             ])
         ]);
@@ -769,47 +1434,7 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         ]);
     };
 
-    // Render interactive features
-    const renderInteractiveFeatures = () => {
-        return createElement('div', {
-            key: 'interactive-features',
-            className: "bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200"
-        }, [
-            createElement('h3', {
-                key: 'features-title',
-                className: "text-xl font-semibold text-purple-700 mb-6 flex items-center"
-            }, [
-                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '🔧'),
-                'Interactive Features'
-            ]),
-            
-            createElement('div', { key: 'features-grid', className: "grid grid-cols-2 md:grid-cols-4 gap-4" }, [
-                createElement('button', {
-                    key: 'download-pdf',
-                    className: "bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-colors",
-                    onClick: () => alert('PDF download functionality would be implemented here')
-                }, t.downloadPdf),
-                
-                createElement('button', {
-                    key: 'email-plan',
-                    className: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors",
-                    onClick: () => alert('Email functionality would be implemented here')
-                }, t.emailPlan),
-                
-                createElement('button', {
-                    key: 'calendar-integration',
-                    className: "bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors",
-                    onClick: () => alert('Calendar integration would be implemented here')
-                }, t.calendarIntegration),
-                
-                createElement('button', {
-                    key: 'progress-tracking',
-                    className: "bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 px-4 rounded-lg transition-colors",
-                    onClick: () => alert('Progress tracking dashboard would be implemented here')
-                }, t.progressTracking)
-            ])
-        ]);
-    };
+    // Interactive features removed as they were non-functional
 
     return createElement('div', { className: "space-y-8" }, [
         // Title
@@ -838,9 +1463,6 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
 
         // Action Items
         renderActionItems(),
-
-        // Interactive Features
-        renderInteractiveFeatures(),
 
         // Information panel
         createElement('div', {
