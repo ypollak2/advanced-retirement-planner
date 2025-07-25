@@ -1146,18 +1146,17 @@ function testWizardIntegrationPipeline() {
     if (fs.existsSync('src/components/wizard/RetirementWizard.js')) {
         const wizardContent = fs.readFileSync('src/components/wizard/RetirementWizard.js', 'utf8');
         
-        const hasEightStepStructure = wizardContent.includes('totalSteps = 8') ||
-                                     wizardContent.includes('totalSteps: 8');
-        logTest('RetirementWizard: 8-step structure', hasEightStepStructure);
+        const hasNineStepStructure = wizardContent.includes('totalSteps = 9') ||
+                                     wizardContent.includes('totalSteps: 9');
+        logTest('RetirementWizard: 9-step structure', hasNineStepStructure);
         
         const hasStreamlinedStepRefs = wizardContent.includes('WizardStepReview') &&
-                                      !wizardContent.includes('case 9:') &&
+                                      wizardContent.includes('case 9:') &&
                                       !wizardContent.includes('case 10:');
         logTest('RetirementWizard: Streamlined step references', hasStreamlinedStepRefs);
         
         const hasStepValidation = wizardContent.includes('isCurrentStepValid') &&
-                                 wizardContent.includes('case 8') &&
-                                 !wizardContent.includes('case 9:') &&
+                                 wizardContent.includes('case 9') &&
                                  !wizardContent.includes('case 10:');
         logTest('RetirementWizard: Streamlined step validation', hasStepValidation);
         

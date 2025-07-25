@@ -34,7 +34,7 @@ const RetirementWizard = ({
         return null;
     };
     
-    const totalSteps = 8;
+    const totalSteps = 9;
     const savedProgress = loadSavedProgress();
     
     // Ensure saved step doesn't exceed new total (fixing 10->8 step reduction)
@@ -112,12 +112,13 @@ const RetirementWizard = ({
             steps: {
                 1: { title: 'פרטים אישיים', subtitle: 'גיל, גיל פרישה וסוג התכנון' },
                 2: { title: 'משכורת והכנסות', subtitle: 'משכורת חודשית ומקורות הכנסה נוספים' },
-                3: { title: 'חיסכונות קיימים', subtitle: 'פנסיה, קרן השתלמות והשקעות אישיות' },
-                4: { title: 'הגדרות הפקדה', subtitle: 'אחוזי הפקדה וכללים לפי מדינה' },
-                5: { title: 'דמי ניהול', subtitle: 'עמלות ועלויות ניהול השקעות' },
-                6: { title: 'העדפות השקעה', subtitle: 'סיכון, תשואה וחלוקת נכסים' },
-                7: { title: 'יעדי פרישה', subtitle: 'הכנסה רצויה בפרישה ותכנון אורח חיים' },
-                8: { title: 'סקירה מקיפה', subtitle: 'ניתוח מלא עם המלצות והערכת בריאות פיננסית' }
+                3: { title: 'הוצאות חודשיות', subtitle: 'מעקב אחר הוצאות לפי קטגוריות ותחזית שנתית' },
+                4: { title: 'חיסכונות קיימים', subtitle: 'פנסיה, קרן השתלמות והשקעות אישיות' },
+                5: { title: 'הגדרות הפקדה', subtitle: 'אחוזי הפקדה וכללים לפי מדינה' },
+                6: { title: 'דמי ניהול', subtitle: 'עמלות ועלויות ניהול השקעות' },
+                7: { title: 'העדפות השקעה', subtitle: 'סיכון, תשואה וחלוקת נכסים' },
+                8: { title: 'יעדי פרישה', subtitle: 'הכנסה רצויה בפרישה ותכנון אורח חיים' },
+                9: { title: 'סקירה מקיפה', subtitle: 'ניתוח מלא עם המלצות והערכת בריאות פיננסית' }
             }
         },
         en: {
@@ -131,12 +132,13 @@ const RetirementWizard = ({
             steps: {
                 1: { title: 'Personal Information', subtitle: 'Age, retirement age, and planning type' },
                 2: { title: 'Salary & Income', subtitle: 'Monthly salary and additional income sources' },
-                3: { title: 'Current Savings', subtitle: 'Pension, training fund, and personal investments' },
-                4: { title: 'Contribution Settings', subtitle: 'Contribution percentages and country-specific rules' },
-                5: { title: 'Management Fees', subtitle: 'Investment fees and management costs' },
-                6: { title: 'Investment Preferences', subtitle: 'Risk tolerance, returns, and asset allocation' },
-                7: { title: 'Retirement Goals', subtitle: 'Target retirement income and lifestyle planning' },
-                8: { title: 'Comprehensive Review', subtitle: 'Complete analysis with recommendations and financial health scoring' }
+                3: { title: 'Monthly Expenses', subtitle: 'Track expenses by category and yearly predictions' },
+                4: { title: 'Current Savings', subtitle: 'Pension, training fund, and personal investments' },
+                5: { title: 'Contribution Settings', subtitle: 'Contribution percentages and country-specific rules' },
+                6: { title: 'Management Fees', subtitle: 'Investment fees and management costs' },
+                7: { title: 'Investment Preferences', subtitle: 'Risk tolerance, returns, and asset allocation' },
+                8: { title: 'Retirement Goals', subtitle: 'Target retirement income and lifestyle planning' },
+                9: { title: 'Comprehensive Review', subtitle: 'Complete analysis with recommendations and financial health scoring' }
             }
         }
     };
@@ -275,41 +277,51 @@ const RetirementWizard = ({
                         'Salary & Income Step - To be implemented');
                 }
             case 3:
+                if (window.WizardStepExpenses) {
+                    return React.createElement(window.WizardStepExpenses, {
+                        ...stepProps,
+                        formatCurrency: window.formatCurrency
+                    });
+                } else {
+                    return React.createElement('div', { className: 'text-center p-8' }, 
+                        'Monthly Expenses Step - To be implemented');
+                }
+            case 4:
                 if (window.WizardStepSavings) {
                     return React.createElement(window.WizardStepSavings, stepProps);
                 } else {
                     return React.createElement('div', { className: 'text-center p-8' }, 
                         'Current Savings Step - To be implemented');
                 }
-            case 4:
+            case 5:
                 if (window.WizardStepContributions) {
                     return React.createElement(window.WizardStepContributions, stepProps);
                 } else {
                     return React.createElement('div', { className: 'text-center p-8' }, 
                         'Contribution Settings Step - To be implemented');
                 }
-            case 5:
+            case 6:
                 if (window.WizardStepFees) {
                     return React.createElement(window.WizardStepFees, stepProps);
                 } else {
                     return React.createElement('div', { className: 'text-center p-8' }, 
                         'Management Fees Step - To be implemented');
                 }
-            case 6:
+            case 7:
                 if (window.WizardStepInvestments) {
                     return React.createElement(window.WizardStepInvestments, stepProps);
                 } else {
                     return React.createElement('div', { className: 'text-center p-8' }, 
                         'Investment Preferences Step - To be implemented');
                 }
-            case 7:
+            case 8:
                 if (window.WizardStepGoals) {
                     return React.createElement(window.WizardStepGoals, stepProps);
                 } else {
                     return React.createElement('div', { className: 'text-center p-8' }, 
                         'Retirement Goals Step - To be implemented');
                 }
-            case 8:
+            case 9:
                 if (window.WizardStepReview) {
                     return React.createElement(window.WizardStepReview, stepProps);
                 } else {
