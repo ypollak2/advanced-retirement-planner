@@ -514,51 +514,67 @@ function generateImprovementSuggestions(scoreBreakdown) {
         // CRITICAL FIX: Add null safety checks to prevent "Cannot read properties of undefined (reading 'status')" error
         const status = factorData?.details?.status || 'unknown';
         if (status === 'critical' || status === 'poor') {
+            // Ensure factorData.details exists before accessing properties
+            if (!factorData?.details) {
+                console.warn(`Missing details for factor: ${factorName}`);
+                return;
+            }
+            
             switch (factorName) {
                 case 'savingsRate':
-                    suggestions.push({
-                        priority: 'high',
-                        category: 'Savings Rate',
-                        issue: `Currently saving only ${factorData.details.rate.toFixed(1)}% of income`,
-                        action: `Increase monthly savings by ₪${Math.round(factorData.details.improvement)} to reach 15% target`,
-                        impact: `+${Math.round((SCORE_FACTORS.savingsRate.weight * 0.85) - factorData.score)} points`
-                    });
+                    if (factorData.details.rate !== undefined && factorData.details.improvement !== undefined) {
+                        suggestions.push({
+                            priority: 'high',
+                            category: 'Savings Rate',
+                            issue: `Currently saving only ${factorData.details.rate.toFixed(1)}% of income`,
+                            action: `Increase monthly savings by ₪${Math.round(factorData.details.improvement)} to reach 15% target`,
+                            impact: `+${Math.round((SCORE_FACTORS.savingsRate.weight * 0.85) - factorData.score)} points`
+                        });
+                    }
                     break;
                 case 'retirementReadiness':
-                    suggestions.push({
-                        priority: 'high',
-                        category: 'Retirement Readiness',
-                        issue: `₪${Math.round(factorData.details.gap).toLocaleString()} behind age-appropriate savings target`,
-                        action: `Increase retirement contributions or consider working longer`,
-                        impact: `+${Math.round((SCORE_FACTORS.retirementReadiness.weight * 0.85) - factorData.score)} points`
-                    });
+                    if (factorData.details.gap !== undefined) {
+                        suggestions.push({
+                            priority: 'high',
+                            category: 'Retirement Readiness',
+                            issue: `₪${Math.round(factorData.details.gap).toLocaleString()} behind age-appropriate savings target`,
+                            action: `Increase retirement contributions or consider working longer`,
+                            impact: `+${Math.round((SCORE_FACTORS.retirementReadiness.weight * 0.85) - factorData.score)} points`
+                        });
+                    }
                     break;
                 case 'diversification':
-                    suggestions.push({
-                        priority: 'medium',
-                        category: 'Portfolio Diversification',
-                        issue: `Only ${factorData.details.assetClasses} asset classes in portfolio`,
-                        action: `Add ${factorData.details.missingClasses} more asset class(es) like real estate or international stocks`,
-                        impact: `+${Math.round((SCORE_FACTORS.diversification.weight * 0.85) - factorData.score)} points`
-                    });
+                    if (factorData.details.assetClasses !== undefined && factorData.details.missingClasses !== undefined) {
+                        suggestions.push({
+                            priority: 'medium',
+                            category: 'Portfolio Diversification',
+                            issue: `Only ${factorData.details.assetClasses} asset classes in portfolio`,
+                            action: `Add ${factorData.details.missingClasses} more asset class(es) like real estate or international stocks`,
+                            impact: `+${Math.round((SCORE_FACTORS.diversification.weight * 0.85) - factorData.score)} points`
+                        });
+                    }
                     break;
                 case 'emergencyFund':
-                    suggestions.push({
-                        priority: 'high',
-                        category: 'Emergency Fund',
-                        issue: `Only ${factorData.details.months.toFixed(1)} months of expenses covered`,
-                        action: `Save additional ₪${Math.round(factorData.details.gap).toLocaleString()} for 6-month emergency fund`,
-                        impact: `+${Math.round((SCORE_FACTORS.emergencyFund.weight * 0.85) - factorData.score)} points`
-                    });
+                    if (factorData.details.months !== undefined && factorData.details.gap !== undefined) {
+                        suggestions.push({
+                            priority: 'high',
+                            category: 'Emergency Fund',
+                            issue: `Only ${factorData.details.months.toFixed(1)} months of expenses covered`,
+                            action: `Save additional ₪${Math.round(factorData.details.gap).toLocaleString()} for 6-month emergency fund`,
+                            impact: `+${Math.round((SCORE_FACTORS.emergencyFund.weight * 0.85) - factorData.score)} points`
+                        });
+                    }
                     break;
                 case 'taxEfficiency':
-                    suggestions.push({
-                        priority: 'medium',
-                        category: 'Tax Optimization',
-                        issue: `${factorData.details.efficiencyScore.toFixed(0)}% tax efficiency vs optimal`,
-                        action: `Maximize pension and training fund contributions`,
-                        impact: `+${Math.round((SCORE_FACTORS.taxEfficiency.weight * 0.85) - factorData.score)} points`
-                    });
+                    if (factorData.details.efficiencyScore !== undefined) {
+                        suggestions.push({
+                            priority: 'medium',
+                            category: 'Tax Optimization',
+                            issue: `${factorData.details.efficiencyScore.toFixed(0)}% tax efficiency vs optimal`,
+                            action: `Maximize pension and training fund contributions`,
+                            impact: `+${Math.round((SCORE_FACTORS.taxEfficiency.weight * 0.85) - factorData.score)} points`
+                        });
+                    }
                     break;
             }
         }

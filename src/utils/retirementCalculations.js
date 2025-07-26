@@ -11,14 +11,19 @@ window.formatCurrency = (amount) => {
 
 window.convertCurrency = (amount, currency, exchangeRates) => {
     // Critical fix: Add null/zero check to prevent division by zero errors
-    if (!exchangeRates || !exchangeRates[currency] || exchangeRates[currency] === 0) {
-        const rateValue = exchangeRates ? exchangeRates[currency] : 'null object';
+    if (!exchangeRates || typeof exchangeRates !== 'object') {
+        console.warn(`Exchange rates object is invalid:`, exchangeRates);
+        return 'N/A';
+    }
+    
+    if (!currency || !exchangeRates[currency] || exchangeRates[currency] === 0) {
+        const rateValue = exchangeRates[currency];
         console.warn(`Exchange rate for ${currency} is invalid:`, rateValue);
         return 'N/A';
     }
     
     // Validate amount is a valid number
-    if (isNaN(amount) || amount === null || amount === undefined) {
+    if (amount === null || amount === undefined || isNaN(amount)) {
         console.warn(`Invalid amount for currency conversion:`, amount);
         return 'N/A';
     }
