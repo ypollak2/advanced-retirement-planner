@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Retirement Planner v6.6.5</title>
+    <meta name="description" content="Advanced retirement planning tool with comprehensive investment tracking">
+    
+    <!-- Security Headers (Note: X-Frame-Options removed - should be set via HTTP headers, not meta tags) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+    
+    <!-- Tailwind CSS via CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <!-- Main Application Styles -->
+    <link rel="stylesheet" href="src/styles/main.css?v=6.6.5">
+    
+    <style>
+        /* Version indicator - repositioned for better UX */
+        .version-indicator {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #cffafe 20%, #f1f5f9 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <!-- Version indicator (populated from version.json) -->
+    <div class="version-indicator" id="version-indicator">
+        ✨ Loading...
+    </div>
+    
+    <div id="root" class="min-h-screen" role="main" aria-label="Retirement Planner Application"></div>
+    
+    <!-- Centralized Version Management -->
+    <script>
+        // Load version from version.json and update all version-dependent elements
+        fetch('version.json')
+            .then(response => response.json())
+            .then(versionData => {
+                const version = versionData.version;
+                
+                // Update page title
+                document.title = `Advanced Retirement Planner v${version}`;
+                
+                // Update version indicator
+                const versionIndicator = document.getElementById('version-indicator');
+                if (versionIndicator) {
+                    versionIndicator.textContent = `✨ v${version}`;
+                }
+                
+                // Store version globally for other scripts
+                window.APP_VERSION = version;
+                
+                console.log(`📋 Version loaded: v${version}`);
+            })
+            .catch(error => {
+                console.warn('⚠️ Could not load version from version.json:', error);
+                // Fallback version
+                window.APP_VERSION = '6.6.5';
+                document.getElementById('version-indicator').textContent = '✨ v6.6.5';
+            });
+    </script>
+
+    <!-- React & ReactDOM from CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Component Scripts -->
+    <script src="src/translations/multiLanguage.js?v=6.6.5"></script>
+    <script src="src/data/marketConstants.js?v=6.6.5"></script>
+    <script src="src/utils/retirementCalculations.js?v=6.6.5"></script>
+    <script src="src/utils/chartDataGenerator.js?v=6.6.5"></script>
+    <script src="src/utils/stockPriceAPI.js?v=6.6.5"></script>
+    <script src="src/utils/exportFunctions.js?v=6.6.5"></script>
+    <script src="src/utils/stressTestScenarios.js?v=6.6.5"></script>
+    <script src="src/utils/currencyAPI.js?v=6.6.5"></script>
+    <script src="src/utils/IsraeliNationalInsurance.js?v=6.6.5"></script>
+    <script src="src/utils/TaxCalculators.js?v=6.6.5&t=20250723-net-salary-calculator"></script>
+    <script src="src/utils/coupleValidation.js?v=6.6.5"></script>
+    <script src="src/utils/portfolioOptimizer.js?v=6.6.5"></script>
+    <script src="src/utils/taxOptimization.js?v=6.6.5"></script>
+    <script src="src/utils/dynamicReturnAssumptions.js?v=6.6.5"></script>
+    <script src="src/utils/advancedRebalancing.js?v=6.6.5"></script>
+    <script src="src/utils/inflationCalculations.js?v=6.6.5"></script>
+    <script src="src/utils/expenseCalculations.js?v=6.6.5"></script>
+    <script src="src/utils/monteCarloSimulation.js?v=6.6.5"></script>
+    <script src="src/utils/withdrawalStrategies.js?v=6.6.5"></script>
+    <script src="src/utils/inputValidation.js?v=6.6.5"></script>
+    <script src="src/utils/cryptoPriceAPI.js?v=6.6.5&t=20250723-digital-asset-security-fix"></script>
+    <script src="src/utils/goalSuggestionEngine.js?v=6.6.5&t=20250723-smart-goals"></script>
+    <script src="src/utils/financialHealthEngine.js?v=6.6.5&t=20250723-enhanced-health"></script>
+    
+    <!-- Error Boundary (loaded first for error handling) -->
+    <script src="src/components/shared/ErrorBoundary.js?v=6.6.5"></script>
+    
+    <!-- Base Components (loaded first) -->
+    <script src="src/components/forms/SecureInput.js?v=6.6.5"></script>
+    <script src="src/components/shared/EnhancedRSUCompanySelector.js?v=6.6.5"></script>
+    <script src="src/components/panels/summary/BottomLineSummary.js?v=6.6.5"></script>
+    <script src="src/components/charts/FinancialChart.js?v=6.6.5"></script>
+    <script src="src/components/shared/MultiCurrencySavings.js?v=6.6.5"></script>
+    <script src="src/components/shared/CryptoPortfolioInput.js?v=6.6.5&t=20250723-digital-asset-security-fix"></script>
+    <script src="src/components/shared/EnhancedFinancialHealthMeter.js?v=6.6.5&t=20250723-enhanced-health"></script>
+    <script src="src/components/shared/ScoreExplanation.js?v=6.6.5&t=20250723-score-explanations"></script>
+    <script src="src/components/panels/settings/PermanentSidePanel.js?v=6.6.5"></script>
+    
+    <!-- Core Wizard Components -->
+    <script src="src/components/wizard/WizardStep.js?v=6.6.5"></script>
+    <script src="src/components/wizard/steps/WizardStepPersonal.js?v=6.6.5"></script>
+    <script src="src/components/wizard/steps/WizardStepSalary.js?v=6.6.5&t=20250723-enhanced-validation"></script>
+    <script src="src/components/wizard/steps/WizardStepExpenses.js?v=6.6.5"></script>
+    <script src="src/components/wizard/steps/WizardStepSavings.js?v=6.6.5&t=20250723-crypto-enhancement"></script>
+    <script src="src/components/wizard/steps/WizardStepContributions.js?v=6.6.5&t=20250723-partner-training-fund"></script>
+    <script src="src/components/wizard/steps/WizardStepFees.js?v=6.6.5"></script>
+    <script src="src/components/wizard/steps/WizardStepInvestments.js?v=6.6.5"></script>
+    <script src="src/components/wizard/steps/WizardStepGoals.js?v=6.6.5"></script>
+    <script src="src/components/wizard/steps/WizardStepInheritance.js?v=6.6.5"></script>
+    <script src="src/components/wizard/steps/WizardStepTaxes.js?v=6.6.5"></script>
+    <script src="src/components/wizard/steps/WizardStepReview.js?v=6.6.5"></script>
+    <script src="src/components/wizard/RetirementWizard.js?v=6.6.5"></script>
+    
+    <!-- Core Components (loaded immediately) -->
+    <script src="src/components/shared/HelpTooltip.js?v=6.6.5"></script>
+    <script src="src/components/shared/FinancialHealthScoreEnhanced.js?v=6.6.5"></script>
+    <script src="src/components/analysis/ReadinessScore.js?v=6.6.5"></script>
+    <script src="src/components/forms/BasicInputs.js?v=6.6.5"></script>
+    <script src="src/components/forms/RetirementAdvancedForm.js?v=6.6.5"></script>
+    <script src="src/components/panels/RetirementResultsPanel.js?v=6.6.5"></script>
+    
+    <!-- Dashboard Components (lazy-loaded as needed) -->
+    <script src="src/components/panels/summary/SavingsSummaryPanel.js?v=6.6.5"></script>
+    
+    <!-- Scenario Comparison Components -->
+    <script src="src/components/charts/ScenarioChart.js?v=6.6.5"></script>
+    <script src="src/components/scenarios/ScenarioEditor.js?v=6.6.5"></script>
+    <script src="src/components/scenarios/ScenarioComparison.js?v=6.6.5"></script>
+    
+    <!-- Goal Tracking Components -->
+    <script src="src/components/tracking/GoalTrackingDashboard.js?v=6.6.5"></script>
+    
+    <!-- Couple Planning Components -->
+    <script src="src/components/validation/CoupleValidationPanel.js?v=6.6.5"></script>
+    
+    <!-- Portfolio Optimization Components -->
+    <script src="src/components/panels/analysis/PortfolioOptimizationPanel.js?v=6.6.5"></script>
+    <script src="src/components/panels/analysis/TaxOptimizationPanel.js?v=6.6.5"></script>
+    <script src="src/components/panels/analysis/DynamicReturnPanel.js?v=6.6.5"></script>
+    <script src="src/components/panels/settings/AdvancedRebalancingPanel.js?v=6.6.5"></script>
+    <script src="src/components/panels/analysis/InflationVisualizationPanel.js?v=6.6.5"></script>
+    <script src="src/components/analysis/MonteCarloResultsDashboard.js?v=6.6.5"></script>
+    <script src="src/components/analysis/WithdrawalStrategyInterface.js?v=6.6.5"></script>
+    <script src="src/components/panels/settings/AdvancedSettingsPanel.js?v=6.6.5"></script>
+    
+    <!-- Currency & Dashboard Components -->
+    <script src="src/components/shared/CurrencySelector.js?v=6.6.5"></script>
+    <script src="src/components/shared/ExportControls.js?v=6.6.5"></script>
+    <script src="src/components/charts/DynamicPartnerCharts.js?v=6.6.5"></script>
+    <script src="src/utils/performanceMonitor.js?v=6.6.5"></script>
+    <script src="src/utils/dynamicLoader.js?v=6.6.5"></script>
+    <script src="src/components/core/LazyComponent.js?v=6.6.5"></script>
+    <script src="src/components/core/Dashboard.js?v=6.6.5"></script>
+    <script src="src/components/core/RetirementPlannerApp.js?v=6.6.5"></script>
+    
+    <!-- Application Initialization -->
+    <script>
+        // Enhanced error handling and component validation
+        function validateComponents() {
+            const requiredComponents = [
+                'RetirementPlannerApp', 'Dashboard', 'CurrencySelector', 'BasicInputs', 'AdvancedInputs', 'ResultsPanel',
+                'ReadinessScore', 'HelpTooltip', 'calculateRetirement', 'formatCurrency', 'currencyAPI',
+                'ScenarioComparison', 'ScenarioEditor', 'ScenarioChart', 'GoalTrackingDashboard', 
+                'CoupleValidationPanel', 'CoupleValidation', 'PortfolioOptimizer', 'PortfolioOptimizationPanel'
+            ];
+            
+            const missing = requiredComponents.filter(comp => !window[comp]);
+            if (missing.length > 0) {
+                console.warn('⚠️ Missing components:', missing);
+                return false;
+            }
+            return true;
+        }
+
+        // Initialize the complete RetirementPlannerApp after all components load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Enhanced component loading with retry logic
+            function attemptInitialization(attempt = 1, maxAttempts = 10) {
+                try {
+                    if (window.RetirementPlannerApp && validateComponents()) {
+                        if (ReactDOM.createRoot) {
+                            const root = ReactDOM.createRoot(document.getElementById('root'));
+                            root.render(React.createElement(window.RetirementPlannerApp));
+                            console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '6.6.4'} initialized successfully`);
+                        } else if (ReactDOM.render) {
+                            ReactDOM.render(
+                                React.createElement(window.RetirementPlannerApp),
+                                document.getElementById('root')
+                            );
+                            console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '6.6.4'} initialized (React 17 mode)`);
+                        }
+                    } else {
+                        if (attempt < maxAttempts) {
+                            console.log(`⏳ Waiting for components to load... (attempt ${attempt}/${maxAttempts})`);
+                            // Progressive delay: 100ms, 200ms, 400ms, 800ms, etc.
+                            const delay = Math.min(100 * Math.pow(1.5, attempt - 1), 2000);
+                            setTimeout(() => attemptInitialization(attempt + 1, maxAttempts), delay);
+                        } else {
+                            throw new Error('Required components failed to load after multiple attempts');
+                        }
+                    }
+                } catch (error) {
+                    if (attempt < maxAttempts) {
+                        console.warn(`⚠️ Initialization attempt ${attempt} failed, retrying...`, error.message);
+                        const delay = Math.min(200 * attempt, 2000);
+                        setTimeout(() => attemptInitialization(attempt + 1, maxAttempts), delay);
+                    } else {
+                        throw error;
+                    }
+                }
+            }
+
+            try {
+                attemptInitialization();
+            } catch (error) {
+                console.error('❌ Application initialization error:', error);
+                document.getElementById('root').innerHTML = `
+                    <div style="text-align: center; padding: 50px; font-family: Arial;">
+                        <h2 style="color: #e53e3e;">Application Loading Error</h2>
+                        <p>The retirement planner could not initialize: ${error.message}</p>
+                        <p><small>Check browser console for details</small></p>
+                        <button id="refresh-btn" style="padding: 10px 20px; background: #4299e1; color: white; border: none; border-radius: 5px; cursor: pointer;">Refresh Page</button>
+                        <script>document.getElementById('refresh-btn').addEventListener('click', () => location.reload());<\/script>
+                    </div>
+                `;
+            }
+        });
+
+        // Service Worker Registration for Offline Support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    // Determine correct service worker path based on deployment
+                    const isGitHubPages = window.location.hostname === 'ypollak2.github.io';
+                    const swPath = isGitHubPages ? '/advanced-retirement-planner/sw.js' : '/sw.js';
+                    
+                    const registration = await navigator.serviceWorker.register(swPath);
+                    console.log('📦 Service Worker registered successfully:', registration.scope);
+                    
+                    // Listen for updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('🔄 New service worker available - refresh to update');
+                                // Optionally show user notification about update
+                            }
+                        });
+                    });
+                    
+                    // Send stock symbols to cache for offline use
+                    if (registration.active) {
+                        const commonStocks = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META', 'TSLA', 'NVDA'];
+                        registration.active.postMessage({
+                            type: 'CACHE_STOCK_PRICES',
+                            symbols: commonStocks
+                        });
+                    }
+                } catch (error) {
+                    console.log('Service Worker registration failed:', error);
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
