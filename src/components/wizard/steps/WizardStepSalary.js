@@ -197,44 +197,76 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
 
     const t = content[language];
 
-    // Calculate total income
+    // Calculate total income using NET (after-tax) amounts
     const calculateTotalIncome = () => {
         const mainSalary = inputs.currentMonthlySalary || 0;
         const partner1Salary = inputs.partner1Salary || 0;
         const partner2Salary = inputs.partner2Salary || 0;
         
-        // Main person additional income
-        const freelanceIncome = inputs.freelanceIncome || 0;
-        const rentalIncome = inputs.rentalIncome || 0;
-        const dividendIncome = inputs.dividendIncome || 0;
-        const annualBonusMonthly = (inputs.annualBonus || 0) / 12; // Convert annual to monthly
-        // Handle RSU frequency conversion to monthly
-        let rsuMonthly = 0;
-        const rsuAmount = inputs.rsuAmount || inputs.quarterlyRSU || 0;
-        const rsuFrequency = inputs.rsuFrequency || 'quarterly';
+        // Calculate NET additional income using tax engine
+        let mainAdditionalIncomeMonthly = 0;
+        let partnerAdditionalIncomeMonthly = 0;
         
-        if (rsuFrequency === 'monthly') {
-            rsuMonthly = rsuAmount;
-        } else if (rsuFrequency === 'quarterly') {
-            rsuMonthly = rsuAmount / 3;
-        } else if (rsuFrequency === 'yearly') {
-            rsuMonthly = rsuAmount / 12;
+        // Main person additional income - use after-tax calculations
+        if (window.AdditionalIncomeTax && window.AdditionalIncomeTax.getMonthlyAfterTaxAdditionalIncome) {
+            try {
+                const mainTaxResult = window.AdditionalIncomeTax.getMonthlyAfterTaxAdditionalIncome(inputs);
+                mainAdditionalIncomeMonthly = mainTaxResult.totalMonthlyNet || 0;
+            } catch (error) {
+                console.warn('Error calculating main additional income tax:', error);
+                // Fallback to simplified calculation
+                const freelanceIncome = inputs.freelanceIncome || 0;
+                const rentalIncome = inputs.rentalIncome || 0;
+                const dividendIncome = inputs.dividendIncome || 0;
+                const annualBonusMonthly = (inputs.annualBonus || 0) / 12 * 0.5; // Assume ~50% tax
+                const quarterlyRSUMonthly = (inputs.quarterlyRSU || 0) / 3 * 0.55; // Assume ~45% tax
+                const otherIncome = inputs.otherIncome || 0;
+                mainAdditionalIncomeMonthly = freelanceIncome + rentalIncome + dividendIncome + 
+                                            annualBonusMonthly + quarterlyRSUMonthly + otherIncome;
+            }
+        } else {
+            // Fallback calculation if tax engine not available
+            const freelanceIncome = inputs.freelanceIncome || 0;
+            const rentalIncome = inputs.rentalIncome || 0;
+            const dividendIncome = inputs.dividendIncome || 0;
+            const annualBonusMonthly = (inputs.annualBonus || 0) / 12 * 0.5; // Assume ~50% tax
+            const quarterlyRSUMonthly = (inputs.quarterlyRSU || 0) / 3 * 0.55; // Assume ~45% tax
+            const otherIncome = inputs.otherIncome || 0;
+            mainAdditionalIncomeMonthly = freelanceIncome + rentalIncome + dividendIncome + 
+                                        annualBonusMonthly + quarterlyRSUMonthly + otherIncome;
         }
         
-        const quarterlyRSUMonthly = rsuMonthly; // For backward compatibility
-        const otherIncome = inputs.otherIncome || 0;
+        // Partner additional income - use after-tax calculations for couple planning
+        if (inputs.planningType === 'couple' && window.AdditionalIncomeTax) {
+            try {
+                const partnerInputs = {
+                    country: inputs.country || 'israel',
+                    currentMonthlySalary: inputs.partner1Salary || 0,
+                    annualBonus: inputs.partnerAnnualBonus || 0,
+                    quarterlyRSU: inputs.partnerQuarterlyRSU || 0,
+                    freelanceIncome: inputs.partnerFreelanceIncome || 0,
+                    rentalIncome: inputs.partnerRentalIncome || 0,
+                    dividendIncome: inputs.partnerDividendIncome || 0,
+                    otherIncome: inputs.partnerOtherIncome || 0
+                };
+                const partnerTaxResult = window.AdditionalIncomeTax.getMonthlyAfterTaxAdditionalIncome(partnerInputs);
+                partnerAdditionalIncomeMonthly = partnerTaxResult.totalMonthlyNet || 0;
+            } catch (error) {
+                console.warn('Error calculating partner additional income tax:', error);
+                // Fallback to simplified calculation
+                const partnerFreelanceIncome = inputs.partnerFreelanceIncome || 0;
+                const partnerRentalIncome = inputs.partnerRentalIncome || 0;
+                const partnerDividendIncome = inputs.partnerDividendIncome || 0;
+                const partnerAnnualBonusMonthly = (inputs.partnerAnnualBonus || 0) / 12 * 0.55; // Assume ~45% tax
+                const partnerQuarterlyRSUMonthly = (inputs.partnerQuarterlyRSU || 0) / 3 * 0.57; // Assume ~43% tax
+                const partnerOtherIncome = inputs.partnerOtherIncome || 0;
+                partnerAdditionalIncomeMonthly = partnerFreelanceIncome + partnerRentalIncome + partnerDividendIncome + 
+                                               partnerAnnualBonusMonthly + partnerQuarterlyRSUMonthly + partnerOtherIncome;
+            }
+        }
         
-        // Partner additional income (for couple planning)
-        const partnerFreelanceIncome = inputs.partnerFreelanceIncome || 0;
-        const partnerRentalIncome = inputs.partnerRentalIncome || 0;
-        const partnerDividendIncome = inputs.partnerDividendIncome || 0;
-        const partnerAnnualBonusMonthly = (inputs.partnerAnnualBonus || 0) / 12;
-        const partnerQuarterlyRSUMonthly = (inputs.partnerQuarterlyRSU || 0) / 3;
-        const partnerOtherIncome = inputs.partnerOtherIncome || 0;
-
-        return mainSalary + partner1Salary + partner2Salary + 
-               freelanceIncome + rentalIncome + dividendIncome + annualBonusMonthly + quarterlyRSUMonthly + otherIncome +
-               partnerFreelanceIncome + partnerRentalIncome + partnerDividendIncome + partnerAnnualBonusMonthly + partnerQuarterlyRSUMonthly + partnerOtherIncome;
+        // Return total monthly income using NET amounts
+        return mainSalary + partner1Salary + partner2Salary + mainAdditionalIncomeMonthly + partnerAdditionalIncomeMonthly;
     };
 
     const formatCurrency = (amount) => {
