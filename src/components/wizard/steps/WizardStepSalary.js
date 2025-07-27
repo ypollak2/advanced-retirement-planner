@@ -199,9 +199,10 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
 
     // Calculate total income using NET (after-tax) amounts
     const calculateTotalIncome = () => {
-        const mainSalary = inputs.currentMonthlySalary || 0;
-        const partner1Salary = inputs.partner1Salary || 0;
-        const partner2Salary = inputs.partner2Salary || 0;
+        // Use NET salaries instead of gross salaries
+        const mainSalary = inputs.currentNetSalary || calculateNetFromGross(inputs.currentMonthlySalary || 0, inputs.country);
+        const partner1Salary = inputs.partner1NetSalary || calculateNetFromGross(inputs.partner1Salary || 0, inputs.country);
+        const partner2Salary = inputs.partner2NetSalary || calculateNetFromGross(inputs.partner2Salary || 0, inputs.country);
         
         // Calculate NET additional income using tax engine
         let mainAdditionalIncomeMonthly = 0;
@@ -266,7 +267,19 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
         }
         
         // Return total monthly income using NET amounts
-        return mainSalary + partner1Salary + partner2Salary + mainAdditionalIncomeMonthly + partnerAdditionalIncomeMonthly;
+        const totalIncome = mainSalary + partner1Salary + partner2Salary + mainAdditionalIncomeMonthly + partnerAdditionalIncomeMonthly;
+        
+        // Debug logging
+        console.log(`💰 Total Monthly Income Calculation (NET):`, {
+            mainSalary,
+            partner1Salary, 
+            partner2Salary,
+            mainAdditionalIncomeMonthly,
+            partnerAdditionalIncomeMonthly,
+            totalIncome
+        });
+        
+        return totalIncome;
     };
 
     const formatCurrency = (amount) => {
@@ -927,7 +940,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             ])
         ]),
 
-        // Total Income Summary
+        // Total Income Summary with Per-Partner Breakdown
         createElement('div', { 
             key: 'income-summary',
             className: "bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6 border border-green-200" 
@@ -937,16 +950,144 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                 className: "text-xl font-semibold text-green-700 mb-4 flex items-center" 
             }, [
                 createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '💵'),
-                t.totalMonthlyIncome
+                t.totalMonthlyIncome + ' (NET)'
             ]),
-            createElement('div', { 
-                key: 'total-amount',
-                className: "text-3xl font-bold text-green-800 mb-2" 
-            }, formatCurrency(calculateTotalIncome())),
+            
+            // Main person breakdown
+            createElement('div', {
+                key: 'main-person-breakdown',
+                className: "bg-white rounded-lg p-4 mb-4 border border-green-100"
+            }, (() => {
+                const mainNetSalary = inputs.currentNetSalary || calculateNetFromGross(inputs.currentMonthlySalary || 0, inputs.country);
+                const mainAdditionalNet = window.AdditionalIncomeTax?.getMonthlyAfterTaxAdditionalIncome 
+                    ? (window.AdditionalIncomeTax.getMonthlyAfterTaxAdditionalIncome(inputs)?.totalMonthlyNet || 0)
+                    : ((inputs.annualBonus || 0) / 12 * 0.5 + (inputs.quarterlyRSU || 0) / 3 * 0.55 + (inputs.freelanceIncome || 0) + (inputs.rentalIncome || 0) + (inputs.dividendIncome || 0));
+                const mainTotal = mainNetSalary + mainAdditionalNet;
+                
+                return [
+                    createElement('div', {
+                        key: 'main-header',
+                        className: "flex justify-between items-center mb-3"
+                    }, [
+                        createElement('h4', {
+                            key: 'main-title', 
+                            className: "font-semibold text-gray-700"
+                        }, language === 'he' ? 'הכנסה עיקרית' : 'Main Person'),
+                        createElement('div', {
+                            key: 'main-total',
+                            className: "text-lg font-bold text-green-700"
+                        }, formatCurrency(mainTotal))
+                    ]),
+                    createElement('div', {
+                        key: 'main-details',
+                        className: "grid grid-cols-1 md:grid-cols-2 gap-2 text-sm"
+                    }, [
+                        createElement('div', { key: 'salary-row', className: "flex justify-between" }, [
+                            createElement('span', { key: 'salary-label', className: "text-gray-600" }, 
+                                language === 'he' ? 'משכורת נטו:' : 'Net Salary:'),
+                            createElement('span', { key: 'salary-value', className: "font-medium" }, 
+                                formatCurrency(mainNetSalary))
+                        ]),
+                        mainAdditionalNet > 0 && createElement('div', { key: 'additional-row', className: "flex justify-between" }, [
+                            createElement('span', { key: 'additional-label', className: "text-gray-600" }, 
+                                language === 'he' ? 'הכנסות נוספות נטו:' : 'Additional Income Net:'),
+                            createElement('span', { key: 'additional-value', className: "font-medium" }, 
+                                formatCurrency(mainAdditionalNet))
+                        ])
+                    ])
+                ];
+            })()),
+            
+            // Partner breakdown (for couple planning)
+            inputs.planningType === 'couple' && createElement('div', {
+                key: 'partner-breakdown',
+                className: "bg-white rounded-lg p-4 mb-4 border border-green-100"
+            }, (() => {
+                const partner1NetSalary = inputs.partner1NetSalary || calculateNetFromGross(inputs.partner1Salary || 0, inputs.country);
+                const partner2NetSalary = inputs.partner2NetSalary || calculateNetFromGross(inputs.partner2Salary || 0, inputs.country);
+                
+                // Partner additional income calculation
+                const partnerInputs = {
+                    country: inputs.country || 'israel',
+                    currentMonthlySalary: inputs.partner1Salary || 0,
+                    annualBonus: inputs.partnerAnnualBonus || 0,
+                    quarterlyRSU: inputs.partnerQuarterlyRSU || 0,
+                    freelanceIncome: inputs.partnerFreelanceIncome || 0,
+                    rentalIncome: inputs.partnerRentalIncome || 0,
+                    dividendIncome: inputs.partnerDividendIncome || 0,
+                    otherIncome: inputs.partnerOtherIncome || 0
+                };
+                
+                const partnerAdditionalNet = window.AdditionalIncomeTax?.getMonthlyAfterTaxAdditionalIncome 
+                    ? (window.AdditionalIncomeTax.getMonthlyAfterTaxAdditionalIncome(partnerInputs)?.totalMonthlyNet || 0)
+                    : ((inputs.partnerAnnualBonus || 0) / 12 * 0.55 + (inputs.partnerQuarterlyRSU || 0) / 3 * 0.57 + (inputs.partnerFreelanceIncome || 0) + (inputs.partnerRentalIncome || 0) + (inputs.partnerDividendIncome || 0) + (inputs.partnerOtherIncome || 0));
+                
+                const partnerTotal = partner1NetSalary + partner2NetSalary + partnerAdditionalNet;
+                
+                return [
+                    createElement('div', {
+                        key: 'partner-header',
+                        className: "flex justify-between items-center mb-3"
+                    }, [
+                        createElement('h4', {
+                            key: 'partner-title', 
+                            className: "font-semibold text-gray-700"
+                        }, language === 'he' ? 'בני הזוג' : 'Partners'),
+                        createElement('div', {
+                            key: 'partner-total',
+                            className: "text-lg font-bold text-green-700"
+                        }, formatCurrency(partnerTotal))
+                    ]),
+                    createElement('div', {
+                        key: 'partner-details',
+                        className: "grid grid-cols-1 md:grid-cols-2 gap-2 text-sm"
+                    }, [
+                        partner1NetSalary > 0 && createElement('div', { key: 'p1-salary-row', className: "flex justify-between" }, [
+                            createElement('span', { key: 'p1-salary-label', className: "text-gray-600" }, 
+                                language === 'he' ? 'בן/בת זוג 1 נטו:' : 'Partner 1 Net:'),
+                            createElement('span', { key: 'p1-salary-value', className: "font-medium" }, 
+                                formatCurrency(partner1NetSalary))
+                        ]),
+                        partner2NetSalary > 0 && createElement('div', { key: 'p2-salary-row', className: "flex justify-between" }, [
+                            createElement('span', { key: 'p2-salary-label', className: "text-gray-600" }, 
+                                language === 'he' ? 'בן/בת זוג 2 נטו:' : 'Partner 2 Net:'),
+                            createElement('span', { key: 'p2-salary-value', className: "font-medium" }, 
+                                formatCurrency(partner2NetSalary))
+                        ]),
+                        partnerAdditionalNet > 0 && createElement('div', { key: 'partner-additional-row', className: "flex justify-between" }, [
+                            createElement('span', { key: 'partner-additional-label', className: "text-gray-600" }, 
+                                language === 'he' ? 'הכנסות נוספות נטו:' : 'Additional Income Net:'),
+                            createElement('span', { key: 'partner-additional-value', className: "font-medium" }, 
+                                formatCurrency(partnerAdditionalNet))
+                        ])
+                    ])
+                ];
+            })()),
+            
+            // Combined total
+            createElement('div', {
+                key: 'combined-total',
+                className: "border-t-2 border-green-300 pt-4"
+            }, [
+                createElement('div', {
+                    key: 'combined-header',
+                    className: "flex justify-between items-center"
+                }, [
+                    createElement('h4', {
+                        key: 'combined-title',
+                        className: "text-xl font-semibold text-green-700"
+                    }, language === 'he' ? 'סך הכל משותף' : 'Combined Total'),
+                    createElement('div', { 
+                        key: 'combined-amount',
+                        className: "text-3xl font-bold text-green-800" 
+                    }, formatCurrency(calculateTotalIncome()))
+                ])
+            ]),
+            
             createElement('p', { 
                 key: 'total-help',
-                className: "text-sm text-green-600" 
-            }, t.incomeBreakdown)
+                className: "text-sm text-green-600 mt-3" 
+            }, language === 'he' ? 'כל הסכומים מוצגים נטו (אחרי מסים)' : 'All amounts shown are net (after taxes)')
         ]),
         
         // Tax Impact Preview for Additional Income

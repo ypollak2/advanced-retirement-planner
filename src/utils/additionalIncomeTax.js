@@ -16,6 +16,17 @@ window.AdditionalIncomeTax = (() => {
         const netBonus = annualBonus - bonusTax;
         const effectiveRate = (bonusTax / annualBonus) * 100;
         
+        // Debug logging
+        console.log(`🧮 Bonus Tax Calculation:`, {
+            annualBonus,
+            baseSalary,
+            totalIncomeWithBonus: baseSalary + annualBonus,
+            taxWithBonus: taxWithBonus.totalTax,
+            taxWithoutBonus: taxWithoutBonus.totalTax,
+            bonusTax,
+            effectiveRate: Math.round(effectiveRate)
+        });
+        
         return {
             tax: Math.round(bonusTax),
             netBonus: Math.round(netBonus),

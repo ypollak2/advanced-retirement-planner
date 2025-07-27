@@ -143,7 +143,9 @@ const SavingsSummaryPanel = ({
                 key: 'salary-section',
                 className: "bg-blue-50 rounded-lg p-3 mb-4 border border-blue-200"
             }, (() => {
-                const taxResult = calculateNetSalary(inputs.currentMonthlySalary || 15000, inputs.taxCountry || 'israel');
+                const taxResult = window.TaxCalculators ? 
+                    window.TaxCalculators.calculateNetSalary(inputs.currentMonthlySalary || 15000, inputs.taxCountry || 'israel') :
+                    { netSalary: Math.round((inputs.currentMonthlySalary || 15000) * 0.66), taxRate: 34 };
                 const countryName = inputs.taxCountry === 'israel' ? (language === 'he' ? 'ישראל' : 'Israel') :
                                    inputs.taxCountry === 'uk' ? (language === 'he' ? 'בריטניה' : 'UK') :
                                    inputs.taxCountry === 'us' ? (language === 'he' ? 'ארה״ב' : 'US') : '';
