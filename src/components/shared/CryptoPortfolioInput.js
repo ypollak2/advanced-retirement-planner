@@ -227,7 +227,7 @@ const DigitalAssetPortfolioInput = ({
                 createElement('span', { key: 'price-label' }, 
                     `1 ${assetToken} = ${currencySymbol}${formatPrice(currentPrice.price)}`),
                 createElement('div', { key: 'price-meta', className: "flex items-center space-x-2" }, [
-                    currentPrice.change24h !== 0 && createElement('span', {
+                    currentPrice.change24h !== 0 && assetAmount > 0 && createElement('span', {
                         key: 'change-24h',
                         className: currentPrice.change24h > 0 ? 'text-green-600' : 'text-red-600'
                     }, `${currentPrice.change24h > 0 ? '+' : ''}${currentPrice.change24h.toFixed(2)}%`),

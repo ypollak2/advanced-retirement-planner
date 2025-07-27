@@ -183,38 +183,46 @@ function calculateSavingsRateScore(inputs) {
         };
     }
     
-    const savingsRate = (monthlyContributions / monthlyIncome) * 100;
+    // CRITICAL FIX: Add NaN prevention for division
+    const savingsRate = (monthlyIncome > 0) ? (monthlyContributions / monthlyIncome) * 100 : 0;
+    
+    // Validate savingsRate is a finite number
+    const validSavingsRate = (isNaN(savingsRate) || !isFinite(savingsRate)) ? 0 : savingsRate;
+    
     const maxScore = SCORE_FACTORS.savingsRate.weight;
     
     let score = 0;
     let status = 'poor';
     
-    if (savingsRate >= SCORE_FACTORS.savingsRate.benchmarks.excellent) {
+    if (validSavingsRate >= SCORE_FACTORS.savingsRate.benchmarks.excellent) {
         score = maxScore;
         status = 'excellent';
-    } else if (savingsRate >= SCORE_FACTORS.savingsRate.benchmarks.good) {
+    } else if (validSavingsRate >= SCORE_FACTORS.savingsRate.benchmarks.good) {
         score = maxScore * 0.85;
         status = 'good';
-    } else if (savingsRate >= SCORE_FACTORS.savingsRate.benchmarks.fair) {
+    } else if (validSavingsRate >= SCORE_FACTORS.savingsRate.benchmarks.fair) {
         score = maxScore * 0.70;
         status = 'fair';
-    } else if (savingsRate >= SCORE_FACTORS.savingsRate.benchmarks.poor) {
+    } else if (validSavingsRate >= SCORE_FACTORS.savingsRate.benchmarks.poor) {
         score = maxScore * 0.50;
         status = 'poor';
     } else {
-        score = Math.max(0, (savingsRate / SCORE_FACTORS.savingsRate.benchmarks.poor) * maxScore * 0.50);
+        score = Math.max(0, (validSavingsRate / SCORE_FACTORS.savingsRate.benchmarks.poor) * maxScore * 0.50);
         status = 'critical';
     }
+    
+    // Ensure final score is valid
+    score = (isNaN(score) || !isFinite(score)) ? 0 : score;
     
     return {
         score: Math.round(score),
         details: {
-            rate: savingsRate,
+            rate: validSavingsRate,
             monthlyAmount: monthlyContributions,
             monthlyIncome: monthlyIncome,
             status: status,
             target: SCORE_FACTORS.savingsRate.benchmarks.good,
-            improvement: Math.max(0, (SCORE_FACTORS.savingsRate.benchmarks.good - savingsRate) * monthlyIncome / 100),
+            improvement: Math.max(0, (SCORE_FACTORS.savingsRate.benchmarks.good - validSavingsRate) * monthlyIncome / 100),
             calculationMethod: monthlyContributions > 0 ? 
                 (inputs.monthlyContribution ? 'direct' : 'calculated_from_rates') : 'no_contributions',
             debugInfo: {
@@ -523,24 +531,94 @@ function calculateTaxEfficiencyScore(inputs) {
 }
 
 /**
- * Calculate emergency fund score
+ * Calculate emergency fund score with debt load consideration
  */
 function calculateEmergencyFundScore(inputs) {
-    const monthlyExpenses = parseFloat(inputs.currentMonthlyExpenses || inputs.currentSalary || 0);
-    const emergencyFund = parseFloat(inputs.emergencyFund || inputs.currentSavingsAccount || 0);
+    // Calculate total monthly expenses including debt payments
+    let monthlyExpenses = 0;
     
-    if (monthlyExpenses === 0) return { score: 0, details: { months: 0, status: 'unknown' } };
+    // Get basic living expenses from expenses structure
+    if (inputs.expenses) {
+        const expenseCategories = ['housing', 'transportation', 'food', 'insurance', 'other'];
+        monthlyExpenses = expenseCategories.reduce((sum, category) => {
+            return sum + (parseFloat(inputs.expenses[category]) || 0);
+        }, 0);
+        
+        // Add debt payments to monthly expenses for emergency fund calculation
+        const debtCategories = ['mortgage', 'carLoan', 'creditCard', 'otherDebt'];
+        const monthlyDebtPayments = debtCategories.reduce((sum, category) => {
+            return sum + (parseFloat(inputs.expenses[category]) || 0);
+        }, 0);
+        
+        monthlyExpenses += monthlyDebtPayments;
+    } else {
+        // Fallback to legacy field
+        monthlyExpenses = parseFloat(inputs.currentMonthlyExpenses || inputs.currentSalary || 0);
+    }
+    
+    // Get emergency fund amount with enhanced field mapping
+    const emergencyFund = getFieldValue(inputs, [
+        'emergencyFund', 'currentSavingsAccount', 'emergencyFundAmount',
+        'cashReserves', 'liquidSavings', 'savingsAccount'
+    ]);
+    
+    if (monthlyExpenses === 0) {
+        return { 
+            score: 0, 
+            details: { 
+                months: 0, 
+                status: 'unknown',
+                debugInfo: {
+                    reason: 'No monthly expenses found',
+                    fieldsChecked: ['expenses structure', 'currentMonthlyExpenses'],
+                    expensesFound: false
+                }
+            } 
+        };
+    }
     
     const monthsCovered = emergencyFund / monthlyExpenses;
-    const maxScore = SCORE_FACTORS.emergencyFund.weight;
     
+    // Calculate debt-to-income ratio to adjust emergency fund recommendations
+    const monthlyIncome = getFieldValue(inputs, [
+        'currentMonthlySalary', 'currentSalary', 'partner1Salary', 
+        'monthlySalary', 'salary', 'monthly_salary', 'monthlyIncome'
+    ]);
+    
+    let totalMonthlyIncome = monthlyIncome;
+    if (inputs.planningType === 'couple') {
+        const partner1Income = parseFloat(inputs.partner1Salary || 0);
+        const partner2Income = parseFloat(inputs.partner2Salary || 0);
+        totalMonthlyIncome = partner1Income + partner2Income;
+    }
+    
+    // Calculate debt load for enhanced recommendations
+    let monthlyDebtPayments = 0;
+    if (inputs.expenses) {
+        const debtCategories = ['mortgage', 'carLoan', 'creditCard', 'otherDebt'];
+        monthlyDebtPayments = debtCategories.reduce((sum, category) => {
+            return sum + (parseFloat(inputs.expenses[category]) || 0);
+        }, 0);
+    }
+    
+    const debtToIncomeRatio = totalMonthlyIncome > 0 ? monthlyDebtPayments / totalMonthlyIncome : 0;
+    
+    // Adjust target months based on debt load
+    let targetMonths = SCORE_FACTORS.emergencyFund.benchmarks.good; // Default 6 months
+    if (debtToIncomeRatio > 0.3) {
+        targetMonths = 8; // High debt requires more emergency fund
+    } else if (debtToIncomeRatio > 0.2) {
+        targetMonths = 7; // Moderate debt requires slightly more
+    }
+    
+    const maxScore = SCORE_FACTORS.emergencyFund.weight;
     let score = 0;
     let status = 'poor';
     
     if (monthsCovered >= SCORE_FACTORS.emergencyFund.benchmarks.excellent) {
         score = maxScore;
         status = 'excellent';
-    } else if (monthsCovered >= SCORE_FACTORS.emergencyFund.benchmarks.good) {
+    } else if (monthsCovered >= targetMonths) {
         score = maxScore * 0.85;
         status = 'good';
     } else if (monthsCovered >= SCORE_FACTORS.emergencyFund.benchmarks.fair) {
@@ -559,23 +637,81 @@ function calculateEmergencyFundScore(inputs) {
         details: {
             months: monthsCovered,
             currentAmount: emergencyFund,
-            targetAmount: monthlyExpenses * SCORE_FACTORS.emergencyFund.benchmarks.good,
-            gap: Math.max(0, (monthlyExpenses * SCORE_FACTORS.emergencyFund.benchmarks.good) - emergencyFund),
-            status: status
+            targetAmount: monthlyExpenses * targetMonths,
+            gap: Math.max(0, (monthlyExpenses * targetMonths) - emergencyFund),
+            status: status,
+            adjustedTarget: targetMonths !== SCORE_FACTORS.emergencyFund.benchmarks.good,
+            debtAdjustment: {
+                debtToIncomeRatio: debtToIncomeRatio,
+                recommendedMonths: targetMonths,
+                reason: debtToIncomeRatio > 0.3 ? 'high_debt' : 
+                       debtToIncomeRatio > 0.2 ? 'moderate_debt' : 'standard'
+            },
+            calculationMethod: inputs.expenses ? 'expense_structure_with_debt' : 'legacy_field',
+            debugInfo: {
+                monthlyExpensesFound: monthlyExpenses > 0,
+                emergencyFundFound: emergencyFund > 0,
+                debtConsideration: monthlyDebtPayments > 0 ? 'included' : 'none',
+                fieldsUsed: {
+                    expenses: monthlyExpenses > 0 ? 'found' : 'missing',
+                    emergencyFund: emergencyFund > 0 ? 'found' : 'missing'
+                }
+            }
         }
     };
 }
 
 /**
- * Calculate debt management score
+ * Calculate debt management score with enhanced field mapping
  */
 function calculateDebtManagementScore(inputs) {
-    const monthlyIncome = parseFloat(inputs.currentMonthlySalary || 0);
-    const monthlyDebtPayments = parseFloat(inputs.monthlyDebtPayments || 0);
+    // Enhanced field mapping for monthly income
+    const monthlyIncome = getFieldValue(inputs, [
+        'currentMonthlySalary', 'currentSalary', 'partner1Salary', 
+        'monthlySalary', 'salary', 'monthly_salary', 'monthlyIncome'
+    ]);
     
-    if (monthlyIncome === 0) return { score: SCORE_FACTORS.debtManagement.weight, details: { ratio: 0, status: 'unknown' } };
+    // Calculate monthly debt payments from expenses structure or legacy field
+    let monthlyDebtPayments = 0;
     
-    const debtToIncomeRatio = monthlyDebtPayments / monthlyIncome;
+    // First try the new expenses structure with individual debt categories
+    if (inputs.expenses) {
+        const debtCategories = ['mortgage', 'carLoan', 'creditCard', 'otherDebt'];
+        monthlyDebtPayments = debtCategories.reduce((sum, category) => {
+            return sum + (parseFloat(inputs.expenses[category]) || 0);
+        }, 0);
+    }
+    
+    // Fallback to legacy monthlyDebtPayments field if no expenses structure
+    if (monthlyDebtPayments === 0) {
+        monthlyDebtPayments = parseFloat(inputs.monthlyDebtPayments || 0);
+    }
+    
+    // For couple planning, combine partner incomes
+    let totalMonthlyIncome = monthlyIncome;
+    if (inputs.planningType === 'couple') {
+        const partner1Income = parseFloat(inputs.partner1Salary || 0);
+        const partner2Income = parseFloat(inputs.partner2Salary || 0);
+        totalMonthlyIncome = partner1Income + partner2Income;
+    }
+    
+    if (totalMonthlyIncome === 0) {
+        return { 
+            score: SCORE_FACTORS.debtManagement.weight, 
+            details: { 
+                ratio: 0, 
+                status: 'unknown',
+                debugInfo: {
+                    reason: 'No monthly income found',
+                    fieldsChecked: ['currentMonthlySalary', 'partner1Salary', 'partner2Salary'],
+                    incomeFound: false,
+                    debtPaymentsFound: monthlyDebtPayments > 0
+                }
+            } 
+        };
+    }
+    
+    const debtToIncomeRatio = monthlyDebtPayments / totalMonthlyIncome;
     const maxScore = SCORE_FACTORS.debtManagement.weight;
     
     let score = maxScore;
@@ -598,12 +734,34 @@ function calculateDebtManagementScore(inputs) {
         status = 'critical';
     }
     
+    // Calculate debt breakdown for detailed analysis
+    const debtBreakdown = {};
+    if (inputs.expenses) {
+        debtBreakdown.mortgage = parseFloat(inputs.expenses.mortgage || 0);
+        debtBreakdown.carLoan = parseFloat(inputs.expenses.carLoan || 0);
+        debtBreakdown.creditCard = parseFloat(inputs.expenses.creditCard || 0);
+        debtBreakdown.otherDebt = parseFloat(inputs.expenses.otherDebt || 0);
+    }
+    
     return {
         score: Math.round(score),
         details: {
             ratio: debtToIncomeRatio,
             monthlyPayments: monthlyDebtPayments,
-            status: status
+            monthlyIncome: totalMonthlyIncome,
+            status: status,
+            debtBreakdown: debtBreakdown,
+            calculationMethod: inputs.expenses ? 'expense_categories' : 'legacy_field',
+            debugInfo: {
+                incomeSource: inputs.planningType === 'couple' ? 'combined_partners' : 'individual',
+                debtSource: inputs.expenses ? 'expense_structure' : 'legacy_field',
+                totalIncomeFound: totalMonthlyIncome > 0,
+                debtPaymentsFound: monthlyDebtPayments > 0,
+                fieldsUsed: {
+                    income: totalMonthlyIncome > 0 ? 'found' : 'missing',
+                    debt: monthlyDebtPayments > 0 ? 'found' : 'missing'
+                }
+            }
         }
     };
 }
@@ -664,11 +822,14 @@ function generateImprovementSuggestions(scoreBreakdown) {
                     break;
                 case 'emergencyFund':
                     if (factorData.details.months !== undefined && factorData.details.gap !== undefined) {
+                        const targetMonths = factorData.details.debtAdjustment?.recommendedMonths || 6;
+                        const debtAdjustment = factorData.details.adjustedTarget ? ` (${targetMonths} months recommended due to debt load)` : '';
+                        
                         suggestions.push({
                             priority: 'high',
                             category: 'Emergency Fund',
                             issue: `Only ${factorData.details.months.toFixed(1)} months of expenses covered`,
-                            action: `Save additional ₪${Math.round(factorData.details.gap).toLocaleString()} for 6-month emergency fund`,
+                            action: `Save additional ₪${Math.round(factorData.details.gap).toLocaleString()} for ${targetMonths}-month emergency fund${debtAdjustment}`,
                             impact: `+${Math.round((SCORE_FACTORS.emergencyFund.weight * 0.85) - factorData.score)} points`
                         });
                     }
@@ -681,6 +842,38 @@ function generateImprovementSuggestions(scoreBreakdown) {
                             issue: `${factorData.details.efficiencyScore.toFixed(0)}% tax efficiency vs optimal`,
                             action: `Maximize pension and training fund contributions`,
                             impact: `+${Math.round((SCORE_FACTORS.taxEfficiency.weight * 0.85) - factorData.score)} points`
+                        });
+                    }
+                    break;
+                case 'debtManagement':
+                    if (factorData.details.ratio !== undefined && factorData.details.monthlyPayments !== undefined) {
+                        const debtRatioPercent = (factorData.details.ratio * 100).toFixed(1);
+                        let actionText = '';
+                        
+                        if (factorData.details.ratio > 0.35) {
+                            actionText = 'Consider debt consolidation, sell non-essential assets, or increase income';
+                        } else if (factorData.details.ratio > 0.2) {
+                            actionText = 'Focus on paying off high-interest debt first (credit cards)';
+                        } else if (factorData.details.ratio > 0.1) {
+                            actionText = 'Make extra payments toward principal on highest-rate loans';
+                        } else {
+                            actionText = 'Maintain current debt levels while maximizing retirement savings';
+                        }
+                        
+                        // Enhanced debt breakdown suggestions
+                        if (factorData.details.debtBreakdown) {
+                            const breakdown = factorData.details.debtBreakdown;
+                            if (breakdown.creditCard > breakdown.mortgage && breakdown.creditCard > 0) {
+                                actionText += '. Prioritize credit card debt (typically highest interest rate)';
+                            }
+                        }
+                        
+                        suggestions.push({
+                            priority: factorData.details.ratio > 0.3 ? 'high' : 'medium',
+                            category: 'Debt Management',
+                            issue: `${debtRatioPercent}% debt-to-income ratio (₪${Math.round(factorData.details.monthlyPayments)} monthly)`,
+                            action: actionText,
+                            impact: `+${Math.round((SCORE_FACTORS.debtManagement.weight * 0.85) - factorData.score)} points`
                         });
                     }
                     break;
@@ -746,16 +939,30 @@ function calculateFinancialHealthScore(inputs) {
             console.log(`  ${name}: ${factor.score}/${window.SCORE_FACTORS[name]?.weight || 'unknown'} (${factor.details?.status || 'no status'})`);
         });
         
-        const totalScore = Object.values(factors).reduce((sum, factor) => sum + factor.score, 0);
+        // CRITICAL FIX: Add comprehensive NaN prevention and validation
+        const factorScores = Object.values(factors).map(factor => {
+            const score = factor?.score || 0;
+            // Ensure score is a valid finite number
+            if (isNaN(score) || !isFinite(score)) {
+                console.warn(`Invalid factor score detected: ${score}, using 0 instead`);
+                return 0;
+            }
+            return score;
+        });
+        
+        const totalScore = factorScores.reduce((sum, score) => sum + score, 0);
+        
+        // Final validation: ensure totalScore is valid
+        const validatedTotalScore = (isNaN(totalScore) || !isFinite(totalScore)) ? 0 : totalScore;
         
         const scoreBreakdown = {
-            totalScore: Math.round(totalScore),
+            totalScore: Math.round(validatedTotalScore),
             factors: factors,
-            status: totalScore >= 85 ? 'excellent' : 
-                   totalScore >= 70 ? 'good' : 
-                   totalScore >= 50 ? 'needsWork' : 'critical',
+            status: validatedTotalScore >= 85 ? 'excellent' : 
+                   validatedTotalScore >= 70 ? 'good' : 
+                   validatedTotalScore >= 50 ? 'needsWork' : 'critical',
             suggestions: generateImprovementSuggestions({ factors }),
-            peerComparison: getPeerComparison(inputs, totalScore),
+            peerComparison: getPeerComparison(inputs, validatedTotalScore),
             generatedAt: new Date().toISOString(),
             debugInfo: {
                 inputFieldsFound: Object.keys(inputs).length,

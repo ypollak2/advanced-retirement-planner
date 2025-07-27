@@ -121,9 +121,21 @@
             return t.critical;
         };
 
+        // CRITICAL FIX: Add normalization function to convert factor scores to 0-100 scale
+        const normalizeFactorScore = (factorScore, factorKey) => {
+            if (!factorScore || typeof factorScore.score !== 'number') return 0;
+            
+            const maxWeight = window.SCORE_FACTORS?.[factorKey]?.weight || 25;
+            const normalizedScore = Math.round((factorScore.score / maxWeight) * 100);
+            
+            // Ensure score is within 0-100 range
+            return Math.max(0, Math.min(100, normalizedScore));
+        };
+
         // Helper to render score factor with tooltip
         const renderScoreFactor = (factorKey, factorData, factorInfo) => {
-            const score = factorData?.score || 0;
+            const rawScore = factorData?.score || 0;
+            const normalizedScore = normalizeFactorScore(factorData, factorKey);
             const details = factorData?.details || {};
             const debugInfo = details?.debugInfo || {};
             const tooltipKey = factorKey + 'Tooltip';
@@ -135,7 +147,7 @@
             switch(factorKey) {
                 case 'savingsRate':
                     detailText = details.rate ? `${t.currentRate}: ${details.rate.toFixed(1)}%` : '';
-                    if (score === 0) {
+                    if (rawScore === 0) {
                         if (debugInfo.reason === 'No monthly income found') {
                             debugText = `${t.noIncomeFound}. ${t.addSalaryData}`;
                         } else if (!debugInfo.contributionsFound) {
@@ -145,7 +157,7 @@
                     break;
                 case 'taxEfficiency':
                     detailText = details.efficiencyScore ? `${t.currentEfficiency}: ${details.efficiencyScore.toFixed(0)}%` : '';
-                    if (score === 0 && debugInfo.ratesFound) {
+                    if (rawScore === 0 && debugInfo.ratesFound) {
                         debugText = `${t.noContributionsFound}. ${t.addContributionData}`;
                     }
                     break;
@@ -169,14 +181,14 @@
             }, [
                 createElement('div', {
                     key: 'score',
-                    className: `text-2xl font-bold text-${getScoreColor(score)}-600`
-                }, Math.round(score)),
+                    className: `text-2xl font-bold text-${getScoreColor(normalizedScore)}-600`
+                }, `${normalizedScore}%`),
                 createElement('div', {
                     key: 'label',
                     className: "text-sm text-gray-600 cursor-help flex items-center justify-center"
                 }, [
                     createElement('span', { key: 'label-text' }, t[factorKey] || factorInfo?.name || factorKey),
-                    score === 0 && createElement('span', {
+                    normalizedScore === 0 && createElement('span', {
                         key: 'warning-icon',
                         className: "ml-1 text-red-500",
                         title: t.whyZeroScore

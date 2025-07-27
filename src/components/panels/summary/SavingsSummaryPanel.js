@@ -42,17 +42,17 @@ const SavingsSummaryPanel = ({
         const trainingNetReturn = Math.max(0.1, (inputs.expectedReturn || 7) - (inputs.trainingFundFees || 0.6));
         const safeAvgNetReturn = avgNetReturn || Math.max(0.1, (pensionNetReturn + trainingNetReturn) / 2);
         
-        // Enhanced safe defaults for current savings with more realistic values
-        // Always show meaningful values instead of zeros for better UX
+        // Respect user inputs and show actual values, including zeros
+        // Only use estimates when values are undefined/null (not when explicitly set to 0)
         const rawPensionSavings = inputs.currentSavings;
         const rawTrainingFundSavings = inputs.currentTrainingFund;
         const userAge = inputs.currentAge || 30;
         
-        // Use realistic age-based estimates when values are undefined, null, or very low
-        const safeCurrentPensionSavings = (rawPensionSavings && rawPensionSavings > 1000) ? rawPensionSavings : 
-            Math.max((userAge - 22) * 12000, 50000);
-        const safeCurrentTrainingFundSavings = (rawTrainingFundSavings && rawTrainingFundSavings > 500) ? rawTrainingFundSavings : 
-            Math.max((userAge - 22) * 8000, 25000);
+        // Use actual input values; only provide age-based estimates for truly undefined values
+        const safeCurrentPensionSavings = (rawPensionSavings !== undefined && rawPensionSavings !== null) ? 
+            rawPensionSavings : Math.max((userAge - 22) * 12000, 50000);
+        const safeCurrentTrainingFundSavings = (rawTrainingFundSavings !== undefined && rawTrainingFundSavings !== null) ? 
+            rawTrainingFundSavings : Math.max((userAge - 22) * 8000, 25000);
         const totalSavings = safeCurrentPensionSavings + safeCurrentTrainingFundSavings;
         
         const formatCurrency = (amount, currency = workingCurrency) => {
@@ -116,12 +116,18 @@ const SavingsSummaryPanel = ({
                 
                 React.createElement('div', {
                     key: 'total',
-                    className: "metric-card metric-positive p-3"
+                    className: totalSavings === 0 ? "metric-card metric-neutral p-3 opacity-60" : "metric-card metric-positive p-3"
                 }, [
                     React.createElement('div', { className: "text-sm text-purple-700 font-medium" }, 
                         language === 'he' ? 'סך הכל נוכחי' : 'Total Current'),
-                    React.createElement('div', { className: "text-xl font-bold text-purple-800 wealth-amount" }, 
-                        formatCurrency(totalSavings, workingCurrency))
+                    React.createElement('div', { 
+                        className: totalSavings === 0 ? 
+                            "text-xl font-bold text-gray-500 wealth-amount" : 
+                            "text-xl font-bold text-purple-800 wealth-amount" 
+                    }, totalSavings === 0 ? 
+                        (language === 'he' ? 'לא הוזנו חיסכונות' : 'No savings entered yet') :
+                        formatCurrency(totalSavings, workingCurrency)
+                    )
                 ])
             ]),
             

@@ -17,6 +17,21 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
             insuranceHint: 'ביטוח בריאות, חיים, תרופות, טיפולים',
             other: 'הוצאות אחרות',
             otherHint: 'כרטיסי אשראי, בידור, שונות',
+            
+            // Debt Payments Section
+            debtPayments: 'תשלומי חובות',
+            debtPaymentsSubtitle: 'תשלומים חודשיים על חובות (לא יתרת החוב הכוללת)',
+            mortgage: 'תשלומי משכנתא',
+            mortgageHint: 'תשלום חודשי למשכנתא (קרן + ריבית)',
+            carLoan: 'הלוואת רכב',
+            carLoanHint: 'תשלום חודשי על הלוואת רכב',
+            creditCard: 'כרטיסי אשראי',
+            creditCardHint: 'תשלום מינימלי או קבוע על כרטיסי אשראי',
+            otherDebt: 'הלוואות אחרות', 
+            otherDebtHint: 'הלוואות אישיות, חובות אחרים',
+            totalDebt: 'סך תשלומי חובות',
+            debtToIncomeRatio: 'יחס חוב להכנסה',
+            
             total: 'סה"כ הוצאות חודשיות',
             yearlyAdjustment: 'התאמה שנתית צפויה',
             adjustmentHint: 'כמה אתה צופה שההוצאות שלך ישתנו בשנה',
@@ -30,7 +45,12 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
                 highHousing: 'הוצאות הדיור שלך גבוהות מהממוצע. שקול לבדוק אפשרויות חיסכון.',
                 goodSavings: 'שיעור חיסכון מצוין! אתה בדרך הנכונה.',
                 lowSavings: 'שיעור החיסכון נמוך. נסה לצמצם הוצאות לא הכרחיות.',
-                balanced: 'חלוקת ההוצאות שלך מאוזנת.'
+                balanced: 'חלוקת ההוצאות שלך מאוזנת.',
+                lowDebt: 'יחס החוב שלך נמוך - מצוין! יש לך מרחב נוסף לחיסכון.',
+                moderateDebt: 'יחס החוב שלך בסדר. שקול לשלם יותר על חובות עם ריבית גבוהה.',
+                highDebt: 'יחס החוב שלך גבוה. שקול לאחד חובות או להגדיל תשלומים.',
+                criticalDebt: 'יחס החוב שלך קריטי. דרושה תכנית דחופה לצמצום חובות.',
+                negativeIncome: 'הוצאות + חובות עולים על ההכנסה. נדרש תכנון מיידי.'
             }
         },
         en: {
@@ -46,6 +66,21 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
             insuranceHint: 'Health insurance, life insurance, medications, treatments',
             other: 'Other Expenses',
             otherHint: 'Credit cards, entertainment, miscellaneous',
+            
+            // Debt Payments Section
+            debtPayments: 'Debt Payments',
+            debtPaymentsSubtitle: 'Monthly debt service payments (not total loan balances)',
+            mortgage: 'Mortgage Payments',
+            mortgageHint: 'Monthly mortgage payment (principal + interest)',
+            carLoan: 'Car Loan Payments',
+            carLoanHint: 'Monthly car loan payment',
+            creditCard: 'Credit Card Payments',
+            creditCardHint: 'Minimum or regular credit card payments',
+            otherDebt: 'Other Loan Payments',
+            otherDebtHint: 'Personal loans, other debt obligations',
+            totalDebt: 'Total Debt Payments',
+            debtToIncomeRatio: 'Debt-to-Income Ratio',
+            
             total: 'Total Monthly Expenses',
             yearlyAdjustment: 'Expected Yearly Adjustment',
             adjustmentHint: 'How much you expect your expenses to change per year',
@@ -59,7 +94,14 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
                 highHousing: 'Your housing expenses are above average. Consider exploring savings options.',
                 goodSavings: 'Excellent savings rate! You\'re on the right track.',
                 lowSavings: 'Low savings rate. Try to reduce non-essential expenses.',
-                balanced: 'Your expense distribution is well balanced.'
+                balanced: 'Your expense distribution is well balanced.',
+                lowDebt: 'Excellent debt management! You have more room for savings.',
+                moderateDebt: 'Manageable debt load. Consider paying extra on high-interest debt.',
+                highDebt: 'High debt load. Consider debt consolidation or accelerated payments.',
+                criticalDebt: 'Critical debt situation. Urgent debt reduction plan needed.',
+                negativeIncome: 'Expenses + debt exceed income. Immediate budgeting required.',
+                debtDurationNote: 'Note: Long-term debt (mortgage, car loans) may end before retirement.',
+                mortgageAdvice: 'Mortgage will likely be paid off before retirement - factor this into your planning.'
             }
         }
     };
@@ -85,42 +127,84 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
                     food: 0,
                     insurance: 0,
                     other: 0,
+                    // Debt payment categories
+                    mortgage: 0,
+                    carLoan: 0,
+                    creditCard: 0,
+                    otherDebt: 0,
                     yearlyAdjustment: 2.5 // Default inflation rate
                 }
             }));
         }
     }, []);
 
-    // Calculate total expenses
+    // Calculate total expenses (excluding debt payments)
     const totalExpenses = React.useMemo(() => {
         if (!inputs.expenses) return 0;
-        return Object.keys(inputs.expenses)
-            .filter(key => key !== 'yearlyAdjustment')
-            .reduce((sum, key) => sum + (parseFloat(inputs.expenses[key]) || 0), 0);
+        const expenseCategories = ['housing', 'transportation', 'food', 'insurance', 'other'];
+        return expenseCategories.reduce((sum, key) => sum + (parseFloat(inputs.expenses[key]) || 0), 0);
     }, [inputs.expenses]);
 
-    // Calculate savings rate
+    // Calculate total debt payments
+    const totalDebtPayments = React.useMemo(() => {
+        if (!inputs.expenses) return 0;
+        const debtCategories = ['mortgage', 'carLoan', 'creditCard', 'otherDebt'];
+        return debtCategories.reduce((sum, key) => sum + (parseFloat(inputs.expenses[key]) || 0), 0);
+    }, [inputs.expenses]);
+
+    // Calculate debt-to-income ratio
+    const debtToIncomeRatio = React.useMemo(() => {
+        if (!monthlyIncome || monthlyIncome === 0) return 0;
+        return (totalDebtPayments / monthlyIncome) * 100;
+    }, [monthlyIncome, totalDebtPayments]);
+
+    // Calculate savings rate (updated to account for debt)
     const savingsRate = React.useMemo(() => {
         if (!monthlyIncome || monthlyIncome === 0) return 0;
-        const savings = monthlyIncome - totalExpenses;
-        return Math.max(0, (savings / monthlyIncome) * 100);
-    }, [monthlyIncome, totalExpenses]);
+        const netIncome = monthlyIncome - totalExpenses - totalDebtPayments;
+        const savings = Math.max(0, netIncome);
+        return (savings / monthlyIncome) * 100;
+    }, [monthlyIncome, totalExpenses, totalDebtPayments]);
 
-    // Calculate category percentages
+    // Calculate category percentages (for expense categories only)
     const categoryPercentages = React.useMemo(() => {
         if (!totalExpenses || totalExpenses === 0) return {};
         const percentages = {};
-        Object.keys(inputs.expenses || {}).forEach(key => {
-            if (key !== 'yearlyAdjustment') {
-                percentages[key] = ((parseFloat(inputs.expenses[key]) || 0) / totalExpenses) * 100;
-            }
+        const expenseCategories = ['housing', 'transportation', 'food', 'insurance', 'other'];
+        expenseCategories.forEach(key => {
+            percentages[key] = ((parseFloat(inputs.expenses?.[key]) || 0) / totalExpenses) * 100;
         });
         return percentages;
     }, [inputs.expenses, totalExpenses]);
 
-    // Handle expense input change
+    // Handle expense input change with validation
     const handleExpenseChange = (category, value) => {
         const numValue = parseFloat(value) || 0;
+        
+        // Validation: Prevent negative values
+        if (numValue < 0) {
+            console.warn(`Negative value not allowed for ${category}: ${value}`);
+            return;
+        }
+        
+        // Validation: Reasonable maximum limits to prevent data entry errors
+        const maxLimits = {
+            housing: 50000,      // Maximum ₪50,000 housing
+            transportation: 20000, // Maximum ₪20,000 transportation
+            food: 15000,         // Maximum ₪15,000 food
+            insurance: 10000,    // Maximum ₪10,000 insurance
+            other: 25000,        // Maximum ₪25,000 other expenses
+            mortgage: 40000,     // Maximum ₪40,000 mortgage
+            carLoan: 15000,      // Maximum ₪15,000 car loan
+            creditCard: 10000,   // Maximum ₪10,000 credit card
+            otherDebt: 20000     // Maximum ₪20,000 other debt
+        };
+        
+        if (numValue > maxLimits[category]) {
+            console.warn(`Value ${numValue} exceeds reasonable limit for ${category}: ${maxLimits[category]}`);
+            // Still allow but warn - user might have high expenses
+        }
+        
         setInputs(prev => ({
             ...prev,
             expenses: {
@@ -130,9 +214,15 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
         }));
     };
 
-    // Handle yearly adjustment change
+    // Handle yearly adjustment change with validation
     const handleAdjustmentChange = (value) => {
         const numValue = parseFloat(value) || 0;
+        
+        // Validation: Reasonable range for yearly adjustment (-10% to +15%)
+        if (numValue < -10 || numValue > 15) {
+            console.warn(`Yearly adjustment ${numValue}% is outside reasonable range (-10% to +15%)`);
+        }
+        
         setInputs(prev => ({
             ...prev,
             expenses: {
@@ -142,22 +232,93 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
         }));
     };
 
-    // Smart suggestions based on expense patterns
+    // Smart suggestions based on expense patterns and debt analysis with enhanced validation
     const getSmartSuggestions = () => {
         const suggestions = [];
         
+        // Validation: Check for data completeness
+        if (!monthlyIncome || monthlyIncome === 0) {
+            suggestions.push(language === 'he' ? 
+                'הוסף מידע על הכנסה חודשית בשלב 2 לקבלת המלצות מדויקות' :
+                'Add monthly income information in Step 2 for accurate recommendations');
+            return suggestions;
+        }
+        
+        // Check for negative cash flow (critical validation)
+        const netIncome = monthlyIncome - totalExpenses - totalDebtPayments;
+        if (netIncome < 0) {
+            suggestions.push(t.suggestions.negativeIncome);
+            return suggestions; // Critical situation - only show this warning
+        }
+        
+        // Validation: Check for extremely low income vs expenses
+        if (totalExpenses > monthlyIncome * 0.9) {
+            suggestions.push(language === 'he' ? 
+                'ההוצאות שלך כמעט שוות להכנסה - שקול לצמצם הוצאות או להגדיל הכנסה' :
+                'Your expenses nearly equal your income - consider reducing expenses or increasing income');
+        }
+        
         // Check housing expenses (typically should be < 30% of income)
-        if (monthlyIncome > 0 && inputs.expenses?.housing > monthlyIncome * 0.3) {
+        if (inputs.expenses?.housing > monthlyIncome * 0.3) {
             suggestions.push(t.suggestions.highHousing);
         }
         
-        // Check savings rate
+        // Enhanced debt analysis with specific recommendations
+        if (debtToIncomeRatio <= 10) {
+            suggestions.push(t.suggestions.lowDebt);
+        } else if (debtToIncomeRatio <= 20) {
+            suggestions.push(t.suggestions.moderateDebt);
+            
+            // Specific credit card debt warning
+            if (inputs.expenses?.creditCard > inputs.expenses?.mortgage) {
+                suggestions.push(language === 'he' ? 
+                    'חוב כרטיסי האשראי גבוה מהמשכנתא - שקול להעביר לחוב עם ריבית נמוכה יותר' :
+                    'Credit card debt is higher than mortgage - consider transferring to lower-interest debt');
+            }
+        } else if (debtToIncomeRatio <= 35) {
+            suggestions.push(t.suggestions.highDebt);
+        } else if (debtToIncomeRatio > 35) {
+            suggestions.push(t.suggestions.criticalDebt);
+        }
+        
+        // Add debt duration awareness
+        if (totalDebtPayments > 0 && (inputs.expenses?.mortgage > 0 || inputs.expenses?.carLoan > 0)) {
+            suggestions.push(t.suggestions.debtDurationNote);
+        }
+        
+        // Enhanced savings rate analysis
         if (savingsRate >= 20) {
             suggestions.push(t.suggestions.goodSavings);
         } else if (savingsRate < 10) {
             suggestions.push(t.suggestions.lowSavings);
-        } else {
+        } else if (debtToIncomeRatio <= 10) {
             suggestions.push(t.suggestions.balanced);
+        }
+        
+        // Validation: Check for unusually high individual expense categories
+        if (inputs.expenses) {
+            const expenseWarnings = [];
+            
+            if (inputs.expenses.transportation > monthlyIncome * 0.2) {
+                expenseWarnings.push(language === 'he' ? 
+                    'הוצאות התחבורה גבוהות מהממוצע (>20% מההכנסה)' :
+                    'Transportation expenses are above average (>20% of income)');
+            }
+            
+            if (inputs.expenses.food > monthlyIncome * 0.15) {
+                expenseWarnings.push(language === 'he' ? 
+                    'הוצאות מזון גבוהות מהממוצע (>15% מההכנסה)' :
+                    'Food expenses are above average (>15% of income)');
+            }
+            
+            suggestions.push(...expenseWarnings);
+        }
+        
+        // Edge case: Very low debt with high savings potential
+        if (debtToIncomeRatio < 5 && savingsRate < 15) {
+            suggestions.push(language === 'he' ? 
+                'החוב שלך נמוך - זו הזדמנות מצוינת להגדיל את החיסכון לפרישה' :
+                'Your debt is low - great opportunity to increase retirement savings');
         }
         
         return suggestions;
@@ -173,6 +334,22 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
         { key: 'insurance', label: t.insurance, hint: t.insuranceHint, icon: '🏥', color: 'red' },
         { key: 'other', label: t.other, hint: t.otherHint, icon: '💳', color: 'purple' }
     ];
+
+    // Debt payment categories with icons
+    const debtCategories = [
+        { key: 'mortgage', label: t.mortgage, hint: t.mortgageHint, icon: '🏡', color: 'orange' },
+        { key: 'carLoan', label: t.carLoan, hint: t.carLoanHint, icon: '🚙', color: 'orange' },
+        { key: 'creditCard', label: t.creditCard, hint: t.creditCardHint, icon: '💳', color: 'red' },
+        { key: 'otherDebt', label: t.otherDebt, hint: t.otherDebtHint, icon: '📋', color: 'orange' }
+    ];
+
+    // Helper function to get debt color based on ratio
+    const getDebtColor = (ratio) => {
+        if (ratio <= 10) return 'green';
+        if (ratio <= 20) return 'yellow';
+        if (ratio <= 35) return 'orange';
+        return 'red';
+    };
 
     return React.createElement('div', { 
         className: "expense-tracking-step space-y-8" 
@@ -255,6 +432,122 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
             ])
         )),
 
+        // Debt Payments Section
+        React.createElement('div', {
+            key: 'debt-payments-section',
+            className: 'space-y-4'
+        }, [
+            // Debt section header
+            React.createElement('div', {
+                key: 'debt-header',
+                className: 'border-t border-gray-200 pt-6'
+            }, [
+                React.createElement('h3', {
+                    key: 'debt-title',
+                    className: 'text-xl font-semibold text-gray-800 mb-2 flex items-center gap-3'
+                }, [
+                    React.createElement('span', { key: 'icon', className: 'text-2xl' }, '💰'),
+                    t.debtPayments
+                ]),
+                React.createElement('p', {
+                    key: 'debt-subtitle',
+                    className: 'text-gray-600 text-sm mb-4'
+                }, t.debtPaymentsSubtitle)
+            ]),
+
+            // Debt input fields
+            ...debtCategories.map(category => 
+                React.createElement('div', {
+                    key: category.key,
+                    className: 'bg-white p-4 rounded-lg shadow-sm border border-orange-200'
+                }, [
+                    React.createElement('div', {
+                        key: 'category-header',
+                        className: 'flex items-center justify-between mb-2'
+                    }, [
+                        React.createElement('div', {
+                            key: 'label-container',
+                            className: 'flex items-center gap-3'
+                        }, [
+                            React.createElement('span', {
+                                key: 'icon',
+                                className: 'text-2xl'
+                            }, category.icon),
+                            React.createElement('div', {
+                                key: 'label-text'
+                            }, [
+                                React.createElement('label', {
+                                    key: 'label',
+                                    htmlFor: `debt-${category.key}`,
+                                    className: 'font-medium text-gray-800'
+                                }, category.label),
+                                React.createElement('p', {
+                                    key: 'hint',
+                                    className: 'text-sm text-gray-500'
+                                }, category.hint)
+                            ])
+                        ])
+                    ]),
+                    React.createElement('div', {
+                        key: 'input-container',
+                        className: 'flex items-center gap-2'
+                    }, [
+                        React.createElement('span', {
+                            key: 'currency',
+                            className: 'text-gray-500'
+                        }, workingCurrency === 'ILS' ? '₪' : workingCurrency),
+                        React.createElement('input', {
+                            key: 'input',
+                            id: `debt-${category.key}`,
+                            type: 'number',
+                            min: '0',
+                            step: '100',
+                            value: inputs.expenses?.[category.key] || '',
+                            onChange: (e) => handleExpenseChange(category.key, e.target.value),
+                            className: 'flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500',
+                            placeholder: '0'
+                        })
+                    ])
+                ])
+            ),
+
+            // Debt Summary
+            totalDebtPayments > 0 && React.createElement('div', {
+                key: 'debt-summary',
+                className: `bg-${getDebtColor(debtToIncomeRatio)}-50 p-4 rounded-lg border border-${getDebtColor(debtToIncomeRatio)}-200`
+            }, [
+                React.createElement('div', {
+                    key: 'debt-totals',
+                    className: 'grid grid-cols-2 gap-4'
+                }, [
+                    React.createElement('div', {
+                        key: 'total-debt'
+                    }, [
+                        React.createElement('p', {
+                            key: 'label',
+                            className: 'text-sm text-gray-600'
+                        }, t.totalDebt),
+                        React.createElement('p', {
+                            key: 'value',
+                            className: `text-xl font-bold text-${getDebtColor(debtToIncomeRatio)}-700`
+                        }, formatCurrency ? formatCurrency(totalDebtPayments, workingCurrency) : `${workingCurrency} ${totalDebtPayments.toLocaleString()}`)
+                    ]),
+                    React.createElement('div', {
+                        key: 'debt-ratio'
+                    }, [
+                        React.createElement('p', {
+                            key: 'label',
+                            className: 'text-sm text-gray-600'
+                        }, t.debtToIncomeRatio),
+                        React.createElement('p', {
+                            key: 'value',
+                            className: `text-xl font-bold text-${getDebtColor(debtToIncomeRatio)}-700`
+                        }, `${debtToIncomeRatio.toFixed(1)}%`)
+                    ])
+                ])
+            ])
+        ]),
+
         // Total and Summary
         React.createElement('div', {
             key: 'summary',
@@ -301,7 +594,7 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
                     React.createElement('p', {
                         key: 'value',
                         className: 'text-xl font-bold text-gray-800'
-                    }, formatCurrency ? formatCurrency(monthlyIncome - totalExpenses, workingCurrency) : `${workingCurrency} ${(monthlyIncome - totalExpenses).toLocaleString()}`)
+                    }, formatCurrency ? formatCurrency(monthlyIncome - totalExpenses - totalDebtPayments, workingCurrency) : `${workingCurrency} ${(monthlyIncome - totalExpenses - totalDebtPayments).toLocaleString()}`)
                 ])
             ])
         ]),
