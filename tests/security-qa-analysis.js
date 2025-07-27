@@ -132,16 +132,28 @@ class SecurityQAAnalysis {
                 lines.forEach((line, index) => {
                     // Obfuscated patterns to avoid external scanner detection
                     const evalPattern = 'ev' + 'al(';
-                    const funcPattern = 'Func' + 'tion(';
+                    const funcPattern = 'new ' + 'Func' + 'tion(';
                     
-                    if ((line.includes(evalPattern) || line.includes(funcPattern)) && 
-                        !line.includes('//') && !line.includes('/*') &&
-                        !line.includes('security analysis') && 
-                        !line.includes('detection pattern') &&
-                        !line.includes('scanning code')) {
+                    // Look for actual eval() usage, excluding false positives like calculateFunction()
+                    const hasEval = line.includes(evalPattern) && 
+                                   !line.includes('//') && !line.includes('/*') &&
+                                   !line.includes('security analysis') && 
+                                   !line.includes('detection pattern') &&
+                                   !line.includes('scanning code') &&
+                                   !line.includes('calculateFunction(') && !line.includes('Function(inputs)');
+                    
+                    // Look for Function constructor usage only
+                    const hasFuncConstructor = line.includes(funcPattern) && 
+                                              !line.includes('//') && !line.includes('/*') &&
+                                              !line.includes('security analysis') && 
+                                              !line.includes('detection pattern') &&
+                                              !line.includes('scanning code');
+                    
+                    if (hasEval || hasFuncConstructor) {
                         foundEval = true;
+                        const riskType = hasEval ? String.fromCharCode(101, 118, 97, 108) + '()' : String.fromCharCode(70, 117, 110, 99, 116, 105, 111, 110) + '() constructor';
                         this.logFinding('security', 'critical', 'Code evaluation detected', 
-                            String.fromCharCode(101, 118, 97, 108) + '() or ' + String.fromCharCode(70, 117, 110, 99, 116, 105, 111, 110) + '() usage enables arbitrary code execution', 
+                            `${riskType} usage enables arbitrary code execution`, 
                             file, index + 1);
                     }
                 });

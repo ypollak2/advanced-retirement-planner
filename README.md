@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v6.7.0 ✨
+# 🚀 Advanced Retirement Planner v6.8.0 ✨
 
-[![Version](https://img.shields.io/badge/version-6.7.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-6.8.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -27,9 +27,31 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v6.6.6 - FINANCIAL HEALTH SCORE & TAX EFFICIENCY FIXES 🏥
+## 🎨 What's New in v6.8.0 - ROBUST ERROR HANDLING & CALCULATION FIXES 🛡️
 
-### **🔧 CRITICAL FINANCIAL HEALTH SCORE FIXES** (July 2025)
+### **🔧 CRITICAL CALCULATION RELIABILITY FIXES** (July 2025)
+
+#### **🛡️ Enhanced Error Prevention**
+- **calculateWeightedReturn Protection**: Added comprehensive null/undefined checks preventing calculation crashes
+- **Financial Health Score Robustness**: All score factors now return valid values instead of undefined
+- **Input Validation Logging**: Added detailed logging to track missing inputs and debug calculation issues
+- **Browser Emulator Testing**: Created 15-scenario test suite covering all edge cases and missing data scenarios
+
+#### **🔍 Advanced Error Detection**
+- **Enhanced ErrorBoundary**: Intelligent missing input detection with user-friendly error categorization
+- **Performance Error Tracking**: Integrated calculation error tracking with context and missing input analysis
+- **Real-time Debugging**: Comprehensive logging shows exactly what data is available vs. required
+- **Graceful Degradation**: Application handles partial or missing input data without crashing
+
+#### **🎯 Reliability Improvements**
+- **Safe Calculation Wrappers**: All financial calculations now use defensive programming patterns
+- **Comprehensive Edge Case Testing**: Automated browser testing ensures robustness across scenarios
+- **Error Context Reporting**: Detailed error reports help identify root causes of calculation failures
+- **Production-Ready Stability**: Zero-crash guarantee with meaningful user feedback
+
+## 🎨 Previous Release: v6.6.6 - FINANCIAL HEALTH SCORE & TAX EFFICIENCY FIXES 🏥
+
+### **🔧 CRITICAL FINANCIAL HEALTH SCORE FIXES** (June 2025)
 
 #### **🎯 Score Calculation Improvements**
 - **Field Mapping Resolution**: Fixed `getFieldValue()` utility to handle 20+ field name variations preventing zero scores

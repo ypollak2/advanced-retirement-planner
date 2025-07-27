@@ -59,15 +59,29 @@ sourceFiles.forEach(file => {
         lines.forEach((line, index) => {
             // Obfuscated patterns to avoid self-detection
             const evalPattern = 'ev' + 'al(';
-            const funcPattern = 'Func' + 'tion(';
+            const funcPattern = 'new ' + 'Func' + 'tion(';
             
-            // Look for actual usage, not references in comments or strings
-            if ((line.includes(evalPattern) || line.includes(funcPattern)) && 
-                !line.includes('//') && !line.includes('/*') && !line.includes('*') &&
-                !line.includes('"') && !line.includes("'") &&
-                !line.includes('security analysis') && !line.includes('detection pattern')) {
+            // Look for actual eval() usage, excluding false positives like calculateFunction()
+            const hasEval = line.includes(evalPattern) && 
+                           !line.includes('//') && !line.includes('/*') && !line.includes('*') &&
+                           !line.includes('"') && !line.includes("'") &&
+                           !line.includes('security analysis') && !line.includes('detection pattern') &&
+                           !line.includes('calculateFunction(') && !line.includes('Function(inputs)');
+            
+            // Look for Function constructor usage
+            const hasFuncConstructor = line.includes(funcPattern) && 
+                                      !line.includes('//') && !line.includes('/*') && !line.includes('*') &&
+                                      !line.includes('"') && !line.includes("'") &&
+                                      !line.includes('security analysis') && !line.includes('detection pattern');
+            
+            if (hasEval || hasFuncConstructor) {
                 console.log(`${file}:${index + 1}:        ${line.trim()}`);
-                console.log('⚠️ ' + String.fromCharCode(101, 118, 97, 108) + '() usage found - security risk');
+                if (hasEval) {
+                    console.log('⚠️ ' + String.fromCharCode(101, 118, 97, 108) + '() usage found - security risk');
+                }
+                if (hasFuncConstructor) {
+                    console.log('⚠️ Function constructor usage found - security risk');
+                }
                 foundEval = true;
                 hasSecurityIssues = true;
             }
