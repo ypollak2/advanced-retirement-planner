@@ -44,7 +44,15 @@
                 diversificationTooltip: 'Spread across asset classes, regions, and sectors.',
                 emergencyFundTooltip: 'Liquid savings for unexpected expenses. Target: 6 months.',
                 debtManagementTooltip: 'Managing debt levels for financial flexibility.',
-                timeHorizonTooltip: 'Years until retirement affects investment strategy.'
+                timeHorizonTooltip: 'Years until retirement affects investment strategy.',
+                // Debug messages
+                missingData: 'Missing data',
+                checkInputs: 'Please check your inputs',
+                whyZeroScore: 'Why is this score 0?',
+                noIncomeFound: 'No monthly income data found',
+                noContributionsFound: 'No contribution rates found',
+                addSalaryData: 'Add salary information in Step 2',
+                addContributionData: 'Add contribution rates in Step 4'
             },
             he: {
                 financialHealthScore: 'ציון הבריאות הפיננסית',
@@ -81,7 +89,15 @@
                 diversificationTooltip: 'פיזור בין סוגי נכסים, אזורים ומגזרים.',
                 emergencyFundTooltip: 'חיסכון נזיל להוצאות בלתי צפויות. יעד: 6 חודשים.',
                 debtManagementTooltip: 'ניהול רמות חוב לגמישות פיננסית.',
-                timeHorizonTooltip: 'שנים עד פרישה משפיעות על אסטרטגיית ההשקעה.'
+                timeHorizonTooltip: 'שנים עד פרישה משפיעות על אסטרטגיית ההשקעה.',
+                // Debug messages
+                missingData: 'חסרים נתונים',
+                checkInputs: 'אנא בדוק את הנתונים שהזנת',
+                whyZeroScore: 'למה הציון הזה 0?',
+                noIncomeFound: 'לא נמצאו נתוני הכנסה חודשית',
+                noContributionsFound: 'לא נמצאו שיעורי הפקדה',
+                addSalaryData: 'הוסף מידע על שכר בשלב 2',
+                addContributionData: 'הוסף שיעורי הפקדה בשלב 4'
             }
         };
 
@@ -109,16 +125,29 @@
         const renderScoreFactor = (factorKey, factorData, factorInfo) => {
             const score = factorData?.score || 0;
             const details = factorData?.details || {};
+            const debugInfo = details?.debugInfo || {};
             const tooltipKey = factorKey + 'Tooltip';
             const tooltip = t[tooltipKey] || factorInfo?.description || '';
             
             let detailText = '';
+            let debugText = '';
+            
             switch(factorKey) {
                 case 'savingsRate':
                     detailText = details.rate ? `${t.currentRate}: ${details.rate.toFixed(1)}%` : '';
+                    if (score === 0) {
+                        if (debugInfo.reason === 'No monthly income found') {
+                            debugText = `${t.noIncomeFound}. ${t.addSalaryData}`;
+                        } else if (!debugInfo.contributionsFound) {
+                            debugText = `${t.noContributionsFound}. ${t.addContributionData}`;
+                        }
+                    }
                     break;
                 case 'taxEfficiency':
                     detailText = details.efficiencyScore ? `${t.currentEfficiency}: ${details.efficiencyScore.toFixed(0)}%` : '';
+                    if (score === 0 && debugInfo.ratesFound) {
+                        debugText = `${t.noContributionsFound}. ${t.addContributionData}`;
+                    }
                     break;
                 case 'timeHorizon':
                     detailText = details.yearsToRetirement ? `${t.yearsRemaining}: ${details.yearsToRetirement}` : '';
@@ -144,8 +173,15 @@
                 }, Math.round(score)),
                 createElement('div', {
                     key: 'label',
-                    className: "text-sm text-gray-600 cursor-help"
-                }, t[factorKey] || factorInfo?.name || factorKey),
+                    className: "text-sm text-gray-600 cursor-help flex items-center justify-center"
+                }, [
+                    createElement('span', { key: 'label-text' }, t[factorKey] || factorInfo?.name || factorKey),
+                    score === 0 && createElement('span', {
+                        key: 'warning-icon',
+                        className: "ml-1 text-red-500",
+                        title: t.whyZeroScore
+                    }, '❓')
+                ]),
                 
                 // Tooltip
                 createElement('div', {
@@ -167,7 +203,14 @@
                         detailText && createElement('div', { 
                             key: 'tooltip-details', 
                             className: "text-xs opacity-80" 
-                        }, detailText)
+                        }, detailText),
+                        debugText && createElement('div', { 
+                            key: 'tooltip-debug', 
+                            className: "text-xs bg-red-600 bg-opacity-20 p-2 rounded mt-2" 
+                        }, [
+                            createElement('span', { key: 'debug-icon', className: "mr-1" }, '⚠️'),
+                            createElement('span', { key: 'debug-text' }, debugText)
+                        ])
                     ]),
                     createElement('div', {
                         key: 'tooltip-arrow',
@@ -336,6 +379,46 @@
                 healthReport.factors.timeHorizon && 
                     renderScoreFactor('timeToRetirement', healthReport.factors.timeHorizon, window.SCORE_FACTORS?.timeHorizon)
             ].filter(Boolean)),
+
+            // Debug panel for zero scores
+            (healthReport.debugInfo?.zeroScoreFactors?.length > 0 || 
+             Object.values(healthReport.factors || {}).some(f => f.score === 0)) &&
+            createElement('div', {
+                key: 'debug-panel',
+                className: "mt-4 bg-amber-50 border border-amber-200 rounded-lg p-4"
+            }, [
+                createElement('h4', {
+                    key: 'debug-title',
+                    className: "font-semibold text-amber-800 mb-2 flex items-center"
+                }, [
+                    createElement('span', { key: 'icon', className: "mr-2" }, '⚠️'),
+                    createElement('span', { key: 'text' }, t.missingData || 'Missing Data')
+                ]),
+                createElement('div', { key: 'debug-items', className: "space-y-2" },
+                    Object.entries(healthReport.factors || {}).filter(([_, f]) => f.score === 0).map(([factorName, factorData]) => {
+                        const debugInfo = factorData.details?.debugInfo || {};
+                        let message = '';
+                        
+                        if (factorName === 'savingsRate' && debugInfo.reason) {
+                            message = debugInfo.reason === 'No monthly income found' ? 
+                                t.addSalaryData : t.addContributionData;
+                        } else if (factorName === 'taxEfficiency') {
+                            message = t.addContributionData;
+                        }
+                        
+                        return createElement('div', {
+                            key: `debug-${factorName}`,
+                            className: "text-sm text-amber-700"
+                        }, [
+                            createElement('span', { key: 'factor', className: "font-medium" }, 
+                                t[factorName] || factorName),
+                            createElement('span', { key: 'colon' }, ': '),
+                            createElement('span', { key: 'message' }, 
+                                message || t.checkInputs || 'Please check your inputs')
+                        ]);
+                    })
+                )
+            ]),
 
             // Improvement Suggestions
             healthReport.suggestions && healthReport.suggestions.length > 0 && 

@@ -915,6 +915,116 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                 key: 'total-help',
                 className: "text-sm text-green-600" 
             }, t.incomeBreakdown)
+        ]),
+        
+        // Tax Impact Preview for Additional Income
+        (inputs.annualBonus > 0 || inputs.quarterlyRSU > 0 || inputs.freelanceIncome > 0 || inputs.rentalIncome > 0 || inputs.dividendIncome > 0) && 
+        createElement('div', {
+            key: 'tax-impact-preview',
+            className: "bg-gradient-to-r from-red-50 to-orange-50 rounded-xl p-6 border border-red-200 mt-6"
+        }, [
+            createElement('h3', {
+                key: 'tax-preview-title',
+                className: "text-xl font-semibold text-red-700 mb-4 flex items-center"
+            }, [
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '🧮'),
+                language === 'he' ? 'תחזית מס על הכנסות נוספות' : 'Tax Preview on Additional Income'
+            ]),
+            (() => {
+                // Calculate tax impact
+                if (window.TaxCalculators && window.TaxCalculators.calculateAdditionalIncomeTax) {
+                    const taxInfo = window.TaxCalculators.calculateAdditionalIncomeTax(inputs);
+                    if (taxInfo) {
+                        return createElement('div', { key: 'tax-details', className: "space-y-3" }, [
+                            // Total additional income
+                            createElement('div', { key: 'total-additional', className: "flex justify-between items-center pb-3 border-b border-red-200" }, [
+                                createElement('span', { key: 'label', className: "text-gray-700" }, 
+                                    language === 'he' ? 'סך הכנסות נוספות (ברוטו)' : 'Total Additional Income (Gross)'),
+                                createElement('span', { key: 'value', className: "font-semibold text-gray-900" }, 
+                                    formatCurrency(taxInfo.totalAdditionalIncome))
+                            ]),
+                            
+                            // Tax amount
+                            createElement('div', { key: 'tax-amount', className: "flex justify-between items-center" }, [
+                                createElement('span', { key: 'label', className: "text-red-700" }, 
+                                    language === 'he' ? 'מס משוער' : 'Estimated Tax'),
+                                createElement('span', { key: 'value', className: "font-semibold text-red-800" }, 
+                                    formatCurrency(taxInfo.totalAdditionalTax))
+                            ]),
+                            
+                            // Net amount
+                            createElement('div', { key: 'net-amount', className: "flex justify-between items-center pt-3 border-t border-red-200" }, [
+                                createElement('span', { key: 'label', className: "text-green-700 font-medium" }, 
+                                    language === 'he' ? 'נטו אחרי מס' : 'Net After Tax'),
+                                createElement('span', { key: 'value', className: "font-bold text-green-800 text-lg" }, 
+                                    formatCurrency(taxInfo.totalAdditionalIncome - taxInfo.totalAdditionalTax))
+                            ]),
+                            
+                            // Marginal tax rate
+                            createElement('div', { key: 'marginal-rate', className: "mt-2 text-sm text-gray-600" }, 
+                                language === 'he' ? 
+                                    `שיעור מס שולי: ${taxInfo.marginalRate}% | שיעור מס אפקטיבי: ${taxInfo.effectiveRate}%` :
+                                    `Marginal Tax Rate: ${taxInfo.marginalRate}% | Effective Tax Rate: ${taxInfo.effectiveRate}%`
+                            ),
+                            
+                            // Breakdown by income type
+                            taxInfo.breakdown && createElement('details', { 
+                                key: 'breakdown-details',
+                                className: "mt-4 bg-white rounded-lg p-4"
+                            }, [
+                                createElement('summary', {
+                                    key: 'breakdown-summary',
+                                    className: "cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900"
+                                }, language === 'he' ? 'פירוט לפי סוג הכנסה' : 'Breakdown by Income Type'),
+                                
+                                createElement('div', { key: 'breakdown-content', className: "mt-3 space-y-2 text-sm" }, [
+                                    // Bonus breakdown
+                                    taxInfo.breakdown.bonus.gross > 0 && createElement('div', { 
+                                        key: 'bonus-breakdown',
+                                        className: "flex justify-between text-gray-600"
+                                    }, [
+                                        createElement('span', { key: 'label' }, 
+                                            language === 'he' ? `בונוס (${taxInfo.breakdown.bonus.rate}% מס)` : `Bonus (${taxInfo.breakdown.bonus.rate}% tax)`),
+                                        createElement('span', { key: 'value' }, 
+                                            `${formatCurrency(taxInfo.breakdown.bonus.gross)} → ${formatCurrency(taxInfo.breakdown.bonus.net)}`)
+                                    ]),
+                                    
+                                    // RSU breakdown
+                                    taxInfo.breakdown.rsu.gross > 0 && createElement('div', { 
+                                        key: 'rsu-breakdown',
+                                        className: "flex justify-between text-gray-600"
+                                    }, [
+                                        createElement('span', { key: 'label' }, 
+                                            language === 'he' ? `RSU (${taxInfo.breakdown.rsu.rate}% מס)` : `RSU (${taxInfo.breakdown.rsu.rate}% tax)`),
+                                        createElement('span', { key: 'value' }, 
+                                            `${formatCurrency(taxInfo.breakdown.rsu.gross)} → ${formatCurrency(taxInfo.breakdown.rsu.net)}`)
+                                    ]),
+                                    
+                                    // Other income breakdown
+                                    taxInfo.breakdown.otherIncome.gross > 0 && createElement('div', { 
+                                        key: 'other-breakdown',
+                                        className: "flex justify-between text-gray-600"
+                                    }, [
+                                        createElement('span', { key: 'label' }, 
+                                            language === 'he' ? `הכנסות אחרות (${taxInfo.breakdown.otherIncome.rate}% מס)` : `Other Income (${taxInfo.breakdown.otherIncome.rate}% tax)`),
+                                        createElement('span', { key: 'value' }, 
+                                            `${formatCurrency(taxInfo.breakdown.otherIncome.gross)} → ${formatCurrency(taxInfo.breakdown.otherIncome.net)}`)
+                                    ])
+                                ])
+                            ])
+                        ]);
+                    }
+                }
+                
+                // Fallback if tax calculation not available
+                return createElement('p', { 
+                    key: 'tax-preview-unavailable',
+                    className: "text-sm text-gray-600" 
+                }, language === 'he' ? 
+                    'חישוב מס מפורט יהיה זמין בשלב הבא' : 
+                    'Detailed tax calculation will be available in the next step'
+                );
+            })()
         ])
     ]);
 };

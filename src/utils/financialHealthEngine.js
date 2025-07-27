@@ -6,6 +6,20 @@
  * Provides detailed breakdowns, actionable insights, and peer comparisons
  */
 
+// Enhanced field mapping utility with common variations
+function getFieldValue(inputs, fieldNames) {
+    for (const fieldName of fieldNames) {
+        const value = inputs[fieldName];
+        if (value !== undefined && value !== null && value !== '') {
+            const parsed = parseFloat(value);
+            if (!isNaN(parsed)) {
+                return parsed;
+            }
+        }
+    }
+    return 0;
+}
+
 // Score factor definitions with weights and benchmarks
 const SCORE_FACTORS = {
     savingsRate: {
@@ -119,25 +133,55 @@ const COUNTRY_FACTORS = {
  * Calculate savings rate score
  */
 function calculateSavingsRateScore(inputs) {
-    const monthlyIncome = parseFloat(inputs.currentMonthlySalary || inputs.partner1Salary || 0);
+    // Enhanced field mapping with common variations
+    const monthlyIncome = getFieldValue(inputs, [
+        'currentMonthlySalary', 'currentSalary', 'partner1Salary', 
+        'monthlySalary', 'salary', 'monthly_salary', 'monthlyIncome'
+    ]);
     
     // Calculate monthly contributions from multiple sources with better field mapping
-    let monthlyContributions = parseFloat(inputs.monthlyContribution || 0);
+    let monthlyContributions = getFieldValue(inputs, [
+        'monthlyContribution', 'monthly_contribution', 'monthlyContributions'
+    ]);
     
     // If monthlyContribution is not set, calculate from pension/training fund rates
     if (monthlyContributions === 0 && monthlyIncome > 0) {
-        const pensionRate = parseFloat(inputs.pensionContributionRate || inputs.employeePensionRate || inputs.pensionEmployee || 0);
-        const trainingFundRate = parseFloat(inputs.trainingFundContributionRate || inputs.trainingFundEmployeeRate || inputs.trainingFundEmployee || 0);
+        const pensionRate = getFieldValue(inputs, [
+            'pensionContributionRate', 'employeePensionRate', 'pensionEmployee',
+            'pension_employee', 'pensionEmployeeRate', 'pensionRate', 'employeeContribution'
+        ]);
+        const trainingFundRate = getFieldValue(inputs, [
+            'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee',
+            'training_fund_employee', 'trainingFundRate', 'trainingFundContribution'
+        ]);
         
         // Calculate contributions as percentage of salary
         monthlyContributions = monthlyIncome * (pensionRate + trainingFundRate) / 100;
         
         // Also include additional savings if available
-        const additionalSavings = parseFloat(inputs.additionalMonthlySavings || inputs.monthlyInvestment || 0);
+        const additionalSavings = getFieldValue(inputs, [
+            'additionalMonthlySavings', 'monthlyInvestment', 'additionalSavings',
+            'additional_savings', 'monthlyAdditionalSavings'
+        ]);
         monthlyContributions += additionalSavings;
     }
     
-    if (monthlyIncome === 0) return { score: 0, details: { rate: 0, status: 'unknown', monthlyAmount: 0 } };
+    // Add null/zero validation
+    if (monthlyIncome === 0 || isNaN(monthlyIncome)) {
+        return { 
+            score: 0, 
+            details: { 
+                rate: 0, 
+                status: 'unknown', 
+                monthlyAmount: 0,
+                debugInfo: {
+                    reason: 'No monthly income found',
+                    fieldsChecked: ['currentMonthlySalary', 'currentSalary', 'partner1Salary'],
+                    fieldsFound: 'none'
+                }
+            } 
+        };
+    }
     
     const savingsRate = (monthlyContributions / monthlyIncome) * 100;
     const maxScore = SCORE_FACTORS.savingsRate.weight;
@@ -172,7 +216,15 @@ function calculateSavingsRateScore(inputs) {
             target: SCORE_FACTORS.savingsRate.benchmarks.good,
             improvement: Math.max(0, (SCORE_FACTORS.savingsRate.benchmarks.good - savingsRate) * monthlyIncome / 100),
             calculationMethod: monthlyContributions > 0 ? 
-                (inputs.monthlyContribution ? 'direct' : 'calculated_from_rates') : 'no_contributions'
+                (inputs.monthlyContribution ? 'direct' : 'calculated_from_rates') : 'no_contributions',
+            debugInfo: {
+                monthlyIncomeFound: monthlyIncome > 0,
+                contributionsFound: monthlyContributions > 0,
+                fieldsUsed: {
+                    income: monthlyIncome > 0 ? 'found' : 'missing',
+                    contributions: monthlyContributions > 0 ? 'found' : 'missing'
+                }
+            }
         }
     };
 }
@@ -354,24 +406,23 @@ function calculateDiversificationScore(inputs) {
  */
 function calculateTaxEfficiencyScore(inputs) {
     // Better field name mapping for pension and training fund rates
-    const pensionRate = parseFloat(
-        inputs.pensionContributionRate || 
-        inputs.employeePensionRate || 
-        inputs.pensionEmployee || 
-        inputs.pensionRate ||
-        inputs.employeeContribution || 
-        7 // Default Israeli pension rate if not found
-    );
+    const pensionRate = getFieldValue(inputs, [
+        'pensionContributionRate', 'employeePensionRate', 'pensionEmployee',
+        'pensionRate', 'employeeContribution', 'pension_employee',
+        'pensionEmployeeRate', 'employee_pension_rate'
+    ]);
     
-    const trainingFundRate = parseFloat(
-        inputs.trainingFundContributionRate || 
-        inputs.trainingFundEmployeeRate || 
-        inputs.trainingFundEmployee ||
-        inputs.trainingFundRate ||
-        2.5 // Default Israeli training fund rate if not found
-    );
+    const trainingFundRate = getFieldValue(inputs, [
+        'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee',
+        'trainingFundRate', 'training_fund_employee', 'trainingFundContribution',
+        'employee_training_fund_rate'
+    ]);
     
-    const country = (inputs.country || 'ISR').toLowerCase();
+    // Country normalization with proper handling
+    const country = (inputs.country || inputs.taxCountry || inputs.inheritanceCountry || 'ISR')
+        .toString()
+        .toLowerCase()
+        .trim();
     
     // Calculate tax-advantaged contribution rate
     const totalTaxAdvantaged = pensionRate + trainingFundRate;
@@ -380,14 +431,19 @@ function calculateTaxEfficiencyScore(inputs) {
     
     // Country-specific optimal rates with better mapping
     const optimalRates = {
-        'isr': 21.333, 'israel': 21.333, // Israeli pension + training fund
-        'usa': 15, 'us': 15, 'united states': 15,     // 401k + IRA
-        'gbr': 12, 'uk': 12, 'united kingdom': 12,     // Workplace pension
-        'eur': 10, 'germany': 10, 'france': 10, 'europe': 10      // Average European pension
+        'isr': 21.333, 'israel': 21.333, 'il': 21.333, // Israeli pension + training fund
+        'usa': 15, 'us': 15, 'united states': 15, 'united_states': 15,     // 401k + IRA
+        'gbr': 12, 'uk': 12, 'gb': 12, 'united kingdom': 12, 'united_kingdom': 12,     // Workplace pension
+        'eur': 10, 'eu': 10, 'germany': 10, 'de': 10, 'france': 10, 'fr': 10, 'europe': 10      // Average European pension
     };
     
     const optimalRate = optimalRates[country] || optimalRates['isr'];
-    efficiencyScore = Math.min(100, (totalTaxAdvantaged / optimalRate) * 100);
+    // Prevent division by zero and handle edge cases
+    if (optimalRate === 0 || isNaN(optimalRate)) {
+        efficiencyScore = 0;
+    } else {
+        efficiencyScore = Math.min(100, (totalTaxAdvantaged / optimalRate) * 100);
+    }
     
     const maxScore = SCORE_FACTORS.taxEfficiency.weight;
     const score = (efficiencyScore / 100) * maxScore;
@@ -409,7 +465,15 @@ function calculateTaxEfficiencyScore(inputs) {
             pensionRate: pensionRate,
             trainingFundRate: trainingFundRate,
             country: country,
-            calculationMethod: (pensionRate > 0 || trainingFundRate > 0) ? 'rates_found' : 'using_defaults'
+            calculationMethod: (pensionRate > 0 || trainingFundRate > 0) ? 'rates_found' : 'using_defaults',
+            debugInfo: {
+                countryDetected: country,
+                optimalRateUsed: optimalRate,
+                ratesFound: {
+                    pension: pensionRate > 0,
+                    trainingFund: trainingFundRate > 0
+                }
+            }
         }
     };
 }

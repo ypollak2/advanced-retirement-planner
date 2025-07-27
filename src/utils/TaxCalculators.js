@@ -150,13 +150,40 @@
         };
     };
 
+    // Calculate additional income tax using marginal rates
+    const calculateAdditionalIncomeTax = (inputs) => {
+        if (!window.AdditionalIncomeTax) {
+            console.warn('AdditionalIncomeTax utilities not loaded');
+            return null;
+        }
+        
+        return window.AdditionalIncomeTax.calculateTotalAdditionalIncomeTax(inputs);
+    };
+    
+    // Get monthly after-tax additional income
+    const getMonthlyAfterTaxAdditionalIncome = (inputs) => {
+        if (!window.AdditionalIncomeTax) {
+            console.warn('AdditionalIncomeTax utilities not loaded');
+            return {
+                monthlyNetBonus: 0,
+                monthlyNetRSU: 0,
+                monthlyNetOther: 0,
+                totalMonthlyNet: 0
+            };
+        }
+        
+        return window.AdditionalIncomeTax.getMonthlyAfterTaxAdditionalIncome(inputs);
+    };
+    
     // Export to window for global access
     if (typeof window !== 'undefined') {
         window.TaxCalculators = {
             calculateNetSalary,
             calculateIsraeliTax,
             calculateUKTax,
-            calculateUSTax
+            calculateUSTax,
+            calculateAdditionalIncomeTax,
+            getMonthlyAfterTaxAdditionalIncome
         };
         console.log('✅ TaxCalculators loaded and available globally');
     }

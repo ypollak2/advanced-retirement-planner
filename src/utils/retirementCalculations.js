@@ -353,31 +353,90 @@ window.calculateRetirement = (
         partnerNetIncome = partnerNetPension + partnerNetTrainingFund + partnerNetPersonalPortfolio + partnerSocialSecurity;
     }
     
-    // Calculate additional income sources from wizard inputs
+    // Calculate additional income sources from wizard inputs with proper tax treatment
     const currentSalary = inputs.currentMonthlySalary || inputs.currentSalary || 0;
-    const annualBonusMonthly = (parseFloat(inputs.annualBonus) || 0) / 12;
-    const quarterlyRSUMonthly = (parseFloat(inputs.quarterlyRSU) || 0) / 3;
-    const freelanceIncome = parseFloat(inputs.freelanceIncome) || 0;
-    const rentalIncome = parseFloat(inputs.rentalIncome) || 0;
-    const dividendIncome = parseFloat(inputs.dividendIncome) || 0;
     
-    // Partner additional income sources
+    // Get after-tax additional income values using marginal tax rates
+    let annualBonusMonthly = 0;
+    let quarterlyRSUMonthly = 0;
+    let freelanceIncome = 0;
+    let rentalIncome = 0;
+    let dividendIncome = 0;
+    
+    if (window.TaxCalculators && window.TaxCalculators.getMonthlyAfterTaxAdditionalIncome) {
+        const afterTaxIncome = window.TaxCalculators.getMonthlyAfterTaxAdditionalIncome(inputs);
+        annualBonusMonthly = afterTaxIncome.monthlyNetBonus || 0;
+        quarterlyRSUMonthly = afterTaxIncome.monthlyNetRSU || 0;
+        
+        // Other income (freelance, rental, dividends) grouped together
+        const otherIncomeMonthly = afterTaxIncome.monthlyNetOther || 0;
+        
+        // Distribute other income proportionally if we have the breakdown
+        const totalOtherGross = (parseFloat(inputs.freelanceIncome) || 0) + 
+                                (parseFloat(inputs.rentalIncome) || 0) + 
+                                (parseFloat(inputs.dividendIncome) || 0);
+        
+        if (totalOtherGross > 0) {
+            freelanceIncome = otherIncomeMonthly * ((parseFloat(inputs.freelanceIncome) || 0) / totalOtherGross);
+            rentalIncome = otherIncomeMonthly * ((parseFloat(inputs.rentalIncome) || 0) / totalOtherGross);
+            dividendIncome = otherIncomeMonthly * ((parseFloat(inputs.dividendIncome) || 0) / totalOtherGross);
+        }
+    } else {
+        // Fallback to simple calculation if tax utilities not available
+        console.warn('Additional income tax utilities not available, using gross values');
+        annualBonusMonthly = (parseFloat(inputs.annualBonus) || 0) / 12;
+        quarterlyRSUMonthly = (parseFloat(inputs.quarterlyRSU) || 0) / 3;
+        freelanceIncome = parseFloat(inputs.freelanceIncome) || 0;
+        rentalIncome = parseFloat(inputs.rentalIncome) || 0;
+        dividendIncome = parseFloat(inputs.dividendIncome) || 0;
+    }
+    
+    // Partner additional income sources with tax treatment
     let partnerAdditionalIncome = 0;
     if (inputs.planningType === 'couple') {
-        const partner1AnnualBonusMonthly = (parseFloat(inputs.partner1AnnualBonus) || 0) / 12;
-        const partner1QuarterlyRSUMonthly = (parseFloat(inputs.partner1QuarterlyRSU) || 0) / 3;
-        const partner1FreelanceIncome = parseFloat(inputs.partner1FreelanceIncome) || 0;
-        const partner1RentalIncome = parseFloat(inputs.partner1RentalIncome) || 0;
-        const partner1DividendIncome = parseFloat(inputs.partner1DividendIncome) || 0;
+        // Create partner 1 inputs object for tax calculation
+        const partner1Inputs = {
+            country: inputs.country,
+            currentMonthlySalary: inputs.partner1Salary || 0,
+            annualBonus: inputs.partner1AnnualBonus || 0,
+            quarterlyRSU: inputs.partner1QuarterlyRSU || 0,
+            freelanceIncome: inputs.partner1FreelanceIncome || 0,
+            rentalIncome: inputs.partner1RentalIncome || 0,
+            dividendIncome: inputs.partner1DividendIncome || 0
+        };
         
-        const partner2AnnualBonusMonthly = (parseFloat(inputs.partner2AnnualBonus) || 0) / 12;
-        const partner2QuarterlyRSUMonthly = (parseFloat(inputs.partner2QuarterlyRSU) || 0) / 3;
-        const partner2FreelanceIncome = parseFloat(inputs.partner2FreelanceIncome) || 0;
-        const partner2RentalIncome = parseFloat(inputs.partner2RentalIncome) || 0;
-        const partner2DividendIncome = parseFloat(inputs.partner2DividendIncome) || 0;
+        // Create partner 2 inputs object for tax calculation
+        const partner2Inputs = {
+            country: inputs.country,
+            currentMonthlySalary: inputs.partner2Salary || 0,
+            annualBonus: inputs.partner2AnnualBonus || 0,
+            quarterlyRSU: inputs.partner2QuarterlyRSU || 0,
+            freelanceIncome: inputs.partner2FreelanceIncome || 0,
+            rentalIncome: inputs.partner2RentalIncome || 0,
+            dividendIncome: inputs.partner2DividendIncome || 0
+        };
         
-        partnerAdditionalIncome = partner1AnnualBonusMonthly + partner1QuarterlyRSUMonthly + partner1FreelanceIncome + partner1RentalIncome + partner1DividendIncome +
-                                 partner2AnnualBonusMonthly + partner2QuarterlyRSUMonthly + partner2FreelanceIncome + partner2RentalIncome + partner2DividendIncome;
+        if (window.TaxCalculators && window.TaxCalculators.getMonthlyAfterTaxAdditionalIncome) {
+            const partner1AfterTax = window.TaxCalculators.getMonthlyAfterTaxAdditionalIncome(partner1Inputs);
+            const partner2AfterTax = window.TaxCalculators.getMonthlyAfterTaxAdditionalIncome(partner2Inputs);
+            partnerAdditionalIncome = partner1AfterTax.totalMonthlyNet + partner2AfterTax.totalMonthlyNet;
+        } else {
+            // Fallback to gross values
+            const partner1AnnualBonusMonthly = (parseFloat(inputs.partner1AnnualBonus) || 0) / 12;
+            const partner1QuarterlyRSUMonthly = (parseFloat(inputs.partner1QuarterlyRSU) || 0) / 3;
+            const partner1FreelanceIncome = parseFloat(inputs.partner1FreelanceIncome) || 0;
+            const partner1RentalIncome = parseFloat(inputs.partner1RentalIncome) || 0;
+            const partner1DividendIncome = parseFloat(inputs.partner1DividendIncome) || 0;
+            
+            const partner2AnnualBonusMonthly = (parseFloat(inputs.partner2AnnualBonus) || 0) / 12;
+            const partner2QuarterlyRSUMonthly = (parseFloat(inputs.partner2QuarterlyRSU) || 0) / 3;
+            const partner2FreelanceIncome = parseFloat(inputs.partner2FreelanceIncome) || 0;
+            const partner2RentalIncome = parseFloat(inputs.partner2RentalIncome) || 0;
+            const partner2DividendIncome = parseFloat(inputs.partner2DividendIncome) || 0;
+            
+            partnerAdditionalIncome = partner1AnnualBonusMonthly + partner1QuarterlyRSUMonthly + partner1FreelanceIncome + partner1RentalIncome + partner1DividendIncome +
+                                     partner2AnnualBonusMonthly + partner2QuarterlyRSUMonthly + partner2FreelanceIncome + partner2RentalIncome + partner2DividendIncome;
+        }
     }
     
     const additionalIncomeTotal = annualBonusMonthly + quarterlyRSUMonthly + freelanceIncome + rentalIncome + dividendIncome;
