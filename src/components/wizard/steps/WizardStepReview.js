@@ -68,6 +68,23 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
             totalAccumulation: 'צבירה כוללת',
             inflationAdjusted: 'מותאם לאינפלציה',
             
+            // Additional Income Tax Breakdown
+            taxBreakdown: 'פירוט מסים',
+            additionalIncomeTax: 'ניתוח מס על הכנסות נוספות',
+            grossIncome: 'הכנסה ברוטו',
+            netIncome: 'הכנסה נטו',
+            taxPaid: 'מס ששולם',
+            effectiveRate: 'שיעור מס אפקטיבי',
+            bonusIncome: 'בונוס שנתי',
+            rsuIncome: 'הכנסות RSU',
+            rentalIncome: 'הכנסות שכירות',
+            dividendIncome: 'דיבידנדים',
+            otherIncome: 'הכנסות אחרות',
+            totalAdditionalTax: 'סך מס על הכנסות נוספות',
+            annualAmount: 'סכום שנתי',
+            monthlyAmount: 'סכום חודשי',
+            taxOptimization: 'הצעות לאופטימיזציית מס',
+            
             info: 'תכנית הפרישה שלך מותאמת אישית לפרופיל הסיכון, המדינה והמטרות שלך. עדכן אותה באופן קבוע.'
         },
         en: {
@@ -131,6 +148,23 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
             monthlyRetirementIncome: 'Monthly Retirement Income',
             totalAccumulation: 'Total Accumulation',
             inflationAdjusted: 'Inflation Adjusted',
+            
+            // Additional Income Tax Breakdown
+            taxBreakdown: 'Tax Breakdown',
+            additionalIncomeTax: 'Additional Income Tax Analysis',
+            grossIncome: 'Gross Income',
+            netIncome: 'Net Income',
+            taxPaid: 'Tax Paid',
+            effectiveRate: 'Effective Rate',
+            bonusIncome: 'Annual Bonus',
+            rsuIncome: 'RSU Income',
+            rentalIncome: 'Rental Income', 
+            dividendIncome: 'Dividend Income',
+            otherIncome: 'Other Income',
+            totalAdditionalTax: 'Total Additional Income Tax',
+            annualAmount: 'Annual Amount',
+            monthlyAmount: 'Monthly Amount',
+            taxOptimization: 'Tax Optimization Suggestions',
             
             info: 'Your retirement plan is customized for your risk profile, country, and goals. Update it regularly as circumstances change.'
         }
@@ -619,6 +653,193 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                 ])
             ])
         ]);
+    };
+
+    // Render additional income tax breakdown
+    const renderAdditionalIncomeTaxBreakdown = () => {
+        if (!window.AdditionalIncomeTax || !window.TaxCalculators) {
+            return null;
+        }
+
+        try {
+            const additionalTaxInfo = window.AdditionalIncomeTax.calculateTotalAdditionalIncomeTax(inputs);
+            
+            if (additionalTaxInfo.totalAdditionalIncome === 0) {
+                return null; // No additional income to show
+            }
+
+            const monthlyResult = window.AdditionalIncomeTax.getMonthlyAfterTaxAdditionalIncome(inputs);
+            
+            return createElement('div', {
+                key: 'additional-income-tax',
+                className: "bg-amber-50 rounded-xl p-6 border border-amber-200 mb-8"
+            }, [
+                createElement('h3', {
+                    key: 'tax-breakdown-title',
+                    className: "text-xl font-semibold text-amber-700 mb-6 flex items-center"
+                }, [
+                    createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '📊'),
+                    t.additionalIncomeTax
+                ]),
+
+                // Summary cards
+                createElement('div', { 
+                    key: 'tax-summary', 
+                    className: "grid grid-cols-1 md:grid-cols-3 gap-4 mb-6" 
+                }, [
+                    createElement('div', { 
+                        key: 'total-gross', 
+                        className: "bg-white rounded-lg p-4 border border-amber-200" 
+                    }, [
+                        createElement('div', { 
+                            key: 'gross-label', 
+                            className: "text-sm text-amber-600 font-medium" 
+                        }, t.grossIncome),
+                        createElement('div', { 
+                            key: 'gross-amount', 
+                            className: "text-2xl font-bold text-amber-800" 
+                        }, `${currency}${additionalTaxInfo.totalAdditionalIncome.toLocaleString()}`),
+                        createElement('div', { 
+                            key: 'gross-monthly', 
+                            className: "text-xs text-amber-500" 
+                        }, `${currency}${Math.round(additionalTaxInfo.totalAdditionalIncome / 12).toLocaleString()}/${t.monthlyAmount}`)
+                    ]),
+
+                    createElement('div', { 
+                        key: 'total-tax', 
+                        className: "bg-white rounded-lg p-4 border border-red-200" 
+                    }, [
+                        createElement('div', { 
+                            key: 'tax-label', 
+                            className: "text-sm text-red-600 font-medium" 
+                        }, t.taxPaid),
+                        createElement('div', { 
+                            key: 'tax-amount', 
+                            className: "text-2xl font-bold text-red-700" 
+                        }, `${currency}${additionalTaxInfo.totalAdditionalTax.toLocaleString()}`),
+                        createElement('div', { 
+                            key: 'tax-monthly', 
+                            className: "text-xs text-red-500" 
+                        }, `${currency}${Math.round(additionalTaxInfo.totalAdditionalTax / 12).toLocaleString()}/${t.monthlyAmount}`)
+                    ]),
+
+                    createElement('div', { 
+                        key: 'total-net', 
+                        className: "bg-white rounded-lg p-4 border border-green-200" 
+                    }, [
+                        createElement('div', { 
+                            key: 'net-label', 
+                            className: "text-sm text-green-600 font-medium" 
+                        }, t.netIncome),
+                        createElement('div', { 
+                            key: 'net-amount', 
+                            className: "text-2xl font-bold text-green-700" 
+                        }, `${currency}${(additionalTaxInfo.totalAdditionalIncome - additionalTaxInfo.totalAdditionalTax).toLocaleString()}`),
+                        createElement('div', { 
+                            key: 'net-monthly', 
+                            className: "text-xs text-green-500" 
+                        }, `${currency}${monthlyResult.totalMonthlyNet.toLocaleString()}/${t.monthlyAmount}`)
+                    ])
+                ]),
+
+                // Effective tax rate
+                createElement('div', { 
+                    key: 'effective-rate', 
+                    className: "text-center mb-6 p-4 bg-white rounded-lg border border-amber-200" 
+                }, [
+                    createElement('div', { 
+                        key: 'rate-label', 
+                        className: "text-sm text-amber-600 font-medium mb-2" 
+                    }, t.effectiveRate),
+                    createElement('div', { 
+                        key: 'rate-value', 
+                        className: "text-3xl font-bold text-amber-800" 
+                    }, `${additionalTaxInfo.effectiveRate}%`)
+                ]),
+
+                // Detailed breakdown by income type
+                createElement('div', { key: 'detailed-breakdown', className: "space-y-4" }, [
+                    createElement('h4', { 
+                        key: 'breakdown-title', 
+                        className: "font-semibold text-amber-800 mb-3" 
+                    }, t.taxBreakdown),
+
+                    // Bonus breakdown
+                    additionalTaxInfo.breakdown.bonus.gross > 0 && 
+                    createElement('div', { 
+                        key: 'bonus-breakdown', 
+                        className: "bg-white rounded-lg p-4 border border-amber-200" 
+                    }, [
+                        createElement('div', { 
+                            key: 'bonus-header', 
+                            className: "flex justify-between items-center mb-2" 
+                        }, [
+                            createElement('span', { 
+                                key: 'bonus-label', 
+                                className: "font-medium text-amber-700" 
+                            }, t.bonusIncome),
+                            createElement('span', { 
+                                key: 'bonus-rate', 
+                                className: "text-sm text-red-600" 
+                            }, `${additionalTaxInfo.breakdown.bonus.rate}% ${t.effectiveRate}`)
+                        ]),
+                        createElement('div', { key: 'bonus-details', className: "text-sm space-y-1" }, [
+                            createElement('div', { key: 'bonus-gross', className: "flex justify-between" }, [
+                                createElement('span', { className: "text-gray-600" }, t.grossIncome),
+                                createElement('span', { className: "font-medium" }, `${currency}${additionalTaxInfo.breakdown.bonus.gross.toLocaleString()}`)
+                            ]),
+                            createElement('div', { key: 'bonus-tax', className: "flex justify-between" }, [
+                                createElement('span', { className: "text-red-600" }, t.taxPaid),
+                                createElement('span', { className: "text-red-600 font-medium" }, `${currency}${additionalTaxInfo.breakdown.bonus.tax.toLocaleString()}`)
+                            ]),
+                            createElement('div', { key: 'bonus-net', className: "flex justify-between font-medium border-t pt-1" }, [
+                                createElement('span', { className: "text-green-600" }, t.netIncome),
+                                createElement('span', { className: "text-green-600" }, `${currency}${additionalTaxInfo.breakdown.bonus.net.toLocaleString()}`)
+                            ])
+                        ])
+                    ]),
+
+                    // Other income breakdown (rental, dividends, etc.)
+                    additionalTaxInfo.breakdown.otherIncome.gross > 0 && 
+                    createElement('div', { 
+                        key: 'other-breakdown', 
+                        className: "bg-white rounded-lg p-4 border border-amber-200" 
+                    }, [
+                        createElement('div', { 
+                            key: 'other-header', 
+                            className: "flex justify-between items-center mb-2" 
+                        }, [
+                            createElement('span', { 
+                                key: 'other-label', 
+                                className: "font-medium text-amber-700" 
+                            }, `${t.rentalIncome} + ${t.dividendIncome}`),
+                            createElement('span', { 
+                                key: 'other-rate', 
+                                className: "text-sm text-red-600" 
+                            }, `${additionalTaxInfo.breakdown.otherIncome.rate}% ${t.effectiveRate}`)
+                        ]),
+                        createElement('div', { key: 'other-details', className: "text-sm space-y-1" }, [
+                            createElement('div', { key: 'other-gross', className: "flex justify-between" }, [
+                                createElement('span', { className: "text-gray-600" }, t.grossIncome),
+                                createElement('span', { className: "font-medium" }, `${currency}${additionalTaxInfo.breakdown.otherIncome.gross.toLocaleString()}`)
+                            ]),
+                            createElement('div', { key: 'other-tax', className: "flex justify-between" }, [
+                                createElement('span', { className: "text-red-600" }, t.taxPaid),
+                                createElement('span', { className: "text-red-600 font-medium" }, `${currency}${additionalTaxInfo.breakdown.otherIncome.tax.toLocaleString()}`)
+                            ]),
+                            createElement('div', { key: 'other-net', className: "flex justify-between font-medium border-t pt-1" }, [
+                                createElement('span', { className: "text-green-600" }, t.netIncome),
+                                createElement('span', { className: "text-green-600" }, `${currency}${additionalTaxInfo.breakdown.otherIncome.net.toLocaleString()}`)
+                            ])
+                        ])
+                    ])
+                ])
+            ]);
+
+        } catch (error) {
+            console.warn('Error rendering additional income tax breakdown:', error);
+            return null;
+        }
     };
 
     // Render couple compatibility section
@@ -1934,6 +2155,9 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
 
         // Financial Health Score
         renderFinancialHealthScore(),
+
+        // Additional Income Tax Breakdown
+        renderAdditionalIncomeTaxBreakdown(),
 
         // Couple Compatibility
         renderCoupleCompatibility(),

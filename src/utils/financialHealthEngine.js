@@ -427,6 +427,40 @@ function calculateTaxEfficiencyScore(inputs) {
     // Calculate tax-advantaged contribution rate
     const totalTaxAdvantaged = pensionRate + trainingFundRate;
     
+    // Get base salary and additional income for comprehensive tax efficiency
+    const baseSalary = getFieldValue(inputs, [
+        'currentMonthlySalary', 'currentSalary', 'partner1Salary', 
+        'monthlySalary', 'salary', 'monthly_salary'
+    ]) * 12;
+    
+    // Calculate additional income impact if AdditionalIncomeTax is available
+    let additionalIncomeEfficiency = 0;
+    let hasAdditionalIncome = false;
+    let additionalIncomeDetails = {};
+    
+    if (window.AdditionalIncomeTax && typeof window.AdditionalIncomeTax.calculateTotalAdditionalIncomeTax === 'function') {
+        try {
+            const additionalTaxInfo = window.AdditionalIncomeTax.calculateTotalAdditionalIncomeTax(inputs);
+            if (additionalTaxInfo.totalAdditionalIncome > 0) {
+                hasAdditionalIncome = true;
+                const totalIncome = baseSalary + additionalTaxInfo.totalAdditionalIncome;
+                const totalTaxAdvantaged = baseSalary * (pensionRate + trainingFundRate) / 100;
+                const overallTaxAdvantageRate = totalIncome > 0 ? (totalTaxAdvantaged / totalIncome) * 100 : 0;
+                
+                // Adjust efficiency score based on overall tax advantage
+                additionalIncomeEfficiency = overallTaxAdvantageRate;
+                additionalIncomeDetails = {
+                    totalAdditionalIncome: additionalTaxInfo.totalAdditionalIncome,
+                    additionalTaxRate: additionalTaxInfo.effectiveRate,
+                    overallTaxAdvantageRate: overallTaxAdvantageRate,
+                    dilutionEffect: (pensionRate + trainingFundRate) - overallTaxAdvantageRate
+                };
+            }
+        } catch (error) {
+            console.warn('Error calculating additional income tax efficiency:', error);
+        }
+    }
+    
     let efficiencyScore = 0;
     
     // Country-specific optimal rates with better mapping
@@ -438,11 +472,17 @@ function calculateTaxEfficiencyScore(inputs) {
     };
     
     const optimalRate = optimalRates[country] || optimalRates['isr'];
-    // Prevent division by zero and handle edge cases
+    // Calculate base efficiency score
     if (optimalRate === 0 || isNaN(optimalRate)) {
         efficiencyScore = 0;
     } else {
-        efficiencyScore = Math.min(100, (totalTaxAdvantaged / optimalRate) * 100);
+        if (hasAdditionalIncome) {
+            // Use overall tax advantage rate when additional income exists
+            efficiencyScore = Math.min(100, (additionalIncomeEfficiency / optimalRate) * 100);
+        } else {
+            // Use traditional pension/training fund rate calculation
+            efficiencyScore = Math.min(100, (totalTaxAdvantaged / optimalRate) * 100);
+        }
     }
     
     const maxScore = SCORE_FACTORS.taxEfficiency.weight;
@@ -458,21 +498,25 @@ function calculateTaxEfficiencyScore(inputs) {
     return {
         score: Math.round(score),
         details: {
-            currentRate: totalTaxAdvantaged,
+            currentRate: hasAdditionalIncome ? additionalIncomeEfficiency : totalTaxAdvantaged,
             optimalRate: optimalRate,
             efficiencyScore: efficiencyScore,
             status: status,
             pensionRate: pensionRate,
             trainingFundRate: trainingFundRate,
             country: country,
-            calculationMethod: (pensionRate > 0 || trainingFundRate > 0) ? 'rates_found' : 'using_defaults',
+            calculationMethod: hasAdditionalIncome ? 'comprehensive_with_additional_income' : 
+                            (pensionRate > 0 || trainingFundRate > 0) ? 'rates_found' : 'using_defaults',
+            hasAdditionalIncome: hasAdditionalIncome,
+            additionalIncomeDetails: additionalIncomeDetails,
             debugInfo: {
                 countryDetected: country,
                 optimalRateUsed: optimalRate,
                 ratesFound: {
                     pension: pensionRate > 0,
                     trainingFund: trainingFundRate > 0
-                }
+                },
+                additionalIncomeConsidered: hasAdditionalIncome
             }
         }
     };
