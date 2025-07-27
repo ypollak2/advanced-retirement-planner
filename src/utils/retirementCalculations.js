@@ -113,11 +113,11 @@ window.getAdjustedReturn = (baseReturn, riskLevel = 'moderate') => {
 
 window.calculateRetirement = (
     inputs, 
-    workPeriods, 
-    pensionIndexAllocation, 
-    trainingFundIndexAllocation,
-    historicalReturns,
-    monthlyTrainingFundContribution,
+    workPeriods = [], 
+    pensionIndexAllocation = [], 
+    trainingFundIndexAllocation = [],
+    historicalReturns = {},
+    monthlyTrainingFundContribution = 0,
     partnerWorkPeriods = []
 ) => {
     const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
@@ -126,8 +126,21 @@ window.calculateRetirement = (
         return null;
     }
 
-    const basePensionWeightedReturn = calculateWeightedReturn(pensionIndexAllocation, yearsToRetirement, historicalReturns);
-    const baseTrainingFundWeightedReturn = calculateWeightedReturn(trainingFundIndexAllocation, yearsToRetirement, historicalReturns);
+    // Provide default allocations if not specified
+    const defaultPensionAllocation = [
+        { name: 'Mixed Portfolio', allocation: 100, historicalReturn: 6.5 }
+    ];
+    const defaultTrainingFundAllocation = [
+        { name: 'Conservative Portfolio', allocation: 100, historicalReturn: 5.5 }
+    ];
+    
+    const validPensionAllocation = Array.isArray(pensionIndexAllocation) && pensionIndexAllocation.length > 0 
+        ? pensionIndexAllocation : defaultPensionAllocation;
+    const validTrainingFundAllocation = Array.isArray(trainingFundIndexAllocation) && trainingFundIndexAllocation.length > 0 
+        ? trainingFundIndexAllocation : defaultTrainingFundAllocation;
+    
+    const basePensionWeightedReturn = calculateWeightedReturn(validPensionAllocation, yearsToRetirement, historicalReturns);
+    const baseTrainingFundWeightedReturn = calculateWeightedReturn(validTrainingFundAllocation, yearsToRetirement, historicalReturns);
     
     // Apply dynamic return assumptions if available
     const effectivePensionReturn = inputs.pensionReturn !== undefined ? inputs.pensionReturn : basePensionWeightedReturn;
@@ -143,7 +156,9 @@ window.calculateRetirement = (
     let totalRealEstate = inputs.currentRealEstate;
     let periodResults = [];
     
-    const sortedPeriods = [...workPeriods].sort((a, b) => a.startAge - b.startAge);
+    // Ensure workPeriods is an array to prevent iteration errors
+    const validWorkPeriods = Array.isArray(workPeriods) ? workPeriods : [];
+    const sortedPeriods = [...validWorkPeriods].sort((a, b) => a.startAge - b.startAge);
     
     // Calculate pension savings from work periods
     for (const period of sortedPeriods) {

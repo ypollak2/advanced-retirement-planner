@@ -8,9 +8,9 @@
 
 // Value caps to prevent extreme scenarios from producing unrealistic calculations
 const VALUE_CAPS = {
-    maxInflationRate: 0.15,        // 15% maximum inflation rate
-    maxReturnRate: 0.20,           // 20% maximum return rate
-    minReturnRate: 0.01,           // 1% minimum return rate
+    maxInflationRate: 15,          // 15% maximum inflation rate (as percentage)
+    maxReturnRate: 20,             // 20% maximum return rate (as percentage)
+    minReturnRate: 1,              // 1% minimum return rate (as percentage)
     maxYearsToRetirement: 50,      // 50 years maximum planning horizon
     minYearsToRetirement: 1,       // 1 year minimum planning horizon
     maxMonthlyIncome: 500000,      // ₪500,000 maximum monthly income
@@ -50,17 +50,14 @@ function applyValueCaps(value, capType, inputName = 'value') {
     const cap = VALUE_CAPS[capType];
     if (!cap) return value;
     
-    if (value > cap) {
+    // Handle maximum caps
+    if (capType.startsWith('max') && value > cap) {
         console.warn(`⚠️ ${inputName} (${value}) exceeds maximum cap (${cap}), applying cap`);
         return cap;
     }
     
-    // Apply minimum caps for certain types
-    if (capType === 'minReturnRate' && value < cap) {
-        console.warn(`⚠️ ${inputName} (${value}) below minimum cap (${cap}), applying cap`);
-        return cap;
-    }
-    if (capType === 'minYearsToRetirement' && value < cap) {
+    // Handle minimum caps  
+    if (capType.startsWith('min') && value < cap) {
         console.warn(`⚠️ ${inputName} (${value}) below minimum cap (${cap}), applying cap`);
         return cap;
     }

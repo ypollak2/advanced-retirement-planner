@@ -1014,15 +1014,25 @@ function calculateFinancialHealthScore(inputs) {
         // Helper function to safely calculate each factor
         const safeCalculate = (factorName, calculateFunction) => {
             try {
+                console.log(`🔧 Calculating ${factorName}...`);
                 const result = calculateFunction(inputs);
-                // Validate result structure
-                if (!result || typeof result !== 'object' || typeof result.score !== 'number') {
-                    console.warn(`${factorName}: Invalid result structure, using default`);
-                    return { score: 0, details: { status: 'error', message: 'Invalid calculation result' } };
+                console.log(`🔧 ${factorName} result:`, result);
+                // Validate result structure - be more specific about what we expect
+                if (!result) {
+                    console.warn(`${factorName}: Function returned null/undefined, using default`);
+                    return { score: 0, details: { status: 'error', message: 'Function returned null' } };
+                }
+                if (typeof result !== 'object') {
+                    console.warn(`${factorName}: Function returned non-object (${typeof result}), using default`);
+                    return { score: 0, details: { status: 'error', message: `Expected object, got ${typeof result}` } };
+                }
+                if (typeof result.score !== 'number') {
+                    console.warn(`${factorName}: Score is not a number (${typeof result.score}: ${result.score}), using default`);
+                    return { score: 0, details: { status: 'error', message: `Score not a number: ${typeof result.score}` } };
                 }
                 // Ensure score is finite and valid
                 if (!isFinite(result.score) || isNaN(result.score)) {
-                    console.warn(`${factorName}: Invalid score value, using 0`);
+                    console.warn(`${factorName}: Invalid score value (${result.score}), using 0`);
                     result.score = 0;
                 }
                 return result;
