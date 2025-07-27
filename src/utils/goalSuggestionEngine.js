@@ -73,7 +73,8 @@ function calculateTotalCurrentSavings(inputs) {
         'currentSavings',           // Pension savings
         'currentTrainingFund',      // Training fund
         'currentPersonalPortfolio', // Personal portfolio
-        'currentCryptoFiatValue',   // Cryptocurrency (fiat value)
+        'currentDigitalAssetFiatValue', // Digital assets (fiat value)
+        'currentCryptoFiatValue',   // Cryptocurrency (fiat value - fallback)
         'currentSavingsAccount',    // Savings account
         'currentRealEstate'         // Real estate
     ];
@@ -328,7 +329,7 @@ function generateGoalSuggestions(inputs) {
 function shouldRefreshSuggestions(previousInputs, currentInputs) {
     const significantFields = [
         'currentAge', 'retirementAge', 'currentMonthlySalary',
-        'currentSavings', 'currentPersonalPortfolio', 'currentCryptoFiatValue',
+        'currentSavings', 'currentPersonalPortfolio', 'currentDigitalAssetFiatValue', 'currentCryptoFiatValue',
         'retirementLifestyle', 'inflationRate', 'pensionReturn', 'portfolioReturn',
         'partner1Salary', 'partner2Salary', 'relationshipStatus'
     ];

@@ -53,14 +53,37 @@ const SavingsSummaryPanel = ({
             rawPensionSavings : Math.max((userAge - 22) * 12000, 50000);
         const safeCurrentTrainingFundSavings = (rawTrainingFundSavings !== undefined && rawTrainingFundSavings !== null) ? 
             rawTrainingFundSavings : Math.max((userAge - 22) * 8000, 25000);
-        // Include crypto and other investment savings in total
-        const currentCrypto = inputs.currentCryptoFiatValue || inputs.currentCrypto || 0;
+        // Include crypto and other investment savings in total (with correct field names)
+        const currentCrypto = inputs.currentDigitalAssetFiatValue || inputs.currentCryptoFiatValue || inputs.currentCrypto || 0;
         const currentSavingsAccount = inputs.currentSavingsAccount || 0;
         const currentRealEstate = inputs.currentRealEstate || 0;
         const currentInvestments = inputs.currentInvestments || 0;
         
+        // Include partner crypto assets if in couple mode
+        const partner1Crypto = inputs.partner1DigitalAssetFiatValue || inputs.partner1Crypto || 0;
+        const partner2Crypto = inputs.partner2DigitalAssetFiatValue || inputs.partner2Crypto || 0;
+        
         const totalSavings = safeCurrentPensionSavings + safeCurrentTrainingFundSavings + 
-                           currentCrypto + currentSavingsAccount + currentRealEstate + currentInvestments;
+                           currentCrypto + partner1Crypto + partner2Crypto + 
+                           currentSavingsAccount + currentRealEstate + currentInvestments;
+        
+        // Debug logging for crypto inclusion
+        if (currentCrypto > 0 || partner1Crypto > 0 || partner2Crypto > 0) {
+            console.log(`💎 Crypto Assets in Total Savings:`, {
+                currentCrypto,
+                partner1Crypto,
+                partner2Crypto,
+                totalCrypto: currentCrypto + partner1Crypto + partner2Crypto,
+                totalSavings,
+                allInputFields: {
+                    currentDigitalAssetFiatValue: inputs.currentDigitalAssetFiatValue,
+                    currentDigitalAssetAmount: inputs.currentDigitalAssetAmount,
+                    currentDigitalAssetToken: inputs.currentDigitalAssetToken,
+                    partner1DigitalAssetFiatValue: inputs.partner1DigitalAssetFiatValue,
+                    partner2DigitalAssetFiatValue: inputs.partner2DigitalAssetFiatValue
+                }
+            });
+        }
         
         const formatCurrency = (amount, currency = workingCurrency) => {
             const symbols = { 'ILS': '₪', 'USD': '$', 'EUR': '€', 'GBP': '£', 'BTC': '₿', 'ETH': 'Ξ' };
@@ -119,6 +142,35 @@ const SavingsSummaryPanel = ({
                     ]),
                     React.createElement('div', { className: "text-xl font-bold text-green-800 wealth-amount" }, 
                         formatCurrency(safeCurrentTrainingFundSavings, workingCurrency))
+                ]),
+                
+                // Crypto Assets (only show if there are any)
+                (currentCrypto > 0 || partner1Crypto > 0 || partner2Crypto > 0) && React.createElement('div', {
+                    key: 'crypto',
+                    className: "metric-card metric-positive p-4 border-l-4 border-yellow-500"
+                }, [
+                    React.createElement('div', { className: "flex items-center justify-between mb-2" }, [
+                        React.createElement('div', { key: 'crypto-label', className: "flex items-center" }, [
+                            React.createElement('span', { key: 'crypto-icon', className: "text-lg mr-2" }, '₿'),
+                            React.createElement('span', { key: 'crypto-text', className: "text-sm text-yellow-700 font-medium" }, 
+                                language === 'he' ? 'נכסים דיגיטליים' : 'Digital Assets')
+                        ]),
+                        React.createElement('span', { key: 'crypto-trend', className: "text-xs text-green-600" }, '🚀')
+                    ]),
+                    React.createElement('div', { className: "text-xl font-bold text-yellow-800 wealth-amount" }, 
+                        formatCurrency(currentCrypto + partner1Crypto + partner2Crypto, workingCurrency)),
+                    // Show breakdown if multiple sources
+                    (currentCrypto > 0 && (partner1Crypto > 0 || partner2Crypto > 0)) && React.createElement('div', {
+                        key: 'crypto-breakdown',
+                        className: "text-xs text-yellow-600 mt-1"
+                    }, [
+                        currentCrypto > 0 && React.createElement('div', { key: 'main-crypto' }, 
+                            `${language === 'he' ? 'עיקרי' : 'Main'}: ${formatCurrency(currentCrypto, workingCurrency)}`),
+                        partner1Crypto > 0 && React.createElement('div', { key: 'p1-crypto' }, 
+                            `${language === 'he' ? 'בן/בת זוג 1' : 'Partner 1'}: ${formatCurrency(partner1Crypto, workingCurrency)}`),
+                        partner2Crypto > 0 && React.createElement('div', { key: 'p2-crypto' }, 
+                            `${language === 'he' ? 'בן/בת זוג 2' : 'Partner 2'}: ${formatCurrency(partner2Crypto, workingCurrency)}`)
+                    ])
                 ]),
                 
                 React.createElement('div', {
