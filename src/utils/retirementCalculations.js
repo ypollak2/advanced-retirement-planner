@@ -57,6 +57,17 @@ window.getNetReturn = (grossReturn, managementFee) => {
 };
 
 window.calculateWeightedReturn = (allocations, timeHorizon = 20, historicalReturns) => {
+    // Add comprehensive null/undefined checks to prevent crashes
+    if (!allocations || !Array.isArray(allocations) || allocations.length === 0) {
+        console.warn('calculateWeightedReturn: Invalid or empty allocations array provided', allocations);
+        return 0;
+    }
+    
+    if (!historicalReturns || typeof historicalReturns !== 'object') {
+        console.warn('calculateWeightedReturn: Invalid historicalReturns object', historicalReturns);
+        // Continue with calculation but returns will be 0 for historical data
+    }
+    
     let totalReturn = 0;
     let totalPercentage = 0;
     
@@ -65,18 +76,34 @@ window.calculateWeightedReturn = (allocations, timeHorizon = 20, historicalRetur
         Math.abs(curr - timeHorizon) < Math.abs(prev - timeHorizon) ? curr : prev
     );
     
-    allocations.forEach(allocation => {
-        if (allocation.percentage > 0) {
-            const returnRate = allocation.customReturn !== null 
-                ? allocation.customReturn 
-                : (historicalReturns[closestTimeHorizon] && historicalReturns[closestTimeHorizon][allocation.index]) || 0;
+    // Use try-catch to handle any unexpected errors during iteration
+    try {
+        allocations.forEach(allocation => {
+            // Validate allocation object structure
+            if (!allocation || typeof allocation !== 'object') {
+                console.warn('calculateWeightedReturn: Invalid allocation object', allocation);
+                return; // Skip this allocation
+            }
             
-            totalReturn += (returnRate * allocation.percentage / 100);
-            totalPercentage += allocation.percentage;
-        }
-    });
+            const percentage = parseFloat(allocation.percentage) || 0;
+            if (percentage > 0) {
+                const returnRate = allocation.customReturn !== null && allocation.customReturn !== undefined
+                    ? parseFloat(allocation.customReturn) || 0
+                    : (historicalReturns && historicalReturns[closestTimeHorizon] && 
+                       historicalReturns[closestTimeHorizon][allocation.index]) || 0;
+                
+                totalReturn += (returnRate * percentage / 100);
+                totalPercentage += percentage;
+            }
+        });
+    } catch (error) {
+        console.error('calculateWeightedReturn: Error during calculation', error);
+        return 0;
+    }
     
-    return totalPercentage > 0 ? totalReturn : 0;
+    // Final validation to ensure we return a valid number
+    const result = totalPercentage > 0 ? totalReturn : 0;
+    return isNaN(result) || !isFinite(result) ? 0 : result;
 };
 
 window.getAdjustedReturn = (baseReturn, riskLevel = 'moderate') => {

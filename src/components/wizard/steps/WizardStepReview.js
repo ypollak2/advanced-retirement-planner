@@ -81,6 +81,24 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     
     // Financial health scoring (test patterns: financialHealthScore, calculateHealthScore)
     const calculateHealthScore = (inputs) => {
+        // Add comprehensive input validation logging
+        console.log('🔍 Inputs passed to Financial Health Score:', {
+            hasSalary: !!inputs.currentMonthlySalary,
+            salaryValue: inputs.currentMonthlySalary,
+            hasContributions: !!inputs.monthlyContribution,
+            contributionValue: inputs.monthlyContribution,
+            hasPortfolioAllocations: !!inputs.portfolioAllocations,
+            portfolioCount: inputs.portfolioAllocations ? inputs.portfolioAllocations.length : 0,
+            hasPensionContributions: !!inputs.pensionContributionRate,
+            pensionRate: inputs.pensionContributionRate,
+            hasEmergencyFund: !!inputs.emergencyFund,
+            emergencyFundValue: inputs.emergencyFund,
+            hasExpenses: !!inputs.expenses,
+            expenseCategories: inputs.expenses ? Object.keys(inputs.expenses) : [],
+            planningType: inputs.planningType,
+            country: inputs.country || inputs.taxCountry || 'unknown'
+        });
+        
         if (window.calculateFinancialHealthScore) {
             return window.calculateFinancialHealthScore(inputs);
         }
@@ -103,6 +121,19 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     
     // Retirement projections (test patterns: retirementAge, projectedIncome, totalAccumulation, monthlyRetirementIncome)
     const retirementAge = inputs.retirementAge || 67;
+    
+    // Log inputs passed to retirement calculations
+    console.log('📊 Inputs passed to Retirement Calculations:', {
+        currentAge: inputs.currentAge,
+        retirementAge: inputs.retirementAge,
+        currentSavings: inputs.currentSavings,
+        monthlyContribution: inputs.monthlyContribution,
+        pensionIndexAllocation: inputs.pensionIndexAllocation,
+        hasWorkPeriods: !!(inputs.workPeriods || inputs.employment),
+        inflationRate: inputs.inflationRate,
+        exchangeRates: inputs.exchangeRates ? Object.keys(inputs.exchangeRates) : 'none'
+    });
+    
     const retirementProjections = window.calculateRetirement ? 
         window.calculateRetirement(inputs) : {};
     

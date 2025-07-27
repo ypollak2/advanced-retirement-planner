@@ -18,18 +18,78 @@ window.ErrorBoundary = class extends React.Component {
     }
 
     componentDidCatch(error, errorInfo) {
-        // Log error details for debugging
-        console.error('🚨 Error Boundary caught an error:', error, errorInfo);
+        // Enhanced error logging with missing input detection
+        const errorDetails = {
+            message: error.toString(),
+            stack: error.stack,
+            componentStack: errorInfo.componentStack,
+            timestamp: new Date().toISOString(),
+            // Add context about missing data
+            missingInputs: this.detectMissingInputs(error),
+            errorType: this.categorizeError(error)
+        };
+        
+        console.error('🚨 Error Boundary caught an error:', errorDetails);
         
         this.setState({
             error: error,
-            errorInfo: errorInfo
+            errorInfo: errorInfo,
+            errorDetails: errorDetails
         });
 
         // Report error to analytics or error reporting service if available
         if (window.reportError) {
-            window.reportError(error, errorInfo);
+            window.reportError(error, errorDetails);
         }
+        
+        // Report to Performance Monitor if available
+        if (window.PerformanceMonitor && window.PerformanceMonitor.trackCalculationError) {
+            window.PerformanceMonitor.trackCalculationError('ErrorBoundary', error, errorDetails);
+        }
+    }
+    
+    detectMissingInputs(error) {
+        const errorStr = error.toString() + (error.stack || '');
+        const missingInputs = [];
+        
+        // Common patterns for missing data errors
+        const patterns = [
+            { pattern: /undefined.*forEach/i, input: 'array or allocation data' },
+            { pattern: /Cannot read.*of undefined/i, input: 'object property' },
+            { pattern: /Cannot read.*of null/i, input: 'null value' },
+            { pattern: /exchangeRates.*undefined/i, input: 'exchange rates' },
+            { pattern: /portfolioAllocations.*undefined/i, input: 'portfolio allocations' },
+            { pattern: /expenses.*undefined/i, input: 'expense data' },
+            { pattern: /invalid.*allocation/i, input: 'allocation configuration' },
+            { pattern: /NaN|Infinity/i, input: 'numeric calculation' }
+        ];
+        
+        patterns.forEach(({ pattern, input }) => {
+            if (pattern.test(errorStr)) {
+                missingInputs.push(input);
+            }
+        });
+        
+        return missingInputs.length > 0 ? missingInputs : ['unknown'];
+    }
+    
+    categorizeError(error) {
+        const errorStr = error.toString();
+        
+        if (errorStr.includes('forEach') || errorStr.includes('map') || errorStr.includes('reduce')) {
+            return 'Array Operation Error';
+        }
+        if (errorStr.includes('undefined') || errorStr.includes('null')) {
+            return 'Missing Data Error';
+        }
+        if (errorStr.includes('NaN') || errorStr.includes('Infinity')) {
+            return 'Calculation Error';
+        }
+        if (errorStr.includes('network') || errorStr.includes('fetch')) {
+            return 'Network Error';
+        }
+        
+        return 'Unknown Error';
     }
 
     handleRetry = () => {
@@ -145,6 +205,30 @@ window.ErrorBoundary = class extends React.Component {
                             onClick: () => window.reportIssue(this.state.error),
                             className: 'w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors'
                         }, t.reportButton)
+                    ]),
+                    
+                    // Enhanced error details section
+                    this.state.errorDetails && this.state.errorDetails.missingInputs && 
+                    React.createElement('div', {
+                        key: 'missing-inputs',
+                        className: 'mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200'
+                    }, [
+                        React.createElement('h4', {
+                            key: 'missing-title',
+                            className: 'font-semibold text-yellow-800 mb-2'
+                        }, 'Likely Cause:'),
+                        React.createElement('ul', {
+                            key: 'missing-list',
+                            className: 'text-sm text-yellow-700 space-y-1'
+                        }, this.state.errorDetails.missingInputs.map((input, index) => 
+                            React.createElement('li', {
+                                key: `missing-${index}`
+                            }, `• Missing or invalid ${input}`)
+                        )),
+                        React.createElement('p', {
+                            key: 'suggestion',
+                            className: 'text-sm text-yellow-600 mt-2'
+                        }, 'Please ensure all required data is properly entered in the wizard.')
                     ]),
                     
                     // Technical details (collapsible)

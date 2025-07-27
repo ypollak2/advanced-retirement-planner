@@ -14,6 +14,10 @@ class PerformanceMonitor {
         this.lastSaveTime = 0;
         this.saveInterval = 30000; // Save every 30 seconds minimum
         
+        // Error tracking
+        this.errors = [];
+        this.maxErrors = 100; // Maximum errors to track
+        
         this.initializeObservers();
         this.setupEventListeners();
     }
@@ -467,6 +471,96 @@ class PerformanceMonitor {
             connection: this.getConnectionInfo()
         };
     }
+    
+    // Track calculation errors with context
+    trackCalculationError(functionName, error, context = {}) {
+        if (!this.isEnabled) return;
+        
+        const errorData = {
+            timestamp: Date.now(),
+            function: functionName,
+            message: error.message || error.toString(),
+            stack: error.stack,
+            type: error.constructor.name,
+            context: {
+                ...context,
+                missingInputs: this.detectMissingInputs(context.inputs || {}),
+                userAgent: navigator.userAgent,
+                url: window.location.href
+            }
+        };
+        
+        // Add to errors array with size limit
+        this.errors.push(errorData);
+        if (this.errors.length > this.maxErrors) {
+            this.errors = this.errors.slice(-this.maxErrors);
+        }
+        
+        // Also record as a metric
+        this.recordMetric('calculation_error', {
+            function: functionName,
+            errorType: error.constructor.name,
+            hasStack: !!error.stack
+        });
+        
+        console.warn(`📊 Tracked calculation error in ${functionName}:`, error.message);
+    }
+    
+    // Detect missing inputs from error context
+    detectMissingInputs(inputs) {
+        const missing = [];
+        
+        // Check common required fields
+        const requiredFields = [
+            'currentAge', 'retirementAge', 'currentMonthlySalary',
+            'pensionContributionRate', 'portfolioAllocations',
+            'exchangeRates', 'expenses'
+        ];
+        
+        requiredFields.forEach(field => {
+            if (!inputs[field] || 
+                (Array.isArray(inputs[field]) && inputs[field].length === 0) ||
+                (typeof inputs[field] === 'object' && Object.keys(inputs[field]).length === 0)) {
+                missing.push(field);
+            }
+        });
+        
+        return missing;
+    }
+    
+    // Get error statistics
+    getErrorStatistics() {
+        const stats = {
+            totalErrors: this.errors.length,
+            errorsByFunction: {},
+            errorsByType: {},
+            recentErrors: this.errors.slice(-10),
+            missingInputFrequency: {}
+        };
+        
+        this.errors.forEach(error => {
+            // Count by function
+            stats.errorsByFunction[error.function] = (stats.errorsByFunction[error.function] || 0) + 1;
+            
+            // Count by type
+            stats.errorsByType[error.type] = (stats.errorsByType[error.type] || 0) + 1;
+            
+            // Count missing inputs
+            if (error.context.missingInputs) {
+                error.context.missingInputs.forEach(input => {
+                    stats.missingInputFrequency[input] = (stats.missingInputFrequency[input] || 0) + 1;
+                });
+            }
+        });
+        
+        return stats;
+    }
+    
+    // Clear error history
+    clearErrors() {
+        this.errors = [];
+        console.log('📊 Error history cleared');
+    }
 }
 
 // Create global instance
@@ -531,4 +625,9 @@ window.getPerformanceInfo = () => performanceMonitor.getRealTimeInfo();
 window.getStorageInfo = () => performanceMonitor.getStorageInfo();
 window.clearPerformanceMetrics = () => performanceMonitor.clearOldMetrics();
 
-console.log('📊 Performance Monitor initialized');
+// Error tracking functions
+window.trackCalculationError = (functionName, error, context) => performanceMonitor.trackCalculationError(functionName, error, context);
+window.getErrorStatistics = () => performanceMonitor.getErrorStatistics();
+window.clearErrorHistory = () => performanceMonitor.clearErrors();
+
+console.log('📊 Performance Monitor initialized with error tracking');

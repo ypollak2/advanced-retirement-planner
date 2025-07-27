@@ -329,84 +329,170 @@ function calculateTimeHorizonScore(inputs) {
  * Calculate risk alignment score
  */
 function calculateRiskAlignmentScore(inputs) {
-    const currentAge = parseFloat(inputs.currentAge || 30);
-    const riskTolerance = inputs.riskTolerance || 'moderate';
-    const stockPercentage = parseFloat(inputs.stockPercentage || 60);
-    
-    // Age-based recommended stock allocation: 100 - age, with min 20%
-    const recommendedStockPercentage = Math.max(20, 100 - currentAge);
-    const deviation = Math.abs(stockPercentage - recommendedStockPercentage);
-    
-    let alignmentScore = Math.max(0, 100 - deviation * 2);
-    
-    // Adjust for risk tolerance
-    if (riskTolerance === 'conservative' && stockPercentage > 40) alignmentScore *= 0.8;
-    if (riskTolerance === 'aggressive' && stockPercentage < 70) alignmentScore *= 0.8;
-    
-    const maxScore = SCORE_FACTORS.riskAlignment.weight;
-    const score = (alignmentScore / 100) * maxScore;
-    
-    let status = 'poor';
-    if (alignmentScore >= 95) status = 'excellent';
-    else if (alignmentScore >= 85) status = 'good';
-    else if (alignmentScore >= 70) status = 'fair';
-    else if (alignmentScore >= 50) status = 'poor';
-    else status = 'critical';
-    
-    return {
-        score: Math.round(score),
-        details: {
-            stockPercentage: stockPercentage,
-            recommendedPercentage: recommendedStockPercentage,
-            deviation: deviation,
-            alignmentScore: alignmentScore,
-            status: status
+    try {
+        // Validate inputs exist
+        if (!inputs || typeof inputs !== 'object') {
+            console.warn('calculateRiskAlignmentScore: Invalid inputs provided');
+            return { score: 0, details: { status: 'no_data', message: 'Invalid inputs' } };
         }
-    };
+        
+        const currentAge = parseFloat(inputs.currentAge || 30);
+        const riskTolerance = inputs.riskTolerance || 'moderate';
+        
+        // Check if portfolio allocations exist for better stock percentage calculation
+        let stockPercentage = 0;
+        if (inputs.portfolioAllocations && Array.isArray(inputs.portfolioAllocations)) {
+            // Calculate stock percentage from portfolio allocations
+            const stockAllocation = inputs.portfolioAllocations.find(a => 
+                a && a.index && (a.index.toLowerCase().includes('stock') || a.index.toLowerCase().includes('equity'))
+            );
+            stockPercentage = stockAllocation ? parseFloat(stockAllocation.percentage || 0) : 0;
+        } else {
+            // Fallback to direct field
+            stockPercentage = parseFloat(inputs.stockPercentage || 60);
+        }
+        
+        // If no allocation data available, return minimal score
+        if (stockPercentage === 0 && !inputs.portfolioAllocations && !inputs.stockPercentage) {
+            return { 
+                score: 0, 
+                details: { 
+                    status: 'no_data', 
+                    message: 'No portfolio allocation data available',
+                    stockPercentage: 0,
+                    recommendedPercentage: Math.max(20, 100 - currentAge)
+                } 
+            };
+        }
+        
+        // Age-based recommended stock allocation: 100 - age, with min 20%
+        const recommendedStockPercentage = Math.max(20, 100 - currentAge);
+        const deviation = Math.abs(stockPercentage - recommendedStockPercentage);
+        
+        let alignmentScore = Math.max(0, 100 - deviation * 2);
+        
+        // Adjust for risk tolerance
+        if (riskTolerance === 'conservative' && stockPercentage > 40) alignmentScore *= 0.8;
+        if (riskTolerance === 'aggressive' && stockPercentage < 70) alignmentScore *= 0.8;
+        
+        const maxScore = SCORE_FACTORS.riskAlignment.weight;
+        const score = (alignmentScore / 100) * maxScore;
+        
+        let status = 'poor';
+        if (alignmentScore >= 95) status = 'excellent';
+        else if (alignmentScore >= 85) status = 'good';
+        else if (alignmentScore >= 70) status = 'fair';
+        else if (alignmentScore >= 50) status = 'poor';
+        else status = 'critical';
+        
+        // Ensure score is valid
+        const finalScore = isNaN(score) || !isFinite(score) ? 0 : Math.round(score);
+        
+        return {
+            score: finalScore,
+            details: {
+                stockPercentage: stockPercentage,
+                recommendedPercentage: recommendedStockPercentage,
+                deviation: deviation,
+                alignmentScore: alignmentScore,
+                status: status,
+                dataSource: inputs.portfolioAllocations ? 'portfolio_allocations' : 'direct_field'
+            }
+        };
+    } catch (error) {
+        console.error('calculateRiskAlignmentScore: Error during calculation', error);
+        return { score: 0, details: { status: 'error', message: error.message } };
+    }
 }
 
 /**
  * Calculate diversification score
  */
 function calculateDiversificationScore(inputs) {
-    let assetClasses = 0;
-    
-    if (parseFloat(inputs.currentSavings || 0) > 0) assetClasses++; // Pension
-    if (parseFloat(inputs.currentPersonalPortfolio || 0) > 0) assetClasses++; // Stocks/Bonds
-    if (parseFloat(inputs.currentRealEstate || 0) > 0) assetClasses++; // Real Estate
-    if (parseFloat(inputs.currentCryptoFiatValue || inputs.currentCrypto || 0) > 0) assetClasses++; // Crypto
-    if (parseFloat(inputs.currentSavingsAccount || 0) > 0) assetClasses++; // Cash
-    if (parseFloat(inputs.currentTrainingFund || 0) > 0) assetClasses++; // Training Fund
-    
-    const maxScore = SCORE_FACTORS.diversification.weight;
-    let score = 0;
-    let status = 'poor';
-    
-    if (assetClasses >= SCORE_FACTORS.diversification.benchmarks.excellent) {
-        score = maxScore;
-        status = 'excellent';
-    } else if (assetClasses >= SCORE_FACTORS.diversification.benchmarks.good) {
-        score = maxScore * 0.85;
-        status = 'good';
-    } else if (assetClasses >= SCORE_FACTORS.diversification.benchmarks.fair) {
-        score = maxScore * 0.70;
-        status = 'fair';
-    } else if (assetClasses >= SCORE_FACTORS.diversification.benchmarks.poor) {
-        score = maxScore * 0.50;
-        status = 'poor';
-    } else {
-        score = 0;
-        status = 'critical';
-    }
-    
-    return {
-        score: Math.round(score),
-        details: {
-            assetClasses: assetClasses,
-            status: status,
-            missingClasses: Math.max(0, SCORE_FACTORS.diversification.benchmarks.good - assetClasses)
+    try {
+        // Validate inputs
+        if (!inputs || typeof inputs !== 'object') {
+            console.warn('calculateDiversificationScore: Invalid inputs provided');
+            return { score: 0, details: { status: 'no_data', assetClasses: 0 } };
         }
-    };
+        
+        let assetClasses = 0;
+        const assetDetails = [];
+        
+        // Check each asset class with proper validation
+        const pensionAmount = parseFloat(inputs.currentSavings || 0);
+        if (pensionAmount > 0) {
+            assetClasses++;
+            assetDetails.push({ type: 'Pension', amount: pensionAmount });
+        }
+        
+        const portfolioAmount = parseFloat(inputs.currentPersonalPortfolio || 0);
+        if (portfolioAmount > 0) {
+            assetClasses++;
+            assetDetails.push({ type: 'Stocks/Bonds', amount: portfolioAmount });
+        }
+        
+        const realEstateAmount = parseFloat(inputs.currentRealEstate || 0);
+        if (realEstateAmount > 0) {
+            assetClasses++;
+            assetDetails.push({ type: 'Real Estate', amount: realEstateAmount });
+        }
+        
+        const cryptoAmount = parseFloat(inputs.currentCryptoFiatValue || inputs.currentCrypto || 0);
+        if (cryptoAmount > 0) {
+            assetClasses++;
+            assetDetails.push({ type: 'Crypto', amount: cryptoAmount });
+        }
+        
+        const cashAmount = parseFloat(inputs.currentSavingsAccount || inputs.emergencyFund || 0);
+        if (cashAmount > 0) {
+            assetClasses++;
+            assetDetails.push({ type: 'Cash/Savings', amount: cashAmount });
+        }
+        
+        const trainingFundAmount = parseFloat(inputs.currentTrainingFund || 0);
+        if (trainingFundAmount > 0) {
+            assetClasses++;
+            assetDetails.push({ type: 'Training Fund', amount: trainingFundAmount });
+        }
+        
+        const maxScore = SCORE_FACTORS.diversification.weight;
+        let score = 0;
+        let status = 'poor';
+        
+        if (assetClasses >= SCORE_FACTORS.diversification.benchmarks.excellent) {
+            score = maxScore;
+            status = 'excellent';
+        } else if (assetClasses >= SCORE_FACTORS.diversification.benchmarks.good) {
+            score = maxScore * 0.85;
+            status = 'good';
+        } else if (assetClasses >= SCORE_FACTORS.diversification.benchmarks.fair) {
+            score = maxScore * 0.70;
+            status = 'fair';
+        } else if (assetClasses >= SCORE_FACTORS.diversification.benchmarks.poor) {
+            score = maxScore * 0.50;
+            status = 'poor';
+        } else {
+            score = 0;
+            status = 'critical';
+        }
+        
+        // Ensure score is valid
+        const finalScore = isNaN(score) || !isFinite(score) ? 0 : Math.round(score);
+        
+        return {
+            score: finalScore,
+            details: {
+                assetClasses: assetClasses,
+                status: status,
+                missingClasses: Math.max(0, SCORE_FACTORS.diversification.benchmarks.good - assetClasses),
+                assets: assetDetails
+            }
+        };
+    } catch (error) {
+        console.error('calculateDiversificationScore: Error during calculation', error);
+        return { score: 0, details: { status: 'error', message: error.message, assetClasses: 0 } };
+    }
 }
 
 /**
@@ -922,16 +1008,39 @@ function calculateFinancialHealthScore(inputs) {
             key.includes('contribution') || key.includes('savings')
         ));
         
-        const factors = {
-            savingsRate: calculateSavingsRateScore(inputs),
-            retirementReadiness: calculateRetirementReadinessScore(inputs),
-            timeHorizon: calculateTimeHorizonScore(inputs),
-            riskAlignment: calculateRiskAlignmentScore(inputs),
-            diversification: calculateDiversificationScore(inputs),
-            taxEfficiency: calculateTaxEfficiencyScore(inputs),
-            emergencyFund: calculateEmergencyFundScore(inputs),
-            debtManagement: calculateDebtManagementScore(inputs)
+        // Calculate each factor with error handling
+        const factors = {};
+        
+        // Helper function to safely calculate each factor
+        const safeCalculate = (factorName, calculateFunction) => {
+            try {
+                const result = calculateFunction(inputs);
+                // Validate result structure
+                if (!result || typeof result !== 'object' || typeof result.score !== 'number') {
+                    console.warn(`${factorName}: Invalid result structure, using default`);
+                    return { score: 0, details: { status: 'error', message: 'Invalid calculation result' } };
+                }
+                // Ensure score is finite and valid
+                if (!isFinite(result.score) || isNaN(result.score)) {
+                    console.warn(`${factorName}: Invalid score value, using 0`);
+                    result.score = 0;
+                }
+                return result;
+            } catch (error) {
+                console.error(`${factorName}: Calculation failed`, error);
+                return { score: 0, details: { status: 'error', message: error.message } };
+            }
         };
+        
+        // Calculate each factor with safety wrapper
+        factors.savingsRate = safeCalculate('savingsRate', calculateSavingsRateScore);
+        factors.retirementReadiness = safeCalculate('retirementReadiness', calculateRetirementReadinessScore);
+        factors.timeHorizon = safeCalculate('timeHorizon', calculateTimeHorizonScore);
+        factors.riskAlignment = safeCalculate('riskAlignment', calculateRiskAlignmentScore);
+        factors.diversification = safeCalculate('diversification', calculateDiversificationScore);
+        factors.taxEfficiency = safeCalculate('taxEfficiency', calculateTaxEfficiencyScore);
+        factors.emergencyFund = safeCalculate('emergencyFund', calculateEmergencyFundScore);
+        factors.debtManagement = safeCalculate('debtManagement', calculateDebtManagementScore);
         
         // Debug logging for factor scores
         console.log('📈 Factor Scores Breakdown:');
