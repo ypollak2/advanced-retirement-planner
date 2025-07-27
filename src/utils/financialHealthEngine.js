@@ -1012,18 +1012,18 @@ function calculateFinancialHealthScore(inputs) {
         const factors = {};
         
         // Helper function to safely calculate each factor
-        const safeCalculate = (factorName, calculateFunction) => {
+        const safeCalculate = (factorName, calculator) => {
             try {
                 console.log(`🔧 Calculating ${factorName}...`);
-                const result = calculateFunction(inputs);
+                const result = calculator(inputs);
                 console.log(`🔧 ${factorName} result:`, result);
                 // Validate result structure - be more specific about what we expect
                 if (!result) {
-                    console.warn(`${factorName}: Function returned null/undefined, using default`);
-                    return { score: 0, details: { status: 'error', message: 'Function returned null' } };
+                    console.warn(`${factorName}: Calculator returned null/undefined, using default`);
+                    return { score: 0, details: { status: 'error', message: 'Calculator returned null' } };
                 }
                 if (typeof result !== 'object') {
-                    console.warn(`${factorName}: Function returned non-object (${typeof result}), using default`);
+                    console.warn(`${factorName}: Calculator returned non-object (${typeof result}), using default`);
                     return { score: 0, details: { status: 'error', message: `Expected object, got ${typeof result}` } };
                 }
                 if (typeof result.score !== 'number') {
