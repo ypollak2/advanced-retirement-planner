@@ -17,7 +17,12 @@ const RECOMMENDED_EXPENSE_RATIOS = {
     food: { min: 10, max: 20, ideal: 15 },
     insurance: { min: 5, max: 15, ideal: 10 },
     other: { min: 5, max: 20, ideal: 10 },
-    savings: { min: 10, max: 30, ideal: 20 }
+    savings: { min: 10, max: 30, ideal: 20 },
+    // Debt payment categories
+    mortgage: { min: 0, max: 28, ideal: 20 },
+    carLoan: { min: 0, max: 10, ideal: 5 },
+    creditCard: { min: 0, max: 5, ideal: 0 },
+    otherDebt: { min: 0, max: 10, ideal: 5 }
 };
 
 /**
@@ -110,6 +115,12 @@ function analyzeExpenseRatios(expenses, monthlyIncome, language = 'en') {
         const amount = parseFloat(expenses[category]) || 0;
         const ratio = (amount / monthlyIncome) * 100;
         const recommended = RECOMMENDED_EXPENSE_RATIOS[category];
+        
+        // Safety check: skip if no recommended ratios found for this category
+        if (!recommended) {
+            console.warn(`No recommended ratios found for category: ${category}`);
+            return;
+        }
         
         analysis[category] = {
             amount: amount,

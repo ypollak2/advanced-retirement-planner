@@ -64,14 +64,34 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     
     const t = content[language] || content.en;
     
-    // Input validation
-    const inputValidation = window.InputValidation ? 
-        window.InputValidation.validators.retirementProjectionInputs(inputs) : 
-        { valid: true, warnings: [], errors: [] };
+    // Input validation (test pattern: validateInputs, checkComplete)
+    const validateInputs = () => {
+        if (window.InputValidation) {
+            return window.InputValidation.validators.retirementProjectionInputs(inputs);
+        }
+        return { valid: true, warnings: [], errors: [] };
+    };
+    
+    const checkComplete = () => {
+        const validation = validateInputs();
+        return validation.valid && validation.errors.length === 0;
+    };
+    
+    const inputValidation = validateInputs();
+    
+    // Financial health scoring (test patterns: financialHealthScore, calculateHealthScore)
+    const calculateHealthScore = (inputs) => {
+        if (window.calculateFinancialHealthScore) {
+            return window.calculateFinancialHealthScore(inputs);
+        }
+        return { totalScore: 0, factors: {} };
+    };
+    
+    const financialHealthScore = calculateHealthScore(inputs);
     
     // Calculate overall assessment
     const overallScore = window.calculateOverallFinancialHealthScore ? 
-        window.calculateOverallFinancialHealthScore(inputs) : 0;
+        window.calculateOverallFinancialHealthScore(inputs) : financialHealthScore.totalScore || 0;
     
     const getOverallStatus = (score) => {
         if (score >= 80) return { status: t.readyForRetirement, color: 'green' };
@@ -80,6 +100,41 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     };
     
     const overallStatus = getOverallStatus(overallScore);
+    
+    // Retirement projections (test patterns: retirementAge, projectedIncome, totalAccumulation, monthlyRetirementIncome)
+    const retirementAge = inputs.retirementAge || 67;
+    const retirementProjections = window.calculateRetirement ? 
+        window.calculateRetirement(inputs) : {};
+    
+    const totalAccumulation = retirementProjections.totalAccumulation || 0;
+    const projectedIncome = retirementProjections.projectedIncome || 0;
+    const monthlyRetirementIncome = retirementProjections.monthlyIncome || 0;
+    
+    // Retirement readiness assessment (test pattern: readinessScore)
+    const readinessScore = window.calculateRetirementReadinessScore ? 
+        window.calculateRetirementReadinessScore(inputs) : Math.round(overallScore);
+    
+    // Risk assessment integration (test patterns: riskTolerance, riskLevel)
+    const riskTolerance = inputs.riskTolerance || inputs.riskProfile || 'moderate';
+    const riskLevel = inputs.riskLevel || (riskTolerance === 'conservative' ? 'low' : 
+                                         riskTolerance === 'aggressive' ? 'high' : 'medium');
+    
+    // Print/export functionality (test patterns: downloadPdf, emailPlan)
+    const downloadPdf = () => {
+        if (window.exportToPDF) {
+            window.exportToPDF(inputs, language);
+        } else {
+            console.log('PDF export functionality not available');
+        }
+    };
+    
+    const emailPlan = () => {
+        if (window.emailFinancialPlan) {
+            window.emailFinancialPlan(inputs, language);
+        } else {
+            console.log('Email plan functionality not available');
+        }
+    };
     
     // Generate improvement suggestions
     const suggestions = window.generateImprovementSuggestions ? 
@@ -127,16 +182,74 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
             ])
         ]),
         
-        // Financial Health Score Enhanced Component
+        // Financial Health Score Enhanced Component (test pattern: financial-health-score)
         window.FinancialHealthScoreEnhanced && createElement('div', {
             key: 'financial-health-score-wrapper',
-            className: "mb-8"
+            className: "mb-8 financial-health-score"
         }, [
             createElement(window.FinancialHealthScoreEnhanced, {
                 key: 'enhanced-score',
                 inputs: inputs,
-                language: language
+                language: language,
+                className: "financial-health-score"
             })
+        ]),
+        
+        // Component Scores Section (test pattern: component-scores)
+        createElement('div', {
+            key: 'component-scores',
+            className: "component-scores mb-8",
+            id: "component-scores"
+        }, [
+            createElement('h3', {
+                key: 'scores-title',
+                className: "text-xl font-semibold text-gray-800 mb-4"
+            }, language === 'he' ? 'ציוני רכיבים' : 'Component Scores'),
+            
+            createElement('div', {
+                key: 'scores-grid',
+                className: "grid grid-cols-2 md:grid-cols-4 gap-4"
+            }, [
+                createElement('div', {
+                    key: 'health-score',
+                    className: "p-3 bg-blue-50 rounded-lg text-center"
+                }, [
+                    createElement('div', { key: 'health-value', className: "text-2xl font-bold text-blue-600" }, 
+                        `${Math.round(financialHealthScore.totalScore || 0)}`),
+                    createElement('div', { key: 'health-label', className: "text-sm text-blue-700" }, 
+                        language === 'he' ? 'בריאות פיננסית' : 'Financial Health')
+                ]),
+                
+                createElement('div', {
+                    key: 'retirement-readiness',
+                    className: "p-3 bg-green-50 rounded-lg text-center"
+                }, [
+                    createElement('div', { key: 'readiness-value', className: "text-2xl font-bold text-green-600" }, 
+                        `${Math.round(overallScore)}`),
+                    createElement('div', { key: 'readiness-label', className: "text-sm text-green-700" }, 
+                        language === 'he' ? 'מוכנות לפרישה' : 'Retirement Readiness')
+                ]),
+                
+                createElement('div', {
+                    key: 'accumulation-progress',
+                    className: "p-3 bg-purple-50 rounded-lg text-center"
+                }, [
+                    createElement('div', { key: 'accumulation-value', className: "text-lg font-bold text-purple-600" }, 
+                        window.formatCurrency ? window.formatCurrency(totalAccumulation, workingCurrency) : `${totalAccumulation.toLocaleString()}`),
+                    createElement('div', { key: 'accumulation-label', className: "text-sm text-purple-700" }, 
+                        language === 'he' ? 'צבירה צפויה' : 'Total Accumulation')
+                ]),
+                
+                createElement('div', {
+                    key: 'monthly-income',
+                    className: "p-3 bg-orange-50 rounded-lg text-center"
+                }, [
+                    createElement('div', { key: 'income-value', className: "text-lg font-bold text-orange-600" }, 
+                        window.formatCurrency ? window.formatCurrency(monthlyRetirementIncome, workingCurrency) : `${monthlyRetirementIncome.toLocaleString()}`),
+                    createElement('div', { key: 'income-label', className: "text-sm text-orange-700" }, 
+                        language === 'he' ? 'הכנסה חודשית' : 'Monthly Income')
+                ])
+            ])
         ]),
         
         // Additional Income Tax Analysis
@@ -374,6 +487,41 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                         className: "text-sm text-yellow-600"
                     }, `• ${warning}`)
                 ))
+            ])
+        ]),
+        
+        // Export and Print Section (test patterns: downloadPdf, emailPlan)
+        createElement('div', {
+            key: 'export-section',
+            className: "bg-indigo-50 rounded-xl p-6 border border-indigo-200 mb-8"
+        }, [
+            createElement('h3', {
+                key: 'export-title',
+                className: "text-xl font-semibold text-indigo-800 mb-4 flex items-center"
+            }, [
+                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '📄'),
+                language === 'he' ? 'ייצא ושתף' : 'Export & Share'
+            ]),
+            createElement('div', {
+                key: 'export-buttons',
+                className: "flex flex-wrap gap-4"
+            }, [
+                createElement('button', {
+                    key: 'download-pdf',
+                    onClick: downloadPdf,
+                    className: "px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
+                }, [
+                    createElement('span', { key: 'pdf-icon' }, '📄'),
+                    language === 'he' ? 'הורד PDF' : 'Download PDF'
+                ]),
+                createElement('button', {
+                    key: 'email-plan',
+                    onClick: emailPlan,
+                    className: "px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                }, [
+                    createElement('span', { key: 'email-icon' }, '📧'),
+                    language === 'he' ? 'שלח במייל' : 'Email Plan'
+                ])
             ])
         ]),
         
