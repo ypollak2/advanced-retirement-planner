@@ -330,7 +330,11 @@ const ExpenseAnalysisPanel = ({ inputs, language = 'en', workingCurrency = 'ILS'
                     className: "flex items-start text-sm text-yellow-700"
                 }, [
                     createElement('span', { key: 'bullet', className: "mr-2 mt-0.5" }, '•'),
-                    createElement('span', { key: 'text' }, recommendation.text || recommendation)
+                    createElement('span', { key: 'text' }, 
+                        typeof recommendation === 'object' ? 
+                            (recommendation.message || recommendation.text || JSON.stringify(recommendation)) : 
+                            recommendation
+                    )
                 ])
             ))
         ]),

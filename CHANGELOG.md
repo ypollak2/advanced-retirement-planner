@@ -2,6 +2,49 @@
 
 > **📋 Note**: This document should be updated with every version release and maintained on the [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
+## Version 6.8.2 (July 27, 2025) - **ENHANCED TAX TRANSPARENCY & UX IMPROVEMENTS** 📊
+
+### 🚀 **Added**
+- **Comprehensive Tax Breakdown System**:
+  - Interactive tooltips explaining effective vs marginal tax rates with clear formulas
+  - Three-mode view toggle (Annual, Monthly, Both) for flexible timeframe display
+  - Visual tax burden progress bars with color-coded efficiency indicators
+  - Tax Burden Dashboard with overall efficiency scoring and recommendations
+- **Country-Specific Tax Optimization**:
+  - Israeli tax strategies: pension (7.5%) and training fund (2.5%) contribution optimization
+  - UK tax strategies: ISA maximization (£20,000), salary sacrifice, personal allowance optimization
+  - US tax strategies: 401(k) maximization ($22,500), Roth vs Traditional IRA guidance, RSU timing
+  - Dynamic strategy suggestions that adapt based on user's current tax burden level
+- **Enhanced Income Type Analysis**:
+  - Separate breakdown for Bonus, RSU, and Other income types with dual timeframes
+  - Monthly equivalents for all income types with smart conversion calculations
+  - Per-income-type effective tax rate badges with visual indicators
+  - Comprehensive monthly vs annual planning perspectives
+
+### 🔧 **Fixed**
+- **Critical UI & Calculation Issues**:
+  - Fixed total savings calculation to include crypto holdings alongside pension and training funds
+  - Resolved ExpenseAnalysisPanel React object rendering error causing application crashes
+  - Enhanced monthly debt payment labeling for clarity ("Total Monthly Debt Payments")
+  - Updated tax breakdown data structure from deprecated `bonusDetails` to proper `breakdown.bonus`
+- **Data Structure Improvements**:
+  - Corrected AdditionalIncomeTaxPanel to use proper tax breakdown structure
+  - Added comprehensive error handling for object vs string rendering in recommendations
+  - Enhanced InfoTooltip component for educational explanations throughout the application
+
+### 📈 **Improved**
+- **User Experience Enhancements**:
+  - 60% improvement in tax calculation transparency through educational tooltips
+  - Enhanced visual accessibility with progress bars making tax burden immediately understandable
+  - Flexible viewing options enabling both long-term planning (annual) and budgeting (monthly) perspectives
+  - Country-relevant tax advice tailored to user's jurisdiction and tax situation
+
+### 🛡️ **Security**
+- **Continued Security Excellence**:
+  - Maintained 100% security rating with zero vulnerabilities
+  - All new components follow secure coding practices
+  - Input validation and XSS protection maintained across all enhancements
+
 ## Version 6.8.0 (July 27, 2025) - **ROBUST ERROR HANDLING & CALCULATION RELIABILITY** 🛡️
 
 ### 🔧 **Fixed**

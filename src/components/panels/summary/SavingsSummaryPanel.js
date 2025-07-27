@@ -53,7 +53,14 @@ const SavingsSummaryPanel = ({
             rawPensionSavings : Math.max((userAge - 22) * 12000, 50000);
         const safeCurrentTrainingFundSavings = (rawTrainingFundSavings !== undefined && rawTrainingFundSavings !== null) ? 
             rawTrainingFundSavings : Math.max((userAge - 22) * 8000, 25000);
-        const totalSavings = safeCurrentPensionSavings + safeCurrentTrainingFundSavings;
+        // Include crypto and other investment savings in total
+        const currentCrypto = inputs.currentCryptoFiatValue || inputs.currentCrypto || 0;
+        const currentSavingsAccount = inputs.currentSavingsAccount || 0;
+        const currentRealEstate = inputs.currentRealEstate || 0;
+        const currentInvestments = inputs.currentInvestments || 0;
+        
+        const totalSavings = safeCurrentPensionSavings + safeCurrentTrainingFundSavings + 
+                           currentCrypto + currentSavingsAccount + currentRealEstate + currentInvestments;
         
         const formatCurrency = (amount, currency = workingCurrency) => {
             const symbols = { 'ILS': '₪', 'USD': '$', 'EUR': '€', 'GBP': '£', 'BTC': '₿', 'ETH': 'Ξ' };

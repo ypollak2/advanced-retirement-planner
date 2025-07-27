@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v6.8.1 ✨
+# 🚀 Advanced Retirement Planner v6.8.2 ✨
 
-[![Version](https://img.shields.io/badge/version-6.8.1-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-6.8.2-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -26,6 +26,34 @@
 > **📋 Deployment Status**: GitHub Pages is the primary deployment and is fully operational with the reorganized component structure. Netlify is currently rebuilding after the repository reorganization and should be available shortly.
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
+
+## 🎨 What's New in v6.8.2 - ENHANCED TAX TRANSPARENCY & UX IMPROVEMENTS 📊
+
+### **🎯 COMPREHENSIVE TAX BREAKDOWN ENHANCEMENTS** (July 2025)
+
+#### **💡 Educational Tax Insights**
+- **Interactive Tax Tooltips**: Hover explanations for effective vs marginal tax rates with clear formulas
+- **Country-Specific Optimization**: Tailored tax strategies for Israel, UK, and US with specific contribution limits
+- **Visual Tax Burden Indicators**: Color-coded progress bars showing tax efficiency (Green: <20%, Yellow: 20-30%, Orange: 30-40%, Red: >40%)
+- **Tax Burden Dashboard**: Comprehensive overview with efficiency scoring and optimization recommendations
+
+#### **📅 Flexible Timeframe Display**
+- **Monthly/Annual Dual View**: Three-mode toggle (Annual, Monthly, Both) for better planning perspectives
+- **Enhanced Income Type Breakdown**: Separate analysis for Bonus, RSU, and Other income with dual timeframes
+- **Smart Monthly Equivalents**: Automatic conversion showing both annual totals and monthly budgeting amounts
+- **Progress Bar Visualizations**: Immediate visual understanding of tax burden across income types
+
+#### **🌍 Country-Specific Tax Context**
+- **Israeli Optimization**: Pension (7.5%) and training fund (2.5%) contribution strategies, bonus spreading advice
+- **UK Optimization**: ISA maximization (£20,000), salary sacrifice schemes, personal allowance optimization
+- **US Optimization**: 401(k) maximization ($22,500), Roth vs Traditional IRA guidance, RSU timing strategies
+- **Dynamic Strategy Suggestions**: Recommendations adapt based on user's current tax burden level
+
+#### **🔧 Critical UI & Calculation Fixes**
+- **Crypto Integration**: Fixed total savings calculation to include all asset types (crypto, real estate, investments)
+- **ExpenseAnalysisPanel Error**: Resolved React object rendering crashes in recommendation display
+- **Monthly Debt Payment Clarity**: Enhanced labeling to clearly indicate monthly vs total debt payments
+- **Enhanced Data Structure**: Updated tax breakdown to use proper data structure (`breakdown.bonus` vs deprecated `bonusDetails`)
 
 ## 🎨 What's New in v6.8.0 - ROBUST ERROR HANDLING & CALCULATION FIXES 🛡️
 

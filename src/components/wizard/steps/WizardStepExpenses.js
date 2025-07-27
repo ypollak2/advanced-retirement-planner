@@ -78,7 +78,7 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
             creditCardHint: 'Minimum or regular credit card payments',
             otherDebt: 'Other Loan Payments',
             otherDebtHint: 'Personal loans, other debt obligations',
-            totalDebt: 'Total Debt Payments',
+            totalDebt: 'Total Monthly Debt Payments',
             debtToIncomeRatio: 'Debt-to-Income Ratio',
             
             total: 'Total Monthly Expenses',
