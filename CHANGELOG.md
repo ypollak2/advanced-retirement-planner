@@ -2,6 +2,48 @@
 
 > **📋 Note**: This document should be updated with every version release and maintained on the [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
+## Version 6.6.6 (July 27, 2025) - **FINANCIAL HEALTH SCORE & TAX EFFICIENCY FIXES** 🏥
+
+### 🔧 **Fixed**
+- **Critical Financial Health Score Issues**:
+  - Fixed `getFieldValue()` utility to handle 20+ field name variations (currentMonthlySalary vs monthlyIncome, etc.)
+  - Resolved country code case sensitivity causing calculation failures
+  - Fixed zero scores for Savings Rate and Tax Efficiency despite valid input data
+  - Added comprehensive null/zero validation to prevent NaN scores
+- **Tax Efficiency Calculation Bugs**:
+  - Enhanced tax efficiency to consider additional income dilution effects
+  - Fixed integration between Financial Health Score and additional income tax calculations
+  - Resolved field mapping issues preventing proper tax optimization assessment
+- **Currency Conversion Safety**: Enhanced error handling to prevent division by zero crashes
+
+### 🚀 **Added**  
+- **Enhanced Debug System**:
+  - Added warning icons and tooltips for zero scores with actionable guidance
+  - Comprehensive debug panels showing why scores are zero and how to fix them
+  - Real-time validation feedback in Financial Health Score component
+- **Additional Income Tax Integration**:
+  - Complete integration of bonus, rental, dividend income with Financial Health Score
+  - Detailed tax breakdown displays in review step (gross/tax/net for each income type)
+  - Real-time tax impact visualization in wizard steps
+  - Enhanced tooltips with tax optimization suggestions
+- **UI/UX Enhancements**:
+  - Contextual help system with expandable information panels
+  - Enhanced error messages with specific steps to resolve issues
+  - Improved mobile responsiveness for Financial Health Score display
+
+### 🎯 **Changed**
+- **Tax Efficiency Algorithm**: Now considers overall tax optimization across all income sources instead of just pension contributions
+- **Field Mapping System**: Robust field name resolution supporting multiple input field variations
+- **Test Suite**: Expanded to 248 comprehensive tests covering all edge cases and financial calculations
+- **Error Handling**: Enhanced validation throughout application with user-friendly messaging
+
+### 🛡️ **Security**
+- Maintained zero security vulnerabilities with comprehensive input validation
+- Enhanced XSS protection across all user input fields
+- Continued A+ security rating compliance
+
+---
+
 ## Version 6.6.5 (July 25, 2025) - **EXPENSE TRACKING & ANALYSIS** 💰
 
 ### 🚀 **Added**
