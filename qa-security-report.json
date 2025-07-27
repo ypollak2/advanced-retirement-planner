@@ -11,7 +11,7 @@
       "description": "Content Security Policy allows unsafe-inline which may enable XSS attacks",
       "file": "index.html",
       "line": "",
-      "timestamp": "2025-07-27T13:30:28.410Z"
+      "timestamp": "2025-07-27T13:36:49.396Z"
     },
     {
       "category": "security",
@@ -20,7 +20,7 @@
       "description": "Direct innerHTML usage can lead to XSS vulnerabilities",
       "file": "src/app.js",
       "line": 345,
-      "timestamp": "2025-07-27T13:30:28.418Z"
+      "timestamp": "2025-07-27T13:36:49.406Z"
     },
     {
       "category": "security",
@@ -29,7 +29,7 @@
       "description": "Direct innerHTML usage can lead to XSS vulnerabilities",
       "file": "src/components/core/RetirementPlannerApp.js",
       "line": 1196,
-      "timestamp": "2025-07-27T13:30:28.425Z"
+      "timestamp": "2025-07-27T13:36:49.413Z"
     },
     {
       "category": "security",
@@ -38,7 +38,7 @@
       "description": "Direct innerHTML usage can lead to XSS vulnerabilities",
       "file": "src/utils/robustLocalStorage.js",
       "line": 103,
-      "timestamp": "2025-07-27T13:30:28.456Z"
+      "timestamp": "2025-07-27T13:36:49.446Z"
     },
     {
       "category": "security",
@@ -47,7 +47,7 @@
       "description": "Consider using JSON.stringify for localStorage data",
       "file": "src/utils/performanceMonitor.js",
       "line": 321,
-      "timestamp": "2025-07-27T13:30:28.493Z"
+      "timestamp": "2025-07-27T13:36:49.487Z"
     },
     {
       "category": "security",
@@ -56,7 +56,7 @@
       "description": "Consider using JSON.stringify for localStorage data",
       "file": "src/utils/robustLocalStorage.js",
       "line": 151,
-      "timestamp": "2025-07-27T13:30:28.494Z"
+      "timestamp": "2025-07-27T13:36:49.488Z"
     },
     {
       "category": "security",
@@ -65,7 +65,7 @@
       "description": "Consider using JSON.stringify for localStorage data",
       "file": "src/utils/robustLocalStorage.js",
       "line": 152,
-      "timestamp": "2025-07-27T13:30:28.494Z"
+      "timestamp": "2025-07-27T13:36:49.488Z"
     },
     {
       "category": "security",
@@ -74,7 +74,7 @@
       "description": "Consider using JSON.stringify for localStorage data",
       "file": "src/utils/robustLocalStorage.js",
       "line": 160,
-      "timestamp": "2025-07-27T13:30:28.494Z"
+      "timestamp": "2025-07-27T13:36:49.488Z"
     },
     {
       "category": "security",
@@ -83,7 +83,7 @@
       "description": "Consider using JSON.stringify for localStorage data",
       "file": "src/utils/robustLocalStorage.js",
       "line": 334,
-      "timestamp": "2025-07-27T13:30:28.494Z"
+      "timestamp": "2025-07-27T13:36:49.488Z"
     },
     {
       "category": "security",
@@ -92,7 +92,7 @@
       "description": "Consider using JSON.stringify for localStorage data",
       "file": "src/utils/robustLocalStorage.js",
       "line": 335,
-      "timestamp": "2025-07-27T13:30:28.494Z"
+      "timestamp": "2025-07-27T13:36:49.488Z"
     },
     {
       "category": "security",
@@ -101,7 +101,7 @@
       "description": "Consider using JSON.stringify for localStorage data",
       "file": "src/utils/robustLocalStorage.js",
       "line": 474,
-      "timestamp": "2025-07-27T13:30:28.494Z"
+      "timestamp": "2025-07-27T13:36:49.488Z"
     },
     {
       "category": "security",
@@ -110,7 +110,7 @@
       "description": "Consider using JSON.stringify for localStorage data",
       "file": "src/utils/robustLocalStorage.js",
       "line": 554,
-      "timestamp": "2025-07-27T13:30:28.494Z"
+      "timestamp": "2025-07-27T13:36:49.488Z"
     },
     {
       "category": "performance",
@@ -119,7 +119,7 @@
       "description": "setInterval without clearInterval may cause memory leaks",
       "file": "src/utils/performanceMonitor.js",
       "line": "",
-      "timestamp": "2025-07-27T13:30:28.503Z"
+      "timestamp": "2025-07-27T13:36:49.497Z"
     }
   ],
   "criticalIssues": 0,
