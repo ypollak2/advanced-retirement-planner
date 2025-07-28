@@ -259,8 +259,15 @@ function getFieldValue(inputs, fieldNames, options = {}) {
         }
     }
     
-    debugLog(`❌ No valid value found for any fields: ${fieldNames.join(', ')}`);
-    debugLog(`📊 Available input fields: ${Object.keys(inputs).join(', ')}`);
+    // Enhanced fallback logging for better debugging
+    console.warn(`⚠️ Fallback Activated: No value found for fields: [${fieldNames.join(', ')}]. Defaulting to 0.`);
+    console.log(`🕵️‍♂️ Debug Info: Available input keys: [${Object.keys(inputs).join(', ')}]`);
+
+    // Log a more detailed warning if critical fields are missing
+    const criticalFields = ['salary', 'income', 'pension', 'savings', 'emergency', 'portfolio'];
+    if (fieldNames.some(f => criticalFields.some(c => f.toLowerCase().includes(c)))) {
+        console.warn(`CRITICAL: A key financial field was not found. This will significantly impact score accuracy.`);
+    }
     
     return 0;
 }

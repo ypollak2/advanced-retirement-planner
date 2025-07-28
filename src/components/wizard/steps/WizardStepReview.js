@@ -94,28 +94,30 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     
     // Financial health scoring (test patterns: financialHealthScore, calculateHealthScore)
     const calculateHealthScore = (inputs) => {
+        const adaptedInputs = window.adaptInputsForFinancialHealth ? window.adaptInputsForFinancialHealth(inputs) : inputs;
+
         // Use processed inputs for couple mode compatibility
-        const inputsToUse = inputs.planningType === 'couple' ? processedInputs : inputs;
+        const inputsToUse = adaptedInputs.planningType === 'couple' ? processedInputs : adaptedInputs;
         // Add comprehensive input validation logging
         console.log('🔍 Inputs passed to Financial Health Score:', {
-            hasSalary: !!inputs.currentMonthlySalary,
-            salaryValue: inputs.currentMonthlySalary,
-            hasContributions: !!inputs.monthlyContribution,
-            contributionValue: inputs.monthlyContribution,
-            hasPortfolioAllocations: !!inputs.portfolioAllocations,
-            portfolioCount: inputs.portfolioAllocations ? inputs.portfolioAllocations.length : 0,
-            hasPensionContributions: !!inputs.pensionContributionRate,
-            pensionRate: inputs.pensionContributionRate,
-            hasEmergencyFund: !!inputs.emergencyFund,
-            emergencyFundValue: inputs.emergencyFund,
-            hasExpenses: !!inputs.expenses,
-            expenseCategories: inputs.expenses ? Object.keys(inputs.expenses) : [],
-            planningType: inputs.planningType,
-            country: inputs.country || inputs.taxCountry || 'unknown'
+            hasSalary: !!inputsToUse.currentMonthlySalary,
+            salaryValue: inputsToUse.currentMonthlySalary,
+            hasContributions: !!inputsToUse.monthlyContribution,
+            contributionValue: inputsToUse.monthlyContribution,
+            hasPortfolioAllocations: !!inputsToUse.portfolioAllocations,
+            portfolioCount: inputsToUse.portfolioAllocations ? inputsToUse.portfolioAllocations.length : 0,
+            hasPensionContributions: !!inputsToUse.pensionContributionRate,
+            pensionRate: inputsToUse.pensionContributionRate,
+            hasEmergencyFund: !!inputsToUse.emergencyFund,
+            emergencyFundValue: inputsToUse.emergencyFund,
+            hasExpenses: !!inputsToUse.expenses,
+            expenseCategories: inputsToUse.expenses ? Object.keys(inputsToUse.expenses) : [],
+            planningType: inputsToUse.planningType,
+            country: inputsToUse.country || inputsToUse.taxCountry || 'unknown'
         });
         
         if (window.calculateFinancialHealthScore) {
-            return window.calculateFinancialHealthScore(inputs);
+            return window.calculateFinancialHealthScore(inputsToUse);
         }
         return { totalScore: 0, factors: {} };
     };
