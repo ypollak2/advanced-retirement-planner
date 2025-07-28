@@ -549,7 +549,7 @@ function RetirementPlannerApp() {
                 // Create a basic result structure for demo
                 var monthlyIncome = (inputs.currentMonthlySalary || inputs.currentSalary || 20000) * 0.8;
                 setResults({
-                    totalSavings: (inputs.currentSavings || 0) * 2,
+                    totalSavings: 0,
                     monthlyIncome: Math.round(monthlyIncome),
                     currentAge: inputs.currentAge || 30,
                     retirementAge: inputs.retirementAge || 67
