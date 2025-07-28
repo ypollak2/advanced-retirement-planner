@@ -1,8 +1,8 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "6.8.2",
+    number: "6.8.3",
     build: "2025-07-25",
-    commit: "v6.6.5-expense-tracking",
+    commit: "v6.8.3-version-update",
     description: "Comprehensive expense tracking with category analysis and projections"
 };
 

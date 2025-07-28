@@ -563,7 +563,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                     createElement('h4', { 
                         key: 'main-title',
                         className: "text-lg font-semibold text-blue-700 mb-4" 
-                    }, inputs.userName || (language === 'he' ? 'הפקדות עיקריות' : 'Main Person Contributions')),
+                    }, inputs.userName || (language === 'he' ? 'הפקדות בן/בת זוג ראשון' : 'Partner 1 Contributions')),
                     createElement('div', { key: 'main-fields', className: "space-y-4" }, [
                         createElement('div', { key: 'main-employee' }, [
                             createElement('label', { 
@@ -636,7 +636,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                     createElement('h4', { 
                         key: 'partner-title',
                         className: "text-lg font-semibold text-green-700 mb-4" 
-                    }, inputs.partnerName || (language === 'he' ? 'הפקדות בן/בת זוג' : 'Partner Contributions')),
+                    }, inputs.partnerName || (language === 'he' ? 'הפקדות בן/בת זוג שני' : 'Partner 2 Contributions')),
                     createElement('div', { key: 'partner-fields', className: "space-y-4" }, [
                         createElement('div', { key: 'partner-employee' }, [
                             createElement('label', { 

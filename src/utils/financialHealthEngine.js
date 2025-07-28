@@ -15,92 +15,195 @@ function getFieldValue(inputs, fieldNames, options = {}) {
     debugLog(`📋 Planning type: ${inputs.planningType}, Combine partners: ${combinePartners}`);
     
     // PHASE 1: Direct field lookup with enhanced validation
-    for (const fieldName of fieldNames) {
-        const value = inputs[fieldName];
-        debugLog(`  Checking field "${fieldName}": ${value} (type: ${typeof value})`);
-        
-        if (value !== undefined && value !== null && value !== '') {
-            const parsed = parseFloat(value);
-            if (!isNaN(parsed) && (allowZero || parsed > 0)) {
-                debugLog(`✅ Found valid field "${fieldName}": ${parsed}`);
-                return parsed;
-            } else {
-                debugLog(`  Field "${fieldName}" exists but value invalid: ${parsed}`);
+    // Skip Phase 1 entirely if we need to combine partners
+    if (!(combinePartners && inputs.planningType === 'couple')) {
+        for (const fieldName of fieldNames) {
+            const value = inputs[fieldName];
+            debugLog(`  Checking field "${fieldName}": ${value} (type: ${typeof value})`);
+            
+            if (value !== undefined && value !== null && value !== '') {
+                const parsed = parseFloat(value);
+                if (!isNaN(parsed) && (allowZero || parsed > 0)) {
+                    debugLog(`✅ Found valid field "${fieldName}": ${parsed}`);
+                    return parsed;
+                } else {
+                    debugLog(`  Field "${fieldName}" exists but value invalid: ${parsed}`);
+                }
             }
         }
+    } else {
+        debugLog(`👫 Skipping Phase 1 direct lookup to combine partners...`);
     }
     
-    // PHASE 2: For couple mode, try combining partner fields automatically
+    // PHASE 1.5: Enhanced wizard step-specific field detection
+    // Skip Phase 1.5 entirely if we need to combine partners
+    if (!(combinePartners && inputs.planningType === 'couple')) {
+        debugLog(`🧙 Checking wizard step-specific patterns...`);
+        
+        // Check for step-based field structures (step1, step2, etc.)
+        for (let stepNum = 1; stepNum <= 10; stepNum++) {
+            const stepData = inputs[`step${stepNum}`];
+            if (stepData && typeof stepData === 'object') {
+                for (const fieldName of fieldNames) {
+                    const stepValue = stepData[fieldName];
+                    if (stepValue !== undefined && stepValue !== null && stepValue !== '') {
+                        const parsed = parseFloat(stepValue);
+                        if (!isNaN(parsed) && (allowZero || parsed > 0)) {
+                            debugLog(`✅ Found in step${stepNum}.${fieldName}: ${parsed}`);
+                            return parsed;
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        debugLog(`👫 Skipping Phase 1.5 wizard steps to combine partners...`);
+    }
+    
+    // PHASE 2: Enhanced partner field combination for couple mode
     if (combinePartners && inputs.planningType === 'couple') {
-        debugLog(`🤝 Attempting to combine partner fields...`);
+        debugLog(`🤝 Attempting to combine partner fields with enhanced detection...`);
         let combinedValue = 0;
         let partnersFound = 0;
         
-        // Enhanced partner field detection
+        // Enhanced partner field detection with comprehensive patterns
         const partnerFieldMappings = [
             { partner1: 'partner1Salary', partner2: 'partner2Salary' },
             { partner1: 'Partner1Salary', partner2: 'Partner2Salary' },
             { partner1: 'partner1Income', partner2: 'partner2Income' },
-            { partner1: 'partner1MonthlySalary', partner2: 'partner2MonthlySalary' }
+            { partner1: 'partner1MonthlySalary', partner2: 'partner2MonthlySalary' },
+            { partner1: 'partner_1_salary', partner2: 'partner_2_salary' },
+            { partner1: 'partnerOneSalary', partner2: 'partnerTwoSalary' }
         ];
         
-        for (const mapping of partnerFieldMappings) {
-            const p1Value = parseFloat(inputs[mapping.partner1] || 0);
-            const p2Value = parseFloat(inputs[mapping.partner2] || 0);
-            
-            if (!isNaN(p1Value) && p1Value > 0) {
-                combinedValue += p1Value;
-                partnersFound++;
-                debugLog(`  Added ${mapping.partner1}: ${p1Value}`);
+        // Also check in wizard step structures
+        for (let stepNum = 1; stepNum <= 10; stepNum++) {
+            const stepData = inputs[`step${stepNum}`];
+            if (stepData && typeof stepData === 'object') {
+                for (const mapping of partnerFieldMappings) {
+                    const p1Value = parseFloat(stepData[mapping.partner1] || 0);
+                    const p2Value = parseFloat(stepData[mapping.partner2] || 0);
+                    
+                    if (!isNaN(p1Value) && p1Value > 0) {
+                        combinedValue += p1Value;
+                        partnersFound++;
+                        debugLog(`  Added step${stepNum}.${mapping.partner1}: ${p1Value}`);
+                    }
+                    
+                    if (!isNaN(p2Value) && p2Value > 0) {
+                        combinedValue += p2Value;
+                        partnersFound++;
+                        debugLog(`  Added step${stepNum}.${mapping.partner2}: ${p2Value}`);
+                    }
+                    
+                    if (partnersFound > 0) break;
+                }
+                if (partnersFound > 0) break;
             }
-            
-            if (!isNaN(p2Value) && p2Value > 0) {
-                combinedValue += p2Value;
-                partnersFound++;
-                debugLog(`  Added ${mapping.partner2}: ${p2Value}`);
+        }
+        
+        // If no step data found, try direct fields
+        if (partnersFound === 0) {
+            for (const mapping of partnerFieldMappings) {
+                const p1Value = parseFloat(inputs[mapping.partner1] || 0);
+                const p2Value = parseFloat(inputs[mapping.partner2] || 0);
+                
+                if (!isNaN(p1Value) && p1Value > 0) {
+                    combinedValue += p1Value;
+                    partnersFound++;
+                    debugLog(`  Added ${mapping.partner1}: ${p1Value}`);
+                }
+                
+                if (!isNaN(p2Value) && p2Value > 0) {
+                    combinedValue += p2Value;
+                    partnersFound++;
+                    debugLog(`  Added ${mapping.partner2}: ${p2Value}`);
+                }
+                
+                // If we found data, don't keep looking in other mappings
+                if (partnersFound > 0) break;
             }
-            
-            // If we found data, don't keep looking in other mappings
-            if (partnersFound > 0) break;
         }
         
         if (combinedValue > 0) {
             debugLog(`✅ Combined ${partnersFound} partner fields: ${combinedValue}`);
             return combinedValue;
         } else {
-            debugLog(`  No valid partner field data found`);
+            debugLog(`  No valid partner field data found in any structure`);
         }
     }
     
-    // PHASE 3: Fallback attempts with alternative field patterns
-    debugLog(`🔄 Trying fallback field patterns...`);
+    // PHASE 3: Enhanced fallback attempts with comprehensive field patterns
+    debugLog(`🔄 Trying enhanced fallback field patterns...`);
     const fallbackPatterns = [];
     
-    // Generate fallback patterns based on original field names
+    // Generate comprehensive fallback patterns based on original field names
     fieldNames.forEach(fieldName => {
         const lowerField = fieldName.toLowerCase();
         
-        // For salary fields, try variations
-        if (lowerField.includes('salary')) {
-            fallbackPatterns.push('monthlySalary', 'grossSalary', 'currentSalary', 'salary', 'income', 'monthlyIncome');
+        // For salary fields, try ALL variations
+        if (lowerField.includes('salary') || lowerField.includes('income')) {
+            fallbackPatterns.push(
+                'monthlySalary', 'grossSalary', 'currentSalary', 'salary', 'income', 'monthlyIncome',
+                'currentMonthlySalary', 'monthly_salary', 'gross_salary', 'current_salary',
+                'netSalary', 'baseSalary', 'annualSalary', 'yearlyIncome', 'totalIncome',
+                // Partner variations
+                'partner1Salary', 'partner2Salary', 'Partner1Salary', 'Partner2Salary',
+                'partner1Income', 'partner2Income', 'partner1MonthlySalary', 'partner2MonthlySalary'
+            );
         }
         
-        // For contribution fields, try variations  
-        if (lowerField.includes('pension') && lowerField.includes('rate')) {
-            fallbackPatterns.push('pensionRate', 'pension_rate', 'employeePensionRate', 'pensionEmployeeRate');
+        // For contribution fields, try ALL variations
+        if (lowerField.includes('pension') && (lowerField.includes('rate') || lowerField.includes('contribution'))) {
+            fallbackPatterns.push(
+                'pensionRate', 'pension_rate', 'employeePensionRate', 'pensionEmployeeRate',
+                'pensionContributionRate', 'pension_contribution_rate', 'pensionEmployee',
+                'pensionRateEmployee', 'employee_pension_rate', 'employeePension'
+            );
         }
         
-        if (lowerField.includes('training') && lowerField.includes('rate')) {
-            fallbackPatterns.push('trainingFundRate', 'training_fund_rate', 'employeeTrainingFundRate', 'trainingFundEmployeeRate');
+        if (lowerField.includes('training') && (lowerField.includes('rate') || lowerField.includes('contribution'))) {
+            fallbackPatterns.push(
+                'trainingFundRate', 'training_fund_rate', 'employeeTrainingFundRate', 'trainingFundEmployeeRate',
+                'trainingFundContributionRate', 'training_fund_contribution_rate', 'trainingFundEmployee',
+                'trainingRateEmployee', 'employee_training_fund_rate', 'employeeTrainingFund'
+            );
         }
         
-        // For asset fields, try variations
+        // For asset fields, try ALL variations
         if (lowerField.includes('current') && lowerField.includes('saving')) {
-            fallbackPatterns.push('currentSavings', 'totalSavings', 'savings', 'currentSavingsAmount');
+            fallbackPatterns.push(
+                'currentSavings', 'totalSavings', 'savings', 'currentSavingsAmount',
+                'pensionSavings', 'retirementSavings', 'totalCurrentSavings'
+            );
         }
         
         if (lowerField.includes('emergency')) {
-            fallbackPatterns.push('emergencyFund', 'emergencyFundAmount', 'currentSavingsAccount', 'liquidSavings');
+            fallbackPatterns.push(
+                'emergencyFund', 'emergencyFundAmount', 'currentSavingsAccount', 'liquidSavings',
+                'cashReserves', 'savingsAccount', 'emergency_fund', 'current_savings_account'
+            );
+        }
+        
+        if (lowerField.includes('portfolio') || lowerField.includes('personal')) {
+            fallbackPatterns.push(
+                'currentPersonalPortfolio', 'personalPortfolio', 'portfolioValue', 'investments',
+                'currentInvestments', 'stocksAndBonds', 'securities', 'marketInvestments'
+            );
+        }
+        
+        if (lowerField.includes('real') && lowerField.includes('estate')) {
+            fallbackPatterns.push(
+                'currentRealEstate', 'realEstate', 'realEstateValue', 'propertyValue',
+                'currentProperty', 'realEstateInvestments', 'real_estate', 'property'
+            );
+        }
+        
+        if (lowerField.includes('crypto')) {
+            fallbackPatterns.push(
+                'currentCrypto', 'currentCryptoFiatValue', 'cryptoValue', 'cryptocurrency',
+                'digitalAssets', 'crypto_value', 'currentCryptocurrency'
+            );
         }
     });
     
@@ -285,10 +388,12 @@ function calculateSavingsRateScore(inputs) {
     if (inputs.planningType === 'couple') {
         console.log('👫 Couple mode: Looking for partner salary fields...');
         
-        // Use enhanced field mapping for couple income
+        // Use enhanced field mapping for couple income with expanded field list
         monthlyIncome = getFieldValue(inputs, [
             'partner1Salary', 'partner2Salary', 'Partner1Salary', 'Partner2Salary',
-            'partner1Income', 'partner2Income', 'partner1MonthlySalary', 'partner2MonthlySalary'
+            'partner1Income', 'partner2Income', 'partner1MonthlySalary', 'partner2MonthlySalary',
+            'partner_1_salary', 'partner_2_salary', 'partnerOneSalary', 'partnerTwoSalary',
+            'currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome'
         ], { combinePartners: true, debugMode: true });
         
         console.log('👫 Combined partner income:', monthlyIncome);
@@ -296,10 +401,11 @@ function calculateSavingsRateScore(inputs) {
     } else {
         console.log('👤 Individual mode: Looking for salary fields...');
         
-        // Use enhanced field mapping for individual income
+        // Use enhanced field mapping for individual income with expanded field list
         monthlyIncome = getFieldValue(inputs, [
             'currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome',
-            'currentSalary', 'monthly_salary', 'income', 'grossSalary'
+            'currentSalary', 'monthly_salary', 'income', 'grossSalary',
+            'netSalary', 'baseSalary', 'totalIncome', 'monthlyIncomeAmount'
         ], { debugMode: true });
         
         console.log('👤 Individual income:', monthlyIncome);
@@ -310,12 +416,14 @@ function calculateSavingsRateScore(inputs) {
     
     const pensionRate = getFieldValue(inputs, [
         'pensionContributionRate', 'pensionEmployeeRate', 'pensionEmployee',
-        'employeePensionRate', 'pension_contribution_rate', 'pension_rate'
+        'employeePensionRate', 'pension_contribution_rate', 'pension_rate',
+        'pensionRateEmployee', 'employee_pension_rate', 'employeePension'
     ], { debugMode: true });
     
     const trainingFundRate = getFieldValue(inputs, [
         'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee',
-        'employeeTrainingFundRate', 'training_fund_rate', 'trainingFund_rate'
+        'employeeTrainingFundRate', 'training_fund_rate', 'trainingFund_rate',
+        'trainingRateEmployee', 'employee_training_fund_rate', 'employeeTrainingFund'
     ], { debugMode: true });
     
     console.log('💰 Contribution rates found:', {
@@ -540,7 +648,22 @@ function calculateSavingsRateScore(inputs) {
  */
 function calculateRetirementReadinessScore(inputs) {
     const currentAge = parseFloat(inputs.currentAge || 30);
-    const annualIncome = parseFloat(inputs.currentMonthlySalary || 0) * 12;
+    
+    // Enhanced income calculation that properly handles couple mode
+    let monthlyIncome = 0;
+    if (inputs.planningType === 'couple') {
+        // For couples, combine both partner salaries
+        const partner1Income = getFieldValue(inputs, ['partner1Salary', 'Partner1Salary'], { debugMode: true });
+        const partner2Income = getFieldValue(inputs, ['partner2Salary', 'Partner2Salary'], { debugMode: true });
+        monthlyIncome = (partner1Income || 0) + (partner2Income || 0);
+    } else {
+        // For individuals, use main salary
+        monthlyIncome = getFieldValue(inputs, [
+            'currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome'
+        ], { debugMode: true });
+    }
+    
+    const annualIncome = monthlyIncome * 12;
     const currentSavings = window.calculateTotalCurrentSavings ? 
         window.calculateTotalCurrentSavings(inputs) : 
         parseFloat(inputs.currentSavings || 0);
@@ -707,6 +830,9 @@ function calculateRiskAlignmentScore(inputs) {
  * Calculate diversification score
  */
 function calculateDiversificationScore(inputs) {
+    console.log('🎯 === CALCULATING DIVERSIFICATION SCORE ===');
+    console.log('📋 Input data:', inputs);
+    
     try {
         // Validate inputs
         if (!inputs || typeof inputs !== 'object') {
@@ -717,47 +843,92 @@ function calculateDiversificationScore(inputs) {
         let assetClasses = 0;
         const assetDetails = [];
         
-        // Check each asset class with proper validation
-        const pensionAmount = parseFloat(inputs.currentSavings || 0);
+        // ENHANCED ASSET DETECTION using getFieldValue function
+        console.log('🔍 Detecting asset classes with enhanced field mapping...');
+        
+        // 1. Pension/Retirement Savings
+        const pensionAmount = getFieldValue(inputs, [
+            'currentSavings', 'currentPensionSavings', 'pensionSavings', 
+            'retirementSavings', 'currentRetirementSavings'
+        ], { allowZero: false, debugMode: true });
         if (pensionAmount > 0) {
             assetClasses++;
-            assetDetails.push({ type: 'Pension', amount: pensionAmount });
+            assetDetails.push({ type: 'Pension/Retirement', amount: pensionAmount });
+            console.log(`✅ Found Pension/Retirement: ${pensionAmount}`);
         }
         
-        const portfolioAmount = parseFloat(inputs.currentPersonalPortfolio || 0);
+        // 2. Personal Portfolio (Stocks/Bonds)
+        const portfolioAmount = getFieldValue(inputs, [
+            'currentPersonalPortfolio', 'personalPortfolio', 'stockPortfolio',
+            'investmentPortfolio', 'currentStockPortfolio', 'stocksAndBonds'
+        ], { allowZero: false, debugMode: true });
         if (portfolioAmount > 0) {
             assetClasses++;
-            assetDetails.push({ type: 'Stocks/Bonds', amount: portfolioAmount });
+            assetDetails.push({ type: 'Stocks/Bonds Portfolio', amount: portfolioAmount });
+            console.log(`✅ Found Portfolio: ${portfolioAmount}`);
         }
         
-        const realEstateAmount = parseFloat(inputs.currentRealEstate || 0);
+        // 3. Real Estate
+        const realEstateAmount = getFieldValue(inputs, [
+            'currentRealEstate', 'realEstate', 'realEstateValue', 
+            'currentRealEstateValue', 'propertyValue', 'currentProperty'
+        ], { allowZero: false, debugMode: true });
         if (realEstateAmount > 0) {
             assetClasses++;
             assetDetails.push({ type: 'Real Estate', amount: realEstateAmount });
+            console.log(`✅ Found Real Estate: ${realEstateAmount}`);
         }
         
-        const cryptoAmount = parseFloat(inputs.currentCryptoFiatValue || inputs.currentCrypto || 0);
+        // 4. Cryptocurrency
+        const cryptoAmount = getFieldValue(inputs, [
+            'currentCrypto', 'currentCryptoFiatValue', 'cryptoValue', 
+            'currentCryptocurrency', 'cryptoPortfolio', 'digitalAssets'
+        ], { allowZero: false, debugMode: true });
         if (cryptoAmount > 0) {
             assetClasses++;
-            assetDetails.push({ type: 'Crypto', amount: cryptoAmount });
+            assetDetails.push({ type: 'Cryptocurrency', amount: cryptoAmount });
+            console.log(`✅ Found Cryptocurrency: ${cryptoAmount}`);
         }
         
-        const cashAmount = parseFloat(inputs.currentSavingsAccount || inputs.emergencyFund || 0);
+        // 5. Cash/Savings Account
+        const cashAmount = getFieldValue(inputs, [
+            'currentSavingsAccount', 'savingsAccount', 'cashSavings',
+            'currentCash', 'liquidSavings', 'bankAccount'
+        ], { allowZero: false, debugMode: true });
         if (cashAmount > 0) {
             assetClasses++;
             assetDetails.push({ type: 'Cash/Savings', amount: cashAmount });
+            console.log(`✅ Found Cash/Savings: ${cashAmount}`);
         }
         
-        const trainingFundAmount = parseFloat(inputs.currentTrainingFund || 0);
+        // 6. Emergency Fund (separate from savings)
+        const emergencyFundAmount = getFieldValue(inputs, [
+            'emergencyFund', 'currentEmergencyFund', 'emergencySavings'
+        ], { allowZero: false, debugMode: true });
+        if (emergencyFundAmount > 0) {
+            assetClasses++;
+            assetDetails.push({ type: 'Emergency Fund', amount: emergencyFundAmount });
+            console.log(`✅ Found Emergency Fund: ${emergencyFundAmount}`);
+        }
+        
+        // 7. Training Fund (Israeli specific)
+        const trainingFundAmount = getFieldValue(inputs, [
+            'currentTrainingFund', 'trainingFund', 'trainingFundValue'
+        ], { allowZero: false, debugMode: true });
         if (trainingFundAmount > 0) {
             assetClasses++;
             assetDetails.push({ type: 'Training Fund', amount: trainingFundAmount });
+            console.log(`✅ Found Training Fund: ${trainingFundAmount}`);
         }
+        
+        console.log(`📊 Total asset classes found: ${assetClasses}`);
+        console.log('📝 Asset details:', assetDetails);
         
         const maxScore = SCORE_FACTORS.diversification.weight;
         let score = 0;
         let status = 'poor';
         
+        // Enhanced scoring with proper benchmarks
         if (assetClasses >= SCORE_FACTORS.diversification.benchmarks.excellent) {
             score = maxScore;
             status = 'excellent';
@@ -778,18 +949,44 @@ function calculateDiversificationScore(inputs) {
         // Ensure score is valid
         const finalScore = isNaN(score) || !isFinite(score) ? 0 : Math.round(score);
         
-        return {
+        console.log(`🎯 Final diversification score: ${finalScore}/${maxScore} (${status})`);
+        
+        const result = {
             score: finalScore,
             details: {
                 assetClasses: assetClasses,
                 status: status,
                 missingClasses: Math.max(0, SCORE_FACTORS.diversification.benchmarks.good - assetClasses),
-                assets: assetDetails
+                assets: assetDetails,
+                debugInfo: {
+                    totalAssetClassesFound: assetClasses,
+                    assetsDetected: assetDetails.map(a => `${a.type}: ${a.amount}`),
+                    calculationMethod: 'enhanced_field_mapping',
+                    benchmarkTargets: SCORE_FACTORS.diversification.benchmarks,
+                    userGuidance: assetClasses === 0 ? 
+                        'Add information about your investments, savings, real estate, or other assets in the wizard' :
+                        `Good diversification! You have ${assetClasses} asset classes. Consider adding ${Math.max(0, SCORE_FACTORS.diversification.benchmarks.good - assetClasses)} more for better diversification.`
+                }
             }
         };
+        
+        console.log('📋 Diversification result:', result);
+        return result;
+        
     } catch (error) {
         console.error('calculateDiversificationScore: Error during calculation', error);
-        return { score: 0, details: { status: 'error', message: error.message, assetClasses: 0 } };
+        return { 
+            score: 0, 
+            details: { 
+                status: 'error', 
+                message: error.message, 
+                assetClasses: 0,
+                debugInfo: {
+                    error: error.message,
+                    calculationMethod: 'failed_with_error'
+                }
+            } 
+        };
     }
 }
 

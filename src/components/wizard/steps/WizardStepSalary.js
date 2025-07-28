@@ -953,8 +953,8 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                 t.totalMonthlyIncome + ' (NET)'
             ]),
             
-            // Main person breakdown
-            createElement('div', {
+            // Main person breakdown (hide in couple mode)
+            inputs.planningType !== 'couple' && createElement('div', {
                 key: 'main-person-breakdown',
                 className: "bg-white rounded-lg p-4 mb-4 border border-green-100"
             }, (() => {

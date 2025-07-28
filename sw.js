@@ -1,9 +1,9 @@
 // Service Worker for Advanced Retirement Planner
-// Created by Yali Pollak (יהלי פולק) - v6.8.2
+// Created by Yali Pollak (יהלי פולק) - v6.8.3
 
-const CACHE_NAME = 'retirement-planner-v6.8.2';
-const STATIC_CACHE_NAME = 'retirement-planner-static-v6.8.2';
-const DYNAMIC_CACHE_NAME = 'retirement-planner-dynamic-v6.8.2';
+const CACHE_NAME = 'retirement-planner-v6.8.3';
+const STATIC_CACHE_NAME = 'retirement-planner-static-v6.8.3';
+const DYNAMIC_CACHE_NAME = 'retirement-planner-dynamic-v6.8.3';
 
 // Files to cache immediately on install
 const STATIC_ASSETS = [
