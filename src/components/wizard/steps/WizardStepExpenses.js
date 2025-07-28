@@ -168,11 +168,10 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
         }
     }, []);
 
-    // Calculate total expenses (excluding debt payments)
+    // Calculate total expenses (now includes debt payments via global utility)
     const totalExpenses = React.useMemo(() => {
-        if (!inputs.expenses) return 0;
-        const expenseCategories = ['housing', 'transportation', 'food', 'insurance', 'other'];
-        return expenseCategories.reduce((sum, key) => sum + (parseFloat(inputs.expenses[key]) || 0), 0);
+        if (!inputs.expenses || !window.calculateTotalExpenses) return 0;
+        return window.calculateTotalExpenses(inputs.expenses);
     }, [inputs.expenses]);
 
     // Calculate total debt payments
