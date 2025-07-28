@@ -169,8 +169,31 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                         type: 'number',
                         value: inputs.currentPersonalPortfolio || 0,
                         onChange: (e) => setInputs({...inputs, currentPersonalPortfolio: parseInt(e.target.value) || 0}),
-                        className: "w-full p-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                    })
+                        className: "w-full p-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 mb-4"
+                    }),
+                    // Portfolio tax rate input
+                    inputs.currentPersonalPortfolio > 0 && createElement('div', { key: 'tax-rate-section' }, [
+                        createElement('label', { 
+                            key: 'tax-rate-label',
+                            className: "block text-sm font-medium text-purple-600 mb-2" 
+                        }, language === 'he' ? 'מס רווחי הון (%)' : 'Capital Gains Tax (%)'),
+                        createElement('input', {
+                            key: 'tax-rate-input',
+                            type: 'number',
+                            min: '0',
+                            max: '50',
+                            step: '0.1',
+                            value: (inputs.portfolioTaxRate * 100) || 25,
+                            onChange: (e) => setInputs({...inputs, portfolioTaxRate: (parseFloat(e.target.value) || 25) / 100}),
+                            className: "w-full p-2 text-base border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
+                        }),
+                        createElement('div', {
+                            key: 'tax-help',
+                            className: "text-xs text-purple-500 mt-1"
+                        }, language === 'he' ? 
+                            'מס רווחי הון בישראל: 25% (אזרחים), 30% (תושבי חוץ)' :
+                            'Israel capital gains: 25% (residents), 30% (non-residents)')
+                    ])
                 ]),
                 
                 // Real Estate

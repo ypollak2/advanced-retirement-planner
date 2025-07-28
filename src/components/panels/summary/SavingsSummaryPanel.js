@@ -49,19 +49,26 @@ const SavingsSummaryPanel = ({
         const userAge = inputs.currentAge || 30;
         
         // Use actual input values; only provide age-based estimates for truly undefined values
+        // Fixed: Remove hardcoded minimums to prevent non-zero baseline when user enters 0
         const safeCurrentPensionSavings = (rawPensionSavings !== undefined && rawPensionSavings !== null) ? 
-            rawPensionSavings : Math.max((userAge - 22) * 12000, 50000);
+            rawPensionSavings : (userAge > 22 ? (userAge - 22) * 12000 : 0);
         const safeCurrentTrainingFundSavings = (rawTrainingFundSavings !== undefined && rawTrainingFundSavings !== null) ? 
-            rawTrainingFundSavings : Math.max((userAge - 22) * 8000, 25000);
+            rawTrainingFundSavings : (userAge > 22 ? (userAge - 22) * 8000 : 0);
         // Include crypto and other investment savings in total (with correct field names)
-        const currentCrypto = inputs.currentDigitalAssetFiatValue || inputs.currentCryptoFiatValue || inputs.currentCrypto || 0;
-        const currentSavingsAccount = inputs.currentSavingsAccount || 0;
-        const currentRealEstate = inputs.currentRealEstate || 0;
-        const currentInvestments = inputs.currentInvestments || 0;
+        // Fixed: Ensure proper Bitcoin/crypto fiat value calculation and inclusion
+        const currentCrypto = parseFloat(inputs.currentDigitalAssetFiatValue) || 
+                            parseFloat(inputs.currentCryptoFiatValue) || 
+                            parseFloat(inputs.currentCrypto) || 0;
+        const currentSavingsAccount = parseFloat(inputs.currentSavingsAccount) || 0;
+        const currentRealEstate = parseFloat(inputs.currentRealEstate) || 0;
+        // Fixed: Use correct field name and add portfolio taxation
+        const grossPersonalPortfolio = parseFloat(inputs.currentPersonalPortfolio) || parseFloat(inputs.currentInvestments) || 0;
+        const portfolioTaxRate = parseFloat(inputs.portfolioTaxRate) || 0.25; // Default 25% capital gains tax
+        const netPersonalPortfolio = grossPersonalPortfolio * (1 - portfolioTaxRate);
         
         // Include partner crypto assets if in couple mode
-        const partner1Crypto = inputs.partner1DigitalAssetFiatValue || inputs.partner1Crypto || 0;
-        const partner2Crypto = inputs.partner2DigitalAssetFiatValue || inputs.partner2Crypto || 0;
+        const partner1Crypto = parseFloat(inputs.partner1DigitalAssetFiatValue) || parseFloat(inputs.partner1Crypto) || 0;
+        const partner2Crypto = parseFloat(inputs.partner2DigitalAssetFiatValue) || parseFloat(inputs.partner2Crypto) || 0;
         
         // Calculate total debt balances
         const calculateTotalDebtBalances = () => {
@@ -71,9 +78,10 @@ const SavingsSummaryPanel = ({
         };
         
         const totalDebtBalances = calculateTotalDebtBalances();
+        // Fixed: Use net personal portfolio value after taxation
         const totalSavings = safeCurrentPensionSavings + safeCurrentTrainingFundSavings + 
                            currentCrypto + partner1Crypto + partner2Crypto + 
-                           currentSavingsAccount + currentRealEstate + currentInvestments;
+                           currentSavingsAccount + currentRealEstate + netPersonalPortfolio;
         
         // Calculate net worth (assets - debts)
         const netWorth = totalSavings - totalDebtBalances;
@@ -181,6 +189,35 @@ const SavingsSummaryPanel = ({
                             `${language === 'he' ? 'בן/בת זוג 1' : 'Partner 1'}: ${formatCurrency(partner1Crypto, workingCurrency)}`),
                         partner2Crypto > 0 && React.createElement('div', { key: 'p2-crypto' }, 
                             `${language === 'he' ? 'בן/בת זוג 2' : 'Partner 2'}: ${formatCurrency(partner2Crypto, workingCurrency)}`)
+                    ])
+                ]),
+                
+                // Personal Portfolio with Taxation (only show if there is any)
+                grossPersonalPortfolio > 0 && React.createElement('div', {
+                    key: 'personal-portfolio',
+                    className: "metric-card metric-warning p-4 border-l-4 border-purple-500"
+                }, [
+                    React.createElement('div', { className: "flex items-center justify-between mb-2" }, [
+                        React.createElement('div', { key: 'portfolio-label', className: "flex items-center" }, [
+                            React.createElement('span', { key: 'portfolio-icon', className: "text-lg mr-2" }, '📈'),
+                            React.createElement('span', { key: 'portfolio-text', className: "text-sm text-purple-700 font-medium" }, 
+                                language === 'he' ? 'תיק השקעות אישי' : 'Personal Portfolio')
+                        ]),
+                        React.createElement('span', { key: 'portfolio-trend', className: "text-xs text-purple-600" }, '💼')
+                    ]),
+                    React.createElement('div', { className: "text-xl font-bold text-purple-800 wealth-amount" }, 
+                        formatCurrency(netPersonalPortfolio, workingCurrency)),
+                    // Show taxation breakdown
+                    React.createElement('div', {
+                        key: 'portfolio-taxation',
+                        className: "text-xs text-purple-600 mt-1 space-y-1"
+                    }, [
+                        React.createElement('div', { key: 'gross-value' }, 
+                            `${language === 'he' ? 'ערך ברוטו:' : 'Gross value:'} ${formatCurrency(grossPersonalPortfolio, workingCurrency)}`),
+                        React.createElement('div', { key: 'tax-rate' }, 
+                            `${language === 'he' ? 'מס רווחי הון:' : 'Capital gains tax:'} ${(portfolioTaxRate * 100).toFixed(0)}%`),
+                        React.createElement('div', { key: 'net-value', className: "font-semibold" }, 
+                            `${language === 'he' ? 'ערך נטו:' : 'Net value:'} ${formatCurrency(netPersonalPortfolio, workingCurrency)}`)
                     ])
                 ]),
                 
