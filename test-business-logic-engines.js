@@ -226,7 +226,7 @@ try {
     // Test 5: Helper Functions
     try {
         const inputs = createValidInputs();
-        const totalSavings = calculateTotalCurrentSavings(inputs);
+        const totalSavings = window.calculateTotalCurrentSavings(inputs);
         const monthlyIncome = calculateMonthlyIncome(inputs);
         
         logTest('GoalSuggestionEngine - calculateTotalCurrentSavings works', typeof totalSavings === 'number' && totalSavings > 0);
@@ -255,13 +255,6 @@ console.log('\n💚 Testing Financial Health Engine...');
 
 try {
     eval(require('fs').readFileSync('./src/utils/financialHealthEngine.js', 'utf8'));
-    
-    // Mock the calculateTotalCurrentSavings function
-    window.calculateTotalCurrentSavings = (inputs) => {
-        return parseFloat(inputs.currentSavings || 0) + 
-               parseFloat(inputs.currentPersonalPortfolio || 0) + 
-               parseFloat(inputs.currentTrainingFund || 0);
-    };
     
     // Test 1: Basic Financial Health Score
     try {

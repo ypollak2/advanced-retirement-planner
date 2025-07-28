@@ -159,7 +159,7 @@ window.inflationCalculations = {
         });
         
         // Real value analysis of retirement savings
-        const totalCurrentSavings = this.calculateTotalCurrentSavings(inputs);
+        const totalCurrentSavings = window.calculateTotalCurrentSavings(inputs);
         analysis.realValueAnalysis = {
             currentNominal: totalCurrentSavings,
             projectedReal: {},
@@ -177,18 +177,9 @@ window.inflationCalculations = {
         return analysis;
     },
     
-    // Calculate total current savings
-    calculateTotalCurrentSavings: function(inputs) {
-        return (parseFloat(inputs.currentSavings || 0) +
-                parseFloat(inputs.currentTrainingFund || 0) +
-                parseFloat(inputs.currentPersonalPortfolio || 0) +
-                parseFloat(inputs.currentRealEstate || 0) +
-                parseFloat(inputs.currentCrypto || 0));
-    },
-    
     // Calculate overall inflation protection of portfolio
     calculateInflationProtection: function(inputs) {
-        const totalValue = this.calculateTotalCurrentSavings(inputs);
+        const totalValue = window.calculateTotalCurrentSavings(inputs);
         if (totalValue === 0) return 0;
         
         let weightedProtection = 0;
@@ -286,7 +277,7 @@ window.inflationCalculations = {
         }
         
         // High cash allocation warning
-        const totalAssets = this.calculateTotalCurrentSavings(inputs);
+        const totalAssets = window.calculateTotalCurrentSavings(inputs);
         const cashEquivalents = parseFloat(inputs.currentTrainingFund || 0); // Treating training fund as cash-like
         const cashPercentage = totalAssets > 0 ? (cashEquivalents / totalAssets) * 100 : 0;
         
@@ -386,7 +377,7 @@ window.inflationCalculations = {
     // Simplified nominal projection calculation (would integrate with main calculation engine)
     calculateNominalProjection: function(inputs, workPeriods, targetYear) {
         // This is a simplified version - in practice would use the full retirement calculation
-        const currentSavings = this.calculateTotalCurrentSavings(inputs);
+        const currentSavings = window.calculateTotalCurrentSavings(inputs);
         const averageReturn = 7; // Simplified average return
         const monthlyContributions = parseFloat(inputs.monthlyContributions || 1000);
         

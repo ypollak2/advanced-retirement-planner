@@ -273,7 +273,7 @@ function generateGoalSuggestions(inputs) {
             metadata: {
                 generatedAt: new Date().toISOString(),
                 yearsToRetirement: (inputs.retirementAge || 67) - (inputs.currentAge || 30),
-                currentTotalSavings: calculateTotalCurrentSavings(inputs),
+                currentTotalSavings: window.calculateTotalCurrentSavings(inputs),
                 monthlyIncome: calculateMonthlyIncome(inputs),
                 blendedReturnRate: calculateBlendedReturnRate(inputs)
             }
