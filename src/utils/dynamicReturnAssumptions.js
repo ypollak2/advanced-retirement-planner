@@ -194,27 +194,99 @@ window.dynamicReturnAssumptions = {
         };
     },
     
-    // Generate time-based return adjustments
-    calculateTimeBasedReturns: (baseReturns, yearsToRetirement) => {
-        // Adjust returns based on time horizon (glide path concept)
-        const adjustmentFactor = (() => {
-            if (yearsToRetirement >= 30) return 1.0;  // Long-term: no adjustment
-            if (yearsToRetirement >= 20) return 0.95; // Moderate-term: slight reduction
-            if (yearsToRetirement >= 10) return 0.90; // Short-term: reduce risk
-            if (yearsToRetirement >= 5) return 0.85;  // Near-term: conservative
-            return 0.80; // Very near-term: very conservative
-        })();
+    // Generate time-based return adjustments with enhanced age-based logic
+    calculateTimeBasedReturns: (baseReturns, yearsToRetirement, currentAge = 30, riskTolerance = 'moderate') => {
+        // Enhanced glide path with age and risk tolerance considerations
+        const getAdjustmentFactor = () => {
+            const timeHorizonFactor = (() => {
+                if (yearsToRetirement >= 30) return 1.0;  // Long-term: no adjustment
+                if (yearsToRetirement >= 20) return 0.95; // Moderate-term: slight reduction
+                if (yearsToRetirement >= 10) return 0.90; // Short-term: reduce risk
+                if (yearsToRetirement >= 5) return 0.85;  // Near-term: conservative
+                return 0.80; // Very near-term: very conservative
+            })();
+            
+            // Age-based adjustment (younger can handle more volatility)
+            const ageFactor = (() => {
+                if (currentAge <= 30) return 1.05; // Young: can take more risk
+                if (currentAge <= 40) return 1.02; // Still young: slight increase
+                if (currentAge <= 50) return 1.0;  // Middle-aged: baseline
+                if (currentAge <= 60) return 0.95; // Pre-retirement: more conservative
+                return 0.90; // Near retirement: very conservative
+            })();
+            
+            // Risk tolerance modifier
+            const riskFactor = (() => {
+                switch (riskTolerance) {
+                    case 'conservative': return 0.85;
+                    case 'moderate': return 1.0;
+                    case 'aggressive': return 1.15;
+                    default: return 1.0;
+                }
+            })();
+            
+            // Combined factor with limits
+            const combinedFactor = timeHorizonFactor * ageFactor * riskFactor;
+            return Math.max(0.5, Math.min(1.3, combinedFactor)); // Cap between 50% and 130%
+        };
+        
+        const adjustmentFactor = getAdjustmentFactor();
+        
+        // Different adjustment strategies by asset class
+        const adjustments = {
+            pensionReturn: {
+                factor: adjustmentFactor * 0.9, // Pension funds are more conservative
+                minimum: 3.0,
+                maximum: 10.0
+            },
+            trainingFundReturn: {
+                factor: adjustmentFactor * 0.95, // Training funds slightly more conservative
+                minimum: 2.5,
+                maximum: 9.0
+            },
+            personalPortfolioReturn: {
+                factor: adjustmentFactor, // Full adjustment for personal portfolio
+                minimum: 4.0,
+                maximum: 12.0
+            },
+            realEstateReturn: {
+                factor: adjustmentFactor * 0.8, // Real estate is naturally more stable
+                minimum: 3.0,
+                maximum: 8.0
+            },
+            cryptoReturn: {
+                factor: yearsToRetirement > 10 ? 1.0 : 0.7, // Reduce crypto exposure near retirement
+                minimum: 5.0,
+                maximum: 30.0
+            }
+        };
+        
+        const adjustedReturns = {};
+        Object.keys(baseReturns).forEach(assetType => {
+            const adjustment = adjustments[assetType];
+            if (adjustment) {
+                const adjustedValue = baseReturns[assetType] * adjustment.factor;
+                adjustedReturns[assetType] = Math.max(
+                    adjustment.minimum, 
+                    Math.min(adjustment.maximum, adjustedValue)
+                );
+            } else {
+                adjustedReturns[assetType] = baseReturns[assetType];
+            }
+        });
         
         return {
-            pensionReturn: Math.max(3.0, baseReturns.pensionReturn * adjustmentFactor),
-            trainingFundReturn: Math.max(2.5, baseReturns.trainingFundReturn * adjustmentFactor),
-            personalPortfolioReturn: Math.max(4.0, baseReturns.personalPortfolioReturn * adjustmentFactor),
-            realEstateReturn: Math.max(3.0, baseReturns.realEstateReturn * adjustmentFactor),
-            cryptoReturn: baseReturns.cryptoReturn, // Don't adjust crypto (too volatile for glide path)
+            ...adjustedReturns,
             adjustmentFactor,
-            explanation: {
-                en: `Returns adjusted by ${Math.round((1 - adjustmentFactor) * 100)}% for ${yearsToRetirement}-year horizon`,
-                he: `תשואות הותאמו ב-${Math.round((1 - adjustmentFactor) * 100)}% לטווח של ${yearsToRetirement} שנים`
+            metadata: {
+                yearsToRetirement,
+                currentAge,
+                riskTolerance,
+                timeHorizonEffect: Math.round((adjustmentFactor - 1) * 100),
+                explanation: {
+                    en: `Returns adjusted for ${currentAge}-year-old investor with ${yearsToRetirement} years to retirement (${riskTolerance} risk tolerance)`,
+                    he: `תשואות הותאמו למשקיע בן ${currentAge} עם ${yearsToRetirement} שנים לפרישה (סובלנות סיכון ${riskTolerance === 'conservative' ? 'שמרנית' : riskTolerance === 'aggressive' ? 'אגרסיבית' : 'מתונה'})`
+                }
             }
         };
     },
@@ -285,6 +357,97 @@ window.dynamicReturnAssumptions = {
         }
         
         return recommendations;
+    },
+    
+    // Apply dynamic return adjustments to inputs
+    applyDynamicReturns: (inputs) => {
+        const currentAge = inputs.currentAge || 30;
+        const retirementAge = inputs.retirementAge || 67;
+        const yearsToRetirement = retirementAge - currentAge;
+        const riskTolerance = inputs.riskTolerance || 'moderate';
+        
+        // Base returns from inputs or defaults
+        const baseReturns = {
+            pensionReturn: inputs.pensionReturn || 7.0,
+            trainingFundReturn: inputs.trainingFundReturn || 6.5,
+            personalPortfolioReturn: inputs.personalPortfolioReturn || 8.0,
+            realEstateReturn: inputs.realEstateReturn || 6.0,
+            cryptoReturn: inputs.cryptoReturn || 15.0
+        };
+        
+        // Get age-adjusted returns
+        const dynamicReturns = window.dynamicReturnAssumptions.calculateTimeBasedReturns(
+            baseReturns, 
+            yearsToRetirement, 
+            currentAge, 
+            riskTolerance
+        );
+        
+        // Create enhanced inputs with dynamic returns
+        const enhancedInputs = {
+            ...inputs,
+            ...dynamicReturns,
+            dynamicReturnAdjustment: {
+                applied: true,
+                baseReturns: baseReturns,
+                adjustedReturns: {
+                    pensionReturn: dynamicReturns.pensionReturn,
+                    trainingFundReturn: dynamicReturns.trainingFundReturn,
+                    personalPortfolioReturn: dynamicReturns.personalPortfolioReturn,
+                    realEstateReturn: dynamicReturns.realEstateReturn,
+                    cryptoReturn: dynamicReturns.cryptoReturn
+                },
+                metadata: dynamicReturns.metadata
+            }
+        };
+        
+        return enhancedInputs;
+    },
+    
+    // Generate dynamic return analysis summary
+    getDynamicReturnSummary: (inputs, language = 'en') => {
+        const enhancedInputs = window.dynamicReturnAssumptions.applyDynamicReturns(inputs);
+        const adjustment = enhancedInputs.dynamicReturnAdjustment;
+        
+        if (!adjustment || !adjustment.applied) {
+            return {
+                hasAdjustments: false,
+                summary: language === 'he' ? 'לא הוחלו התאמות דינמיות' : 'No dynamic adjustments applied'
+            };
+        }
+        
+        const changes = [];
+        Object.keys(adjustment.baseReturns).forEach(assetType => {
+            const base = adjustment.baseReturns[assetType];
+            const adjusted = adjustment.adjustedReturns[assetType];
+            const difference = adjusted - base;
+            
+            if (Math.abs(difference) > 0.1) {
+                const assetNames = {
+                    pensionReturn: language === 'he' ? 'פנסיה' : 'Pension',
+                    trainingFundReturn: language === 'he' ? 'קרן השתלמות' : 'Training Fund',
+                    personalPortfolioReturn: language === 'he' ? 'תיק אישי' : 'Personal Portfolio',
+                    realEstateReturn: language === 'he' ? 'נדל"ן' : 'Real Estate',
+                    cryptoReturn: language === 'he' ? 'קריפטו' : 'Crypto'
+                };
+                
+                changes.push({
+                    assetType: assetNames[assetType] || assetType,
+                    baseReturn: base,
+                    adjustedReturn: adjusted,
+                    change: difference,
+                    changePercent: Math.round((difference / base) * 100)
+                });
+            }
+        });
+        
+        return {
+            hasAdjustments: true,
+            metadata: adjustment.metadata,
+            changes: changes,
+            summary: adjustment.metadata.explanation[language],
+            overallImpact: changes.reduce((sum, change) => sum + change.change, 0) / changes.length
+        };
     },
     
     // Comprehensive return analysis

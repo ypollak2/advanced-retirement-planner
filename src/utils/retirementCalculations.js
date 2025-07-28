@@ -126,6 +126,32 @@ window.calculateRetirement = (
         return null;
     }
 
+    // Apply dynamic return adjustments based on age and risk tolerance
+    let enhancedInputs = inputs;
+    if (window.dynamicReturnAssumptions && window.dynamicReturnAssumptions.applyDynamicReturns) {
+        try {
+            enhancedInputs = window.dynamicReturnAssumptions.applyDynamicReturns(inputs);
+            console.log('✅ Dynamic return adjustments applied to calculation', {
+                originalReturns: {
+                    pension: inputs.pensionReturn,
+                    trainingFund: inputs.trainingFundReturn,
+                    personalPortfolio: inputs.personalPortfolioReturn
+                },
+                adjustedReturns: {
+                    pension: enhancedInputs.pensionReturn,
+                    trainingFund: enhancedInputs.trainingFundReturn,
+                    personalPortfolio: enhancedInputs.personalPortfolioReturn
+                }
+            });
+        } catch (error) {
+            console.warn('⚠️ Error applying dynamic return adjustments, using original inputs:', error);
+            enhancedInputs = inputs;
+        }
+    }
+    
+    // Use enhanced inputs for all calculations
+    inputs = enhancedInputs;
+
     // Provide default allocations if not specified
     const defaultPensionAllocation = [
         { name: 'Mixed Portfolio', allocation: 100, historicalReturn: 6.5 }

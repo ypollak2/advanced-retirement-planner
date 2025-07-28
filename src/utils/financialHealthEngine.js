@@ -133,53 +133,101 @@ const COUNTRY_FACTORS = {
  * Calculate savings rate score
  */
 function calculateSavingsRateScore(inputs) {
-    // Enhanced field mapping with common variations
-    const monthlyIncome = getFieldValue(inputs, [
-        'currentMonthlySalary', 'currentSalary', 'partner1Salary', 
-        'monthlySalary', 'salary', 'monthly_salary', 'monthlyIncome'
-    ]);
+    // CRITICAL FIX: Use actual field names from wizard
+    let monthlyIncome = 0;
     
-    // Calculate monthly contributions from multiple sources with better field mapping
-    let monthlyContributions = getFieldValue(inputs, [
-        'monthlyContribution', 'monthly_contribution', 'monthlyContributions'
-    ]);
+    // Calculate total monthly income based on planning type
+    if (inputs.planningType === 'couple') {
+        // For couples, sum both partner salaries
+        const partner1Income = parseFloat(inputs.partner1Salary || 0);
+        const partner2Income = parseFloat(inputs.partner2Salary || 0);
+        monthlyIncome = partner1Income + partner2Income;
+    } else {
+        // For individuals, use current monthly salary
+        monthlyIncome = parseFloat(inputs.currentMonthlySalary || 0);
+    }
     
-    // If monthlyContribution is not set, calculate from pension/training fund rates
-    if (monthlyContributions === 0 && monthlyIncome > 0) {
-        const pensionRate = getFieldValue(inputs, [
-            'pensionContributionRate', 'employeePensionRate', 'pensionEmployee',
-            'pension_employee', 'pensionEmployeeRate', 'pensionRate', 'employeeContribution'
-        ]);
-        const trainingFundRate = getFieldValue(inputs, [
-            'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee',
-            'training_fund_employee', 'trainingFundRate', 'trainingFundContribution'
-        ]);
-        
+    // Calculate monthly contributions from pension/training fund rates
+    let monthlyContributions = 0;
+    
+    // CRITICAL FIX: Use correct field names from wizard
+    const pensionRate = parseFloat(inputs.pensionContributionRate || 0);
+    const trainingFundRate = parseFloat(inputs.trainingFundContributionRate || 0);
+    
+    console.log('💰 Savings Rate Debug:', {
+        monthlyIncome,
+        pensionRate,
+        trainingFundRate,
+        planningType: inputs.planningType,
+        partner1Salary: inputs.partner1Salary,
+        partner2Salary: inputs.partner2Salary,
+        currentMonthlySalary: inputs.currentMonthlySalary
+    });
+    
+    if (monthlyIncome > 0 && (pensionRate > 0 || trainingFundRate > 0)) {
         // Calculate contributions as percentage of salary
         monthlyContributions = monthlyIncome * (pensionRate + trainingFundRate) / 100;
         
-        // Also include additional savings if available
-        const additionalSavings = getFieldValue(inputs, [
-            'additionalMonthlySavings', 'monthlyInvestment', 'additionalSavings',
-            'additional_savings', 'monthlyAdditionalSavings'
-        ]);
+        // Add additional monthly savings if available
+        const additionalSavings = parseFloat(inputs.additionalMonthlySavings || 0);
         monthlyContributions += additionalSavings;
+    } else {
+        // Fallback: try to get direct monthly contribution amount
+        monthlyContributions = parseFloat(inputs.monthlyContribution || 0);
     }
     
-    // Add null/zero validation
+    // Add null/zero validation with enhanced debugging
     if (monthlyIncome === 0 || isNaN(monthlyIncome)) {
+        const missingFields = [];
+        if (inputs.planningType === 'couple') {
+            if (!inputs.partner1Salary) missingFields.push('partner1Salary');
+            if (!inputs.partner2Salary) missingFields.push('partner2Salary');
+        } else {
+            if (!inputs.currentMonthlySalary) missingFields.push('currentMonthlySalary');
+        }
+        
         return { 
             score: 0, 
             details: { 
                 rate: 0, 
-                status: 'unknown', 
+                status: 'missing_income_data', 
                 monthlyAmount: 0,
                 debugInfo: {
                     reason: 'No monthly income found',
-                    fieldsChecked: ['currentMonthlySalary', 'currentSalary', 'partner1Salary'],
-                    fieldsFound: 'none'
+                    missingFields: missingFields,
+                    planningType: inputs.planningType,
+                    fieldsFound: {
+                        currentMonthlySalary: !!inputs.currentMonthlySalary,
+                        partner1Salary: !!inputs.partner1Salary,
+                        partner2Salary: !!inputs.partner2Salary
+                    },
+                    suggestion: inputs.planningType === 'couple' ? 
+                        'Add partner salary information in Step 2' : 
+                        'Add monthly salary information in Step 2'
                 }
             } 
+        };
+    }
+    
+    // Check if contribution rates are missing
+    if (monthlyContributions === 0 && pensionRate === 0 && trainingFundRate === 0) {
+        return {
+            score: 0,
+            details: {
+                rate: 0,
+                status: 'missing_contribution_data',
+                monthlyAmount: 0,
+                monthlyIncome: monthlyIncome,
+                debugInfo: {
+                    reason: 'No contribution rates found',
+                    missingFields: ['pensionContributionRate', 'trainingFundContributionRate'],
+                    fieldsFound: {
+                        pensionContributionRate: !!inputs.pensionContributionRate,
+                        trainingFundContributionRate: !!inputs.trainingFundContributionRate
+                    },
+                    suggestion: 'Add contribution rates in Step 4 - Contributions'
+                }
+            }
         };
     }
     
@@ -499,18 +547,9 @@ function calculateDiversificationScore(inputs) {
  * Calculate tax efficiency score
  */
 function calculateTaxEfficiencyScore(inputs) {
-    // Better field name mapping for pension and training fund rates
-    const pensionRate = getFieldValue(inputs, [
-        'pensionContributionRate', 'employeePensionRate', 'pensionEmployee',
-        'pensionRate', 'employeeContribution', 'pension_employee',
-        'pensionEmployeeRate', 'employee_pension_rate'
-    ]);
-    
-    const trainingFundRate = getFieldValue(inputs, [
-        'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee',
-        'trainingFundRate', 'training_fund_employee', 'trainingFundContribution',
-        'employee_training_fund_rate'
-    ]);
+    // CRITICAL FIX: Use actual wizard field names and integrate with existing tax system
+    const pensionRate = parseFloat(inputs.pensionContributionRate || 0);
+    const trainingFundRate = parseFloat(inputs.trainingFundContributionRate || 0);
     
     // Country normalization with proper handling
     const country = (inputs.country || inputs.taxCountry || inputs.inheritanceCountry || 'ISR')
@@ -518,14 +557,89 @@ function calculateTaxEfficiencyScore(inputs) {
         .toLowerCase()
         .trim();
     
+    console.log('💸 Tax Efficiency Debug:', {
+        pensionRate,
+        trainingFundRate,
+        country,
+        taxCountry: inputs.taxCountry,
+        hasTaxCalculators: !!window.TaxCalculators,
+        hasAdditionalIncomeTax: !!window.AdditionalIncomeTax
+    });
+    
     // Calculate tax-advantaged contribution rate
     const totalTaxAdvantaged = pensionRate + trainingFundRate;
     
-    // Get base salary and additional income for comprehensive tax efficiency
-    const baseSalary = getFieldValue(inputs, [
-        'currentMonthlySalary', 'currentSalary', 'partner1Salary', 
-        'monthlySalary', 'salary', 'monthly_salary'
-    ]) * 12;
+    // Get base salary based on planning type
+    let baseSalary = 0;
+    if (inputs.planningType === 'couple') {
+        const partner1Income = parseFloat(inputs.partner1Salary || 0);
+        const partner2Income = parseFloat(inputs.partner2Salary || 0);
+        baseSalary = (partner1Income + partner2Income) * 12;
+    } else {
+        baseSalary = parseFloat(inputs.currentMonthlySalary || 0) * 12;
+    }
+    
+    // Enhanced tax efficiency calculation using existing tax system
+    let effectiveTaxRate = 0;
+    let taxSavingsFromContributions = 0;
+    
+    // Try to use existing TaxCalculators if available
+    if (window.TaxCalculators && baseSalary > 0) {
+        try {
+            const grossMonthlySalary = baseSalary / 12;
+            const taxResult = window.TaxCalculators.calculateNetSalary(grossMonthlySalary, inputs.taxCountry || 'israel');
+            effectiveTaxRate = taxResult.taxRate || 0;
+            
+            // Calculate tax savings from pension/training fund contributions
+            const monthlyContributions = grossMonthlySalary * totalTaxAdvantaged / 100;
+            taxSavingsFromContributions = monthlyContributions * (effectiveTaxRate / 100) * 12;
+            
+            console.log('💸 Using TaxCalculators:', {
+                grossMonthlySalary,
+                effectiveTaxRate,
+                monthlyContributions,
+                taxSavingsFromContributions
+            });
+        } catch (error) {
+            console.warn('Error using TaxCalculators:', error);
+        }
+    }
+    
+    // Check for missing data and return appropriate error states
+    if (baseSalary === 0) {
+        return {
+            score: 0,
+            details: {
+                currentRate: 0,
+                optimalRate: 0,
+                efficiencyScore: 0,
+                status: 'missing_income_data',
+                debugInfo: {
+                    reason: 'No salary data found',
+                    missingFields: inputs.planningType === 'couple' ? 
+                        ['partner1Salary', 'partner2Salary'] : ['currentMonthlySalary'],
+                    suggestion: 'Add salary information in Step 2'
+                }
+            }
+        };
+    }
+    
+    if (totalTaxAdvantaged === 0) {
+        return {
+            score: 0,
+            details: {
+                currentRate: 0,
+                optimalRate: getOptimalTaxAdvantageRate(country),
+                efficiencyScore: 0,
+                status: 'missing_contribution_data',
+                debugInfo: {
+                    reason: 'No contribution rates found',
+                    missingFields: ['pensionContributionRate', 'trainingFundContributionRate'],
+                    suggestion: 'Add contribution rates in Step 4'
+                }
+            }
+        };
+    }
     
     // Calculate additional income impact if AdditionalIncomeTax is available
     let additionalIncomeEfficiency = 0;
@@ -554,29 +668,28 @@ function calculateTaxEfficiencyScore(inputs) {
             console.warn('Error calculating additional income tax efficiency:', error);
         }
     }
+
+    // Helper function to get optimal tax advantage rate by country
+    function getOptimalTaxAdvantageRate(country) {
+        const optimalRates = {
+            'isr': 21.333, 'israel': 21.333, 'il': 21.333,
+            'usa': 15, 'us': 15, 'united states': 15, 'united_states': 15,
+            'gbr': 12, 'uk': 12, 'gb': 12, 'united kingdom': 12, 'united_kingdom': 12,
+            'eur': 10, 'eu': 10, 'germany': 10, 'de': 10, 'france': 10, 'fr': 10, 'europe': 10
+        };
+        return optimalRates[country] || optimalRates['isr'];
+    }
     
+    // Calculate efficiency score based on current vs optimal contribution rates
+    const optimalRate = getOptimalTaxAdvantageRate(country);
     let efficiencyScore = 0;
     
-    // Country-specific optimal rates with better mapping
-    const optimalRates = {
-        'isr': 21.333, 'israel': 21.333, 'il': 21.333, // Israeli pension + training fund
-        'usa': 15, 'us': 15, 'united states': 15, 'united_states': 15,     // 401k + IRA
-        'gbr': 12, 'uk': 12, 'gb': 12, 'united kingdom': 12, 'united_kingdom': 12,     // Workplace pension
-        'eur': 10, 'eu': 10, 'germany': 10, 'de': 10, 'france': 10, 'fr': 10, 'europe': 10      // Average European pension
-    };
-    
-    const optimalRate = optimalRates[country] || optimalRates['isr'];
-    // Calculate base efficiency score
-    if (optimalRate === 0 || isNaN(optimalRate)) {
-        efficiencyScore = 0;
+    if (hasAdditionalIncome) {
+        // Use overall tax advantage rate when additional income exists
+        efficiencyScore = Math.min(100, (additionalIncomeEfficiency / optimalRate) * 100);
     } else {
-        if (hasAdditionalIncome) {
-            // Use overall tax advantage rate when additional income exists
-            efficiencyScore = Math.min(100, (additionalIncomeEfficiency / optimalRate) * 100);
-        } else {
-            // Use traditional pension/training fund rate calculation
-            efficiencyScore = Math.min(100, (totalTaxAdvantaged / optimalRate) * 100);
-        }
+        // Use traditional pension/training fund rate calculation
+        efficiencyScore = Math.min(100, (totalTaxAdvantaged / optimalRate) * 100);
     }
     
     const maxScore = SCORE_FACTORS.taxEfficiency.weight;
@@ -599,16 +712,33 @@ function calculateTaxEfficiencyScore(inputs) {
             pensionRate: pensionRate,
             trainingFundRate: trainingFundRate,
             country: country,
+            baseSalary: baseSalary,
+            effectiveTaxRate: effectiveTaxRate,
+            taxSavingsFromContributions: taxSavingsFromContributions,
             calculationMethod: hasAdditionalIncome ? 'comprehensive_with_additional_income' : 
-                            (pensionRate > 0 || trainingFundRate > 0) ? 'rates_found' : 'using_defaults',
+                            (pensionRate > 0 || trainingFundRate > 0) ? 'rates_found_with_tax_integration' : 'using_defaults',
             hasAdditionalIncome: hasAdditionalIncome,
             additionalIncomeDetails: additionalIncomeDetails,
             debugInfo: {
                 countryDetected: country,
                 optimalRateUsed: optimalRate,
+                taxSystemIntegration: {
+                    usedTaxCalculators: !!window.TaxCalculators && baseSalary > 0,
+                    effectiveTaxRate: effectiveTaxRate,
+                    taxSavings: taxSavingsFromContributions
+                },
                 ratesFound: {
                     pension: pensionRate > 0,
                     trainingFund: trainingFundRate > 0
+                },
+                incomeData: {
+                    baseSalaryFound: baseSalary > 0,
+                    planningType: inputs.planningType,
+                    salaryFields: {
+                        currentMonthlySalary: !!inputs.currentMonthlySalary,
+                        partner1Salary: !!inputs.partner1Salary,
+                        partner2Salary: !!inputs.partner2Salary
+                    }
                 },
                 additionalIncomeConsidered: hasAdditionalIncome
             }

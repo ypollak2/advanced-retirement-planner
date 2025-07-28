@@ -63,9 +63,20 @@ const SavingsSummaryPanel = ({
         const partner1Crypto = inputs.partner1DigitalAssetFiatValue || inputs.partner1Crypto || 0;
         const partner2Crypto = inputs.partner2DigitalAssetFiatValue || inputs.partner2Crypto || 0;
         
+        // Calculate total debt balances
+        const calculateTotalDebtBalances = () => {
+            const debtFields = ['mortgageBalance', 'carLoanBalance', 'creditCardBalance', 'otherDebtBalance'];
+            const debtBalances = inputs.debtBalances || {};
+            return debtFields.reduce((total, field) => total + (parseFloat(debtBalances[field]) || 0), 0);
+        };
+        
+        const totalDebtBalances = calculateTotalDebtBalances();
         const totalSavings = safeCurrentPensionSavings + safeCurrentTrainingFundSavings + 
                            currentCrypto + partner1Crypto + partner2Crypto + 
                            currentSavingsAccount + currentRealEstate + currentInvestments;
+        
+        // Calculate net worth (assets - debts)
+        const netWorth = totalSavings - totalDebtBalances;
         
         // Debug logging for crypto inclusion
         if (currentCrypto > 0 || partner1Crypto > 0 || partner2Crypto > 0) {
@@ -173,20 +184,75 @@ const SavingsSummaryPanel = ({
                     ])
                 ]),
                 
+                // Debt Balances (only show if there are any)
+                totalDebtBalances > 0 && React.createElement('div', {
+                    key: 'debt-balances',
+                    className: "metric-card metric-negative p-4 border-l-4 border-red-500"
+                }, [
+                    React.createElement('div', { className: "flex items-center justify-between mb-2" }, [
+                        React.createElement('div', { key: 'debt-label', className: "flex items-center" }, [
+                            React.createElement('span', { key: 'debt-icon', className: "text-lg mr-2" }, '💳'),
+                            React.createElement('span', { key: 'debt-text', className: "text-sm text-red-700 font-medium" }, 
+                                language === 'he' ? 'חובות נוכחיים' : 'Current Debt')
+                        ]),
+                        React.createElement('span', { key: 'debt-trend', className: "text-xs text-red-600" }, '📉')
+                    ]),
+                    React.createElement('div', { className: "text-xl font-bold text-red-800 wealth-amount" }, 
+                        formatCurrency(totalDebtBalances, workingCurrency)),
+                    // Show debt breakdown if multiple sources
+                    inputs.debtBalances && React.createElement('div', {
+                        key: 'debt-breakdown',
+                        className: "text-xs text-red-600 mt-1 space-y-1"
+                    }, [
+                        (inputs.debtBalances.mortgageBalance > 0) && React.createElement('div', { key: 'mortgage' }, 
+                            `${language === 'he' ? 'משכנתא' : 'Mortgage'}: ${formatCurrency(inputs.debtBalances.mortgageBalance, workingCurrency)}`),
+                        (inputs.debtBalances.carLoanBalance > 0) && React.createElement('div', { key: 'car-loan' }, 
+                            `${language === 'he' ? 'הלוואת רכב' : 'Car Loan'}: ${formatCurrency(inputs.debtBalances.carLoanBalance, workingCurrency)}`),
+                        (inputs.debtBalances.creditCardBalance > 0) && React.createElement('div', { key: 'credit-card' }, 
+                            `${language === 'he' ? 'כרטיס אשראי' : 'Credit Card'}: ${formatCurrency(inputs.debtBalances.creditCardBalance, workingCurrency)}`),
+                        (inputs.debtBalances.otherDebtBalance > 0) && React.createElement('div', { key: 'other-debt' }, 
+                            `${language === 'he' ? 'חובות אחרים' : 'Other Debt'}: ${formatCurrency(inputs.debtBalances.otherDebtBalance, workingCurrency)}`)
+                    ])
+                ]),
+                
+                // Total Assets Section
                 React.createElement('div', {
-                    key: 'total',
+                    key: 'total-assets',
                     className: totalSavings === 0 ? "metric-card metric-neutral p-3 opacity-60" : "metric-card metric-positive p-3"
                 }, [
-                    React.createElement('div', { className: "text-sm text-purple-700 font-medium" }, 
-                        language === 'he' ? 'סך הכל נוכחי' : 'Total Current'),
+                    React.createElement('div', { className: "text-sm text-blue-700 font-medium" }, 
+                        language === 'he' ? 'סך הנכסים' : 'Total Assets'),
                     React.createElement('div', { 
                         className: totalSavings === 0 ? 
-                            "text-xl font-bold text-gray-500 wealth-amount" : 
-                            "text-xl font-bold text-purple-800 wealth-amount" 
+                            "text-lg font-bold text-gray-500 wealth-amount" : 
+                            "text-lg font-bold text-blue-800 wealth-amount" 
                     }, totalSavings === 0 ? 
                         (language === 'he' ? 'לא הוזנו חיסכונות' : 'No savings entered yet') :
                         formatCurrency(totalSavings, workingCurrency)
                     )
+                ]),
+                
+                // Net Worth Section (Assets - Debts)
+                React.createElement('div', {
+                    key: 'net-worth',
+                    className: netWorth >= 0 ? 
+                        "metric-card metric-positive p-4 border-l-4 border-purple-600 bg-gradient-to-r from-purple-50 to-blue-50" :
+                        "metric-card metric-negative p-4 border-l-4 border-red-600 bg-gradient-to-r from-red-50 to-orange-50"
+                }, [
+                    React.createElement('div', { className: "flex items-center justify-between mb-2" }, [
+                        React.createElement('div', { key: 'networth-label', className: "flex items-center" }, [
+                            React.createElement('span', { key: 'networth-icon', className: "text-xl mr-2" }, 
+                                netWorth >= 0 ? '💎' : '⚠️'),
+                            React.createElement('span', { key: 'networth-text', className: `text-sm font-bold ${netWorth >= 0 ? 'text-purple-700' : 'text-red-700'}` }, 
+                                language === 'he' ? 'שווי נטו' : 'Net Worth')
+                        ]),
+                        React.createElement('span', { key: 'networth-trend', className: "text-xs" }, 
+                            netWorth >= 0 ? '💪' : '📉')
+                    ]),
+                    React.createElement('div', { className: `text-2xl font-bold wealth-amount ${netWorth >= 0 ? 'text-purple-800' : 'text-red-800'}` }, 
+                        formatCurrency(netWorth, workingCurrency)),
+                    React.createElement('div', { className: `text-xs mt-1 ${netWorth >= 0 ? 'text-purple-600' : 'text-red-600'}` }, 
+                        `${formatCurrency(totalSavings, workingCurrency)} ${language === 'he' ? 'נכסים' : 'assets'} - ${formatCurrency(totalDebtBalances, workingCurrency)} ${language === 'he' ? 'חובות' : 'debts'}`)
                 ])
             ]),
             

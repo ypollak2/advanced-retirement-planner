@@ -32,6 +32,21 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
             totalDebt: 'סך תשלומי חובות',
             debtToIncomeRatio: 'יחס חוב להכנסה',
             
+            // Debt Balances Section
+            debtBalances: 'יתרות חובות',
+            debtBalancesSubtitle: 'סכומי החוב הכוללים שנותרו לפירעון',
+            mortgageBalance: 'יתרת משכנתא',
+            mortgageBalanceHint: 'סכום המשכנתא שנותר לפירעון',
+            carLoanBalance: 'יתרת הלוואת רכב',
+            carLoanBalanceHint: 'סכום הלוואת הרכב שנותר לפירעון',
+            creditCardBalance: 'יתרת כרטיסי אשראי',
+            creditCardBalanceHint: 'סכום החוב בכרטיסי האשראי',
+            otherDebtBalance: 'יתרות חובות אחרים',
+            otherDebtBalanceHint: 'הלוואות אישיות וחובות אחרים',
+            totalDebtBalance: 'סך יתרות החובות',
+            netWorth: 'שווי נטו',
+            netWorthHint: 'סך הנכסים פחות סך החובות',
+            
             total: 'סה"כ הוצאות חודשיות',
             yearlyAdjustment: 'התאמה שנתית צפויה',
             adjustmentHint: 'כמה אתה צופה שההוצאות שלך ישתנו בשנה',
@@ -80,6 +95,21 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
             otherDebtHint: 'Personal loans, other debt obligations',
             totalDebt: 'Total Monthly Debt Payments',
             debtToIncomeRatio: 'Debt-to-Income Ratio',
+            
+            // Debt Balances Section
+            debtBalances: 'Debt Balances',
+            debtBalancesSubtitle: 'Total remaining debt amounts owed',
+            mortgageBalance: 'Mortgage Balance',
+            mortgageBalanceHint: 'Remaining amount owed on mortgage',
+            carLoanBalance: 'Car Loan Balance', 
+            carLoanBalanceHint: 'Remaining amount owed on car loan',
+            creditCardBalance: 'Credit Card Balance',
+            creditCardBalanceHint: 'Total credit card debt amount',
+            otherDebtBalance: 'Other Debt Balances',
+            otherDebtBalanceHint: 'Personal loans and other debt amounts',
+            totalDebtBalance: 'Total Debt Balance',
+            netWorth: 'Net Worth',
+            netWorthHint: 'Total assets minus total debts',
             
             total: 'Total Monthly Expenses',
             yearlyAdjustment: 'Expected Yearly Adjustment',
@@ -165,6 +195,13 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
         const savings = Math.max(0, netIncome);
         return (savings / monthlyIncome) * 100;
     }, [monthlyIncome, totalExpenses, totalDebtPayments]);
+
+    // Calculate total debt balances
+    const totalDebtBalances = React.useMemo(() => {
+        if (!inputs.debtBalances) return 0;
+        const debtBalanceCategories = ['mortgageBalance', 'carLoanBalance', 'creditCardBalance', 'otherDebtBalance'];
+        return debtBalanceCategories.reduce((sum, key) => sum + (parseFloat(inputs.debtBalances[key]) || 0), 0);
+    }, [inputs.debtBalances]);
 
     // Calculate category percentages (for expense categories only)
     const categoryPercentages = React.useMemo(() => {
@@ -341,6 +378,14 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
         { key: 'carLoan', label: t.carLoan, hint: t.carLoanHint, icon: '🚙', color: 'orange' },
         { key: 'creditCard', label: t.creditCard, hint: t.creditCardHint, icon: '💳', color: 'red' },
         { key: 'otherDebt', label: t.otherDebt, hint: t.otherDebtHint, icon: '📋', color: 'orange' }
+    ];
+
+    // Debt balance categories with icons
+    const debtBalanceCategories = [
+        { key: 'mortgageBalance', label: t.mortgageBalance, hint: t.mortgageBalanceHint, icon: '🏡', color: 'orange' },
+        { key: 'carLoanBalance', label: t.carLoanBalance, hint: t.carLoanBalanceHint, icon: '🚙', color: 'orange' },
+        { key: 'creditCardBalance', label: t.creditCardBalance, hint: t.creditCardBalanceHint, icon: '💳', color: 'red' },
+        { key: 'otherDebtBalance', label: t.otherDebtBalance, hint: t.otherDebtBalanceHint, icon: '📋', color: 'orange' }
     ];
 
     // Helper function to get debt color based on ratio
@@ -544,6 +589,90 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
                             className: `text-xl font-bold text-${getDebtColor(debtToIncomeRatio)}-700`
                         }, `${debtToIncomeRatio.toFixed(1)}%`)
                     ])
+                ])
+            ])
+        ]),
+
+        // Debt Balances Section
+        React.createElement('div', {
+            key: 'debt-balances-section',
+            className: 'bg-gradient-to-r from-red-50 to-orange-50 p-6 rounded-lg border border-red-200'
+        }, [
+            React.createElement('h3', {
+                key: 'debt-balances-title',
+                className: 'text-xl font-bold text-red-700 mb-2 flex items-center'
+            }, [
+                React.createElement('span', { key: 'icon', className: 'mr-3 text-2xl' }, '📊'),
+                t.debtBalances
+            ]),
+            React.createElement('p', {
+                key: 'debt-balances-subtitle',
+                className: 'text-sm text-red-600 mb-4'
+            }, t.debtBalancesSubtitle),
+
+            // Debt Balance Categories
+            React.createElement('div', {
+                key: 'debt-balance-categories',
+                className: 'space-y-4 mb-6'
+            }, debtBalanceCategories.map(category => 
+                React.createElement('div', {
+                    key: category.key,
+                    className: 'bg-white p-4 rounded-lg shadow-sm border border-gray-200'
+                }, [
+                    React.createElement('div', {
+                        key: 'category-header',
+                        className: 'flex items-center justify-between mb-2'
+                    }, [
+                        React.createElement('div', {
+                            key: 'label-container',
+                            className: 'flex items-center gap-3'
+                        }, [
+                            React.createElement('span', {
+                                key: 'icon',
+                                className: 'text-xl'
+                            }, category.icon),
+                            React.createElement('span', {
+                                key: 'label',
+                                className: 'font-medium text-gray-700'
+                            }, category.label)
+                        ]),
+                        React.createElement('span', {
+                            key: 'hint',
+                            className: 'text-xs text-gray-500'
+                        }, category.hint)
+                    ]),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'number',
+                        min: '0',
+                        value: inputs.debtBalances?.[category.key] || 0,
+                        onChange: (e) => {
+                            const newDebtBalances = { ...inputs.debtBalances };
+                            newDebtBalances[category.key] = parseFloat(e.target.value) || 0;
+                            setInputs({ ...inputs, debtBalances: newDebtBalances });
+                        },
+                        className: `w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-${category.color}-500 focus:border-transparent`
+                    })
+                ])
+            )),
+
+            // Total Debt Balance
+            totalDebtBalances > 0 && React.createElement('div', {
+                key: 'total-debt-balance',
+                className: 'bg-white p-4 rounded-lg border border-red-300'
+            }, [
+                React.createElement('div', {
+                    key: 'total-header',
+                    className: 'flex justify-between items-center mb-2'
+                }, [
+                    React.createElement('h4', {
+                        key: 'total-label',
+                        className: 'font-semibold text-red-700'
+                    }, t.totalDebtBalance),
+                    React.createElement('div', {
+                        key: 'total-amount',
+                        className: 'text-xl font-bold text-red-800'
+                    }, formatCurrency ? formatCurrency(totalDebtBalances, workingCurrency) : `${workingCurrency} ${totalDebtBalances.toLocaleString()}`)
                 ])
             ])
         ]),

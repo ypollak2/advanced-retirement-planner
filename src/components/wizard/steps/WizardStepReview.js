@@ -314,6 +314,22 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
             workingCurrency: workingCurrency
         }),
         
+        // Debt Payoff Timeline Panel
+        window.DebtPayoffTimelinePanel && createElement(window.DebtPayoffTimelinePanel, {
+            key: 'debt-payoff-timeline',
+            inputs: inputs,
+            language: language,
+            workingCurrency: workingCurrency
+        }),
+        
+        // Dynamic Return Adjustment Panel
+        window.DynamicReturnAdjustmentPanel && createElement(window.DynamicReturnAdjustmentPanel, {
+            key: 'dynamic-return-adjustment',
+            inputs: inputs,
+            language: language,
+            workingCurrency: workingCurrency
+        }),
+        
         // Action Items Section
         suggestions.length > 0 && createElement('div', {
             key: 'action-items',

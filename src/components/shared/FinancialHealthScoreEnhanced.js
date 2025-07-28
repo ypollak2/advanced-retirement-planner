@@ -148,17 +148,25 @@
                 case 'savingsRate':
                     detailText = details.rate ? `${t.currentRate}: ${details.rate.toFixed(1)}%` : '';
                     if (rawScore === 0) {
-                        if (debugInfo.reason === 'No monthly income found') {
-                            debugText = `${t.noIncomeFound}. ${t.addSalaryData}`;
-                        } else if (!debugInfo.contributionsFound) {
-                            debugText = `${t.noContributionsFound}. ${t.addContributionData}`;
+                        if (details.status === 'missing_income_data') {
+                            debugText = debugInfo.suggestion || `${t.noIncomeFound}. ${t.addSalaryData}`;
+                        } else if (details.status === 'missing_contribution_data') {
+                            debugText = debugInfo.suggestion || `${t.noContributionsFound}. ${t.addContributionData}`;
+                        } else if (debugInfo.reason) {
+                            debugText = debugInfo.reason;
                         }
                     }
                     break;
                 case 'taxEfficiency':
                     detailText = details.efficiencyScore ? `${t.currentEfficiency}: ${details.efficiencyScore.toFixed(0)}%` : '';
-                    if (rawScore === 0 && debugInfo.ratesFound) {
-                        debugText = `${t.noContributionsFound}. ${t.addContributionData}`;
+                    if (rawScore === 0) {
+                        if (details.status === 'missing_income_data') {
+                            debugText = debugInfo.suggestion || `${t.noIncomeFound}. ${t.addSalaryData}`;
+                        } else if (details.status === 'missing_contribution_data') {
+                            debugText = debugInfo.suggestion || `${t.noContributionsFound}. ${t.addContributionData}`;
+                        } else if (debugInfo.reason) {
+                            debugText = debugInfo.reason;
+                        }
                     }
                     break;
                 case 'timeHorizon':
@@ -214,8 +222,47 @@
                         }, tooltip),
                         detailText && createElement('div', { 
                             key: 'tooltip-details', 
-                            className: "text-xs opacity-80" 
+                            className: "text-xs opacity-80 mb-2" 
                         }, detailText),
+                        
+                        // Enhanced calculation explanation for non-zero scores
+                        normalizedScore > 0 && createElement('div', {
+                            key: 'calculation-explanation',
+                            className: "text-xs bg-blue-600 bg-opacity-20 p-2 rounded mb-2"
+                        }, [
+                            createElement('div', { key: 'calc-title', className: "font-semibold mb-1" }, 
+                                language === 'he' ? 'איך מחושב הציון:' : 'How this score is calculated:'),
+                            factorKey === 'savingsRate' && details.rate && createElement('div', { key: 'calc-details' }, 
+                                `${details.monthlyAmount ? Math.round(details.monthlyAmount).toLocaleString() : 0} ÷ ${details.monthlyIncome ? Math.round(details.monthlyIncome).toLocaleString() : 0} = ${details.rate.toFixed(1)}%`),
+                            factorKey === 'taxEfficiency' && details.efficiencyScore && createElement('div', { key: 'calc-details' }, 
+                                `${details.currentRate.toFixed(1)}% ÷ ${details.optimalRate}% × 100 = ${details.efficiencyScore.toFixed(0)}%`),
+                            factorKey === 'diversification' && details.assetClasses && createElement('div', { key: 'calc-details' }, 
+                                `${details.assetClasses} ${language === 'he' ? 'סוגי נכסים מזוהים' : 'asset classes identified'}`),
+                            factorKey === 'emergencyFund' && details.months && createElement('div', { key: 'calc-details' }, 
+                                `${details.currentAmount ? Math.round(details.currentAmount).toLocaleString() : 0} ÷ ${language === 'he' ? 'הוצאות חודשיות' : 'monthly expenses'} = ${details.months.toFixed(1)} ${language === 'he' ? 'חודשים' : 'months'}`)
+                        ]),
+                        
+                        // Improvement suggestions for low scores
+                        normalizedScore < 70 && normalizedScore > 0 && createElement('div', {
+                            key: 'improvement-suggestion',
+                            className: "text-xs bg-green-600 bg-opacity-20 p-2 rounded mb-2"
+                        }, [
+                            createElement('div', { key: 'improve-title', className: "font-semibold mb-1" }, 
+                                language === 'he' ? 'להשיג ציון טוב יותר:' : 'To improve this score:'),
+                            factorKey === 'savingsRate' && createElement('div', { key: 'improve-text' }, 
+                                language === 'he' ? 
+                                    `הגדל חיסכון ל-15% מההכנסה (₪${details.monthlyIncome ? Math.round(details.monthlyIncome * 0.15).toLocaleString() : 0} לחודש)` :
+                                    `Increase savings to 15% of income (₪${details.monthlyIncome ? Math.round(details.monthlyIncome * 0.15).toLocaleString() : 0}/month)`),
+                            factorKey === 'taxEfficiency' && createElement('div', { key: 'improve-text' }, 
+                                language === 'he' ? 
+                                    `הגדל הפקדות פנסיוניות ל-${details.optimalRate}% מההכנסה` :
+                                    `Increase retirement contributions to ${details.optimalRate}% of income`),
+                            factorKey === 'diversification' && createElement('div', { key: 'improve-text' }, 
+                                language === 'he' ? 
+                                    `הוסף ${Math.max(3 - (details.assetClasses || 0), 0)} סוגי נכסים נוספים` :
+                                    `Add ${Math.max(3 - (details.assetClasses || 0), 0)} more asset class(es)`)
+                        ]),
+                        
                         debugText && createElement('div', { 
                             key: 'tooltip-debug', 
                             className: "text-xs bg-red-600 bg-opacity-20 p-2 rounded mt-2" 
@@ -392,44 +439,94 @@
                     renderScoreFactor('timeToRetirement', healthReport.factors.timeHorizon, window.SCORE_FACTORS?.timeHorizon)
             ].filter(Boolean)),
 
-            // Debug panel for zero scores
+            // Enhanced Missing Data Alert Panel
             (healthReport.debugInfo?.zeroScoreFactors?.length > 0 || 
              Object.values(healthReport.factors || {}).some(f => f.score === 0)) &&
             createElement('div', {
-                key: 'debug-panel',
-                className: "mt-4 bg-amber-50 border border-amber-200 rounded-lg p-4"
+                key: 'missing-data-panel',
+                className: "mt-6 bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-xl p-6"
             }, [
                 createElement('h4', {
-                    key: 'debug-title',
-                    className: "font-semibold text-amber-800 mb-2 flex items-center"
+                    key: 'missing-data-title',
+                    className: "font-bold text-red-800 mb-4 flex items-center text-lg"
                 }, [
-                    createElement('span', { key: 'icon', className: "mr-2" }, '⚠️'),
-                    createElement('span', { key: 'text' }, t.missingData || 'Missing Data')
+                    createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '🚨'),
+                    createElement('span', { key: 'text' }, 
+                        language === 'he' ? 'נתונים חסרים משפיעים על הציון' : 'Missing Data Affecting Your Score')
                 ]),
-                createElement('div', { key: 'debug-items', className: "space-y-2" },
+                
+                createElement('div', { key: 'missing-items', className: "space-y-4" },
                     Object.entries(healthReport.factors || {}).filter(([_, f]) => f.score === 0).map(([factorName, factorData]) => {
                         const debugInfo = factorData.details?.debugInfo || {};
-                        let message = '';
+                        const status = factorData.details?.status || 'unknown';
                         
-                        if (factorName === 'savingsRate' && debugInfo.reason) {
-                            message = debugInfo.reason === 'No monthly income found' ? 
-                                t.addSalaryData : t.addContributionData;
+                        let stepNumber = '';
+                        let actionText = '';
+                        let priority = 'medium';
+                        
+                        if (factorName === 'savingsRate') {
+                            if (status === 'missing_income_data') {
+                                stepNumber = '2';
+                                actionText = language === 'he' ? 'הוסף מידע על שכר' : 'Add salary information';
+                                priority = 'high';
+                            } else if (status === 'missing_contribution_data') {
+                                stepNumber = '4';
+                                actionText = language === 'he' ? 'הוסף שיעורי הפקדה' : 'Add contribution rates';
+                                priority = 'high';
+                            }
                         } else if (factorName === 'taxEfficiency') {
-                            message = t.addContributionData;
+                            if (status === 'missing_income_data') {
+                                stepNumber = '2';
+                                actionText = language === 'he' ? 'הוסף מידע על שכר' : 'Add salary information';
+                                priority = 'high';
+                            } else if (status === 'missing_contribution_data') {
+                                stepNumber = '4';
+                                actionText = language === 'he' ? 'הוסף שיעורי הפקדה' : 'Add contribution rates';
+                                priority = 'high';
+                            }
                         }
                         
+                        const priorityColor = priority === 'high' ? 'red' : 'amber';
+                        
                         return createElement('div', {
-                            key: `debug-${factorName}`,
-                            className: "text-sm text-amber-700"
+                            key: `missing-${factorName}`,
+                            className: `bg-white rounded-lg p-4 border-l-4 border-${priorityColor}-500 shadow-sm`
                         }, [
-                            createElement('span', { key: 'factor', className: "font-medium" }, 
-                                t[factorName] || factorName),
-                            createElement('span', { key: 'colon' }, ': '),
-                            createElement('span', { key: 'message' }, 
-                                message || t.checkInputs || 'Please check your inputs')
+                            createElement('div', { key: 'missing-header', className: "flex items-center justify-between mb-2" }, [
+                                createElement('div', { key: 'factor-info', className: "flex items-center" }, [
+                                    createElement('span', { key: 'factor-name', className: `font-semibold text-${priorityColor}-700` }, 
+                                        t[factorName] || factorName),
+                                    createElement('span', { key: 'score-badge', className: `ml-2 px-2 py-1 bg-${priorityColor}-100 text-${priorityColor}-700 text-xs rounded` }, 
+                                        '0/100')
+                                ]),
+                                stepNumber && createElement('div', { key: 'step-badge', className: `px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full` }, 
+                                    `${language === 'he' ? 'שלב' : 'Step'} ${stepNumber}`)
+                            ]),
+                            createElement('div', { key: 'missing-description', className: `text-sm text-${priorityColor}-600 mb-2` }, 
+                                debugInfo.reason || (language === 'he' ? 'נתונים חסרים' : 'Missing required data')),
+                            actionText && createElement('div', { key: 'missing-action', className: `text-sm font-medium text-${priorityColor}-800` }, 
+                                `→ ${actionText}`)
                         ]);
                     })
-                )
+                ),
+                
+                // Quick action button
+                createElement('div', { key: 'quick-action', className: "mt-4 pt-4 border-t border-red-200" }, [
+                    createElement('div', { key: 'action-text', className: "text-sm text-red-700 mb-3" }, 
+                        language === 'he' ? 
+                            'השלמת הנתונים החסרים תשפר משמעותית את ציון הבריאות הפיננסית שלך' :
+                            'Completing the missing data will significantly improve your financial health score'),
+                    createElement('button', {
+                        key: 'action-button',
+                        className: "bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                        onClick: () => {
+                            // This would typically navigate back to the appropriate wizard step
+                            alert(language === 'he' ? 
+                                'חזור לשלבי האשף כדי להשלים את הנתונים החסרים' :
+                                'Go back to the wizard steps to complete the missing data');
+                        }
+                    }, language === 'he' ? 'השלם נתונים חסרים' : 'Complete Missing Data')
+                ])
             ]),
 
             // Improvement Suggestions
