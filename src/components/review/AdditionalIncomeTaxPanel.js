@@ -216,9 +216,9 @@ const AdditionalIncomeTaxPanel = ({ inputs, language = 'en', workingCurrency = '
                 key: 'toggle-container',
                 className: "bg-white border border-purple-200 rounded-lg p-1 flex"
             }, [
-                ['annual', 'monthly', 'both'].map(mode => 
+                ['annual', 'monthly', 'both'].map((mode, index) => 
                     createElement('button', {
-                        key: mode,
+                        key: `${mode}-${index}`,
                         onClick: () => setViewMode(mode),
                         className: `px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                             viewMode === mode 

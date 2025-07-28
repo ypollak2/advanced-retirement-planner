@@ -108,9 +108,9 @@
         const processedInputs = inputs.planningType === 'couple' && window.getFieldValue ? 
             {
                 ...inputs,
-                currentSalary: window.getFieldValue(inputs, 'currentSalary', { combinePartners: true }),
-                monthlyExpenses: window.getFieldValue(inputs, 'currentMonthlyExpenses', { combinePartners: true }),
-                currentSavings: window.getFieldValue(inputs, 'currentSavings', { combinePartners: true })
+                currentSalary: window.getFieldValue(inputs, ['currentSalary'], { combinePartners: true }),
+                monthlyExpenses: window.getFieldValue(inputs, ['currentMonthlyExpenses'], { combinePartners: true }),
+                currentSavings: window.getFieldValue(inputs, ['currentSavings'], { combinePartners: true })
             } : inputs;
 
         const healthReport = window.calculateFinancialHealthScore ? 

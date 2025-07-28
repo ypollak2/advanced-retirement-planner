@@ -18,10 +18,10 @@ const Dashboard = ({
     const processedInputs = inputs?.planningType === 'couple' && window.getFieldValue ? 
         {
             ...inputs,
-            currentSalary: window.getFieldValue(inputs, 'currentSalary', { combinePartners: true }),
-            monthlyExpenses: window.getFieldValue(inputs, 'currentMonthlyExpenses', { combinePartners: true }),
-            currentSavings: window.getFieldValue(inputs, 'currentSavings', { combinePartners: true }),
-            monthlyContribution: window.getFieldValue(inputs, 'monthlyContribution', { combinePartners: true })
+            currentSalary: window.getFieldValue(inputs, ['currentSalary'], { combinePartners: true }),
+            monthlyExpenses: window.getFieldValue(inputs, ['currentMonthlyExpenses'], { combinePartners: true }),
+            currentSavings: window.getFieldValue(inputs, ['currentSavings'], { combinePartners: true }),
+            monthlyContribution: window.getFieldValue(inputs, ['monthlyContribution'], { combinePartners: true })
         } : inputs;
     
     const [expandedSections, setExpandedSections] = React.useState({
