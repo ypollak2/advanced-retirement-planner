@@ -66,41 +66,6 @@ function applyValueCaps(value, capType, inputName = 'value') {
 }
 
 /**
- * Calculate total current savings across all asset types
- */
-function calculateTotalCurrentSavings(inputs) {
-    const assets = [
-        'currentSavings',           // Pension savings
-        'currentTrainingFund',      // Training fund
-        'currentPersonalPortfolio', // Personal portfolio
-        'currentDigitalAssetFiatValue', // Digital assets (fiat value)
-        'currentCryptoFiatValue',   // Cryptocurrency (fiat value - fallback)
-        'currentSavingsAccount',    // Savings account
-        'currentRealEstate'         // Real estate
-    ];
-    
-    let total = 0;
-    
-    // Add individual savings
-    assets.forEach(asset => {
-        total += parseFloat(inputs[asset]) || 0;
-    });
-    
-    // Add partner savings if couple mode
-    if (inputs.relationshipStatus === 'couple') {
-        assets.forEach(asset => {
-            const partner1Field = asset.replace('current', 'partner1');
-            const partner2Field = asset.replace('current', 'partner2');
-            total += parseFloat(inputs[partner1Field]) || 0;
-            total += parseFloat(inputs[partner2Field]) || 0;
-        });
-    }
-    
-    // Apply maximum cap to prevent extreme calculations
-    return applyValueCaps(total, 'maxCurrentSavings', 'total current savings');
-}
-
-/**
  * Calculate combined monthly income
  */
 function calculateMonthlyIncome(inputs) {
@@ -187,7 +152,7 @@ function suggestRetirementSavingsGoal(inputs) {
     const cappedRequiredSavings = applyValueCaps(requiredSavings, 'maxSavingsGoal', 'required savings');
     
     // Project current savings growth with caps
-    const currentSavings = calculateTotalCurrentSavings(inputs);
+    const currentSavings = window.calculateTotalCurrentSavings(inputs);
     const rawYearsToRetirement = retirementAge - (inputs.currentAge || 30);
     const yearsToRetirement = Math.max(
         applyValueCaps(rawYearsToRetirement, 'minYearsToRetirement', 'years to retirement'),
@@ -228,7 +193,7 @@ function calculateBlendedReturnRate(inputs) {
         applyValueCaps(rawPortfolioReturn, 'maxReturnRate', 'portfolio return')
     );
     
-    const currentSavings = calculateTotalCurrentSavings(inputs);
+    const currentSavings = window.calculateTotalCurrentSavings(inputs);
     const pensionSavings = parseFloat(inputs.currentSavings) || 0;
     const portfolioSavings = parseFloat(inputs.currentPersonalPortfolio) || 0;
     
@@ -267,7 +232,7 @@ function suggestEmergencyFund(inputs) {
  * Calculate gap analysis between current trajectory and goals
  */
 function calculateGapAnalysis(inputs, suggestions) {
-    const currentSavings = calculateTotalCurrentSavings(inputs);
+    const currentSavings = window.calculateTotalCurrentSavings(inputs);
     const rawYearsToRetirement = (inputs.retirementAge || 67) - (inputs.currentAge || 30);
     const yearsToRetirement = Math.max(
         applyValueCaps(rawYearsToRetirement, 'minYearsToRetirement', 'years to retirement'),

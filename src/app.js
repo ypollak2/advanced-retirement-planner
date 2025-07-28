@@ -108,7 +108,7 @@ function initializeApp() {
             const [inputs, setInputs] = React.useState({
                 currentAge: 30,
                 retirementAge: 67,
-                currentSavings: 50000,
+                currentSavings: 0,
                 inflationRate: 3,
                 currentMonthlyExpenses: 12000,
                 targetReplacement: 75,
