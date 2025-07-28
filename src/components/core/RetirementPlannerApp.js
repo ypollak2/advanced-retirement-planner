@@ -915,7 +915,7 @@ function RetirementPlannerApp() {
     function generateExportData() {
         return {
             timestamp: new Date().toISOString(),
-            version: window.APP_VERSION || '6.3.0',
+            version: window.APP_VERSION || '6.8.2',
             personalInfo: {
                 currentAge: inputs.currentAge,
                 retirementAge: inputs.retirementAge,

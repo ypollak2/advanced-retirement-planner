@@ -21,7 +21,7 @@ window.RobustLocalStorage = {
             step7: {},
             step8: {},
             metadata: {
-                version: '6.6.4',
+                version: '6.8.2',
                 created: Date.now(),
                 lastModified: Date.now()
             }
@@ -301,7 +301,7 @@ window.RobustLocalStorage = {
                 partner: data.step2?.partner ? { salary: data.step2.partner.salary } : undefined
             },
             metadata: {
-                version: '6.6.4',
+                version: '6.8.2',
                 essential: true,
                 lastModified: Date.now()
             }
@@ -458,7 +458,7 @@ window.RobustLocalStorage = {
                 ...data,
                 metadata: {
                     ...data.metadata,
-                    version: '6.6.4',
+                    version: '6.8.2',
                     lastModified: Date.now()
                 }
             };

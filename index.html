@@ -228,13 +228,13 @@
                         if (ReactDOM.createRoot) {
                             const root = ReactDOM.createRoot(document.getElementById('root'));
                             root.render(React.createElement(window.RetirementPlannerApp));
-                            console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '6.6.4'} initialized successfully`);
+                            console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '6.8.2'} initialized successfully`);
                         } else if (ReactDOM.render) {
                             ReactDOM.render(
                                 React.createElement(window.RetirementPlannerApp),
                                 document.getElementById('root')
                             );
-                            console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '6.6.4'} initialized (React 17 mode)`);
+                            console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '6.8.2'} initialized (React 17 mode)`);
                         }
                     } else {
                         if (attempt < maxAttempts) {
