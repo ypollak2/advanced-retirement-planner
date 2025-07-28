@@ -58,9 +58,10 @@ function projectExpenses(currentExpenses, yearlyAdjustment = 2.5, yearsAhead = 1
 function calculateTotalExpenses(expenses) {
     if (!expenses) return 0;
     
-    return Object.keys(expenses)
-        .filter(key => key !== 'yearlyAdjustment')
-        .reduce((sum, key) => sum + (parseFloat(expenses[key]) || 0), 0);
+    return Object.values(expenses).reduce((sum, value) => {
+        const parsedValue = parseFloat(value);
+        return sum + (isNaN(parsedValue) ? 0 : parsedValue);
+    }, 0);
 }
 
 /**
