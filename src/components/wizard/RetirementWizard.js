@@ -400,29 +400,41 @@ const RetirementWizard = ({
                 ]),
                 
                 // Clear Progress Button (only show if there's saved progress)
-                savedProgress && currentStep > 1 && React.createElement('div', {
-                    key: 'progress-controls',
-                    className: "flex justify-center"
-                }, [
-                    React.createElement('button', {
-                        key: 'clear-progress',
-                        onClick: () => {
-                            if (window.confirm(language === 'he' ? 
-                                'האם אתה בטוח שברצונך למחוק את ההתקדמות השמורה?' : 
-                                'Are you sure you want to clear your saved progress?')) {
-                                clearSavedProgress();
-                                setCurrentStep(1);
-                                setCompletedSteps([]);
-                                setSkippedSteps([]);
-                                setInputs({});
-                            }
-                        },
-                        className: "px-4 py-2 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                    savedProgress && currentStep > 1 && React.createElement('div', {
+                        key: 'progress-controls',
+                        className: "flex justify-center"
                     }, [
-                        React.createElement('span', { key: 'icon', className: "mr-2" }, '🗑️'),
-                        t.clearProgress
+                        React.createElement('button', {
+                            key: 'clear-progress',
+                            onClick: () => {
+                                if (window.confirm(language === 'he' ? 
+                                    'האם אתה בטוח שברצונך למחוק את ההתקדמות השמורה?' : 
+                                    'Are you sure you want to clear your saved progress?')) {
+                                    clearSavedProgress();
+                                    setCurrentStep(1);
+                                    setCompletedSteps([]);
+                                    setSkippedSteps([]);
+                                    setInputs({});
+                                }
+                            },
+                            className: "px-4 py-2 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                        }, [
+                            React.createElement('span', { key: 'icon', className: "mr-2" }, '🗑️'),
+                            t.clearProgress
+                        ]),
+                        // Temporary button to clear all local storage for debugging
+                        React.createElement('button', {
+                            key: 'clear-all-storage',
+                            onClick: () => {
+                                if (window.confirm('DEBUG: Are you sure you want to clear ALL local storage for this app? This will reset everything.')) {
+                                    localStorage.clear();
+                                    window.location.reload();
+                                }
+                            },
+                            className: "ml-2 px-4 py-2 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                        }, 'DEBUG: Clear All Storage')
                     ])
-                ])
+                ]),
             ]),
             React.createElement('h1', { 
                 key: 'wizard-title',
