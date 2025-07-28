@@ -67,7 +67,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             const currentTrainingFund = inputs.currentTrainingFund || 0;
             const currentPersonalPortfolio = inputs.currentPersonalPortfolio || 0;
             const currentRealEstate = inputs.currentRealEstate || 0;
-            const currentCrypto = inputs.currentCryptoFiatValue || inputs.currentCrypto || 0;
+            const currentCrypto = inputs.currentDigitalAssetFiatValue || inputs.currentCryptoFiatValue || inputs.currentCrypto || 0;
             const currentSavingsAccount = inputs.currentSavingsAccount || 0;
             
             // Partner savings if couple
@@ -75,12 +75,12 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             const partner1TrainingFund = inputs.partner1CurrentTrainingFund || 0;
             const partner1Portfolio = inputs.partner1PersonalPortfolio || 0;
             const partner1RealEstate = inputs.partner1RealEstate || 0;
-            const partner1Crypto = inputs.partner1CryptoFiatValue || inputs.partner1Crypto || 0;
+            const partner1Crypto = inputs.partner1DigitalAssetFiatValue || inputs.partner1CryptoFiatValue || inputs.partner1Crypto || 0;
             const partner2Pension = inputs.partner2CurrentPension || 0;
             const partner2TrainingFund = inputs.partner2CurrentTrainingFund || 0;
             const partner2Portfolio = inputs.partner2PersonalPortfolio || 0;
             const partner2RealEstate = inputs.partner2RealEstate || 0;
-            const partner2Crypto = inputs.partner2CryptoFiatValue || inputs.partner2Crypto || 0;
+            const partner2Crypto = inputs.partner2DigitalAssetFiatValue || inputs.partner2CryptoFiatValue || inputs.partner2Crypto || 0;
             
             const total = currentSavings + currentTrainingFund + currentPersonalPortfolio + 
                          currentRealEstate + currentCrypto + currentSavingsAccount +
