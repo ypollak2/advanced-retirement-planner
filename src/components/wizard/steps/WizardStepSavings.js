@@ -214,7 +214,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                     })
                 ]),
                 
-                // Enhanced Cryptocurrency with Token Selection
+                // Enhanced Cryptocurrency with Digital Asset Token Selection (crypto assets, not auth tokens)
                 window.CryptoPortfolioInput ? createElement(window.CryptoPortfolioInput, {
                     key: 'crypto-portfolio',
                     inputs,
@@ -335,7 +335,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                 className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
                             })
                         ]),
-                        // Enhanced Partner 1 Crypto with Token Selection
+                        // Enhanced Partner 1 Crypto with Digital Asset Token Selection (crypto assets, not auth tokens)
                         window.CryptoPortfolioInput ? createElement(window.CryptoPortfolioInput, {
                             key: 'p1-crypto-portfolio',
                             inputs,
@@ -423,7 +423,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                 className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
                             })
                         ]),
-                        // Enhanced Partner 2 Crypto with Token Selection
+                        // Enhanced Partner 2 Crypto with Digital Asset Token Selection (crypto assets, not auth tokens)
                         window.CryptoPortfolioInput ? createElement(window.CryptoPortfolioInput, {
                             key: 'p2-crypto-portfolio',
                             inputs,

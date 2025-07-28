@@ -1,4 +1,4 @@
-// DigitalAssetPortfolioInput.js - Enhanced digital asset input with token selection and real-time conversion
+// DigitalAssetPortfolioInput.js - Enhanced digital asset input with crypto token selection and real-time conversion (crypto assets, not auth tokens)
 // PORTFOLIO TRACKING ONLY - NOT A CRYPTOCURRENCY WALLET - NO PRIVATE KEYS OR WALLET FUNCTIONS
 // Created by Yali Pollak (יהלי פולק) - v6.6.2
 
@@ -19,14 +19,14 @@ const DigitalAssetPortfolioInput = ({
     const [lastUpdated, setLastUpdated] = React.useState(null);
     const [priceError, setPriceError] = React.useState(null);
     
-    // Field names based on prefix
+    // Field names based on prefix - Digital asset/crypto currency UI fields (not auth tokens)
     const amountField = `${fieldPrefix}DigitalAssetAmount`;
-    const tokenField = `${fieldPrefix}DigitalAssetToken`;
+    const tokenField = `${fieldPrefix}DigitalAssetToken`; // crypto asset selector field
     const fiatValueField = `${fieldPrefix}DigitalAssetFiatValue`;
     
     // Get current values
     const assetAmount = inputs[amountField] || 0;
-    const assetToken = inputs[tokenField] || 'BTC';
+    const assetToken = inputs[tokenField] || 'BTC'; // crypto asset type (BTC/ETH/etc)
     const assetFiatValue = inputs[fiatValueField] || 0;
     
     // Multi-language content
@@ -34,9 +34,9 @@ const DigitalAssetPortfolioInput = ({
         he: {
             digitalAsset: 'נכסים דיגיטליים',
             amount: 'כמות',
-            token: 'נכס',
+            token: 'נכס', // crypto asset (not auth token)
             fiatValue: 'שווי במטבע בסיס',
-            selectToken: 'בחר נכס דיגיטלי',
+            selectToken: 'בחר נכס דיגיטלי', // crypto asset selector
             loading: 'טוען מחירים...',
             error: 'שגיאה בטעינת מחירים',
             lastUpdated: 'עודכן לאחרונה',
@@ -46,9 +46,9 @@ const DigitalAssetPortfolioInput = ({
         en: {
             digitalAsset: 'Digital Asset',
             amount: 'Amount',
-            token: 'Token',
+            token: 'Token', // crypto asset (not auth token)
             fiatValue: 'Fiat Value',
-            selectToken: 'Select digital asset',
+            selectToken: 'Select digital asset', // crypto asset selector
             loading: 'Loading prices...',
             error: 'Error loading prices',
             lastUpdated: 'Last updated',

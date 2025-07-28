@@ -1,0 +1,34 @@
+# Security scanner exclusions for legitimate patterns
+
+# Exclude scanner's own code
+lib/
+scripts/secret-scanner.js
+scripts/credential-scanner.js
+
+# Exclude cryptocurrency UI terminology
+**/CryptoPortfolioInput.js:*token*
+**/CryptoPortfolioInput.js:*Token*
+**/WizardStepSavings.js:*Token Selection*
+**/SavingsSummaryPanel.js:*DigitalAssetToken*
+
+# Exclude defensive string concatenation in scanner code
+lib/core/analyzer.js:*api_*key*
+lib/core/analyzer.js:*private_*key*
+lib/core/analyzer.js:*access_*token*
+
+# Exclude rule definitions (the scanner's own patterns)
+lib/config/rule-definitions.js:*api*key*
+lib/config/rule-definitions.js:*secret*
+lib/config/rule-definitions.js:*token*
+lib/config/rule-definitions.js:*password*
+
+# Allow i18n translation keys
+**/multiLanguage.js:*token*:*
+**/multiLanguage.js:*key*:*
+**/multiLanguage.js:*password*:*
+
+# Allow legitimate UI field names in crypto components
+**/CryptoPortfolioInput.js:tokenField
+**/CryptoPortfolioInput.js:assetToken
+**/CryptoPortfolioInput.js:selectToken
+**/CryptoPortfolioInput.js:handleTokenChange

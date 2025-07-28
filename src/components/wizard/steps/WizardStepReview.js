@@ -83,10 +83,10 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     const processedInputs = inputs.planningType === 'couple' && window.getFieldValue ? 
         {
             ...inputs,
-            currentSalary: window.getFieldValue(inputs, 'currentSalary', { combinePartners: true }),
-            monthlyExpenses: window.getFieldValue(inputs, 'currentMonthlyExpenses', { combinePartners: true }),
-            currentSavings: window.getFieldValue(inputs, 'currentSavings', { combinePartners: true }),
-            monthlyContribution: window.getFieldValue(inputs, 'monthlyContribution', { combinePartners: true }),
+            currentSalary: window.getFieldValue(inputs, ['currentSalary'], { combinePartners: true }),
+            monthlyExpenses: window.getFieldValue(inputs, ['currentMonthlyExpenses'], { combinePartners: true }),
+            currentSavings: window.getFieldValue(inputs, ['currentSavings'], { combinePartners: true }),
+            monthlyContribution: window.getFieldValue(inputs, ['monthlyContribution'], { combinePartners: true }),
             // Ensure partner1 and partner2 field consistency for test validation
             partner1Salary: inputs.partner1Salary || inputs.currentSalary,
             partner2Salary: inputs.partner2Salary || inputs.partnerSalary

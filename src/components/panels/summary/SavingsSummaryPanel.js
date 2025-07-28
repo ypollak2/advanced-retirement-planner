@@ -97,7 +97,7 @@ const SavingsSummaryPanel = ({
                 allInputFields: {
                     currentDigitalAssetFiatValue: inputs.currentDigitalAssetFiatValue,
                     currentDigitalAssetAmount: inputs.currentDigitalAssetAmount,
-                    currentDigitalAssetToken: inputs.currentDigitalAssetToken,
+                    currentDigitalAssetToken: inputs.currentDigitalAssetToken, // crypto asset type (not auth token)
                     partner1DigitalAssetFiatValue: inputs.partner1DigitalAssetFiatValue,
                     partner2DigitalAssetFiatValue: inputs.partner2DigitalAssetFiatValue
                 }
