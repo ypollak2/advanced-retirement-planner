@@ -6,17 +6,159 @@
  * Provides detailed breakdowns, actionable insights, and peer comparisons
  */
 
-// Enhanced field mapping utility with common variations
-function getFieldValue(inputs, fieldNames) {
+// ENHANCED: Comprehensive field mapping utility with wizard compatibility and debugging
+function getFieldValue(inputs, fieldNames, options = {}) {
+    const { combinePartners = false, allowZero = false, debugMode = true } = options;
+    const debugLog = debugMode ? console.log : () => {};
+    
+    debugLog(`🔍 Searching for fields: ${fieldNames.join(', ')}`);
+    debugLog(`📋 Planning type: ${inputs.planningType}, Combine partners: ${combinePartners}`);
+    
+    // PHASE 1: Direct field lookup with enhanced validation
     for (const fieldName of fieldNames) {
         const value = inputs[fieldName];
+        debugLog(`  Checking field "${fieldName}": ${value} (type: ${typeof value})`);
+        
         if (value !== undefined && value !== null && value !== '') {
             const parsed = parseFloat(value);
-            if (!isNaN(parsed)) {
+            if (!isNaN(parsed) && (allowZero || parsed > 0)) {
+                debugLog(`✅ Found valid field "${fieldName}": ${parsed}`);
+                return parsed;
+            } else {
+                debugLog(`  Field "${fieldName}" exists but value invalid: ${parsed}`);
+            }
+        }
+    }
+    
+    // PHASE 2: For couple mode, try combining partner fields automatically
+    if (combinePartners && inputs.planningType === 'couple') {
+        debugLog(`🤝 Attempting to combine partner fields...`);
+        let combinedValue = 0;
+        let partnersFound = 0;
+        
+        // Enhanced partner field detection
+        const partnerFieldMappings = [
+            { partner1: 'partner1Salary', partner2: 'partner2Salary' },
+            { partner1: 'Partner1Salary', partner2: 'Partner2Salary' },
+            { partner1: 'partner1Income', partner2: 'partner2Income' },
+            { partner1: 'partner1MonthlySalary', partner2: 'partner2MonthlySalary' }
+        ];
+        
+        for (const mapping of partnerFieldMappings) {
+            const p1Value = parseFloat(inputs[mapping.partner1] || 0);
+            const p2Value = parseFloat(inputs[mapping.partner2] || 0);
+            
+            if (!isNaN(p1Value) && p1Value > 0) {
+                combinedValue += p1Value;
+                partnersFound++;
+                debugLog(`  Added ${mapping.partner1}: ${p1Value}`);
+            }
+            
+            if (!isNaN(p2Value) && p2Value > 0) {
+                combinedValue += p2Value;
+                partnersFound++;
+                debugLog(`  Added ${mapping.partner2}: ${p2Value}`);
+            }
+            
+            // If we found data, don't keep looking in other mappings
+            if (partnersFound > 0) break;
+        }
+        
+        if (combinedValue > 0) {
+            debugLog(`✅ Combined ${partnersFound} partner fields: ${combinedValue}`);
+            return combinedValue;
+        } else {
+            debugLog(`  No valid partner field data found`);
+        }
+    }
+    
+    // PHASE 3: Fallback attempts with alternative field patterns
+    debugLog(`🔄 Trying fallback field patterns...`);
+    const fallbackPatterns = [];
+    
+    // Generate fallback patterns based on original field names
+    fieldNames.forEach(fieldName => {
+        const lowerField = fieldName.toLowerCase();
+        
+        // For salary fields, try variations
+        if (lowerField.includes('salary')) {
+            fallbackPatterns.push('monthlySalary', 'grossSalary', 'currentSalary', 'salary', 'income', 'monthlyIncome');
+        }
+        
+        // For contribution fields, try variations  
+        if (lowerField.includes('pension') && lowerField.includes('rate')) {
+            fallbackPatterns.push('pensionRate', 'pension_rate', 'employeePensionRate', 'pensionEmployeeRate');
+        }
+        
+        if (lowerField.includes('training') && lowerField.includes('rate')) {
+            fallbackPatterns.push('trainingFundRate', 'training_fund_rate', 'employeeTrainingFundRate', 'trainingFundEmployeeRate');
+        }
+        
+        // For asset fields, try variations
+        if (lowerField.includes('current') && lowerField.includes('saving')) {
+            fallbackPatterns.push('currentSavings', 'totalSavings', 'savings', 'currentSavingsAmount');
+        }
+        
+        if (lowerField.includes('emergency')) {
+            fallbackPatterns.push('emergencyFund', 'emergencyFundAmount', 'currentSavingsAccount', 'liquidSavings');
+        }
+    });
+    
+    // Remove duplicates and try fallback patterns
+    const uniqueFallbacks = [...new Set(fallbackPatterns)];
+    for (const fallbackField of uniqueFallbacks) {
+        const value = inputs[fallbackField];
+        if (value !== undefined && value !== null && value !== '') {
+            const parsed = parseFloat(value);
+            if (!isNaN(parsed) && (allowZero || parsed > 0)) {
+                debugLog(`✅ Found fallback field "${fallbackField}": ${parsed}`);
                 return parsed;
             }
         }
     }
+    
+    // PHASE 4: Special handling for wizard-specific field structures
+    debugLog(`🧙 Checking wizard-specific field structures...`);
+    
+    // Try to extract from nested structures
+    if (inputs.expenses && typeof inputs.expenses === 'object') {
+        // For debt/expense related fields
+        if (fieldNames.some(field => field.toLowerCase().includes('debt') || field.toLowerCase().includes('expense'))) {
+            const expenseCategories = ['mortgage', 'carLoan', 'creditCard', 'otherDebt'];
+            let totalDebt = 0;
+            expenseCategories.forEach(category => {
+                const categoryValue = parseFloat(inputs.expenses[category] || 0);
+                if (!isNaN(categoryValue)) totalDebt += categoryValue;
+            });
+            if (totalDebt > 0) {
+                debugLog(`✅ Found debt from expenses structure: ${totalDebt}`);
+                return totalDebt;
+            }
+        }
+    }
+    
+    // Try to extract from portfolio allocations for risk-related fields
+    if (inputs.portfolioAllocations && Array.isArray(inputs.portfolioAllocations)) {
+        if (fieldNames.some(field => field.toLowerCase().includes('stock') || field.toLowerCase().includes('equity'))) {
+            const stockAllocation = inputs.portfolioAllocations.find(allocation => 
+                allocation && allocation.index && 
+                (allocation.index.toLowerCase().includes('stock') || 
+                 allocation.index.toLowerCase().includes('equity') ||
+                 allocation.index.toLowerCase().includes('shares'))
+            );
+            if (stockAllocation && stockAllocation.percentage) {
+                const stockPercentage = parseFloat(stockAllocation.percentage);
+                if (!isNaN(stockPercentage)) {
+                    debugLog(`✅ Found stock percentage from portfolio allocations: ${stockPercentage}`);
+                    return stockPercentage;
+                }
+            }
+        }
+    }
+    
+    debugLog(`❌ No valid value found for any fields: ${fieldNames.join(', ')}`);
+    debugLog(`📊 Available input fields: ${Object.keys(inputs).join(', ')}`);
+    
     return 0;
 }
 
@@ -133,57 +275,105 @@ const COUNTRY_FACTORS = {
  * Calculate savings rate score
  */
 function calculateSavingsRateScore(inputs) {
-    // CRITICAL FIX: Use actual field names from wizard
+    console.log('🔍 === CALCULATING SAVINGS RATE SCORE ===');
+    console.log('📋 Input planning type:', inputs.planningType);
+    console.log('📋 Available fields:', Object.keys(inputs).length);
+    
+    // PHASE 1: Get monthly income using enhanced field mapping
     let monthlyIncome = 0;
     
-    // Calculate total monthly income based on planning type
     if (inputs.planningType === 'couple') {
-        // For couples, sum both partner salaries
-        const partner1Income = parseFloat(inputs.partner1Salary || 0);
-        const partner2Income = parseFloat(inputs.partner2Salary || 0);
-        monthlyIncome = partner1Income + partner2Income;
+        console.log('👫 Couple mode: Looking for partner salary fields...');
+        
+        // Use enhanced field mapping for couple income
+        monthlyIncome = getFieldValue(inputs, [
+            'partner1Salary', 'partner2Salary', 'Partner1Salary', 'Partner2Salary',
+            'partner1Income', 'partner2Income', 'partner1MonthlySalary', 'partner2MonthlySalary'
+        ], { combinePartners: true, debugMode: true });
+        
+        console.log('👫 Combined partner income:', monthlyIncome);
+        
     } else {
-        // For individuals, use current monthly salary
-        monthlyIncome = parseFloat(inputs.currentMonthlySalary || 0);
+        console.log('👤 Individual mode: Looking for salary fields...');
+        
+        // Use enhanced field mapping for individual income
+        monthlyIncome = getFieldValue(inputs, [
+            'currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome',
+            'currentSalary', 'monthly_salary', 'income', 'grossSalary'
+        ], { debugMode: true });
+        
+        console.log('👤 Individual income:', monthlyIncome);
     }
     
-    // Calculate monthly contributions from pension/training fund rates
-    let monthlyContributions = 0;
+    // PHASE 2: Get contribution rates with enhanced field detection
+    console.log('💰 Looking for contribution rates...');
     
-    // CRITICAL FIX: Use correct field names from wizard
-    const pensionRate = parseFloat(inputs.pensionContributionRate || 0);
-    const trainingFundRate = parseFloat(inputs.trainingFundContributionRate || 0);
+    const pensionRate = getFieldValue(inputs, [
+        'pensionContributionRate', 'pensionEmployeeRate', 'pensionEmployee',
+        'employeePensionRate', 'pension_contribution_rate', 'pension_rate'
+    ], { debugMode: true });
     
-    console.log('💰 Savings Rate Debug:', {
-        monthlyIncome,
-        pensionRate,
-        trainingFundRate,
-        planningType: inputs.planningType,
-        partner1Salary: inputs.partner1Salary,
-        partner2Salary: inputs.partner2Salary,
-        currentMonthlySalary: inputs.currentMonthlySalary
+    const trainingFundRate = getFieldValue(inputs, [
+        'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee',
+        'employeeTrainingFundRate', 'training_fund_rate', 'trainingFund_rate'
+    ], { debugMode: true });
+    
+    console.log('💰 Contribution rates found:', {
+        pension: pensionRate,
+        trainingFund: trainingFundRate,
+        total: pensionRate + trainingFundRate
     });
     
+    // PHASE 3: Calculate monthly contributions
+    let monthlyContributions = 0;
+    let calculationMethod = 'none';
+    
     if (monthlyIncome > 0 && (pensionRate > 0 || trainingFundRate > 0)) {
-        // Calculate contributions as percentage of salary
+        // Method 1: Calculate from rates
         monthlyContributions = monthlyIncome * (pensionRate + trainingFundRate) / 100;
+        calculationMethod = 'calculated_from_rates';
         
         // Add additional monthly savings if available
-        const additionalSavings = parseFloat(inputs.additionalMonthlySavings || 0);
+        const additionalSavings = getFieldValue(inputs, [
+            'additionalMonthlySavings', 'monthlyAdditionalSavings', 'extraSavings'
+        ], { allowZero: true, debugMode: true });
+        
         monthlyContributions += additionalSavings;
+        console.log('💰 Contributions calculated from rates:', {
+            monthlyIncome,
+            totalRate: pensionRate + trainingFundRate,
+            calculatedContributions: monthlyIncome * (pensionRate + trainingFundRate) / 100,
+            additionalSavings,
+            totalContributions: monthlyContributions
+        });
+        
     } else {
-        // Fallback: try to get direct monthly contribution amount
-        monthlyContributions = parseFloat(inputs.monthlyContribution || 0);
+        // Method 2: Try to get direct monthly contribution amount
+        monthlyContributions = getFieldValue(inputs, [
+            'monthlyContribution', 'monthlyContributions', 'monthlySavings',
+            'totalMonthlyContributions', 'currentMonthlyContribution'
+        ], { allowZero: true, debugMode: true });
+        
+        calculationMethod = monthlyContributions > 0 ? 'direct_amount' : 'none';
+        console.log('💰 Direct monthly contributions:', monthlyContributions);
     }
     
-    // Add null/zero validation with enhanced debugging
+    // PHASE 4: Comprehensive validation with enhanced debugging
+    console.log('🔍 Validating calculation inputs...');
+    
     if (monthlyIncome === 0 || isNaN(monthlyIncome)) {
-        const missingFields = [];
+        console.warn('❌ No monthly income found');
+        
+        const availableIncomeFields = Object.keys(inputs).filter(key => 
+            key.toLowerCase().includes('salary') || key.toLowerCase().includes('income')
+        );
+        
+        const missingFieldSuggestions = [];
         if (inputs.planningType === 'couple') {
-            if (!inputs.partner1Salary) missingFields.push('partner1Salary');
-            if (!inputs.partner2Salary) missingFields.push('partner2Salary');
+            if (!inputs.partner1Salary && !inputs.Partner1Salary) missingFieldSuggestions.push('partner1Salary');
+            if (!inputs.partner2Salary && !inputs.Partner2Salary) missingFieldSuggestions.push('partner2Salary');
         } else {
-            if (!inputs.currentMonthlySalary) missingFields.push('currentMonthlySalary');
+            if (!inputs.currentMonthlySalary) missingFieldSuggestions.push('currentMonthlySalary');
         }
         
         return { 
@@ -192,25 +382,35 @@ function calculateSavingsRateScore(inputs) {
                 rate: 0, 
                 status: 'missing_income_data', 
                 monthlyAmount: 0,
+                calculationMethod: 'failed_no_income',
                 debugInfo: {
-                    reason: 'No monthly income found',
-                    missingFields: missingFields,
+                    phase: 'income_detection',
+                    reason: 'No monthly income data found in any expected fields',
                     planningType: inputs.planningType,
-                    fieldsFound: {
-                        currentMonthlySalary: !!inputs.currentMonthlySalary,
-                        partner1Salary: !!inputs.partner1Salary,
-                        partner2Salary: !!inputs.partner2Salary
-                    },
+                    availableIncomeFields: availableIncomeFields,
+                    missingFieldSuggestions: missingFieldSuggestions,
+                    fieldsChecked: inputs.planningType === 'couple' ? 
+                        ['partner1Salary', 'partner2Salary', 'Partner1Salary', 'Partner2Salary'] : 
+                        ['currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome'],
                     suggestion: inputs.planningType === 'couple' ? 
-                        'Add partner salary information in Step 2' : 
-                        'Add monthly salary information in Step 2'
+                        'Add partner salary information in Wizard Step 2 (Salary & Income)' : 
+                        'Add monthly salary information in Wizard Step 2 (Salary & Income)',
+                    userGuidance: 'Complete the salary section in the wizard to enable savings rate calculation'
                 }
             } 
         };
     }
     
-    // Check if contribution rates are missing
+    // Check if contribution data is completely missing
     if (monthlyContributions === 0 && pensionRate === 0 && trainingFundRate === 0) {
+        console.warn('❌ No contribution data found');
+        
+        const availableContributionFields = Object.keys(inputs).filter(key => 
+            key.toLowerCase().includes('contribution') || 
+            key.toLowerCase().includes('pension') || 
+            key.toLowerCase().includes('training')
+        );
+        
         return {
             score: 0,
             details: {
@@ -218,68 +418,118 @@ function calculateSavingsRateScore(inputs) {
                 status: 'missing_contribution_data',
                 monthlyAmount: 0,
                 monthlyIncome: monthlyIncome,
+                calculationMethod: 'failed_no_contributions',
                 debugInfo: {
-                    reason: 'No contribution rates found',
-                    missingFields: ['pensionContributionRate', 'trainingFundContributionRate'],
-                    fieldsFound: {
-                        pensionContributionRate: !!inputs.pensionContributionRate,
-                        trainingFundContributionRate: !!inputs.trainingFundContributionRate
-                    },
-                    suggestion: 'Add contribution rates in Step 4 - Contributions'
+                    phase: 'contribution_detection',
+                    reason: 'No contribution rates or amounts found in any expected fields',
+                    monthlyIncomeFound: monthlyIncome,
+                    availableContributionFields: availableContributionFields,
+                    missingFieldSuggestions: ['pensionContributionRate', 'trainingFundContributionRate'],
+                    fieldsChecked: [
+                        'pensionContributionRate', 'trainingFundContributionRate', 
+                        'monthlyContribution', 'monthlyContributions'
+                    ],
+                    suggestion: 'Add contribution rates in Wizard Step 4 (Contributions)',
+                    userGuidance: 'Set your pension and training fund contribution percentages to calculate savings rate'
                 }
             }
         };
     }
     
-    // CRITICAL FIX: Add NaN prevention for division
-    const savingsRate = (monthlyIncome > 0) ? (monthlyContributions / monthlyIncome) * 100 : 0;
+    // PHASE 5: Calculate savings rate with comprehensive validation
+    console.log('📊 Calculating savings rate...');
     
-    // Validate savingsRate is a finite number
+    const savingsRate = (monthlyIncome > 0) ? (monthlyContributions / monthlyIncome) * 100 : 0;
     const validSavingsRate = (isNaN(savingsRate) || !isFinite(savingsRate)) ? 0 : savingsRate;
     
+    console.log('📊 Savings rate calculation:', {
+        monthlyIncome,
+        monthlyContributions,
+        rawSavingsRate: savingsRate,
+        validSavingsRate: validSavingsRate,
+        calculationValid: validSavingsRate > 0
+    });
+    
+    // PHASE 6: Score calculation with benchmarking
     const maxScore = SCORE_FACTORS.savingsRate.weight;
+    const benchmarks = SCORE_FACTORS.savingsRate.benchmarks;
     
     let score = 0;
     let status = 'poor';
+    let benchmarkLevel = 'none';
     
-    if (validSavingsRate >= SCORE_FACTORS.savingsRate.benchmarks.excellent) {
+    if (validSavingsRate >= benchmarks.excellent) {
         score = maxScore;
         status = 'excellent';
-    } else if (validSavingsRate >= SCORE_FACTORS.savingsRate.benchmarks.good) {
+        benchmarkLevel = 'excellent';
+    } else if (validSavingsRate >= benchmarks.good) {
         score = maxScore * 0.85;
         status = 'good';
-    } else if (validSavingsRate >= SCORE_FACTORS.savingsRate.benchmarks.fair) {
+        benchmarkLevel = 'good';
+    } else if (validSavingsRate >= benchmarks.fair) {
         score = maxScore * 0.70;
         status = 'fair';
-    } else if (validSavingsRate >= SCORE_FACTORS.savingsRate.benchmarks.poor) {
+        benchmarkLevel = 'fair';
+    } else if (validSavingsRate >= benchmarks.poor) {
         score = maxScore * 0.50;
         status = 'poor';
+        benchmarkLevel = 'poor';
     } else {
-        score = Math.max(0, (validSavingsRate / SCORE_FACTORS.savingsRate.benchmarks.poor) * maxScore * 0.50);
+        score = Math.max(0, (validSavingsRate / benchmarks.poor) * maxScore * 0.50);
         status = 'critical';
+        benchmarkLevel = 'critical';
     }
     
-    // Ensure final score is valid
-    score = (isNaN(score) || !isFinite(score)) ? 0 : score;
+    // Final score validation
+    const finalScore = (isNaN(score) || !isFinite(score)) ? 0 : Math.round(score);
+    
+    console.log('✅ Savings Rate Score Calculated:', {
+        finalScore: finalScore,
+        maxPossible: maxScore,
+        status: status,
+        benchmarkLevel: benchmarkLevel,
+        savingsRate: validSavingsRate.toFixed(2) + '%'
+    });
+    
+    // Calculate improvement suggestion
+    const targetRate = benchmarks.good; // 15%
+    const improvementAmount = validSavingsRate < targetRate ? 
+        Math.max(0, (targetRate - validSavingsRate) * monthlyIncome / 100) : 0;
     
     return {
-        score: Math.round(score),
+        score: finalScore,
         details: {
             rate: validSavingsRate,
             monthlyAmount: monthlyContributions,
             monthlyIncome: monthlyIncome,
             status: status,
-            target: SCORE_FACTORS.savingsRate.benchmarks.good,
-            improvement: Math.max(0, (SCORE_FACTORS.savingsRate.benchmarks.good - validSavingsRate) * monthlyIncome / 100),
-            calculationMethod: monthlyContributions > 0 ? 
-                (inputs.monthlyContribution ? 'direct' : 'calculated_from_rates') : 'no_contributions',
+            benchmarkLevel: benchmarkLevel,
+            target: targetRate,
+            improvement: improvementAmount,
+            calculationMethod: calculationMethod,
+            pensionRate: pensionRate,
+            trainingFundRate: trainingFundRate,
+            successfulCalculation: true,
             debugInfo: {
-                monthlyIncomeFound: monthlyIncome > 0,
-                contributionsFound: monthlyContributions > 0,
+                phase: 'successful_calculation',
+                dataQuality: {
+                    monthlyIncomeFound: monthlyIncome > 0,
+                    contributionDataFound: monthlyContributions > 0 || pensionRate > 0 || trainingFundRate > 0,
+                    calculationSuccessful: validSavingsRate >= 0,
+                    benchmarkMet: validSavingsRate >= benchmarks.fair
+                },
                 fieldsUsed: {
                     income: monthlyIncome > 0 ? 'found' : 'missing',
-                    contributions: monthlyContributions > 0 ? 'found' : 'missing'
-                }
+                    contributions: monthlyContributions > 0 ? 'found' : 'missing',
+                    pensionRate: pensionRate > 0 ? 'found' : 'missing',
+                    trainingFundRate: trainingFundRate > 0 ? 'found' : 'missing'
+                },
+                recommendations: validSavingsRate < targetRate ? [{
+                    category: 'Savings Rate Improvement',
+                    suggestion: `Increase monthly savings by ₪${Math.round(improvementAmount)} to reach ${targetRate}% target`,
+                    impact: `Would improve score by ${Math.round((maxScore * 0.85) - finalScore)} points`,
+                    priority: validSavingsRate < benchmarks.poor ? 'high' : 'medium'
+                }] : []
             }
         }
     };
@@ -547,9 +797,18 @@ function calculateDiversificationScore(inputs) {
  * Calculate tax efficiency score
  */
 function calculateTaxEfficiencyScore(inputs) {
-    // CRITICAL FIX: Use actual wizard field names and integrate with existing tax system
-    const pensionRate = parseFloat(inputs.pensionContributionRate || 0);
-    const trainingFundRate = parseFloat(inputs.trainingFundContributionRate || 0);
+    console.log('🔍 Calculating Tax Efficiency Score...');
+    
+    // Enhanced field detection for contribution rates
+    const pensionRate = getFieldValue(inputs, [
+        'pensionContributionRate', 'pensionEmployeeRate', 'pensionEmployee',
+        'employeePensionRate', 'pension_contribution_rate', 'pension_rate'
+    ]);
+    
+    const trainingFundRate = getFieldValue(inputs, [
+        'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee',
+        'employeeTrainingFundRate', 'training_fund_rate', 'trainingFund_rate'
+    ]);
     
     // Country normalization with proper handling
     const country = (inputs.country || inputs.taxCountry || inputs.inheritanceCountry || 'ISR')
@@ -1131,12 +1390,19 @@ function getPeerComparison(inputs, totalScore) {
  */
 function calculateFinancialHealthScore(inputs) {
     try {
-        // Debug logging for input validation
+        // Enhanced debug logging for input validation
         console.log('🔍 Financial Health Score Calculation Started');
-        console.log('📊 Available input fields:', Object.keys(inputs).filter(key => 
-            key.includes('salary') || key.includes('pension') || key.includes('training') || 
-            key.includes('contribution') || key.includes('savings')
-        ));
+        console.log('📋 Input Summary:', {
+            planningType: inputs.planningType,
+            totalFields: Object.keys(inputs).length,
+            salaryFields: Object.keys(inputs).filter(k => k.toLowerCase().includes('salary')),
+            pensionFields: Object.keys(inputs).filter(k => k.toLowerCase().includes('pension')),
+            trainingFields: Object.keys(inputs).filter(k => k.toLowerCase().includes('training')),
+            savingsFields: Object.keys(inputs).filter(k => k.toLowerCase().includes('savings')),
+            expenseFields: Object.keys(inputs).filter(k => k.toLowerCase().includes('expense')),
+            hasExpensesStructure: !!inputs.expenses,
+            country: inputs.country || inputs.taxCountry || 'unknown'
+        });
         
         // Calculate each factor with error handling
         const factors = {};
