@@ -193,6 +193,17 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                         }, language === 'he' ? 
                             'מס רווחי הון בישראל: 25% (אזרחים), 30% (תושבי חוץ)' :
                             'Israel capital gains: 25% (residents), 30% (non-residents)')
+                    ]),
+                    // Net value after tax
+                    inputs.currentPersonalPortfolio > 0 && createElement('div', { key: 'net-value-section' }, [
+                        createElement('label', { 
+                            key: 'net-value-label',
+                            className: "block text-sm font-medium text-purple-600 mb-2" 
+                        }, language === 'he' ? 'שווי נטו לאחר מס' : 'Net Value After Tax'),
+                        createElement('div', { 
+                            key: 'net-value-amount',
+                            className: "text-lg font-bold text-purple-800" 
+                        }, formatCurrency(inputs.currentPersonalPortfolio * (1 - (inputs.portfolioTaxRate || 0.25))))
                     ])
                 ]),
                 
