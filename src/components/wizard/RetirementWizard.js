@@ -234,6 +234,23 @@ const RetirementWizard = ({
                 // Investment validation - reasonable return expectations
                 const expectedReturn = inputs.expectedReturn || 0;
                 const inflationRate = inputs.inflationRate || 0;
+                
+                // Check couple mode partner investments
+                if (inputs.planningType === 'couple') {
+                    // Validate partner 1 investment preferences
+                    const partner1Valid = inputs.partner1RiskProfile && 
+                                        (inputs.partner1ExpectedReturn >= 0 && inputs.partner1ExpectedReturn <= 20);
+                    
+                    // Validate partner 2 investment preferences
+                    const partner2Valid = inputs.partner2RiskProfile && 
+                                        (inputs.partner2ExpectedReturn >= 0 && inputs.partner2ExpectedReturn <= 20);
+                    
+                    // All partner fields must be valid
+                    return partner1Valid && partner2Valid && 
+                           inflationRate >= 0 && inflationRate <= 15;
+                }
+                
+                // Individual mode validation
                 return expectedReturn >= 0 && expectedReturn <= 20 && 
                        inflationRate >= 0 && inflationRate <= 15;
             
