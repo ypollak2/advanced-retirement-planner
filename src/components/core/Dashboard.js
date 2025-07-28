@@ -13,6 +13,17 @@ const Dashboard = ({
 }) => {
     const [exchangeRates, setExchangeRates] = React.useState({});
     const [selectedCurrency, setSelectedCurrency] = React.useState(workingCurrency || 'ILS');
+    
+    // Partner field mapping integration for couple mode
+    const processedInputs = inputs?.planningType === 'couple' && window.getFieldValue ? 
+        {
+            ...inputs,
+            currentSalary: window.getFieldValue(inputs, 'currentSalary', { combinePartners: true }),
+            monthlyExpenses: window.getFieldValue(inputs, 'currentMonthlyExpenses', { combinePartners: true }),
+            currentSavings: window.getFieldValue(inputs, 'currentSavings', { combinePartners: true }),
+            monthlyContribution: window.getFieldValue(inputs, 'monthlyContribution', { combinePartners: true })
+        } : inputs;
+    
     const [expandedSections, setExpandedSections] = React.useState({
         pension: false,
         investments: false,
@@ -133,18 +144,21 @@ const Dashboard = ({
     const calculateHealthScore = () => {
         if (!inputs || !results) return 0;
         
-        const currentAge = inputs.currentAge || 30;
-        const retirementAge = inputs.retirementAge || 67;
+        // Use processed inputs for couple mode compatibility
+        const inputsToUse = processedInputs || inputs;
+        
+        const currentAge = inputsToUse.currentAge || 30;
+        const retirementAge = inputsToUse.retirementAge || 67;
         const yearsToRetirement = retirementAge - currentAge;
-        const currentSavings = inputs.currentSavings || 0;
-        const monthlyExpenses = inputs.currentMonthlyExpenses || 10000;
-        const targetReplacement = inputs.targetReplacement || 75;
+        const currentSavings = inputsToUse.currentSavings || 0;
+        const monthlyExpenses = inputsToUse.currentMonthlyExpenses || 10000;
+        const targetReplacement = inputsToUse.targetReplacement || 75;
         
         let score = 0;
         
         // Factor 1: Savings rate (25 points - adjusted)
-        const annualSavings = (inputs.monthlyContribution || 2000) * 12;
-        const annualIncome = (inputs.currentSalary || 20000) * 12;
+        const annualSavings = (inputsToUse.monthlyContribution || 2000) * 12;
+        const annualIncome = (inputsToUse.currentSalary || 20000) * 12;
         const savingsRate = annualSavings / annualIncome * 100;
         score += Math.min(savingsRate * 1.7, 25);
         

@@ -1,0 +1,231 @@
+{
+  "total": 5,
+  "passed": 3,
+  "failed": 2,
+  "scenarios": [
+    {
+      "name": "Young Professional - Individual",
+      "passed": true,
+      "issues": [],
+      "warnings": [
+        "diversification status 'excellent' differs from expected 'good'",
+        "riskAlignment status 'fair' differs from expected 'good'"
+      ],
+      "actualScore": 77,
+      "actualStatus": "good",
+      "factorAnalysis": {
+        "savingsRate": {
+          "actualScore": 25,
+          "actualStatus": "excellent",
+          "expectedMin": 20,
+          "expectedStatus": "excellent",
+          "passed": true
+        },
+        "timeHorizon": {
+          "actualScore": 15,
+          "actualStatus": "excellent",
+          "expectedMin": 10,
+          "expectedStatus": "excellent",
+          "passed": true
+        },
+        "diversification": {
+          "actualScore": 10,
+          "actualStatus": "excellent",
+          "expectedMin": 8,
+          "expectedStatus": "good",
+          "passed": true
+        },
+        "riskAlignment": {
+          "actualScore": 8,
+          "actualStatus": "fair",
+          "expectedMin": 8,
+          "expectedStatus": "good",
+          "passed": true
+        }
+      }
+    },
+    {
+      "name": "Mid-Career Couple - Dual Income",
+      "passed": true,
+      "issues": [
+        "retirementReadiness score 4 below minimum 15",
+        "diversification score 10 below minimum 12"
+      ],
+      "warnings": [
+        "retirementReadiness status 'critical' differs from expected 'good'",
+        "emergencyFund status 'fair' differs from expected 'good'"
+      ],
+      "actualScore": 81,
+      "actualStatus": "good",
+      "factorAnalysis": {
+        "savingsRate": {
+          "actualScore": 25,
+          "actualStatus": "excellent",
+          "expectedMin": 18,
+          "expectedStatus": "excellent",
+          "passed": true
+        },
+        "retirementReadiness": {
+          "actualScore": 4,
+          "actualStatus": "critical",
+          "expectedMin": 15,
+          "expectedStatus": "good",
+          "passed": false
+        },
+        "diversification": {
+          "actualScore": 10,
+          "actualStatus": "excellent",
+          "expectedMin": 12,
+          "expectedStatus": "excellent",
+          "passed": false
+        },
+        "emergencyFund": {
+          "actualScore": 5,
+          "actualStatus": "fair",
+          "expectedMin": 4,
+          "expectedStatus": "good",
+          "passed": true
+        }
+      }
+    },
+    {
+      "name": "Late Career Individual - Catch-up Mode",
+      "passed": false,
+      "issues": [
+        "Total score 72 outside expected range 45-65",
+        "retirementReadiness score 1 below minimum 5"
+      ],
+      "warnings": [
+        "timeHorizon status 'fair' differs from expected 'good'",
+        "emergencyFund status 'poor' differs from expected 'fair'"
+      ],
+      "actualScore": 72,
+      "actualStatus": "good",
+      "factorAnalysis": {
+        "savingsRate": {
+          "actualScore": 25,
+          "actualStatus": "excellent",
+          "expectedMin": 18,
+          "expectedStatus": "excellent",
+          "passed": true
+        },
+        "retirementReadiness": {
+          "actualScore": 1,
+          "actualStatus": "critical",
+          "expectedMin": 5,
+          "expectedStatus": "critical",
+          "passed": false
+        },
+        "timeHorizon": {
+          "actualScore": 11,
+          "actualStatus": "fair",
+          "expectedMin": 8,
+          "expectedStatus": "good",
+          "passed": true
+        },
+        "emergencyFund": {
+          "actualScore": 4,
+          "actualStatus": "poor",
+          "expectedMin": 3,
+          "expectedStatus": "fair",
+          "passed": true
+        }
+      }
+    },
+    {
+      "name": "Young Couple - Starting Out",
+      "passed": true,
+      "issues": [
+        "retirementReadiness score 1 below minimum 8"
+      ],
+      "warnings": [
+        "retirementReadiness status 'critical' differs from expected 'fair'",
+        "emergencyFund status 'poor' differs from expected 'fair'"
+      ],
+      "actualScore": 75,
+      "actualStatus": "good",
+      "factorAnalysis": {
+        "savingsRate": {
+          "actualScore": 25,
+          "actualStatus": "excellent",
+          "expectedMin": 18,
+          "expectedStatus": "excellent",
+          "passed": true
+        },
+        "timeHorizon": {
+          "actualScore": 15,
+          "actualStatus": "excellent",
+          "expectedMin": 12,
+          "expectedStatus": "excellent",
+          "passed": true
+        },
+        "retirementReadiness": {
+          "actualScore": 1,
+          "actualStatus": "critical",
+          "expectedMin": 8,
+          "expectedStatus": "fair",
+          "passed": false
+        },
+        "emergencyFund": {
+          "actualScore": 4,
+          "actualStatus": "poor",
+          "expectedMin": 2,
+          "expectedStatus": "fair",
+          "passed": true
+        }
+      }
+    },
+    {
+      "name": "High Net Worth Individual - Optimization Focus",
+      "passed": false,
+      "issues": [
+        "Status 'good' not in expected statuses: excellent",
+        "retirementReadiness score 10 below minimum 18",
+        "diversification score 10 below minimum 12"
+      ],
+      "warnings": [
+        "retirementReadiness status 'poor' differs from expected 'good'",
+        "emergencyFund status 'fair' differs from expected 'good'"
+      ],
+      "actualScore": 83,
+      "actualStatus": "good",
+      "factorAnalysis": {
+        "savingsRate": {
+          "actualScore": 25,
+          "actualStatus": "excellent",
+          "expectedMin": 20,
+          "expectedStatus": "excellent",
+          "passed": true
+        },
+        "retirementReadiness": {
+          "actualScore": 10,
+          "actualStatus": "poor",
+          "expectedMin": 18,
+          "expectedStatus": "good",
+          "passed": false
+        },
+        "diversification": {
+          "actualScore": 10,
+          "actualStatus": "excellent",
+          "expectedMin": 12,
+          "expectedStatus": "excellent",
+          "passed": false
+        },
+        "taxEfficiency": {
+          "actualScore": 8,
+          "actualStatus": "excellent",
+          "expectedMin": 7,
+          "expectedStatus": "excellent",
+          "passed": true
+        },
+        "emergencyFund": {
+          "actualScore": 5,
+          "actualStatus": "fair",
+          "expectedMin": 4,
+          "expectedStatus": "good",
+          "passed": true
+        }
+      }
+    }
+  ]
+}

@@ -555,15 +555,15 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                 key: 'couple-layout',
                 className: "grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8" 
             }, [
-                // Main Person Contributions
+                // Partner 1 Contributions Section
                 createElement('div', { 
                     key: 'main-contributions',
                     className: "bg-blue-50 rounded-xl p-6 border border-blue-200" 
                 }, [
                     createElement('h4', { 
-                        key: 'main-title',
+                        key: 'partner1-title',
                         className: "text-lg font-semibold text-blue-700 mb-4" 
-                    }, inputs.userName || (language === 'he' ? 'הפקדות בן/בת זוג ראשון' : 'Partner 1 Contributions')),
+                    }, language === 'he' ? 'הפקדות בן/בת זוג ראשון' : 'Partner 1 Contributions'),
                     createElement('div', { key: 'main-fields', className: "space-y-4" }, [
                         createElement('div', { key: 'main-employee' }, [
                             createElement('label', { 
@@ -628,7 +628,7 @@ const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCu
                     ])
                 ]),
                 
-                // Partner Contributions
+                // Partner 2 Contributions
                 createElement('div', { 
                     key: 'partner-contributions',
                     className: "bg-green-50 rounded-xl p-6 border border-green-200" 

@@ -756,7 +756,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                 key: 'couple-additional-income-grid',
                 className: "grid grid-cols-1 lg:grid-cols-2 gap-8" 
             }, [
-                // Main Person Additional Income
+                // Primary Person Additional Income
                 createElement('div', { 
                     key: 'main-additional-income',
                     className: "bg-blue-50 rounded-xl p-6 border border-blue-200" 
@@ -972,7 +972,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         createElement('h4', {
                             key: 'main-title', 
                             className: "font-semibold text-gray-700"
-                        }, language === 'he' ? 'הכנסה עיקרית' : 'Main Person'),
+                        }, language === 'he' ? 'הכנסה עיקרית' : 'Primary Person'),
                         createElement('div', {
                             key: 'main-total',
                             className: "text-lg font-bold text-green-700"

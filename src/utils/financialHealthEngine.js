@@ -1608,8 +1608,12 @@ function calculateFinancialHealthScore(inputs) {
         const safeCalculate = (factorName, calculator) => {
             try {
                 console.log(`🔧 Calculating ${factorName}...`);
+                console.log(`🔧 Calculator function type: ${typeof calculator}`);
+                console.log(`🔧 Calculator function name: ${calculator.name}`);
                 const result = calculator(inputs);
                 console.log(`🔧 ${factorName} result:`, result);
+                console.log(`🔧 ${factorName} result type:`, typeof result);
+                
                 // Validate result structure - be more specific about what we expect
                 if (!result) {
                     console.warn(`${factorName}: Calculator returned null/undefined, using default`);

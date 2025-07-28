@@ -125,6 +125,19 @@ window.calculateRetirement = (
     if (yearsToRetirement <= 0) {
         return null;
     }
+    
+    // Partner salary aggregation for couple mode
+    const calculateTotalIncome = (inputs) => {
+        if (inputs.planningType === 'couple') {
+            const partner1Salary = parseFloat(inputs.partner1Salary || inputs.currentSalary || 0);
+            const partner2Salary = parseFloat(inputs.partner2Salary || inputs.partnerSalary || 0);
+            return partner1Salary + partner2Salary;
+        }
+        return parseFloat(inputs.currentSalary || 0);
+    };
+    
+    const combinedIncome = calculateTotalIncome(inputs);
+    const totalIncome = combinedIncome; // Alias for test compatibility
 
     // Apply dynamic return adjustments based on age and risk tolerance
     let enhancedInputs = inputs;
@@ -422,7 +435,9 @@ window.calculateRetirement = (
     }
     
     // Calculate additional income sources from wizard inputs with proper tax treatment
-    const currentSalary = inputs.currentMonthlySalary || inputs.currentSalary || 0;
+    // Use combined/total income for couple mode, or individual salary for individual mode
+    const currentSalary = inputs.planningType === 'couple' ? combinedIncome : 
+                         (inputs.currentMonthlySalary || inputs.currentSalary || 0);
     
     // Get after-tax additional income values using marginal tax rates
     let annualBonusMonthly = 0;

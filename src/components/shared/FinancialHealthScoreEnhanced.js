@@ -103,9 +103,21 @@
 
         const t = content[language] || content.en;
 
-        // Use comprehensive Financial Health Engine
+        // Use comprehensive Financial Health Engine with couple mode support
+        // First, use field mapping engine to get the proper field values for couple mode
+        const processedInputs = inputs.planningType === 'couple' && window.getFieldValue ? 
+            {
+                ...inputs,
+                currentSalary: window.getFieldValue(inputs, 'currentSalary', { combinePartners: true }),
+                monthlyExpenses: window.getFieldValue(inputs, 'currentMonthlyExpenses', { combinePartners: true }),
+                currentSavings: window.getFieldValue(inputs, 'currentSavings', { combinePartners: true })
+            } : inputs;
+
         const healthReport = window.calculateFinancialHealthScore ? 
-            window.calculateFinancialHealthScore(inputs) : null;
+            window.calculateFinancialHealthScore(processedInputs, { 
+                combinePartners: inputs.planningType === 'couple',
+                debugMode: true 
+            }) : null;
 
         const getScoreColor = (score) => {
             if (score >= 85) return 'green';
