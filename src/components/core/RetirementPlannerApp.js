@@ -129,7 +129,7 @@ function RetirementPlannerApp() {
         currentMonthlyExpenses: 12000,
         targetReplacement: 75,
         riskTolerance: 'moderate',
-        currentTrainingFund: 25000,
+        currentTrainingFund: 0,
         trainingFundReturn: 6.5,
         trainingFundManagementFee: 0.5,
         // Personal investment portfolio (no tax benefits)
