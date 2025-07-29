@@ -1532,7 +1532,7 @@ function testWizardStepsImplementation() {
                                      content.includes('monthlyRetirementIncome');
         const hasFinancialHealthScore = content.includes('financial-health-score') || 
                                        content.includes('healthScore');
-        const hasPrintFunctionality = content.includes('downloadPdf') || content.includes('emailPlan');
+        const hasPrintFunctionality = content.includes('ExportControls') || content.includes('exportData');
         
         logTest('Review & Calculate: Financial health section implemented', hasFinancialHealthSection);
         logTest('Review & Calculate: Component scores implemented', hasComponentScores);
@@ -2171,6 +2171,282 @@ function testPortfolioTaxCalculation() {
     }
 }
 
+// Test Export Functionality (v7.0.3+)
+function testExportFunctionality() {
+    console.log('\n📤 Testing Export Functionality...');
+    
+    try {
+        // Test export functions availability
+        const exportFunctionsExists = fs.existsSync('src/utils/exportFunctions.js');
+        logTest('Export Functions: exportFunctions.js exists', exportFunctionsExists);
+        
+        const exportControlsExists = fs.existsSync('src/components/shared/ExportControls.js');
+        logTest('Export Controls: ExportControls.js exists', exportControlsExists);
+        
+        // Test export functions are loaded in index.html
+        const indexContent = fs.readFileSync('index.html', 'utf8');
+        const exportFunctionsLoaded = indexContent.includes('src/utils/exportFunctions.js');
+        logTest('Export Integration: exportFunctions.js loaded in index.html', exportFunctionsLoaded);
+        
+        const exportControlsLoaded = indexContent.includes('src/components/shared/ExportControls.js');
+        logTest('Export Integration: ExportControls.js loaded in index.html', exportControlsLoaded);
+        
+        // Test export function implementations
+        if (exportFunctionsExists) {
+            const exportFunctionsContent = fs.readFileSync('src/utils/exportFunctions.js', 'utf8');
+            
+            const hasExportAsImage = exportFunctionsContent.includes('async function exportAsImage') && 
+                                    exportFunctionsContent.includes('window.exportAsImage = exportAsImage');
+            logTest('Export Functions: exportAsImage function defined and exported', hasExportAsImage);
+            
+            const hasLLMExport = exportFunctionsContent.includes('function exportForLLMAnalysis') && 
+                                exportFunctionsContent.includes('window.exportForLLMAnalysis = exportForLLMAnalysis');
+            logTest('Export Functions: exportForLLMAnalysis function defined and exported', hasLLMExport);
+            
+            const hasClaudePrompt = exportFunctionsContent.includes('async function copyClaudePromptToClipboard') && 
+                                   exportFunctionsContent.includes('window.copyClaudePromptToClipboard = copyClaudePromptToClipboard');
+            logTest('Export Functions: copyClaudePromptToClipboard function defined and exported', hasClaudePrompt);
+            
+            const supportsPNG = exportFunctionsContent.includes('exportCanvasAsPNG') && 
+                               exportFunctionsContent.includes('image/png');
+            logTest('Export Functions: PNG format support implemented', supportsPNG);
+            
+            const supportsPDF = exportFunctionsContent.includes('exportCanvasAsPDF') && 
+                               exportFunctionsContent.includes('jsPDF');
+            logTest('Export Functions: PDF format support implemented', supportsPDF);
+            
+            const includesMetadata = exportFunctionsContent.includes('metadata:') && 
+                                    exportFunctionsContent.includes('exportDate') && 
+                                    exportFunctionsContent.includes('version:');
+            logTest('Export Functions: Metadata inclusion implemented', includesMetadata);
+            
+            const supportsPartnerData = exportFunctionsContent.includes('partnerResults') && 
+                                       exportFunctionsContent.includes('partnerData');
+            logTest('Export Functions: Partner data support implemented', supportsPartnerData);
+            
+            const includesIsraeliGuidance = exportFunctionsContent.includes('Israeli retirement planning') && 
+                                           exportFunctionsContent.includes('tax laws');
+            logTest('Export Functions: Israeli-specific guidance included', includesIsraeliGuidance);
+        }
+        
+        // Test ExportControls component
+        if (exportControlsExists) {
+            const exportControlsContent = fs.readFileSync('src/components/shared/ExportControls.js', 'utf8');
+            
+            const componentDefined = exportControlsContent.includes('const ExportControls = ({') && 
+                                    exportControlsContent.includes('window.ExportControls = ExportControls');
+            logTest('Export Controls: Component defined and exported to window', componentDefined);
+            
+            const multipleFormats = exportControlsContent.includes('handleImageExport') && 
+                                   exportControlsContent.includes('handleLLMExport') && 
+                                   exportControlsContent.includes('handleClaudePrompt');
+            logTest('Export Controls: Multiple export formats supported', multipleFormats);
+            
+            const errorHandling = exportControlsContent.includes('try {') && 
+                                 exportControlsContent.includes('catch (error)') && 
+                                 exportControlsContent.includes('setExportStatus');
+            logTest('Export Controls: Error handling implemented', errorHandling);
+            
+            const loadingStates = exportControlsContent.includes('isExporting') && 
+                                 exportControlsContent.includes('setIsExporting') && 
+                                 exportControlsContent.includes('disabled:opacity-50');
+            logTest('Export Controls: Loading states implemented', loadingStates);
+            
+            const multiLanguage = exportControlsContent.includes('language = \'en\'') && 
+                                 exportControlsContent.includes('he:') && 
+                                 exportControlsContent.includes('en:');
+            logTest('Export Controls: Multi-language support implemented', multiLanguage);
+            
+            const instructions = exportControlsContent.includes('instructions:') && 
+                                exportControlsContent.includes('tips:') && 
+                                exportControlsContent.includes('Export Instructions');
+            logTest('Export Controls: User instructions included', instructions);
+        }
+        
+        // Test WizardStepReview integration
+        const wizardReviewExists = fs.existsSync('src/components/wizard/steps/WizardStepReview.js');
+        if (wizardReviewExists) {
+            const wizardReviewContent = fs.readFileSync('src/components/wizard/steps/WizardStepReview.js', 'utf8');
+            
+            const usesExportControls = wizardReviewContent.includes('window.ExportControls') && 
+                                      wizardReviewContent.includes('createElement(window.ExportControls');
+            logTest('Wizard Integration: Uses ExportControls component', usesExportControls);
+            
+            const preparesExportData = wizardReviewContent.includes('exportData = {') && 
+                                      wizardReviewContent.includes('inputs:') && 
+                                      wizardReviewContent.includes('results:');
+            logTest('Wizard Integration: Prepares structured export data', preparesExportData);
+            
+            const includesPartnerData = wizardReviewContent.includes('partnerResults:') && 
+                                       wizardReviewContent.includes('planningType === \'couple\'') && 
+                                       wizardReviewContent.includes('partner1:') && 
+                                       wizardReviewContent.includes('partner2:');
+            logTest('Wizard Integration: Includes partner data for couple planning', includesPartnerData);
+            
+            const removedOldFunctions = !wizardReviewContent.includes('window.exportToPDF') && 
+                                       !wizardReviewContent.includes('window.emailFinancialPlan') &&
+                                       !wizardReviewContent.includes('PDF export functionality not available');
+            logTest('Wizard Integration: Removed old non-functional export code', removedOldFunctions);
+            
+            const passesLanguage = wizardReviewContent.includes('language: language') && 
+                                  wizardReviewContent.includes('createElement(window.ExportControls');
+            logTest('Wizard Integration: Passes language parameter to ExportControls', passesLanguage);
+        }
+        
+        // Test dynamic library loading
+        if (exportFunctionsExists) {
+            const exportFunctionsContent = fs.readFileSync('src/utils/exportFunctions.js', 'utf8');
+            
+            const html2canvasLoading = exportFunctionsContent.includes('loadHtml2Canvas') && 
+                                      exportFunctionsContent.includes('html2canvas.min.js') && 
+                                      exportFunctionsContent.includes('cdnjs.cloudflare.com');
+            logTest('Dynamic Libraries: html2canvas loading implemented', html2canvasLoading);
+            
+            const jsPDFLoading = exportFunctionsContent.includes('loadJsPDF') && 
+                                exportFunctionsContent.includes('jspdf.umd.min.js') && 
+                                exportFunctionsContent.includes('cdnjs.cloudflare.com');
+            logTest('Dynamic Libraries: jsPDF loading implemented', jsPDFLoading);
+            
+            const libraryErrorHandling = exportFunctionsContent.includes('script.onerror') && 
+                                        exportFunctionsContent.includes('reject(new Error') && 
+                                        exportFunctionsContent.includes('Failed to load');
+            logTest('Dynamic Libraries: Error handling for failed CDN requests', libraryErrorHandling);
+            
+            const existingLibraryCheck = exportFunctionsContent.includes('typeof html2canvas !== \'undefined\'') && 
+                                        exportFunctionsContent.includes('typeof jsPDF !== \'undefined\'');
+            logTest('Dynamic Libraries: Checks for existing library availability', existingLibraryCheck);
+        }
+        
+        console.log('    Export functionality successfully implemented with comprehensive features');
+        
+    } catch (error) {
+        logTest('Export Functionality testing', false, `Error: ${error.message}`);
+    }
+}
+
+// Test Missing Data Modal Functionality (v7.0.3+)
+function testMissingDataModalFunctionality() {
+    console.log('\n🔧 Testing Missing Data Modal Functionality...');
+    
+    try {
+        // Test missing data modal component availability
+        const missingDataModalExists = fs.existsSync('src/components/shared/MissingDataModal.js');
+        logTest('Missing Data Modal: MissingDataModal.js exists', missingDataModalExists);
+        
+        const missingDataModalTestExists = fs.existsSync('tests/missing-data-modal-test.js');
+        logTest('Missing Data Modal: Test suite exists', missingDataModalTestExists);
+        
+        // Test missing data modal is loaded in index.html
+        const indexContent = fs.readFileSync('index.html', 'utf8');
+        const modalLoaded = indexContent.includes('src/components/shared/MissingDataModal.js');
+        logTest('Missing Data Modal: Component loaded in index.html', modalLoaded);
+        
+        // Test missing data modal component implementation
+        if (missingDataModalExists) {
+            const modalContent = fs.readFileSync('src/components/shared/MissingDataModal.js', 'utf8');
+            
+            const componentDefined = modalContent.includes('const MissingDataModal = ({') && 
+                                    modalContent.includes('window.MissingDataModal = MissingDataModal');
+            logTest('Missing Data Modal: Component defined and exported to window', componentDefined);
+            
+            const hasRequiredProps = modalContent.includes('isOpen') && 
+                                   modalContent.includes('onClose') && 
+                                   modalContent.includes('inputs') && 
+                                   modalContent.includes('onInputUpdate') && 
+                                   modalContent.includes('healthReport');
+            logTest('Missing Data Modal: Accepts all required props', hasRequiredProps);
+            
+            const hasStateManagement = modalContent.includes('useState') && 
+                                      modalContent.includes('formData') && 
+                                      modalContent.includes('setFormData') && 
+                                      modalContent.includes('currentStep') && 
+                                      modalContent.includes('previewScore');
+            logTest('Missing Data Modal: Includes proper state management', hasStateManagement);
+            
+            const hasMultiLanguage = modalContent.includes('language = \'en\'') && 
+                                   modalContent.includes('he:') && 
+                                   modalContent.includes('en:') && 
+                                   modalContent.includes('const t = content[language]');
+            logTest('Missing Data Modal: Multi-language support implemented', hasMultiLanguage);
+            
+            const hasMissingDataAnalysis = modalContent.includes('const analyzeMissingData = () => {') && 
+                                         modalContent.includes('healthReport.factors') && 
+                                         modalContent.includes('factorData.score === 0');
+            logTest('Missing Data Modal: Missing data analysis logic implemented', hasMissingDataAnalysis);
+            
+            const hasFormGeneration = modalContent.includes('const renderInputField = (item) => {') && 
+                                    modalContent.includes('createElement(\'input\'') && 
+                                    modalContent.includes('type: \'number\'');
+            logTest('Missing Data Modal: Dynamic form generation implemented', hasFormGeneration);
+            
+            const hasInputTypes = modalContent.includes('type: \'currency\'') && 
+                                modalContent.includes('type: \'percentage\'') && 
+                                modalContent.includes('currency-symbol') && 
+                                modalContent.includes('percentage-symbol');
+            logTest('Missing Data Modal: Currency and percentage input types supported', hasInputTypes);
+            
+            const hasValidation = modalContent.includes('const validateField = (field, value) => {') && 
+                                modalContent.includes('validationErrors') && 
+                                modalContent.includes('isNaN(numValue)') && 
+                                modalContent.includes('Maximum 100%');
+            logTest('Missing Data Modal: Input validation implemented', hasValidation);
+            
+            const hasRealTimeCalculation = modalContent.includes('useEffect(() => {') && 
+                                         modalContent.includes('setIsCalculating(true)') && 
+                                         modalContent.includes('window.calculateFinancialHealthScore') && 
+                                         modalContent.includes('setPreviewScore');
+            logTest('Missing Data Modal: Real-time score calculation implemented', hasRealTimeCalculation);
+            
+            const hasModalUI = modalContent.includes('fixed inset-0') && 
+                             modalContent.includes('bg-black bg-opacity-50') && 
+                             modalContent.includes('flex items-center justify-center z-50');
+            logTest('Missing Data Modal: Modal overlay and positioning implemented', hasModalUI);
+            
+            const hasMultiStepNavigation = modalContent.includes('currentStep') && 
+                                         modalContent.includes('setCurrentStep') && 
+                                         modalContent.includes('stepKeys.length > 1') && 
+                                         modalContent.includes('progress-bar');
+            logTest('Missing Data Modal: Multi-step navigation implemented', hasMultiStepNavigation);
+            
+            const hasCoupleModeSupport = modalContent.includes('inputs.planningType === \'couple\'') && 
+                                       modalContent.includes('partner1Salary') && 
+                                       modalContent.includes('partner2Salary');
+            logTest('Missing Data Modal: Couple mode support implemented', hasCoupleModeSupport);
+        }
+        
+        // Test integration with FinancialHealthScoreEnhanced
+        const healthScoreExists = fs.existsSync('src/components/shared/FinancialHealthScoreEnhanced.js');
+        if (healthScoreExists) {
+            const healthScoreContent = fs.readFileSync('src/components/shared/FinancialHealthScoreEnhanced.js', 'utf8');
+            
+            const hasModalState = healthScoreContent.includes('isMissingDataModalOpen') && 
+                                healthScoreContent.includes('setIsMissingDataModalOpen') && 
+                                healthScoreContent.includes('useState(false)');
+            logTest('Financial Health Integration: Modal state management added', hasModalState);
+            
+            const buttonTriggersModal = healthScoreContent.includes('setIsMissingDataModalOpen(true)') && 
+                                      healthScoreContent.includes('onClick: () => {') && 
+                                      !healthScoreContent.includes('alert(');
+            logTest('Financial Health Integration: Button triggers modal (not alert)', buttonTriggersModal);
+            
+            const modalIntegrated = healthScoreContent.includes('window.MissingDataModal') && 
+                                  healthScoreContent.includes('createElement(window.MissingDataModal') && 
+                                  healthScoreContent.includes('isOpen: isMissingDataModalOpen');
+            logTest('Financial Health Integration: Modal component integrated in render', modalIntegrated);
+            
+            const hasInputUpdateHandler = healthScoreContent.includes('onInputUpdate: (updatedData) => {') && 
+                                        healthScoreContent.includes('setInputs') && 
+                                        healthScoreContent.includes('prevInputs => ({ ...prevInputs, ...updatedData })');
+            logTest('Financial Health Integration: Input update handler implemented', hasInputUpdateHandler);
+        }
+        
+        console.log('    Missing Data Modal functionality successfully implemented with comprehensive features');
+        
+    } catch (error) {
+        logTest('Missing Data Modal Functionality testing', false, `Error: ${error.message}`);
+    }
+}
+
 // Test Couple/Single Mode State Management (v6.4.0)
 function testCoupleSingleModeStateManagement() {
     console.log('\n🤝 Testing Couple/Single Mode State Management...');
@@ -2487,6 +2763,12 @@ async function runAllTests() {
     
     // Portfolio Tax Calculation Tests (v7.0.3)
     testPortfolioTaxCalculation();
+    
+    // Export Functionality Tests (v7.0.3+)
+    testExportFunctionality();
+
+    // Missing Data Modal Tests (v7.0.3+)
+    testMissingDataModalFunctionality();
     
     // Summary
     console.log('\n📊 Test Summary');

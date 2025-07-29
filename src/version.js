@@ -1,9 +1,9 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "7.0.3",
-    build: "2025-07-25",
-    commit: "v7.0.3-version-update",
-    description: "Comprehensive expense tracking with category analysis and projections"
+    number: "7.0.4",
+    build: "2025-07-29",
+    commit: "v7.0.4-missing-data-modal-production-release",
+    description: "Complete Missing Data Modal: Interactive data completion for Financial Health Score optimization"
 };
 
 // Export version for use in other modules

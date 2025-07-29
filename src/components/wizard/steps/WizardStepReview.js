@@ -405,21 +405,29 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     const riskLevel = inputs.riskLevel || (riskTolerance === 'conservative' ? 'low' : 
                                          riskTolerance === 'aggressive' ? 'high' : 'medium');
     
-    // Print/export functionality (test patterns: downloadPdf, emailPlan)
-    const downloadPdf = () => {
-        if (window.exportToPDF) {
-            window.exportToPDF(inputs, language);
-        } else {
-            console.log('PDF export functionality not available');
-        }
-    };
-    
-    const emailPlan = () => {
-        if (window.emailFinancialPlan) {
-            window.emailFinancialPlan(inputs, language);
-        } else {
-            console.log('Email plan functionality not available');
-        }
+    // Export functionality using comprehensive ExportControls component
+    const exportData = {
+        inputs: processedInputs,
+        results: retirementProjections,
+        partnerResults: inputs.planningType === 'couple' ? {
+            partner1: {
+                salary: inputs.partner1Salary || 0,
+                pension: inputs.partner1CurrentPension || 0,
+                trainingFund: inputs.partner1CurrentTrainingFund || 0,
+                portfolio: inputs.partner1PersonalPortfolio || 0
+            },
+            partner2: {
+                salary: inputs.partner2Salary || 0,
+                pension: inputs.partner2CurrentPension || 0,
+                trainingFund: inputs.partner2CurrentTrainingFund || 0,
+                portfolio: inputs.partner2PersonalPortfolio || 0
+            },
+            combined: {
+                totalSalary: processedInputs.currentMonthlySalary || 0,
+                totalSavings: (inputs.partner1CurrentPension || 0) + (inputs.partner1CurrentTrainingFund || 0) + 
+                             (inputs.partner2CurrentPension || 0) + (inputs.partner2CurrentTrainingFund || 0)
+            }
+        } : null
     };
     
     // Generate improvement suggestions
@@ -810,39 +818,18 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
             ])
         ]),
         
-        // Export and Print Section (test patterns: downloadPdf, emailPlan)
-        createElement('div', {
+        // Export and Print Section - Comprehensive Export Controls
+        window.ExportControls && createElement('div', {
             key: 'export-section',
-            className: "bg-indigo-50 rounded-xl p-6 border border-indigo-200 mb-8"
+            className: "mb-8"
         }, [
-            createElement('h3', {
-                key: 'export-title',
-                className: "text-xl font-semibold text-indigo-800 mb-4 flex items-center"
-            }, [
-                createElement('span', { key: 'icon', className: "mr-3 text-2xl" }, '📄'),
-                language === 'he' ? 'ייצא ושתף' : 'Export & Share'
-            ]),
-            createElement('div', {
-                key: 'export-buttons',
-                className: "flex flex-wrap gap-4"
-            }, [
-                createElement('button', {
-                    key: 'download-pdf',
-                    onClick: downloadPdf,
-                    className: "px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
-                }, [
-                    createElement('span', { key: 'pdf-icon' }, '📄'),
-                    language === 'he' ? 'הורד PDF' : 'Download PDF'
-                ]),
-                createElement('button', {
-                    key: 'email-plan',
-                    onClick: emailPlan,
-                    className: "px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
-                }, [
-                    createElement('span', { key: 'email-icon' }, '📧'),
-                    language === 'he' ? 'שלח במייל' : 'Email Plan'
-                ])
-            ])
+            createElement(window.ExportControls, {
+                key: 'export-controls',
+                inputs: exportData.inputs,
+                results: exportData.results,
+                partnerResults: exportData.partnerResults,
+                language: language
+            })
         ]),
         
         // Hidden Data Storage (for debugging and test inspection)

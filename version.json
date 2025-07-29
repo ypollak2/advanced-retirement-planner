@@ -1,6 +1,6 @@
 {
-  "version": "7.0.3",
+  "version": "7.0.4",
   "build": "2025-07-29",
-  "commit": "v7.0.3-repository-organization",
-  "description": "Repository reorganization and structure optimization"
+  "commit": "v7.0.4-missing-data-modal-production-release",
+  "description": "Complete Missing Data Modal: Interactive data completion for Financial Health Score optimization"
 }

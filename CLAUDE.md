@@ -24,3 +24,13 @@
 - To memorize - you need to have 100% QA testing pass
 - NEVER deploy unless `npm test` shows 245/245 tests passing
 - Fix any failing tests before deployment, no matter how urgent the fix seems
+
+## Task Planning Standards
+
+When planning a task, follow these rules:
+1. Create a detailed plan in markdown format in `plans/` folder
+2. Give each plan a ticket number for easy reference (e.g., TICKET-001)
+3. Include all implementation steps, files to create/modify, and success criteria
+4. Reference the plan file in each related todo item
+5. When all tasks for a plan are completed, delete the plan file
+6. Plans should be as detailed as possible to ensure nothing is missed

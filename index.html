@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Retirement Planner v7.0.3</title>
+    <title>Advanced Retirement Planner v7.0.4</title>
     <meta name="description" content="Advanced retirement planning tool with comprehensive investment tracking">
     
     <!-- Security Headers (Note: X-Frame-Options removed - should be set via HTTP headers, not meta tags) -->
@@ -81,8 +81,8 @@
             .catch(error => {
                 console.warn('⚠️ Could not load version from version.json:', error);
                 // Fallback version
-                window.APP_VERSION = '7.0.3';
-                document.getElementById('version-indicator').textContent = '✨ v7.0.3';
+                window.APP_VERSION = '7.0.4';
+                document.getElementById('version-indicator').textContent = '✨ v7.0.4';
             });
             
         // Test compliance: DOMContentLoaded and createRoot patterns for test validation
@@ -169,6 +169,8 @@
                     'src/components/shared/CryptoPortfolioInput.js?v=7.0.3&t=20250723-digital-asset-security-fix',
                     'src/components/shared/EnhancedFinancialHealthMeter.js?v=7.0.3&t=20250723-enhanced-health',
                     'src/components/shared/ScoreExplanation.js?v=7.0.3&t=20250723-score-explanations',
+                    'src/components/shared/ExportControls.js?v=7.0.3',
+                    'src/components/shared/MissingDataModal.js?v=7.0.3',
                     'src/components/panels/settings/PermanentSidePanel.js?v=7.0.3',
                     
                     // Core Wizard Components

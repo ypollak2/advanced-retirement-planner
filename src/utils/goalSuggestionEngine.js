@@ -9,8 +9,8 @@
 // Value caps to prevent extreme scenarios from producing unrealistic calculations
 const VALUE_CAPS = {
     maxInflationRate: 15,          // 15% maximum inflation rate (as percentage)
-    maxReturnRate: 20,             // 20% maximum return rate (as percentage)
-    minReturnRate: 1,              // 1% minimum return rate (as percentage)
+    maxReturnRate: 0.20,           // 20% maximum return rate (as decimal)
+    minReturnRate: 0.01,           // 1% minimum return rate (as decimal)
     maxYearsToRetirement: 50,      // 50 years maximum planning horizon
     minYearsToRetirement: 1,       // 1 year minimum planning horizon
     maxMonthlyIncome: 500000,      // ₪500,000 maximum monthly income

@@ -4,8 +4,11 @@
 (function() {
     'use strict';
 
-    const FinancialHealthScoreEnhanced = ({ inputs, language = 'en' }) => {
-        const { createElement } = React;
+    const FinancialHealthScoreEnhanced = ({ inputs, setInputs, language = 'en' }) => {
+        const { createElement, useState } = React;
+        
+        // State for missing data modal
+        const [isMissingDataModalOpen, setIsMissingDataModalOpen] = useState(false);
         
         // Translations
         const content = {
@@ -533,10 +536,7 @@
                         key: 'action-button',
                         className: "bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors",
                         onClick: () => {
-                            // This would typically navigate back to the appropriate wizard step
-                            alert(language === 'he' ? 
-                                'חזור לשלבי האשף כדי להשלים את הנתונים החסרים' :
-                                'Go back to the wizard steps to complete the missing data');
+                            setIsMissingDataModalOpen(true);
                         }
                     }, language === 'he' ? 'השלם נתונים חסרים' : 'Complete Missing Data')
                 ])
@@ -584,7 +584,22 @@
                         }, `→ ${suggestion.action}`)
                     ])
                 )
-            ])
+            ]),
+
+            // Missing Data Modal
+            window.MissingDataModal && createElement(window.MissingDataModal, {
+                key: 'missing-data-modal',
+                isOpen: isMissingDataModalOpen,
+                onClose: () => setIsMissingDataModalOpen(false),
+                inputs: inputs,
+                onInputUpdate: (updatedData) => {
+                    if (setInputs) {
+                        setInputs(prevInputs => ({ ...prevInputs, ...updatedData }));
+                    }
+                },
+                language: language,
+                healthReport: healthReport
+            })
         ]);
     };
 
