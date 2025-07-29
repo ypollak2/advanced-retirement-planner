@@ -102,7 +102,19 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
             
             // Enhanced salary field mapping with couple mode support
             currentMonthlySalary: (() => {
-                // Try individual salary fields first
+                // For couple mode, prioritize combining partner salaries
+                if (inputs.planningType === 'couple') {
+                    const partner1 = parseFloat(inputs.partner1Salary) || 0;
+                    const partner2 = parseFloat(inputs.partner2Salary) || 0;
+                    
+                    if (partner1 > 0 || partner2 > 0) {
+                        const combinedSalary = partner1 + partner2;
+                        console.log('🤝 Couple mode: Combined partner salaries', { partner1, partner2, combined: combinedSalary });
+                        return combinedSalary;
+                    }
+                }
+                
+                // Fall back to individual salary fields
                 let salary = inputs.currentMonthlySalary || 
                            inputs.monthlySalary || 
                            inputs.salary ||
@@ -110,30 +122,13 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                            inputs.currentSalary ||
                            0;
                 
-                // For couple mode, combine partner salaries if individual salary is missing or zero
-                if (inputs.planningType === 'couple' && salary === 0) {
-                    const partner1 = parseFloat(inputs.partner1Salary) || 0;
-                    const partner2 = parseFloat(inputs.partner2Salary) || 0;
-                    
-                    if (partner1 > 0 || partner2 > 0) {
-                        salary = partner1 + partner2;
-                        console.log('🤝 Couple mode: Combined partner salaries', { partner1, partner2, combined: salary });
-                    }
-                }
-                
                 return salary;
             })(),
             
             // Enhanced contribution rate field mapping with couple mode support
             pensionContributionRate: (() => {
-                let rate = inputs.pensionContributionRate || 
-                          inputs.pensionEmployeeRate ||
-                          inputs.pensionEmployee ||
-                          inputs.employeePensionRate ||
-                          0;
-                
-                // For couple mode, use individual rates or combine if needed
-                if (inputs.planningType === 'couple' && rate === 0) {
+                // For couple mode, prioritize combining partner rates
+                if (inputs.planningType === 'couple') {
                     const partner1Rate = parseFloat(inputs.partner1PensionRate) || 0;
                     const partner2Rate = parseFloat(inputs.partner2PensionRate) || 0;
                     
@@ -143,27 +138,30 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                         const partner2Salary = parseFloat(inputs.partner2Salary) || 0;
                         const totalSalary = partner1Salary + partner2Salary;
                         
+                        let combinedRate;
                         if (totalSalary > 0) {
-                            rate = ((partner1Rate * partner1Salary) + (partner2Rate * partner2Salary)) / totalSalary;
+                            combinedRate = ((partner1Rate * partner1Salary) + (partner2Rate * partner2Salary)) / totalSalary;
                         } else {
-                            rate = (partner1Rate + partner2Rate) / 2;
+                            combinedRate = (partner1Rate + partner2Rate) / 2;
                         }
-                        console.log('🤝 Couple mode: Combined pension rates', { partner1Rate, partner2Rate, combined: rate });
+                        console.log('🤝 Couple mode: Combined pension rates', { partner1Rate, partner2Rate, combined: combinedRate });
+                        return combinedRate;
                     }
                 }
+                
+                // Fall back to individual rate fields
+                let rate = inputs.pensionContributionRate || 
+                          inputs.pensionEmployeeRate ||
+                          inputs.pensionEmployee ||
+                          inputs.employeePensionRate ||
+                          0;
                 
                 return rate;
             })(),
             
             trainingFundContributionRate: (() => {
-                let rate = inputs.trainingFundContributionRate ||
-                          inputs.trainingFundEmployeeRate ||
-                          inputs.trainingFundEmployee ||
-                          inputs.employeeTrainingFundRate ||
-                          0;
-                
-                // For couple mode, use individual rates or combine if needed
-                if (inputs.planningType === 'couple' && rate === 0) {
+                // For couple mode, prioritize combining partner rates
+                if (inputs.planningType === 'couple') {
                     const partner1Rate = parseFloat(inputs.partner1TrainingFundRate) || 0;
                     const partner2Rate = parseFloat(inputs.partner2TrainingFundRate) || 0;
                     
@@ -173,35 +171,49 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                         const partner2Salary = parseFloat(inputs.partner2Salary) || 0;
                         const totalSalary = partner1Salary + partner2Salary;
                         
+                        let combinedRate;
                         if (totalSalary > 0) {
-                            rate = ((partner1Rate * partner1Salary) + (partner2Rate * partner2Salary)) / totalSalary;
+                            combinedRate = ((partner1Rate * partner1Salary) + (partner2Rate * partner2Salary)) / totalSalary;
                         } else {
-                            rate = (partner1Rate + partner2Rate) / 2;
+                            combinedRate = (partner1Rate + partner2Rate) / 2;
                         }
-                        console.log('🤝 Couple mode: Combined training fund rates', { partner1Rate, partner2Rate, combined: rate });
+                        console.log('🤝 Couple mode: Combined training fund rates', { partner1Rate, partner2Rate, combined: combinedRate });
+                        return combinedRate;
                     }
                 }
+                
+                // Fall back to individual rate fields
+                let rate = inputs.trainingFundContributionRate ||
+                          inputs.trainingFundEmployeeRate ||
+                          inputs.trainingFundEmployee ||
+                          inputs.employeeTrainingFundRate ||
+                          0;
                 
                 return rate;
             })(),
                                         
             // Enhanced Emergency Fund mapping with couple mode support
             emergencyFund: (() => {
+                // For couple mode, prioritize combining partner funds
+                if (inputs.planningType === 'couple') {
+                    // Check both emergency fund and bank account fields
+                    const partner1Fund = parseFloat(inputs.partner1EmergencyFund || inputs.partner1BankAccount || inputs.partner1Bank) || 0;
+                    const partner2Fund = parseFloat(inputs.partner2EmergencyFund || inputs.partner2BankAccount || inputs.partner2Bank) || 0;
+                    
+                    if (partner1Fund > 0 || partner2Fund > 0) {
+                        const combinedFund = partner1Fund + partner2Fund;
+                        console.log('🤝 Couple mode: Combined emergency funds', { partner1Fund, partner2Fund, combined: combinedFund });
+                        return combinedFund;
+                    }
+                }
+                
+                // Fall back to individual emergency fund fields
                 let fund = inputs.emergencyFund ||
                           inputs.emergencyFundAmount ||
                           inputs.currentEmergencyFund ||
+                          inputs.currentBankAccount ||
+                          inputs.currentSavingsAccount ||
                           0;
-                
-                // For couple mode, combine partner emergency funds if main fund is missing
-                if (inputs.planningType === 'couple' && fund === 0) {
-                    const partner1Fund = parseFloat(inputs.partner1EmergencyFund) || 0;
-                    const partner2Fund = parseFloat(inputs.partner2EmergencyFund) || 0;
-                    
-                    if (partner1Fund > 0 || partner2Fund > 0) {
-                        fund = partner1Fund + partner2Fund;
-                        console.log('🤝 Couple mode: Combined emergency funds', { partner1Fund, partner2Fund, combined: fund });
-                    }
-                }
                 
                 return fund;
             })(),
@@ -225,27 +237,29 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                      
             // Enhanced monthly expenses mapping with couple mode support
             currentMonthlyExpenses: (() => {
-                let expenses = inputs.currentMonthlyExpenses ||
-                              inputs.monthlyExpenses ||
-                              inputs.totalMonthlyExpenses ||
-                              0;
-                
-                // For couple mode, combine partner expenses if main expenses are missing
-                if (inputs.planningType === 'couple' && expenses === 0) {
+                // For couple mode, prioritize combining partner expenses
+                if (inputs.planningType === 'couple') {
                     const partner1Expenses = parseFloat(inputs.partner1MonthlyExpenses) || 0;
                     const partner2Expenses = parseFloat(inputs.partner2MonthlyExpenses) || 0;
                     const sharedExpenses = parseFloat(inputs.sharedMonthlyExpenses) || 0;
                     
                     if (partner1Expenses > 0 || partner2Expenses > 0 || sharedExpenses > 0) {
-                        expenses = partner1Expenses + partner2Expenses + sharedExpenses;
+                        const combinedExpenses = partner1Expenses + partner2Expenses + sharedExpenses;
                         console.log('🤝 Couple mode: Combined monthly expenses', { 
                             partner1Expenses, 
                             partner2Expenses, 
                             sharedExpenses, 
-                            combined: expenses 
+                            combined: combinedExpenses 
                         });
+                        return combinedExpenses;
                     }
                 }
+                
+                // Fall back to individual expense fields
+                let expenses = inputs.currentMonthlyExpenses ||
+                              inputs.monthlyExpenses ||
+                              inputs.totalMonthlyExpenses ||
+                              0;
                 
                 return expenses;
             })()
