@@ -711,7 +711,8 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         key: 'rsu-company-selector',
                         inputs: inputs,
                         setInputs: setInputs,
-                        language: language
+                        language: language,
+                        workingCurrency: workingCurrency
                     }),
                     
                     // RSU Units and Frequency
@@ -894,7 +895,8 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                                 key: 'main-rsu-company-selector',
                                 inputs: inputs,
                                 setInputs: setInputs,
-                                language: language
+                                language: language,
+                                workingCurrency: workingCurrency
                             }),
                             
                             // RSU Units and Frequency for main person

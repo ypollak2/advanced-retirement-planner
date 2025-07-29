@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v7.1.0 ✨
+# 🚀 Advanced Retirement Planner v7.1.1 ✨
 
-[![Version](https://img.shields.io/badge/version-7.1.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-7.1.1-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -26,6 +26,15 @@
 > **📋 Deployment Status**: GitHub Pages is the primary deployment and is fully operational with the reorganized component structure. Netlify is currently rebuilding after the repository reorganization and should be available shortly.
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
+
+## 🎨 What's New in v7.1.1 - RSU CORS & CURRENCY CONVERSION FIXES 🔧💱
+
+### Bug Fixes & Improvements:
+- **CORS Error Resolution**: Fixed Yahoo Finance API calls from GitHub Pages with proxy integration
+- **Currency Conversion**: Stock prices now properly display in selected currency (ILS/USD/EUR)
+- **Exchange Rate Display**: Shows real-time exchange rates with USD base price reference
+- **Enhanced Security**: Added domain validation and input sanitization
+- **Better Error Handling**: Graceful fallbacks for offline scenarios and API failures
 
 ## 🎨 What's New in v7.1.0 - ENHANCED RSU INPUT WITH STOCK PRICES 📈✨
 

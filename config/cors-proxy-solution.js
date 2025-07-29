@@ -24,8 +24,29 @@ class CORSProxyService {
         console.log(`Switching to proxy: ${this.getCurrentProxy()}`);
     }
 
+    // Validate URL is from allowed domains
+    isAllowedDomain(url) {
+        const allowedDomains = [
+            'query1.finance.yahoo.com',
+            'query2.finance.yahoo.com',
+            'finance.yahoo.com'
+        ];
+        
+        try {
+            const urlObj = new URL(url);
+            return allowedDomains.some(domain => urlObj.hostname === domain || urlObj.hostname.endsWith('.' + domain));
+        } catch {
+            return false;
+        }
+    }
+
     // Main function to fetch with CORS proxy
     async fetchWithProxy(url, options = {}) {
+        // Security: Validate URL before proxying
+        if (!this.isAllowedDomain(url)) {
+            throw new Error('Security Error: URL not in allowed domains list');
+        }
+
         const maxRetries = this.proxyUrls.length;
         let lastError;
 
@@ -69,6 +90,11 @@ class YahooFinanceAPI {
         this.corsProxy = new CORSProxyService();
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
+        this.maxCacheSize = 50; // Prevent unbounded growth
+        this.cleanupInterval = null;
+        
+        // Start periodic cleanup
+        this.startCacheCleanup();
     }
 
     // Check if cached data is still valid
@@ -172,6 +198,48 @@ class YahooFinanceAPI {
     clearCache() {
         this.cache.clear();
         console.log('🗑️ Cache cleared');
+    }
+    
+    // Start periodic cache cleanup
+    startCacheCleanup() {
+        // Clean up every minute
+        this.cleanupInterval = setInterval(() => {
+            const now = Date.now();
+            let removed = 0;
+            
+            for (const [key, value] of this.cache.entries()) {
+                if (now - value.timestamp > this.cacheTimeout) {
+                    this.cache.delete(key);
+                    removed++;
+                }
+            }
+            
+            if (removed > 0) {
+                console.log(`🧹 Cleaned up ${removed} expired cache entries`);
+            }
+            
+            // Enforce max cache size
+            if (this.cache.size > this.maxCacheSize) {
+                const entriesToRemove = this.cache.size - this.maxCacheSize;
+                const sortedEntries = Array.from(this.cache.entries())
+                    .sort((a, b) => a[1].timestamp - b[1].timestamp);
+                
+                for (let i = 0; i < entriesToRemove; i++) {
+                    this.cache.delete(sortedEntries[i][0]);
+                }
+                
+                console.log(`🗑️ Removed ${entriesToRemove} oldest cache entries`);
+            }
+        }, 60 * 1000);
+    }
+    
+    // Cleanup method to prevent memory leaks
+    destroy() {
+        if (this.cleanupInterval) {
+            clearInterval(this.cleanupInterval);
+            this.cleanupInterval = null;
+        }
+        this.clearCache();
     }
 }
 

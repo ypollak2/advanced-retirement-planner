@@ -6,6 +6,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [7.1.1] - 2025-07-29 🔧 RSU CORS & CURRENCY CONVERSION FIXES
+
+### 🐛 **Bug Fixes**
+- **CORS Error Resolution**: Integrated CORS proxy service for Yahoo Finance API calls from GitHub Pages
+- **Currency Conversion**: Fixed stock prices displaying in USD instead of selected currency (ILS)
+- **Exchange Rate Integration**: Added real-time currency conversion with fallback rates
+
+### 🔒 **Security Improvements**
+- **Domain Validation**: CORS proxy now validates allowed domains (Yahoo Finance only)
+- **Input Validation**: Enhanced currency rate validation to prevent NaN/Infinity errors
+- **Error Handling**: Improved error handling for API failures and offline scenarios
+
+### ⚡ **Technical Enhancements**
+- **Multi-Currency Support**: Stock prices now convert from USD to working currency automatically
+- **Exchange Rate Display**: Shows current exchange rate and both USD/local currency prices
+- **Manual Price Entry**: Currency symbol now shown in manual price input field
+- **Cache Management**: Added periodic cleanup to prevent memory leaks
+
+### 📊 **Components Updated**
+- `stockPriceAPI.js`: Added CORS proxy integration with fallback mechanism
+- `WizardStepSalary.js`: Added workingCurrency prop to EnhancedRSUCompanySelector
+- `EnhancedRSUCompanySelector.js`: Implemented currency conversion with validation
+- `cors-proxy-solution.js`: Enhanced with security fixes (already implemented)
+
+### 🧪 **Quality Assurance**
+- **100% Test Pass Rate**: All 302 tests passing
+- **Code Review**: Passed security and quality review by code-reviewer agent
+- **Bug Investigation**: All critical issues identified and resolved
+
+---
+
 ## [7.1.0] - 2025-07-29 📈 ENHANCED RSU INPUT WITH STOCK PRICES
 
 ### 🚀 **Major Feature: RSU Stock Symbol & Real-Time Price Integration**

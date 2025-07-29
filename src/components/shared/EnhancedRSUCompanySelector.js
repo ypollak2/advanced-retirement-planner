@@ -1,13 +1,15 @@
-const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
+const EnhancedRSUCompanySelector = ({ inputs, setInputs, language, workingCurrency = 'USD' }) => {
     const [searchQuery, setSearchQuery] = React.useState('');
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
     const [stockPrice, setStockPrice] = React.useState(null);
+    const [stockPriceUSD, setStockPriceUSD] = React.useState(null);
     const [priceLoading, setPriceLoading] = React.useState(false);
     const [manualPriceMode, setManualPriceMode] = React.useState(false);
     const [manualPrice, setManualPrice] = React.useState('');
     const [priceSource, setPriceSource] = React.useState('');
     const [lastUpdated, setLastUpdated] = React.useState(null);
+    const [currencyRate, setCurrencyRate] = React.useState(1);
     
     // Comprehensive list of tech companies with RSUs
     const companies = [
@@ -68,6 +70,36 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
         { symbol: 'ZS', name: 'Zscaler Inc.', category: 'Cybersecurity' }
     ];
     
+    // Currency symbol helper
+    const getCurrencySymbol = (currency) => {
+        const symbols = {
+            'ILS': '₪',
+            'USD': '$',
+            'EUR': '€',
+            'GBP': '£',
+            'BTC': '₿',
+            'ETH': 'Ξ'
+        };
+        return symbols[currency] || '$';
+    };
+    
+    const currencySymbol = getCurrencySymbol(workingCurrency);
+    
+    // Initialize currency API
+    React.useEffect(() => {
+        if (workingCurrency !== 'USD' && window.CurrencyAPI) {
+            const api = new window.CurrencyAPI();
+            api.getExchangeRates().then(rates => {
+                if (rates && rates[workingCurrency]) {
+                    setCurrencyRate(rates[workingCurrency]);
+                    console.log(`💱 Currency rate loaded: 1 USD = ${rates[workingCurrency]} ${workingCurrency}`);
+                }
+            }).catch(error => {
+                console.warn('Failed to load currency rates:', error);
+            });
+        }
+    }, [workingCurrency]);
+    
     // Filter companies based on search query
     const filteredCompanies = companies.filter(company =>
         company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -81,6 +113,16 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
         setSearchQuery('');
         
         if (symbol && symbol !== 'OTHER' && symbol !== '') {
+            // Wait for currency rate if needed before fetching stock price
+            if (workingCurrency !== 'USD' && (!currencyRate || currencyRate <= 0)) {
+                console.log('⏳ Waiting for currency rate to load...');
+                // Try to wait up to 3 seconds for currency rate
+                let waitTime = 0;
+                while ((!currencyRate || currencyRate <= 0) && waitTime < 3000) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    waitTime += 100;
+                }
+            }
             await fetchStockPriceForSymbol(symbol);
         } else {
             // Reset price data for OTHER or empty selection
@@ -103,9 +145,22 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
         setManualPriceMode(false);
         
         try {
-            const price = await window.fetchStockPrice(symbol);
-            if (price && price > 0) {
-                setStockPrice(price);
+            const priceUSD = await window.fetchStockPrice(symbol);
+            if (priceUSD && priceUSD > 0) {
+                setStockPriceUSD(priceUSD);
+                
+                // Convert to working currency with validation
+                let convertedPrice = priceUSD;
+                if (workingCurrency !== 'USD') {
+                    if (!currencyRate || currencyRate <= 0 || !isFinite(currencyRate)) {
+                        console.warn(`⚠️ Invalid currency rate for ${workingCurrency}: ${currencyRate}`);
+                        throw new Error('Currency rate not available');
+                    }
+                    convertedPrice = Math.round(priceUSD * currencyRate * 100) / 100; // Avoid floating point issues
+                    console.log(`💱 Converting ${symbol}: $${priceUSD} USD → ${currencySymbol}${convertedPrice.toFixed(2)} ${workingCurrency} (rate: ${currencyRate})`);
+                }
+                
+                setStockPrice(convertedPrice);
                 setLastUpdated(new Date().toLocaleTimeString());
                 
                 // Check cache info for source
@@ -117,13 +172,13 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
                     }
                 }
                 
-                // Update inputs with fetched price
+                // Update inputs with converted price
                 setInputs(prev => ({
                     ...prev,
-                    rsuCurrentStockPrice: price
+                    rsuCurrentStockPrice: convertedPrice
                 }));
                 
-                console.log(`✅ Stock price fetched for ${symbol}: $${price}`);
+                console.log(`✅ Stock price fetched for ${symbol}: ${currencySymbol}${convertedPrice.toFixed(2)} ${workingCurrency}`);
             } else {
                 throw new Error('Price not available');
             }
@@ -143,6 +198,16 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
         const price = parseFloat(manualPrice);
         if (price && price > 0) {
             setStockPrice(price);
+            // For manual input, assume price is already in working currency
+            if (workingCurrency === 'USD') {
+                setStockPriceUSD(price);
+            } else if (currencyRate && currencyRate > 0 && isFinite(currencyRate)) {
+                setStockPriceUSD(Math.round((price / currencyRate) * 100) / 100);
+            } else {
+                // If no valid rate, we can't convert to USD
+                setStockPriceUSD(null);
+                console.warn('⚠️ Cannot convert manual price to USD - invalid currency rate');
+            }
             setLastUpdated(new Date().toLocaleTimeString());
             setPriceSource('manual');
             
@@ -152,7 +217,7 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
                 rsuCurrentStockPrice: price
             }));
             
-            console.log(`✅ Manual price set for ${inputs.rsuCompany}: $${price}`);
+            console.log(`✅ Manual price set for ${inputs.rsuCompany}: ${currencySymbol}${price}`);
         }
     };
     
@@ -365,14 +430,23 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
                     key: 'manual-price-input',
                     className: "flex gap-2"
                 }, [
-                    React.createElement('input', {
-                        key: 'manual-price-field',
-                        type: 'number',
-                        value: manualPrice,
-                        onChange: (e) => setManualPrice(e.target.value),
-                        placeholder: language === 'he' ? 'הזן מחיר...' : 'Enter price...',
-                        className: "flex-1 px-2 py-1 border border-gray-300 rounded text-sm"
-                    }),
+                    React.createElement('div', {
+                        key: 'manual-price-wrapper',
+                        className: "flex-1 relative"
+                    }, [
+                        React.createElement('span', {
+                            key: 'currency-prefix',
+                            className: "absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm"
+                        }, currencySymbol),
+                        React.createElement('input', {
+                            key: 'manual-price-field',
+                            type: 'number',
+                            value: manualPrice,
+                            onChange: (e) => setManualPrice(e.target.value),
+                            placeholder: language === 'he' ? 'הזן מחיר...' : 'Enter price...',
+                            className: "w-full pl-8 pr-2 py-1 border border-gray-300 rounded text-sm"
+                        })
+                    ]),
                     React.createElement('button', {
                         key: 'submit-manual-price',
                         onClick: handleManualPriceSubmit,
@@ -386,7 +460,11 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
                     React.createElement('div', {
                         key: 'price-value',
                         className: "text-lg font-bold text-green-600"
-                    }, `$${stockPrice.toFixed(2)}`),
+                    }, `${currencySymbol}${stockPrice.toFixed(2)}`),
+                    workingCurrency !== 'USD' && stockPriceUSD && React.createElement('div', {
+                        key: 'price-usd',
+                        className: "text-xs text-gray-500"
+                    }, `($${stockPriceUSD.toFixed(2)} USD)`),
                     React.createElement('div', {
                         key: 'price-meta',
                         className: "text-xs text-gray-500 flex items-center gap-2"
@@ -399,7 +477,16 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language }) => {
                 ]) : React.createElement('div', {
                     key: 'no-price',
                     className: "text-sm text-gray-500 italic"
-                }, language === 'he' ? 'לחץ על כפתור הרענון כדי לקבל מחיר' : 'Click refresh to fetch price')
+                }, language === 'he' ? 'לחץ על כפתור הרענון כדי לקבל מחיר' : 'Click refresh to fetch price'),
+                
+                // Currency status
+                workingCurrency !== 'USD' && React.createElement('div', {
+                    key: 'currency-status',
+                    className: "mt-2 text-xs text-gray-500 italic"
+                }, currencyRate > 0 ? 
+                    `${language === 'he' ? 'שער חליפין' : 'Exchange rate'}: 1 USD = ${currencySymbol}${currencyRate.toFixed(2)} ${workingCurrency}` :
+                    `${language === 'he' ? 'טוען שער חליפין...' : 'Loading exchange rate...'}`
+                )
             ])
         ]) : null
     ]);

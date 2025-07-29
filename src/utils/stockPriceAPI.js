@@ -135,7 +135,18 @@ function saveToLocalStorage() {
         
         localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(data));
     } catch (error) {
-        console.warn('Failed to save to localStorage:', error);
+        // Handle quota exceeded or disabled localStorage
+        if (error.name === 'QuotaExceededError') {
+            console.warn('localStorage quota exceeded - clearing old data');
+            try {
+                localStorage.removeItem(LOCALSTORAGE_KEY);
+                localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify({}));
+            } catch (e) {
+                console.error('Cannot access localStorage:', e);
+            }
+        } else {
+            console.warn('Failed to save to localStorage:', error);
+        }
     }
 }
 
@@ -168,6 +179,7 @@ loadFromLocalStorage();
 // Online/Offline status management
 let isOnline = navigator.onLine;
 let offlineQueue = [];
+let isProcessingQueue = false;
 
 window.addEventListener('online', () => {
     isOnline = true;
@@ -181,18 +193,28 @@ window.addEventListener('offline', () => {
 });
 
 async function processOfflineQueue() {
-    if (offlineQueue.length === 0) return;
+    if (offlineQueue.length === 0 || isProcessingQueue) return;
     
-    console.log(`🔄 Processing ${offlineQueue.length} queued stock price requests...`);
-    const queueCopy = [...offlineQueue];
-    offlineQueue = [];
-    
-    for (const symbol of queueCopy) {
-        try {
-            await fetchStockPrice(symbol, false); // Force fresh fetch
-        } catch (error) {
-            console.log(`Failed to refresh ${symbol}:`, error.message);
+    isProcessingQueue = true;
+    try {
+        console.log(`🔄 Processing ${offlineQueue.length} queued stock price requests...`);
+        const queueCopy = [...new Set(offlineQueue)]; // Remove duplicates
+        offlineQueue = [];
+        
+        // Process in batches to avoid overwhelming the API
+        const batchSize = 5;
+        for (let i = 0; i < queueCopy.length; i += batchSize) {
+            const batch = queueCopy.slice(i, i + batchSize);
+            await Promise.all(
+                batch.map(symbol => 
+                    fetchStockPrice(symbol, false).catch(error => 
+                        console.log(`Failed to refresh ${symbol}:`, error.message)
+                    )
+                )
+            );
         }
+    } finally {
+        isProcessingQueue = false;
     }
 }
 
@@ -201,22 +223,53 @@ function isAppOnline() {
     return navigator.onLine && isOnline;
 }
 
+// Initialize CORS proxy service
+let corsProxy;
+if (window.CORSProxyService) {
+    corsProxy = new window.CORSProxyService();
+    console.log('✅ CORS Proxy Service initialized for stock price API');
+}
+
 // Real-time stock price fetching function - CORS-safe version
 async function fetchRealTimePrice(symbol) {
     try {
-        // Try Yahoo Finance API first (most reliable for CORS)
+        // Try Yahoo Finance API with CORS proxy
         const yahooUrl = `${STOCK_API_ENDPOINTS.YAHOO_FINANCE}/${symbol}`;
         console.log(`📊 StockAPI: Attempting to fetch ${symbol} from Yahoo Finance...`);
         
-        const response = await fetch(yahooUrl, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-            }
-        });
+        let data;
         
-        if (response.ok) {
-            const data = await response.json();
+        // Use CORS proxy if available
+        if (corsProxy) {
+            try {
+                data = await corsProxy.fetchWithProxy(yahooUrl);
+            } catch (proxyError) {
+                console.log(`⚠️ CORS proxy failed, trying direct fetch...`);
+                // Fallback to direct fetch
+                const response = await fetch(yahooUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+                if (response.ok) {
+                    data = await response.json();
+                }
+            }
+        } else {
+            // No CORS proxy available, try direct fetch
+            const response = await fetch(yahooUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                }
+            });
+            if (response.ok) {
+                data = await response.json();
+            }
+        }
+        
+        if (data) {
             const price = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
             if (price && !isNaN(price)) {
                 console.log(`✅ StockAPI: Successfully fetched ${symbol}: $${price}`);
@@ -233,25 +286,38 @@ async function fetchRealTimePrice(symbol) {
 }
 
 // Background refresh function for stale-while-revalidate
+const refreshPromises = new Map(); // Track ongoing refresh promises
+
 async function backgroundRefresh(symbol) {
-    if (refreshingCache.has(symbol)) return; // Already refreshing
-    
-    refreshingCache.add(symbol);
-    try {
-        console.log(`🔄 Background refreshing ${symbol}...`);
-        const freshPrice = await fetchRealTimePrice(symbol);
-        if (freshPrice) {
-            const entry = new CacheEntry(freshPrice, 'api-background');
-            priceCache.set(symbol, entry);
-            evictLeastUsed();
-            saveToLocalStorage();
-            console.log(`✅ Background refresh complete for ${symbol}: $${freshPrice}`);
-        }
-    } catch (error) {
-        console.log(`❌ Background refresh failed for ${symbol}:`, error.message);
-    } finally {
-        refreshingCache.delete(symbol);
+    // Return existing promise if already refreshing
+    if (refreshPromises.has(symbol)) {
+        return refreshPromises.get(symbol);
     }
+    
+    const refreshPromise = (async () => {
+        refreshingCache.add(symbol);
+        try {
+            console.log(`🔄 Background refreshing ${symbol}...`);
+            const freshPrice = await fetchRealTimePrice(symbol);
+            if (freshPrice && freshPrice > 0 && isFinite(freshPrice)) {
+                const entry = new CacheEntry(freshPrice, 'api-background');
+                priceCache.set(symbol, entry);
+                evictLeastUsed();
+                saveToLocalStorage();
+                console.log(`✅ Background refresh complete for ${symbol}: $${freshPrice}`);
+                return freshPrice;
+            }
+        } catch (error) {
+            console.log(`❌ Background refresh failed for ${symbol}:`, error.message);
+            throw error;
+        } finally {
+            refreshingCache.delete(symbol);
+            refreshPromises.delete(symbol);
+        }
+    })();
+    
+    refreshPromises.set(symbol, refreshPromise);
+    return refreshPromise;
 }
 
 // Main function to fetch stock price with stale-while-revalidate
@@ -294,27 +360,39 @@ async function fetchStockPrice(symbol, useCache = true) {
         return null;
     }
     
-    // Try to fetch real-time price from APIs (with timeout)
-    try {
-        const realTimePrice = await Promise.race([
-            fetchRealTimePrice(upperSymbol),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000))
-        ]);
-        
-        if (realTimePrice && realTimePrice > 0) {
-            console.log(`📈 Real-time price fetched for ${upperSymbol}: $${realTimePrice}`);
+    // Try to fetch real-time price from APIs (with timeout and retry)
+    const maxRetries = 2;
+    let lastError = null;
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+            const timeout = 5000 + (attempt * 2000); // Increase timeout with each retry
+            const realTimePrice = await Promise.race([
+                fetchRealTimePrice(upperSymbol),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeout))
+            ]);
             
-            // Cache real-time price
-            const entry = new CacheEntry(realTimePrice, 'api');
-            priceCache.set(upperSymbol, entry);
-            evictLeastUsed();
-            saveToLocalStorage();
-            
-            return realTimePrice;
+            if (realTimePrice && realTimePrice > 0 && isFinite(realTimePrice)) {
+                console.log(`📈 Real-time price fetched for ${upperSymbol}: $${realTimePrice}`);
+                
+                // Cache real-time price
+                const entry = new CacheEntry(realTimePrice, 'api');
+                priceCache.set(upperSymbol, entry);
+                evictLeastUsed();
+                saveToLocalStorage();
+                
+                return realTimePrice;
+            }
+        } catch (error) {
+            lastError = error;
+            if (attempt < maxRetries) {
+                console.log(`🔄 Retry ${attempt + 1}/${maxRetries} for ${upperSymbol}...`);
+                await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1))); // Exponential backoff
+            }
         }
-    } catch (error) {
-        console.warn(`⚠️ Failed to fetch real-time price for ${upperSymbol}:`, error.message);
     }
+    
+    console.warn(`⚠️ Failed to fetch real-time price for ${upperSymbol} after ${maxRetries + 1} attempts:`, lastError?.message || 'Unknown error');
     
     // Fallback to hardcoded prices if API fails
     if (FALLBACK_PRICES[upperSymbol]) {

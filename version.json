@@ -1,5 +1,5 @@
 {
-  "version": "7.1.0",
+  "version": "7.1.1",
   "build": "2025-07-29",
   "commit": "v7.1.0-rsu-stock-enhancement",
   "description": "Enhanced RSU input with stock symbol selection and real-time price lookup"
