@@ -1,5 +1,5 @@
 // Currency Exchange Rate API - Live rates with fallback system
-// Created by Yali Pollak (יהלי פולק) - v7.1.1
+// Created by Yali Pollak (יהלי פולק) - v7.2.0
 
 class CurrencyAPI {
     constructor() {
@@ -291,4 +291,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-console.log('CurrencyAPI v7.1.1 loaded successfully');
+console.log('CurrencyAPI v7.2.0 loaded successfully');

@@ -331,13 +331,19 @@ const RetirementWizard = ({
                 
                 // Check couple mode partner investments
                 if (mergedInputs.planningType === 'couple') {
-                    // Validate partner 1 investment preferences from current or saved data
-                    const partner1Valid = mergedInputs.partner1RiskProfile && 
-                                        (mergedInputs.partner1ExpectedReturn >= 0 && mergedInputs.partner1ExpectedReturn <= 20);
+                    // Use default values if not set - be lenient with validation
+                    const partner1RiskProfile = mergedInputs.partner1RiskProfile || 'moderate';
+                    const partner1ExpectedReturn = mergedInputs.partner1ExpectedReturn || 7.0;
+                    const partner2RiskProfile = mergedInputs.partner2RiskProfile || 'moderate';
+                    const partner2ExpectedReturn = mergedInputs.partner2ExpectedReturn || 7.0;
                     
-                    // Validate partner 2 investment preferences from current or saved data
-                    const partner2Valid = mergedInputs.partner2RiskProfile && 
-                                        (mergedInputs.partner2ExpectedReturn >= 0 && mergedInputs.partner2ExpectedReturn <= 20);
+                    // Validate partner 1 investment preferences (using defaults if not set)
+                    const partner1Valid = partner1RiskProfile && 
+                                        (partner1ExpectedReturn >= 0 && partner1ExpectedReturn <= 25);
+                    
+                    // Validate partner 2 investment preferences (using defaults if not set)
+                    const partner2Valid = partner2RiskProfile && 
+                                        (partner2ExpectedReturn >= 0 && partner2ExpectedReturn <= 25);
                     
                     // All partner fields must be valid
                     return partner1Valid && partner2Valid && 
@@ -345,7 +351,7 @@ const RetirementWizard = ({
                 }
                 
                 // Individual mode validation
-                return expectedReturn >= 0 && expectedReturn <= 20 && 
+                return expectedReturn >= 0 && expectedReturn <= 25 && 
                        inflationRate >= 0 && inflationRate <= 15;
             
             case 8: 

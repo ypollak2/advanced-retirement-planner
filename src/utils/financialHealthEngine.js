@@ -15,38 +15,117 @@ function safeParseFloat(value, defaultValue = 0) {
     return parsed;
 }
 
-function safeDivide(numerator, denominator, defaultValue = 0) {
+function safeDivide(numerator, denominator, defaultValue = 0, context = '') {
+    // Enhanced validation with better error context
     if (!denominator || denominator === 0 || isNaN(denominator) || !isFinite(denominator)) {
-        return defaultValue;
+        if (context && window.location.hostname === 'localhost') {
+            console.warn(`⚠️ SafeDivide: Division by zero/invalid in ${context}`, { numerator, denominator });
+        }
+        return { value: defaultValue, error: 'division_by_zero', context };
     }
+    
     const num = safeParseFloat(numerator, 0);
+    if (num === 0 && defaultValue === 0) {
+        // Allow zero results when numerator is legitimately zero
+        return { value: 0, error: null, context };
+    }
+    
     const result = num / denominator;
     if (isNaN(result) || !isFinite(result)) {
-        return defaultValue;
+        if (context && window.location.hostname === 'localhost') {
+            console.warn(`⚠️ SafeDivide: Invalid result in ${context}`, { numerator: num, denominator, result });
+        }
+        return { value: defaultValue, error: 'invalid_result', context };
     }
-    return result;
+    
+    return { value: result, error: null, context };
 }
 
-function safeMultiply(a, b, defaultValue = 0) {
+function safeMultiply(a, b, defaultValue = 0, context = '') {
     const numA = safeParseFloat(a, 0);
     const numB = safeParseFloat(b, 0);
+    
+    // Allow zero results when inputs are legitimately zero
+    if ((numA === 0 || numB === 0) && defaultValue === 0) {
+        return { value: 0, error: null, context };
+    }
+    
     const result = numA * numB;
     if (isNaN(result) || !isFinite(result)) {
-        return defaultValue;
+        if (context && window.location.hostname === 'localhost') {
+            console.warn(`⚠️ SafeMultiply: Invalid result in ${context}`, { a: numA, b: numB, result });
+        }
+        return { value: defaultValue, error: 'invalid_result', context };
     }
-    return result;
+    
+    return { value: result, error: null, context };
 }
 
-function safePercentage(value, total, defaultValue = 0) {
+function safePercentage(value, total, defaultValue = 0, context = '') {
     if (!total || total === 0) {
-        return defaultValue;
+        if (context && window.location.hostname === 'localhost') {
+            console.warn(`⚠️ SafePercentage: Division by zero in ${context}`, { value, total });
+        }
+        return { value: defaultValue, error: 'division_by_zero', context };
     }
-    return safeDivide(value * 100, total, defaultValue);
+    
+    const divResult = safeDivide(value * 100, total, defaultValue, `${context}_percentage`);
+    return {
+        value: typeof divResult === 'object' ? divResult.value : divResult,
+        error: typeof divResult === 'object' ? divResult.error : null,
+        context
+    };
 }
 
 function clampValue(value, min, max) {
     const safeValue = safeParseFloat(value, min);
     return Math.max(min, Math.min(max, safeValue));
+}
+
+// Backward compatibility wrappers for safe functions
+function safeDivideCompat(numerator, denominator, defaultValue = 0) {
+    const result = safeDivide(numerator, denominator, defaultValue);
+    return typeof result === 'object' ? result.value : result;
+}
+
+function safeMultiplyCompat(a, b, defaultValue = 0) {
+    const result = safeMultiply(a, b, defaultValue);
+    return typeof result === 'object' ? result.value : result;
+}
+
+function safePercentageCompat(value, total, defaultValue = 0) {
+    const result = safePercentage(value, total, defaultValue);
+    return typeof result === 'object' ? result.value : result;
+}
+
+// Enhanced calculation wrapper that provides detailed error context
+function enhancedSafeCalculation(calculationName, calculationFn) {
+    try {
+        const startTime = performance.now();
+        const result = calculationFn();
+        const endTime = performance.now();
+        
+        const calculationTime = Math.round(endTime - startTime);
+        
+        if (calculationTime > 50) {
+            console.log(`⏱️ ${calculationName} took ${calculationTime}ms`);
+        }
+        
+        return {
+            success: true,
+            result,
+            calculationTime,
+            error: null
+        };
+    } catch (error) {
+        console.error(`❌ ${calculationName} failed:`, error);
+        return {
+            success: false,
+            result: null,
+            calculationTime: 0,
+            error: error.message
+        };
+    }
 }
 
 // ENHANCED: Comprehensive field mapping utility with wizard compatibility and debugging
@@ -524,21 +603,58 @@ function calculateSavingsRateScore(inputs) {
         // Add RSU income to total monthly income
         monthlyIncome += monthlyRSUIncome;
         console.log(`💰 Total monthly income with RSUs: ${monthlyIncome}`);
+    } else {
+        console.log('💰 No RSU income found');
+    }
+    
+    // CRITICAL: If income is still 0, this is the problem
+    if (monthlyIncome === 0) {
+        console.error('❌ SAVINGS RATE ISSUE: Monthly income is 0!');
+        console.log('🔍 Available input fields:', Object.keys(inputs));
+        console.log('🔍 Salary fields found:', Object.keys(inputs).filter(k => 
+            k.toLowerCase().includes('salary') || k.toLowerCase().includes('income')
+        ));
+        return {
+            score: 0,
+            details: {
+                status: 'missing_income_data',
+                calculationMethod: 'enhanced_field_mapping',
+                monthlyIncome: 0,
+                monthlyRSUIncome: 0,
+                debugInfo: {
+                    totalInputFields: Object.keys(inputs).length,
+                    salaryFieldsFound: Object.keys(inputs).filter(k => 
+                        k.toLowerCase().includes('salary') || k.toLowerCase().includes('income')
+                    ),
+                    reason: 'No valid income fields found in inputs'
+                }
+            }
+        };
     }
     
     // PHASE 2: Get contribution rates with enhanced field detection
     console.log('💰 Looking for contribution rates...');
+    console.log('💰 Current monthly income for savings rate calculation:', monthlyIncome);
     
     const pensionRate = getFieldValue(inputs, [
+        // Primary field names used by wizard components
         'pensionContributionRate', 'pensionEmployeeRate', 'pensionEmployee',
+        // Legacy field names for backward compatibility
         'employeePensionRate', 'pension_contribution_rate', 'pension_rate',
-        'pensionRateEmployee', 'employee_pension_rate', 'employeePension'
+        'pensionRateEmployee', 'employee_pension_rate', 'employeePension',
+        // Partner-specific fields for couple mode
+        'partner1PensionContributionRate', 'partner2PensionContributionRate'
     ], { debugMode: true });
     
     const trainingFundRate = getFieldValue(inputs, [
+        // Primary field names used by wizard components
         'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee',
+        // Legacy field names for backward compatibility
         'employeeTrainingFundRate', 'training_fund_rate', 'trainingFund_rate',
-        'trainingRateEmployee', 'employee_training_fund_rate', 'employeeTrainingFund'
+        'trainingRateEmployee', 'employee_training_fund_rate', 'employeeTrainingFund',
+        // Partner-specific fields for couple mode
+        'partner1TrainingFundContributionRate', 'partner2TrainingFundContributionRate',
+        'partner1TrainingFundEmployeeRate', 'partner2TrainingFundEmployeeRate'
     ], { debugMode: true });
     
     console.log('💰 Contribution rates found:', {
@@ -674,7 +790,7 @@ function calculateSavingsRateScore(inputs) {
     // PHASE 5: Calculate savings rate with comprehensive validation
     console.log('📊 Calculating savings rate...');
     
-    const savingsRate = safePercentage(monthlyContributions, monthlyIncome, 0);
+    const savingsRate = safePercentageCompat(monthlyContributions, monthlyIncome, 0);
     const validSavingsRate = clampValue(savingsRate, 0, 100); // Savings rate should be 0-100%
     
     console.log('📊 Savings rate calculation:', {
@@ -775,6 +891,16 @@ function calculateSavingsRateScore(inputs) {
  */
 function calculateRetirementReadinessScore(inputs) {
     console.log('🏦 === CALCULATING RETIREMENT READINESS SCORE ===');
+    console.log('🔍 DEBUG: All pension/savings fields in inputs:');
+    Object.keys(inputs).filter(key => 
+        key.toLowerCase().includes('pension') || 
+        key.toLowerCase().includes('saving') ||
+        key.toLowerCase().includes('retirement') ||
+        key.toLowerCase().includes('training')
+    ).forEach(key => {
+        console.log(`  ${key}: ${inputs[key]} (type: ${typeof inputs[key]})`);
+    });
+    
     const currentAge = parseFloat(inputs.currentAge || 30);
     
     // Enhanced income calculation that properly handles couple mode
@@ -843,10 +969,10 @@ function calculateRetirementReadinessScore(inputs) {
     console.log('💰 Calculating total current savings...');
     let currentSavings = 0;
     
-    // Get pension/retirement savings
+    // Get pension/retirement savings - matching wizard component field names
     const pensionSavings = getFieldValue(inputs, [
         'currentPensionSavings', 'currentSavings', 'pensionSavings', 
-        'retirementSavings', 'currentRetirementSavings'
+        'retirementSavings', 'currentRetirementSavings', 'currentPension'
     ], { allowZero: true, debugMode: true });
     currentSavings += pensionSavings;
     console.log('  Pension savings:', pensionSavings);
@@ -950,8 +1076,8 @@ function calculateRetirementReadinessScore(inputs) {
     
     // Age-based savings targets (rule of thumb: 1x by 30, 3x by 40, etc.)
     const targetMultiplier = Math.max(1, (currentAge - 20) / 10);
-    const targetSavings = safeMultiply(annualIncome, targetMultiplier);
-    const savingsRatio = safeDivide(currentSavings, targetSavings, 0);
+    const targetSavings = safeMultiplyCompat(annualIncome, targetMultiplier);
+    const savingsRatio = safeDivideCompat(currentSavings, targetSavings, 0);
     
     console.log('🎯 Retirement readiness calculation:', {
         currentAge,
@@ -1432,8 +1558,8 @@ function calculateTaxEfficiencyScore(inputs) {
             if (additionalTaxInfo.totalAdditionalIncome > 0) {
                 hasAdditionalIncome = true;
                 const totalIncome = baseSalary + additionalTaxInfo.totalAdditionalIncome;
-                const totalTaxAdvantaged = safeMultiply(baseSalary, (pensionRate + trainingFundRate) / 100);
-                const overallTaxAdvantageRate = safePercentage(totalTaxAdvantaged, totalIncome, 0);
+                const totalTaxAdvantaged = safeMultiplyCompat(baseSalary, (pensionRate + trainingFundRate) / 100);
+                const overallTaxAdvantageRate = safePercentageCompat(totalTaxAdvantaged, totalIncome, 0);
                 
                 // Adjust efficiency score based on overall tax advantage
                 additionalIncomeEfficiency = overallTaxAdvantageRate;
@@ -1473,7 +1599,7 @@ function calculateTaxEfficiencyScore(inputs) {
     }
     
     const maxScore = SCORE_FACTORS.taxEfficiency.weight;
-    const score = safeMultiply(efficiencyScore / 100, maxScore);
+    const score = safeMultiplyCompat(efficiencyScore / 100, maxScore);
     
     let status = 'poor';
     if (efficiencyScore >= 90) status = 'excellent';

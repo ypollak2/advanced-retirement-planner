@@ -1,0 +1,164 @@
+{
+  "totalChecks": 17,
+  "passedChecks": 17,
+  "failedChecks": 0,
+  "successRate": 100,
+  "findings": [
+    {
+      "category": "security",
+      "severity": "medium",
+      "title": "CSP allows unsafe-inline",
+      "description": "Content Security Policy allows unsafe-inline which may enable XSS attacks",
+      "file": "index.html",
+      "line": "",
+      "timestamp": "2025-07-29T17:23:46.591Z"
+    },
+    {
+      "category": "security",
+      "severity": "medium",
+      "title": "innerHTML usage detected",
+      "description": "Direct innerHTML usage can lead to XSS vulnerabilities",
+      "file": "src/app.js",
+      "line": 345,
+      "timestamp": "2025-07-29T17:23:46.599Z"
+    },
+    {
+      "category": "security",
+      "severity": "medium",
+      "title": "innerHTML usage detected",
+      "description": "Direct innerHTML usage can lead to XSS vulnerabilities",
+      "file": "src/components/core/RetirementPlannerApp.js",
+      "line": 1245,
+      "timestamp": "2025-07-29T17:23:46.604Z"
+    },
+    {
+      "category": "security",
+      "severity": "medium",
+      "title": "innerHTML usage detected",
+      "description": "Direct innerHTML usage can lead to XSS vulnerabilities",
+      "file": "src/utils/appInitializer.js",
+      "line": 69,
+      "timestamp": "2025-07-29T17:23:46.632Z"
+    },
+    {
+      "category": "security",
+      "severity": "medium",
+      "title": "innerHTML usage detected",
+      "description": "Direct innerHTML usage can lead to XSS vulnerabilities",
+      "file": "src/utils/fullAppInitializer.js",
+      "line": 100,
+      "timestamp": "2025-07-29T17:23:46.637Z"
+    },
+    {
+      "category": "security",
+      "severity": "medium",
+      "title": "innerHTML usage detected",
+      "description": "Direct innerHTML usage can lead to XSS vulnerabilities",
+      "file": "src/utils/robustLocalStorage.js",
+      "line": 103,
+      "timestamp": "2025-07-29T17:23:46.642Z"
+    },
+    {
+      "category": "security",
+      "severity": "medium",
+      "title": "innerHTML usage detected",
+      "description": "Direct innerHTML usage can lead to XSS vulnerabilities",
+      "file": "src/utils/testValidation.js",
+      "line": 248,
+      "timestamp": "2025-07-29T17:23:46.644Z"
+    },
+    {
+      "category": "security",
+      "severity": "low",
+      "title": "Unsafe localStorage usage",
+      "description": "Consider using JSON.stringify for localStorage data",
+      "file": "src/components/core/RetirementPlannerApp.js",
+      "line": 199,
+      "timestamp": "2025-07-29T17:23:46.678Z"
+    },
+    {
+      "category": "security",
+      "severity": "low",
+      "title": "Unsafe localStorage usage",
+      "description": "Consider using JSON.stringify for localStorage data",
+      "file": "src/utils/performanceMonitor.js",
+      "line": 321,
+      "timestamp": "2025-07-29T17:23:46.687Z"
+    },
+    {
+      "category": "security",
+      "severity": "low",
+      "title": "Unsafe localStorage usage",
+      "description": "Consider using JSON.stringify for localStorage data",
+      "file": "src/utils/robustLocalStorage.js",
+      "line": 151,
+      "timestamp": "2025-07-29T17:23:46.688Z"
+    },
+    {
+      "category": "security",
+      "severity": "low",
+      "title": "Unsafe localStorage usage",
+      "description": "Consider using JSON.stringify for localStorage data",
+      "file": "src/utils/robustLocalStorage.js",
+      "line": 152,
+      "timestamp": "2025-07-29T17:23:46.688Z"
+    },
+    {
+      "category": "security",
+      "severity": "low",
+      "title": "Unsafe localStorage usage",
+      "description": "Consider using JSON.stringify for localStorage data",
+      "file": "src/utils/robustLocalStorage.js",
+      "line": 160,
+      "timestamp": "2025-07-29T17:23:46.688Z"
+    },
+    {
+      "category": "security",
+      "severity": "low",
+      "title": "Unsafe localStorage usage",
+      "description": "Consider using JSON.stringify for localStorage data",
+      "file": "src/utils/robustLocalStorage.js",
+      "line": 334,
+      "timestamp": "2025-07-29T17:23:46.688Z"
+    },
+    {
+      "category": "security",
+      "severity": "low",
+      "title": "Unsafe localStorage usage",
+      "description": "Consider using JSON.stringify for localStorage data",
+      "file": "src/utils/robustLocalStorage.js",
+      "line": 335,
+      "timestamp": "2025-07-29T17:23:46.688Z"
+    },
+    {
+      "category": "security",
+      "severity": "low",
+      "title": "Unsafe localStorage usage",
+      "description": "Consider using JSON.stringify for localStorage data",
+      "file": "src/utils/robustLocalStorage.js",
+      "line": 474,
+      "timestamp": "2025-07-29T17:23:46.688Z"
+    },
+    {
+      "category": "security",
+      "severity": "low",
+      "title": "Unsafe localStorage usage",
+      "description": "Consider using JSON.stringify for localStorage data",
+      "file": "src/utils/robustLocalStorage.js",
+      "line": 554,
+      "timestamp": "2025-07-29T17:23:46.688Z"
+    },
+    {
+      "category": "performance",
+      "severity": "medium",
+      "title": "Potential memory leak",
+      "description": "setInterval without clearInterval may cause memory leaks",
+      "file": "src/utils/performanceMonitor.js",
+      "line": "",
+      "timestamp": "2025-07-29T17:23:46.698Z"
+    }
+  ],
+  "criticalIssues": 0,
+  "highIssues": 0,
+  "readyForRelease": true
+}

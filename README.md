@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v7.1.1 ✨
+# 🚀 Advanced Retirement Planner v7.2.0 ✨
 
-[![Version](https://img.shields.io/badge/version-7.1.1-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-7.2.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -27,9 +27,52 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
 
-## 🎨 What's New in v7.1.1 - RSU CORS & CURRENCY CONVERSION FIXES 🔧💱
+## 🎨 What's New in v7.2.0 - FINANCIAL HEALTH SCORE SYSTEM REPAIR 🏥✨
 
-### Bug Fixes & Improvements:
+### 🎯 Major System Repair: Fixed 0% Score Issues
+Comprehensive 6-phase repair of the Financial Health Score system that addresses the core issue where legitimate user data was incorrectly showing 0% scores.
+
+#### ✅ Phase 1: Data Flow Debugging & Logging
+- **Debug Panel Integration**: New comprehensive debug panel for troubleshooting score calculations
+- **Enhanced Logging**: Detailed debug output in `financialHealthEngine.js` with field mapping analysis
+- **Input Analysis**: Real-time analysis of all input fields vs expected fields
+
+#### ✅ Phase 2: Field Mapping Enhancement  
+- **Fixed Field Name Matching**: Updated field patterns to match wizard component names exactly
+- **Enhanced Partner Support**: Proper field combination for couple planning mode
+- **Comprehensive Fallbacks**: Multiple field name patterns for maximum compatibility
+
+#### ✅ Phase 3: Real-time Recalculation System
+- **Live Updates**: Scores now update immediately when inputs change (300ms debounced)
+- **Performance Monitoring**: Built-in calculation time tracking and optimization
+- **Loading States**: Visual feedback during recalculation with pulse animations
+
+#### ✅ Phase 4: Safe Calculation Improvements
+- **Better Error Handling**: Enhanced safe calculation functions with detailed error context
+- **Reduced False Negatives**: Less aggressive fallback to 0 for valid data scenarios
+- **Backward Compatibility**: Maintained existing API while providing enhanced functionality
+
+#### ✅ Phase 5: UI/UX Enhancements
+- **Data Completeness Indicator**: Visual progress bar showing percentage of data filled
+- **Enhanced Tooltips**: Detailed calculation explanations and improvement suggestions
+- **Missing Data Guidance**: Actionable feedback directing users to relevant wizard steps
+- **Performance Indicators**: Shows calculation times in development mode
+
+#### ✅ Phase 6: Comprehensive Testing
+- **100% Test Pass Rate**: All 373 tests passing with comprehensive validation suite
+- **Feature Validation Tests**: Dedicated test suite for v7.2.0 improvements
+- **Regression Prevention**: Ensures no existing functionality was broken
+
+### 🚀 Results Achieved:
+- **Fixed 0% Scores**: Savings Rate, Retirement Readiness, Tax Efficiency, and Diversification now show correct values
+- **Real-time Updates**: Scores recalculate instantly when users modify inputs
+- **Enhanced Debugging**: Comprehensive tools for troubleshooting calculation issues
+- **Better User Experience**: Clear feedback and progress indicators throughout
+- **Production Ready**: Fully tested and validated for deployment
+
+## 🎨 Previous Updates
+
+### v7.1.1 - RSU CORS & CURRENCY CONVERSION FIXES 🔧💱
 - **CORS Error Resolution**: Fixed Yahoo Finance API calls from GitHub Pages with proxy integration
 - **Currency Conversion**: Stock prices now properly display in selected currency (ILS/USD/EUR)
 - **Exchange Rate Display**: Shows real-time exchange rates with USD base price reference

@@ -1019,82 +1019,18 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         createElement('div', { key: 'partner-rsu' }, [
                             createElement('label', { 
                                 key: 'partner-rsu-label',
-                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                                className: "block text-sm font-medium text-gray-700 mb-3" 
                             }, language === 'he' ? 'מניות RSU בן/בת זוג' : 'Partner RSU Stock Options'),
                             
-                            // Partner RSU Company Input (simplified for partner)
-                            createElement('input', {
-                                key: 'partner-rsu-company',
-                                type: 'text',
-                                value: inputs.partnerRsuCompany || '',
-                                onChange: (e) => setInputs({...inputs, partnerRsuCompany: e.target.value.toUpperCase()}),
-                                placeholder: language === 'he' ? "סמל מניה (למשל AAPL)" : "Stock Symbol (e.g. AAPL)",
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 mb-2"
-                            }),
-                            
-                            // Partner RSU Details
-                            createElement('div', { key: 'partner-rsu-details', className: "grid grid-cols-3 gap-2" }, [
-                                createElement('input', {
-                                    key: 'partner-rsu-units',
-                                    type: 'number',
-                                    value: inputs.partnerRsuUnits || 0,
-                                    onChange: (e) => {
-                                        const units = parseInt(e.target.value) || 0;
-                                        if (inputs.partnerRsuCurrentStockPrice) {
-                                            const frequency = inputs.partnerRsuFrequency || 'quarterly';
-                                            let annualValue = 0;
-                                            if (frequency === 'monthly') {
-                                                annualValue = units * inputs.partnerRsuCurrentStockPrice * 12;
-                                            } else if (frequency === 'quarterly') {
-                                                annualValue = units * inputs.partnerRsuCurrentStockPrice * 4;
-                                            } else if (frequency === 'yearly') {
-                                                annualValue = units * inputs.partnerRsuCurrentStockPrice;
-                                            }
-                                            const quarterlyValue = annualValue / 4;
-                                            setInputs(prev => ({...prev, partnerRsuUnits: units, partnerQuarterlyRSU: quarterlyValue}));
-                                        } else {
-                                            setInputs({...inputs, partnerRsuUnits: units});
-                                        }
-                                    },
-                                    placeholder: language === 'he' ? "יחידות" : "Units",
-                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                                }),
-                                createElement('input', {
-                                    key: 'partner-rsu-price',
-                                    type: 'number',
-                                    value: inputs.partnerRsuCurrentStockPrice || '',
-                                    onChange: (e) => {
-                                        const price = parseFloat(e.target.value) || 0;
-                                        setInputs({...inputs, partnerRsuCurrentStockPrice: price});
-                                        // Recalculate quarterlyRSU
-                                        if (inputs.partnerRsuUnits && price) {
-                                            const frequency = inputs.partnerRsuFrequency || 'quarterly';
-                                            let annualValue = 0;
-                                            if (frequency === 'monthly') {
-                                                annualValue = inputs.partnerRsuUnits * price * 12;
-                                            } else if (frequency === 'quarterly') {
-                                                annualValue = inputs.partnerRsuUnits * price * 4;
-                                            } else if (frequency === 'yearly') {
-                                                annualValue = inputs.partnerRsuUnits * price;
-                                            }
-                                            const quarterlyValue = annualValue / 4;
-                                            setInputs(prev => ({...prev, partnerRsuCurrentStockPrice: price, partnerQuarterlyRSU: quarterlyValue}));
-                                        }
-                                    },
-                                    placeholder: language === 'he' ? `מחיר (${currencySymbol})` : `Price (${currencySymbol})`,
-                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                                }),
-                                createElement('select', {
-                                    key: 'partner-rsu-frequency',
-                                    value: inputs.partnerRsuFrequency || 'quarterly',
-                                    onChange: (e) => setInputs({...inputs, partnerRsuFrequency: e.target.value}),
-                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                                }, [
-                                    createElement('option', { key: 'monthly', value: 'monthly' }, t.monthly),
-                                    createElement('option', { key: 'quarterly', value: 'quarterly' }, t.quarterly),
-                                    createElement('option', { key: 'yearly', value: 'yearly' }, t.yearly)
-                                ])
-                            ])
+                            // Enhanced Partner RSU Selector
+                            window.PartnerRSUSelector && createElement(window.PartnerRSUSelector, {
+                                key: 'partner-rsu-selector',
+                                inputs: inputs,
+                                setInputs: setInputs,
+                                language: language,
+                                workingCurrency: workingCurrency,
+                                partnerKey: 'partner'
+                            })
                         ]),
                         createElement('div', { key: 'partner-other' }, [
                             createElement('label', { 

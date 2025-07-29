@@ -5,10 +5,16 @@
     'use strict';
 
     const FinancialHealthScoreEnhanced = ({ inputs, setInputs, language = 'en' }) => {
-        const { createElement, useState } = React;
+        const { createElement, useState, useEffect, useCallback } = React;
         
-        // State for missing data modal
+        // State for missing data modal, debug panel, and real-time updates
         const [isMissingDataModalOpen, setIsMissingDataModalOpen] = useState(false);
+        const [isDebugPanelOpen, setIsDebugPanelOpen] = useState(false);
+        const [isRecalculating, setIsRecalculating] = useState(false);
+        const [lastCalculationTime, setLastCalculationTime] = useState(Date.now());
+        
+        // Debounced recalculation state
+        const [debouncedInputs, setDebouncedInputs] = useState(inputs);
         
         // Translations
         const content = {
@@ -52,10 +58,16 @@
                 missingData: 'Missing data',
                 checkInputs: 'Please check your inputs',
                 whyZeroScore: 'Why is this score 0?',
+                debugPanel: 'Debug Panel',
+                openDebug: 'Open Debug Analysis',
                 noIncomeFound: 'No monthly income data found',
                 noContributionsFound: 'No contribution rates found',
                 addSalaryData: 'Add salary information in Step 2',
-                addContributionData: 'Add contribution rates in Step 4'
+                addContributionData: 'Add contribution rates in Step 4',
+                quickFix: 'Quick Fix',
+                goToStep: 'Go to Step',
+                fillMissingData: 'Fill Missing Data',
+                dataCompleteness: 'Data Completeness'
             },
             he: {
                 financialHealthScore: 'ציון הבריאות הפיננסית',
@@ -100,27 +112,92 @@
                 noIncomeFound: 'לא נמצאו נתוני הכנסה חודשית',
                 noContributionsFound: 'לא נמצאו שיעורי הפקדה',
                 addSalaryData: 'הוסף מידע על שכר בשלב 2',
-                addContributionData: 'הוסף שיעורי הפקדה בשלב 4'
+                addContributionData: 'הוסף שיעורי הפקדה בשלב 4',
+                quickFix: 'תיקון מהיר',
+                goToStep: 'עבור לשלב',
+                fillMissingData: 'השלם נתונים חסרים',
+                dataCompleteness: 'שלמות נתונים'
             }
         };
 
         const t = content[language] || content.en;
+        
+        // Debounced input update effect - prevents excessive recalculations
+        useEffect(() => {
+            const debounceTimer = setTimeout(() => {
+                setDebouncedInputs(inputs);
+                setIsRecalculating(false);
+            }, 300); // 300ms debounce
+            
+            setIsRecalculating(true);
+            
+            return () => clearTimeout(debounceTimer);
+        }, [inputs]);
+        
+        // Performance monitoring effect
+        useEffect(() => {
+            const startTime = Date.now();
+            
+            return () => {
+                const calculationTime = Date.now() - startTime;
+                setLastCalculationTime(calculationTime);
+                
+                if (calculationTime > 500) {
+                    console.warn(`⚠️ Financial Health Score calculation took ${calculationTime}ms (> 500ms threshold)`);
+                } else {
+                    console.log(`✅ Financial Health Score calculated in ${calculationTime}ms`);
+                }
+            };
+        }, [debouncedInputs]);
+        
+        // Memoized calculation function to prevent unnecessary recalculations
+        const calculateHealthScore = useCallback(() => {
+            if (!window.calculateFinancialHealthScore) {
+                console.warn('❌ Financial Health Engine not available');
+                return null;
+            }
+            
+            const startTime = performance.now();
+            
+            // Use debounced inputs for calculation
+            const processedInputs = debouncedInputs.planningType === 'couple' && window.getFieldValue ? 
+                {
+                    ...debouncedInputs,
+                    currentSalary: window.getFieldValue(debouncedInputs, ['currentSalary'], { combinePartners: true }),
+                    monthlyExpenses: window.getFieldValue(debouncedInputs, ['currentMonthlyExpenses'], { combinePartners: true }),
+                    currentSavings: window.getFieldValue(debouncedInputs, ['currentSavings'], { combinePartners: true })
+                } : debouncedInputs;
+            
+            const result = window.calculateFinancialHealthScore(processedInputs, { 
+                combinePartners: debouncedInputs.planningType === 'couple',
+                debugMode: true 
+            });
+            
+            const endTime = performance.now();
+            const calculationTime = Math.round(endTime - startTime);
+            
+            console.log(`🏥 Financial Health Score recalculated in ${calculationTime}ms`);
+            
+            return result;
+        }, [debouncedInputs]);
+        
+        // Calculate health report using memoized function
+        const healthReport = calculateHealthScore();
+        
+        // Calculate data completeness percentage
+        const calculateDataCompleteness = useCallback(() => {
+            if (!healthReport || !healthReport.factors) return 0;
+            
+            const totalFactors = Object.keys(healthReport.factors).length;
+            const factorsWithData = Object.values(healthReport.factors).filter(f => f.score > 0).length;
+            
+            return totalFactors > 0 ? Math.round((factorsWithData / totalFactors) * 100) : 0;
+        }, [healthReport]);
+        
+        const dataCompleteness = calculateDataCompleteness();
 
         // Use comprehensive Financial Health Engine with couple mode support
-        // First, use field mapping engine to get the proper field values for couple mode
-        const processedInputs = inputs.planningType === 'couple' && window.getFieldValue ? 
-            {
-                ...inputs,
-                currentSalary: window.getFieldValue(inputs, ['currentSalary'], { combinePartners: true }),
-                monthlyExpenses: window.getFieldValue(inputs, ['currentMonthlyExpenses'], { combinePartners: true }),
-                currentSavings: window.getFieldValue(inputs, ['currentSavings'], { combinePartners: true })
-            } : inputs;
-
-        const healthReport = window.calculateFinancialHealthScore ? 
-            window.calculateFinancialHealthScore(processedInputs, { 
-                combinePartners: inputs.planningType === 'couple',
-                debugMode: true 
-            }) : null;
+        // Calculation is now handled by the memoized calculateHealthScore function above
 
         const getScoreColor = (score) => {
             if (score >= 85) return 'green';
@@ -298,6 +375,24 @@
             ]);
         };
 
+        // Show loading state during recalculation
+        if (isRecalculating) {
+            return createElement('div', {
+                className: "bg-white rounded-xl p-6 border border-gray-200 animate-pulse"
+            }, [
+                createElement('div', { key: 'loading-header', className: "flex items-center justify-center mb-4" }, [
+                    createElement('div', { key: 'spinner', className: "animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mr-3" }),
+                    createElement('span', { key: 'text', className: "text-gray-600" }, 
+                        language === 'he' ? 'מחשב ציון בריאות פיננסית...' : 'Calculating financial health score...')
+                ]),
+                createElement('div', { key: 'loading-skeleton', className: "space-y-3" }, [
+                    createElement('div', { key: 'skeleton-1', className: "h-4 bg-gray-200 rounded w-3/4" }),
+                    createElement('div', { key: 'skeleton-2', className: "h-4 bg-gray-200 rounded w-1/2" }),
+                    createElement('div', { key: 'skeleton-3', className: "h-4 bg-gray-200 rounded w-2/3" })
+                ])
+            ]);
+        }
+        
         if (!healthReport || healthReport.status === 'error') {
             return createElement('div', {
                 className: "bg-red-50 rounded-lg p-4 text-red-700"
@@ -368,6 +463,32 @@
                 }, t.scoreComposition)
             ]),
 
+            // Data Completeness Indicator
+            createElement('div', {
+                key: 'data-completeness',
+                className: "bg-blue-50 rounded-lg p-3 mb-4 border border-blue-200"
+            }, [
+                createElement('div', { key: 'completeness-header', className: "flex items-center justify-between mb-2" }, [
+                    createElement('span', { key: 'title', className: "text-sm font-medium text-blue-800" }, 
+                        `📊 ${t.dataCompleteness}`),
+                    createElement('span', { key: 'percentage', className: "text-sm font-bold text-blue-900" }, 
+                        `${dataCompleteness}%`)
+                ]),
+                createElement('div', { key: 'progress-bar', className: "w-full bg-blue-200 rounded-full h-2" }, [
+                    createElement('div', {
+                        key: 'progress-fill',
+                        className: `bg-blue-600 h-2 rounded-full transition-all duration-500`,
+                        style: { width: `${dataCompleteness}%` }
+                    })
+                ]),
+                dataCompleteness < 100 && createElement('p', { 
+                    key: 'completeness-tip', 
+                    className: "text-xs text-blue-700 mt-2" 
+                }, language === 'he' ? 
+                    `השלמת ${100 - dataCompleteness}% נתונים נוספים תשפר את דיוק הציון` :
+                    `Adding ${100 - dataCompleteness}% more data will improve score accuracy`)
+            ]),
+            
             // Overall score display
             createElement('div', {
                 key: 'overall-score',
@@ -384,8 +505,8 @@
                     }, getScoreLabel(healthReport.totalScore))
                 ]),
                 
-                // View Details Button
-                createElement('div', { key: 'details-button-container', className: "text-center mt-4" }, [
+                // View Details & Debug Buttons
+                createElement('div', { key: 'details-button-container', className: "text-center mt-4 space-x-4" }, [
                     createElement('button', {
                         key: 'view-details',
                         className: "text-blue-600 hover:text-blue-800 text-sm font-medium underline transition-colors",
@@ -395,7 +516,15 @@
                                 detailsPanel.style.display = detailsPanel.style.display === 'none' ? 'block' : 'none';
                             }
                         }
-                    }, t.viewDetails)
+                    }, t.viewDetails),
+                    
+                    // Debug Panel Button
+                    createElement('button', {
+                        key: 'debug-button',
+                        className: "px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded border transition-colors",
+                        onClick: () => setIsDebugPanelOpen(true),
+                        title: 'Open diagnostic panel to troubleshoot score calculation issues'
+                    }, `🔧 ${t.debugPanel}`)
                 ])
             ]),
 
@@ -605,7 +734,36 @@
                 },
                 language: language,
                 healthReport: healthReport
-            })
+            }),
+            
+            // Debug Panel
+            window.FinancialHealthDebugPanel && createElement(window.FinancialHealthDebugPanel, {
+                key: 'debug-panel',
+                isOpen: isDebugPanelOpen,
+                onClose: () => setIsDebugPanelOpen(false),
+                inputs: inputs,
+                language: language
+            }),
+            
+            // Performance Indicator (only shown in development or when slow)
+            (lastCalculationTime > 200 || window.location.hostname === 'localhost') && 
+            createElement('div', {
+                key: 'performance-indicator',
+                className: "mt-2 text-xs text-gray-500 text-center"
+            }, [
+                createElement('span', { key: 'calc-time' }, 
+                    language === 'he' ? 
+                        `חישוב בוצע ב-${lastCalculationTime}ms` :
+                        `Calculated in ${lastCalculationTime}ms`),
+                lastCalculationTime > 500 && createElement('span', { 
+                    key: 'slow-warning', 
+                    className: "ml-2 text-amber-600" 
+                }, '⚠️'),
+                isRecalculating && createElement('span', { 
+                    key: 'recalc-indicator', 
+                    className: "ml-2 text-blue-600" 
+                }, '🔄')
+            ])
         ]);
     };
 

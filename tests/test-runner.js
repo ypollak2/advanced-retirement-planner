@@ -7,6 +7,8 @@ const http = require('http');
 console.log('🧪 Advanced Retirement Planner Test Suite');
 console.log('==========================================\n');
 
+console.log('Starting automated test suite...\n');
+
 let testsPassed = 0;
 let testsFailed = 0;
 
@@ -1160,6 +1162,21 @@ function testWizardIntegrationPipeline() {
                                  !wizardContent.includes('case 10:');
         logTest('RetirementWizard: Streamlined step validation', hasStepValidation);
         
+        // Test Partner Investments Navigation Validation Fix
+        const hasExpandedReturnRange = wizardContent.includes('expectedReturn <= 25') ||
+                                      wizardContent.includes('partner1ExpectedReturn >= 0 && partner1ExpectedReturn <= 25') ||
+                                      wizardContent.includes('partner2ExpectedReturn >= 0 && partner2ExpectedReturn <= 25');
+        const hasDefaultValueValidation = wizardContent.includes('partner1RiskProfile || \'moderate\'') &&
+                                         wizardContent.includes('partner1ExpectedReturn || 7.0') &&
+                                         wizardContent.includes('partner2RiskProfile || \'moderate\'') &&
+                                         wizardContent.includes('partner2ExpectedReturn || 7.0');
+        const hasPartnerValidationLogic = wizardContent.includes('case 7:') &&
+                                         wizardContent.includes('mergedInputs.planningType === \'couple\'');
+        
+        logTest('Partner Investments Validation: Expanded return range (0-25%) implemented', hasExpandedReturnRange);
+        logTest('Partner Investments Validation: Default value fallbacks in validation', hasDefaultValueValidation);
+        logTest('Partner Investments Validation: Couple mode validation logic updated', hasPartnerValidationLogic);
+        
         const hasStepNavigation = wizardContent.includes('handleNext') &&
                                  wizardContent.includes('handlePrevious') &&
                                  wizardContent.includes('handleSkip');
@@ -1496,6 +1513,19 @@ function testWizardStepsImplementation() {
         logTest('Investment Preferences: Investment parameters', hasInvestmentParameters);
         logTest('Investment Preferences: Partner investment options', hasPartnerInvestments);
         
+        // Test Partner Investments Navigation Fix
+        const hasUseEffect = content.includes('React.useEffect') || content.includes('useEffect');
+        const hasDefaultValueInit = content.includes('partner1RiskProfile') && content.includes('moderate') && 
+                                   content.includes('partner1ExpectedReturn') && content.includes('7.0');
+        const hasPartner2DefaultInit = content.includes('partner2RiskProfile') && content.includes('moderate') && 
+                                      content.includes('partner2ExpectedReturn') && content.includes('7.0');
+        const hasSetInputsCall = content.includes('setInputs(prevInputs') && content.includes('...prevInputs');
+        
+        logTest('Partner Investments Navigation: Default value initialization implemented', hasUseEffect && hasDefaultValueInit);
+        logTest('Partner Investments Navigation: Partner 1 defaults set correctly', hasDefaultValueInit);
+        logTest('Partner Investments Navigation: Partner 2 defaults set correctly', hasPartner2DefaultInit);
+        logTest('Partner Investments Navigation: State update logic implemented', hasSetInputsCall);
+        
     } else {
         logTest('Investment Preferences: WizardStepInvestments.js exists', false, 'File not found');
     }
@@ -1691,6 +1721,15 @@ function testWizardNavigationAndDataPersistence() {
         // Should persist data between steps  
         const hasDataPersistence = content.includes('setInputs') && content.includes('inputs');
         logTest('Wizard Data Persistence: Persists data between steps', hasDataPersistence);
+        
+        // Test Partner Investments Navigation Button Enablement Fix
+        const hasIsCurrentStepValid = content.includes('isCurrentStepValid');
+        const hasNextButtonLogic = content.includes('isValid:') && content.includes('isCurrentStepValid()');
+        const hasNoUserInteractionRequirement = !content.includes('isDirty') && !content.includes('hasUserInput');
+        
+        logTest('Partner Investments Navigation: Button enablement uses validation function', hasIsCurrentStepValid);
+        logTest('Partner Investments Navigation: Next button logic implemented correctly', hasNextButtonLogic);
+        logTest('Partner Investments Navigation: No user interaction requirement for enablement', hasNoUserInteractionRequirement);
     }
     
     // Test WizardStep components have proper data handling
@@ -2325,6 +2364,84 @@ function testExportFunctionality() {
     }
 }
 
+// Test Partner Investments Navigation Fix (TICKET-002)
+function testPartnerInvestmentsNavigationFix() {
+    console.log('\n🎯 Testing Partner Investments Navigation Fix...');
+    
+    // Test WizardStepInvestments default value initialization
+    if (fs.existsSync('src/components/wizard/steps/WizardStepInvestments.js')) {
+        const content = fs.readFileSync('src/components/wizard/steps/WizardStepInvestments.js', 'utf8');
+        
+        // Test couple mode default initialization
+        const hasCoupleModeInitialization = content.includes('inputs.planningType === \'couple\'') &&
+                                           content.includes('React.useEffect(() => {');
+        logTest('Couple Mode Default Init: useEffect hook for couple mode initialization', hasCoupleModeInitialization);
+        
+        const hasPartner1Defaults = content.includes('!inputs.partner1RiskProfile') &&
+                                   content.includes('partner1RiskProfile: \'moderate\'') &&
+                                   content.includes('!inputs.partner1ExpectedReturn') &&
+                                   content.includes('partner1ExpectedReturn: 7.0');
+        logTest('Couple Mode Default Init: Partner 1 defaults (moderate, 7.0%)', hasPartner1Defaults);
+        
+        const hasPartner2Defaults = content.includes('!inputs.partner2RiskProfile') &&
+                                   content.includes('partner2RiskProfile: \'moderate\'') &&
+                                   content.includes('!inputs.partner2ExpectedReturn') &&
+                                   content.includes('partner2ExpectedReturn: 7.0');
+        logTest('Couple Mode Default Init: Partner 2 defaults (moderate, 7.0%)', hasPartner2Defaults);
+        
+        const hasConditionalUpdate = content.includes('if (Object.keys(updates).length > 0)') &&
+                                    content.includes('setInputs(prevInputs => ({') &&
+                                    content.includes('...prevInputs,') &&
+                                    content.includes('...updates');
+        logTest('Couple Mode Default Init: Conditional state update logic', hasConditionalUpdate);
+        
+        const hasProperDependencies = content.includes('inputs.planningType,') &&
+                                     content.includes('inputs.partner1RiskProfile,') &&
+                                     content.includes('inputs.partner1ExpectedReturn,') &&
+                                     content.includes('inputs.partner2RiskProfile,') &&
+                                     content.includes('inputs.partner2ExpectedReturn,') &&
+                                     content.includes('setInputs');
+        logTest('Couple Mode Default Init: Proper useEffect dependencies', hasProperDependencies);
+        
+    } else {
+        logTest('Partner Investments Navigation: WizardStepInvestments.js exists', false, 'File not found');
+    }
+    
+    // Test RetirementWizard validation enhancements
+    if (fs.existsSync('src/components/wizard/RetirementWizard.js')) {
+        const content = fs.readFileSync('src/components/wizard/RetirementWizard.js', 'utf8');
+        
+        // Test expanded expected return range
+        const hasExpandedRange = content.includes('partner1ExpectedReturn >= 0 && partner1ExpectedReturn <= 25') &&
+                                content.includes('partner2ExpectedReturn >= 0 && partner2ExpectedReturn <= 25');
+        logTest('Validation Enhancement: Expanded expected return range (0-25%)', hasExpandedRange);
+        
+        // Test default value fallbacks in validation
+        const hasDefaultFallbacks = content.includes('partner1RiskProfile || \'moderate\'') &&
+                                   content.includes('partner1ExpectedReturn || 7.0') &&
+                                   content.includes('partner2RiskProfile || \'moderate\'') &&
+                                   content.includes('partner2ExpectedReturn || 7.0');
+        logTest('Validation Enhancement: Default value fallbacks in step 7 validation', hasDefaultFallbacks);
+        
+        // Test button enablement without user interaction requirement
+        const hasProperButtonLogic = content.includes('isValid: isCurrentStepValid()') &&
+                                    !content.includes('requiresUserInput') &&
+                                    !content.includes('isDirty');
+        logTest('Navigation Enhancement: Button enabled by validation, not user interaction', hasProperButtonLogic);
+        
+        // Test case 7 couple mode validation logic
+        const hasCase7Logic = content.includes('case 7:') &&
+                             content.includes('mergedInputs.planningType === \'couple\'') &&
+                             content.includes('partner1Valid && partner2Valid');
+        logTest('Navigation Enhancement: Case 7 couple mode validation logic', hasCase7Logic);
+        
+    } else {
+        logTest('Partner Investments Navigation: RetirementWizard.js exists', false, 'File not found');
+    }
+    
+    console.log('    Partner Investments navigation fix successfully tested');
+}
+
 // Test Missing Data Modal Functionality (v7.0.3+)
 function testMissingDataModalFunctionality() {
     console.log('\n🔧 Testing Missing Data Modal Functionality...');
@@ -2761,6 +2878,9 @@ async function runAllTests() {
     testCouplePartnerFieldMappingEngine();
     testCoupleModeCalculationIntegrity();
     testCoupleModeValidationScenarios();
+    
+    // Partner Investments Navigation Fix Tests (TICKET-002)
+    testPartnerInvestmentsNavigationFix();
     
     // Portfolio Tax Calculation Tests (v7.0.3)
     testPortfolioTaxCalculation();

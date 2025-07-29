@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Health Score v7.2.0 Feature Validation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #4CAF50, #2196F3);
+            color: white;
+            border-radius: 8px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .test-results {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            background: #1e1e1e;
+            color: #ffffff;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+        .info { color: #2196F3; }
+        .button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .status-indicator {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 10px 5px;
+            display: inline-block;
+        }
+        .status-ready { background: #e8f5e8; color: #2e7d32; }
+        .status-loading { background: #e3f2fd; color: #1565c0; }
+        .status-error { background: #ffebee; color: #c62828; }
+        .status-success { background: #e8f5e8; color: #2e7d32; }
+        .phase-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .phase-card {
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .phase-success { border-color: #4CAF50; }
+        .phase-warning { border-color: #ff9800; }
+        .phase-error { border-color: #f44336; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Financial Health Score v7.2.0</h1>
+            <h2>Feature Validation Suite</h2>
+            <p>TICKET-004: Financial Health Score System Repair - Production Readiness Test</p>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Validation Overview</h3>
+            <p>This validation suite tests all 6 phases of the Financial Health Score improvements:</p>
+            <ul>
+                <li><strong>Phase 1:</strong> Data Flow Debugging & Logging</li>
+                <li><strong>Phase 2:</strong> Field Mapping Enhancement</li>
+                <li><strong>Phase 3:</strong> Real-time Recalculation System</li>
+                <li><strong>Phase 4:</strong> Safe Calculation Improvements</li>
+                <li><strong>Phase 5:</strong> UI/UX Enhancements</li>
+                <li><strong>Phase 6:</strong> Comprehensive Testing</li>
+            </ul>
+            <p><strong>Core Issue:</strong> Validates that 0% scores are fixed and Financial Health Score works correctly.</p>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Test Controls</h3>
+            <button id="loadDependencies" class="button">Load Dependencies</button>
+            <button id="runValidation" class="button" disabled>Run Full Validation</button>
+            <button id="runCoreTests" class="button" disabled>Test Core Fixes Only</button>
+            <button id="clearResults" class="button">Clear Results</button>
+            
+            <div id="status" class="status-indicator status-ready">Ready to Load Dependencies</div>
+        </div>
+
+        <div id="phaseSummary" class="phase-summary" style="display: none;"></div>
+
+        <div class="test-section">
+            <h3>📊 Test Results</h3>
+            <div id="testResults" class="test-results">
+                <div class="info">Click "Load Dependencies" to begin testing...</div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Manual Verification Checklist</h3>
+            <div id="manualChecklist">
+                <h4>After validation passes, manually verify:</h4>
+                <ul>
+                    <li>✅ Open the main application and complete the wizard</li>
+                    <li>✅ Verify Financial Health Score shows non-zero values for all components</li>
+                    <li>✅ Test both Individual and Couple planning modes</li>
+                    <li>✅ Verify scores update in real-time when inputs change</li>
+                    <li>✅ Open Debug Panel and verify comprehensive logging</li>
+                    <li>✅ Test Data Completeness indicator shows correct percentage</li>
+                    <li>✅ Verify loading states appear during recalculation</li>
+                    <li>✅ Test mobile responsiveness of all new UI elements</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load React and dependencies -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- Load core application files -->
+    <script src="src/utils/retirementCalculations.js?v=7.2.0"></script>
+    <script src="src/utils/financialHealthEngine.js?v=7.2.0"></script>
+    <script src="src/components/shared/FinancialHealthScoreEnhanced.js?v=7.2.0"></script>
+    <script src="src/components/shared/FinancialHealthDebugPanel.js?v=7.2.0"></script>
+    
+    <!-- Load validation tests -->
+    <script src="tests/integration/financial-health-v7.2.0-validation.test.js?v=7.2.0"></script>
+
+    <script>
+        let validationSuite = null;
+        let dependenciesLoaded = false;
+
+        // UI Elements
+        const statusDiv = document.getElementById('status');
+        const resultsDiv = document.getElementById('testResults');
+        const phaseSummaryDiv = document.getElementById('phaseSummary');
+        const loadBtn = document.getElementById('loadDependencies');
+        const runBtn = document.getElementById('runValidation');
+        const coreBtn = document.getElementById('runCoreTests');
+        const clearBtn = document.getElementById('clearResults');
+
+        // Status management
+        function updateStatus(message, type = 'ready') {
+            statusDiv.textContent = message;
+            statusDiv.className = `status-indicator status-${type}`;
+        }
+
+        // Results logging
+        function logResult(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'info';
+            resultsDiv.innerHTML += `<div class="${colorClass}">[${timestamp}] ${message}</div>`;
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+
+        // Load dependencies
+        loadBtn.addEventListener('click', async () => {
+            updateStatus('Loading dependencies...', 'loading');
+            logResult('🔄 Starting dependency loading...', 'info');
+
+            try {
+                // Check if core functions are available
+                const requiredGlobals = [
+                    'calculateFinancialHealthScore',
+                    'FinancialHealthScoreEnhanced',
+                    'FinancialHealthDebugPanel',
+                    'FinancialHealthV720ValidationTests'
+                ];
+
+                const missing = requiredGlobals.filter(name => typeof window[name] === 'undefined');
+                
+                if (missing.length > 0) {
+                    throw new Error(`Missing required dependencies: ${missing.join(', ')}`);
+                }
+
+                validationSuite = window.FinancialHealthV720ValidationTests;
+                dependenciesLoaded = true;
+
+                logResult('✅ All dependencies loaded successfully', 'success');
+                logResult(`✅ Financial Health Engine: ${typeof window.calculateFinancialHealthScore}`, 'success');
+                logResult(`✅ Enhanced UI Component: ${typeof window.FinancialHealthScoreEnhanced}`, 'success');
+                logResult(`✅ Debug Panel: ${typeof window.FinancialHealthDebugPanel}`, 'success');
+                logResult(`✅ Validation Suite: ${typeof validationSuite}`, 'success');
+
+                updateStatus('Dependencies loaded - Ready for validation', 'success');
+                runBtn.disabled = false;
+                coreBtn.disabled = false;
+                loadBtn.disabled = true;
+
+            } catch (error) {
+                logResult(`❌ Failed to load dependencies: ${error.message}`, 'error');
+                updateStatus('Dependency loading failed', 'error');
+            }
+        });
+
+        // Run full validation
+        runBtn.addEventListener('click', () => {
+            if (!dependenciesLoaded) {
+                logResult('❌ Please load dependencies first', 'error');
+                return;
+            }
+
+            updateStatus('Running full validation...', 'loading');
+            runBtn.disabled = true;
+
+            setTimeout(() => {
+                try {
+                    logResult('🚀 Starting Financial Health Score v7.2.0 Full Validation...', 'info');
+                    const results = validationSuite.runAllValidations();
+                    
+                    displayPhaseSummary(results.phases);
+                    
+                    if (results.success) {
+                        updateStatus(`✅ All ${results.totalPassed} tests passed!`, 'success');
+                        logResult('🎉 VALIDATION COMPLETE: All features working correctly!', 'success');
+                        logResult('✅ Financial Health Score v7.2.0 is ready for production deployment', 'success');
+                    } else {
+                        updateStatus(`⚠️ ${results.totalFailed} tests failed`, 'warning');
+                        logResult(`⚠️ Validation completed with ${results.totalFailed} failures`, 'warning');
+                        logResult('❌ Please fix issues before production deployment', 'error');
+                    }
+
+                } catch (error) {
+                    logResult(`❌ Validation error: ${error.message}`, 'error');
+                    updateStatus('Validation failed', 'error');
+                } finally {
+                    runBtn.disabled = false;
+                }
+            }, 100);
+        });
+
+        // Run core tests only
+        coreBtn.addEventListener('click', () => {
+            if (!dependenciesLoaded) {
+                logResult('❌ Please load dependencies first', 'error');
+                return;
+            }
+
+            updateStatus('Testing core fixes...', 'loading');
+            coreBtn.disabled = true;
+
+            setTimeout(() => {
+                try {
+                    logResult('🎯 Testing Core Issue Fixes (0% scores)...', 'info');
+                    const results = validationSuite.validateCoreIssuesFixed();
+                    
+                    if (results.failed === 0) {
+                        updateStatus('✅ Core fixes verified!', 'success');
+                        logResult('🎉 CORE VALIDATION PASSED: 0% score issues are fixed!', 'success');
+                    } else {
+                        updateStatus('⚠️ Core tests failed', 'warning');
+                        logResult(`❌ ${results.failed} core tests failed`, 'error');
+                    }
+
+                } catch (error) {
+                    logResult(`❌ Core test error: ${error.message}`, 'error');
+                    updateStatus('Core testing failed', 'error');
+                } finally {
+                    coreBtn.disabled = false;
+                }
+            }, 100);
+        });
+
+        // Clear results
+        clearBtn.addEventListener('click', () => {
+            resultsDiv.innerHTML = '<div class="info">Results cleared. Ready for new tests...</div>';
+            phaseSummaryDiv.style.display = 'none';
+            updateStatus('Ready for testing', 'ready');
+        });
+
+        // Display phase summary
+        function displayPhaseSummary(phases) {
+            phaseSummaryDiv.innerHTML = '';
+            
+            phases.forEach(phase => {
+                const successRate = ((phase.passed / phase.total) * 100).toFixed(1);
+                const cardClass = phase.failed === 0 ? 'phase-success' : 
+                                 phase.passed > phase.failed ? 'phase-warning' : 'phase-error';
+                
+                const card = document.createElement('div');
+                card.className = `phase-card ${cardClass}`;
+                card.innerHTML = `
+                    <h4>${phase.phase}</h4>
+                    <div><strong>${phase.passed}/${phase.total}</strong> tests passed</div>
+                    <div>Success Rate: <strong>${successRate}%</strong></div>
+                `;
+                
+                phaseSummaryDiv.appendChild(card);
+            });
+            
+            phaseSummaryDiv.style.display = 'grid';
+        }
+
+        // Auto-load dependencies when page loads
+        window.addEventListener('load', () => {
+            logResult('🚀 Financial Health Score v7.2.0 Validation Suite ready', 'info');
+            logResult('📋 This suite validates TICKET-004 improvements', 'info');
+            logResult('🔧 Click "Load Dependencies" to begin testing', 'info');
+        });
+    </script>
+</body>
+</html>

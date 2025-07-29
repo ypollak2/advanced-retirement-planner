@@ -4,6 +4,27 @@
 const WizardStepInvestments = ({ inputs, setInputs, language = 'en', workingCurrency = 'ILS' }) => {
     const createElement = React.createElement;
     
+    // Initialize default values for partner investments if in couple mode
+    React.useEffect(() => {
+        if (inputs.planningType === 'couple') {
+            const updates = {
+                // Set default values if they don't exist
+                ...(!inputs.partner1RiskProfile && { partner1RiskProfile: 'moderate' }),
+                ...(!inputs.partner1ExpectedReturn && { partner1ExpectedReturn: 7.0 }),
+                ...(!inputs.partner2RiskProfile && { partner2RiskProfile: 'moderate' }),
+                ...(!inputs.partner2ExpectedReturn && { partner2ExpectedReturn: 7.0 })
+            };
+            
+            // Only update if we have changes to make
+            if (Object.keys(updates).length > 0) {
+                setInputs(prevInputs => ({
+                    ...prevInputs,
+                    ...updates
+                }));
+            }
+        }
+    }, [inputs.planningType, inputs.partner1RiskProfile, inputs.partner1ExpectedReturn, inputs.partner2RiskProfile, inputs.partner2ExpectedReturn, setInputs]);
+    
     // Multi-language content
     const content = {
         he: {
