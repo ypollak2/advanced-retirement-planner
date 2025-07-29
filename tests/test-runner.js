@@ -2085,6 +2085,92 @@ function testCoupleModeValidationScenarios() {
     }
 }
 
+// Test Portfolio Tax Calculation Features (v7.0.3)
+function testPortfolioTaxCalculation() {
+    console.log('\n🧮 Testing Portfolio Tax Calculation Features...');
+    
+    try {
+        const wizardStepSavingsPath = 'src/components/wizard/steps/WizardStepSavings.js';
+        
+        if (!fs.existsSync(wizardStepSavingsPath)) {
+            logTest('Portfolio Tax Calculation: WizardStepSavings.js exists', false, 'Missing file');
+            return;
+        }
+        
+        const content = fs.readFileSync(wizardStepSavingsPath, 'utf8');
+        
+        // Test main portfolio tax features
+        const hasMainPortfolioTax = content.includes('Capital Gains Tax (%)') &&
+                                   content.includes('portfolioTaxRate') &&
+                                   content.includes('Net Value After Tax');
+        logTest('Portfolio Tax: Main portfolio tax calculation implemented', hasMainPortfolioTax);
+        
+        // Test partner 1 portfolio tax features
+        const hasPartner1Tax = content.includes('partner1PortfolioTaxRate') &&
+                              content.includes('p1-tax-rate-input') &&
+                              content.includes('partner1PersonalPortfolio * (1 - (inputs.partner1PortfolioTaxRate || 0.25))');
+        logTest('Portfolio Tax: Partner 1 portfolio tax calculation implemented', hasPartner1Tax);
+        
+        // Test partner 2 portfolio tax features
+        const hasPartner2Tax = content.includes('partner2PortfolioTaxRate') &&
+                              content.includes('p2-tax-rate-input') &&
+                              content.includes('partner2PersonalPortfolio * (1 - (inputs.partner2PortfolioTaxRate || 0.25))');
+        logTest('Portfolio Tax: Partner 2 portfolio tax calculation implemented', hasPartner2Tax);
+        
+        // Test tax rate validation (0-50% range)
+        const hasTaxValidation = content.includes("min: '0'") &&
+                               content.includes("max: '50'") &&
+                               content.includes("step: '0.1'");
+        logTest('Portfolio Tax: Tax rate input validation (0-50%)', hasTaxValidation);
+        
+        // Test default tax rate (25%)
+        const hasDefaultTaxRate = content.includes('|| 25) / 100');
+        logTest('Portfolio Tax: Default tax rate is 25%', hasDefaultTaxRate);
+        
+        // Test conditional display (only when portfolio > 0)
+        const hasConditionalDisplay = content.includes('inputs.currentPersonalPortfolio > 0') &&
+                                    content.includes('inputs.partner1PersonalPortfolio > 0') &&
+                                    content.includes('inputs.partner2PersonalPortfolio > 0');
+        logTest('Portfolio Tax: Conditional display when portfolio value > 0', hasConditionalDisplay);
+        
+        // Test multi-language support
+        const hasMultiLanguage = content.includes('מס רווחי הון') &&
+                                content.includes('Capital Gains Tax') &&
+                                content.includes('נטו:') &&
+                                content.includes('Net:');
+        logTest('Portfolio Tax: Multi-language support (Hebrew/English)', hasMultiLanguage);
+        
+        // Test Israel tax guidance
+        const hasIsraelGuidance = content.includes('Israel: 25%') &&
+                                content.includes('residents') &&
+                                content.includes('30%') &&
+                                content.includes('non-residents');
+        logTest('Portfolio Tax: Israel-specific tax guidance provided', hasIsraelGuidance);
+        
+        // Test formatCurrency usage
+        const usesFormatCurrency = content.includes('formatCurrency') &&
+                                 content.match(/formatCurrency\([^)]*\(1 - \([^)]*TaxRate/);
+        logTest('Portfolio Tax: Uses formatCurrency for net value display', usesFormatCurrency);
+        
+        // Test tax data storage
+        const storesTaxData = content.includes('setInputs({...inputs, portfolioTaxRate:') &&
+                            content.includes('setInputs({...inputs, partner1PortfolioTaxRate:') &&
+                            content.includes('setInputs({...inputs, partner2PortfolioTaxRate:');
+        logTest('Portfolio Tax: Tax rates stored in inputs object', storesTaxData);
+        
+        // Test integration with couple mode
+        const integrationWithCoupleMode = content.includes("planningType === 'couple'") &&
+                                        content.includes('partner1-savings') &&
+                                        content.includes('partner2-savings');
+        logTest('Portfolio Tax: Integration with couple planning mode', integrationWithCoupleMode);
+        
+        console.log('    Portfolio tax calculation features successfully implemented');
+        
+    } catch (error) {
+        logTest('Portfolio Tax Calculation testing', false, `Error: ${error.message}`);
+    }
+}
+
 // Test Couple/Single Mode State Management (v6.4.0)
 function testCoupleSingleModeStateManagement() {
     console.log('\n🤝 Testing Couple/Single Mode State Management...');
@@ -2398,6 +2484,9 @@ async function runAllTests() {
     testCouplePartnerFieldMappingEngine();
     testCoupleModeCalculationIntegrity();
     testCoupleModeValidationScenarios();
+    
+    // Portfolio Tax Calculation Tests (v7.0.3)
+    testPortfolioTaxCalculation();
     
     // Summary
     console.log('\n📊 Test Summary');

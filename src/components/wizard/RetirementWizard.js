@@ -217,20 +217,25 @@ const RetirementWizard = ({
                        (inputs.currentTrainingFundSavings || 0) >= 0;
             
             case 4: 
+                // Current Savings validation - non-negative values
+                return (inputs.currentSavings || 0) >= 0 && 
+                       (inputs.currentTrainingFundSavings || 0) >= 0;
+            
+            case 5: 
                 // Contribution validation - reasonable percentage ranges
                 const pensionRate = inputs.pensionContributionRate || 0;
                 const trainingRate = inputs.trainingFundContributionRate || 0;
                 return pensionRate >= 0 && pensionRate <= 30 && 
                        trainingRate >= 0 && trainingRate <= 15;
             
-            case 5: 
+            case 6: 
                 // Fees validation - reasonable fee ranges
                 const contribFees = inputs.contributionFees || 0;
                 const accumFees = inputs.accumulationFees || 0;
                 return contribFees >= 0 && contribFees <= 5 && 
                        accumFees >= 0 && accumFees <= 3;
             
-            case 6: 
+            case 7: 
                 // Investment validation - reasonable return expectations
                 const expectedReturn = inputs.expectedReturn || 0;
                 const inflationRate = inputs.inflationRate || 0;
@@ -254,12 +259,12 @@ const RetirementWizard = ({
                 return expectedReturn >= 0 && expectedReturn <= 20 && 
                        inflationRate >= 0 && inflationRate <= 15;
             
-            case 7: 
+            case 8: 
                 // Goals validation - positive values
                 return (inputs.retirementGoal || 0) > 0 && 
                        (inputs.currentMonthlyExpenses || 0) > 0;
             
-            case 8: 
+            case 9: 
                 // Final review step - check if we have minimum required data
                 return inputs.currentAge && inputs.retirementAge && 
                        (inputs.currentMonthlySalary || inputs.partner1Salary || inputs.partner2Salary);

@@ -100,34 +100,111 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         const mappedInputs = {
             ...baseInputs,
             
-            // Salary field mapping - ensure currentMonthlySalary is available
-            currentMonthlySalary: inputs.currentMonthlySalary || 
-                                  inputs.monthlySalary || 
-                                  inputs.salary ||
-                                  inputs.monthlyIncome ||
-                                  inputs.currentSalary ||
-                                  // For couple mode, combine partner salaries if individual salary missing
-                                  (inputs.planningType === 'couple' && inputs.partner1Salary && inputs.partner2Salary ? 
-                                   (parseFloat(inputs.partner1Salary) || 0) + (parseFloat(inputs.partner2Salary) || 0) : 0),
+            // Enhanced salary field mapping with couple mode support
+            currentMonthlySalary: (() => {
+                // Try individual salary fields first
+                let salary = inputs.currentMonthlySalary || 
+                           inputs.monthlySalary || 
+                           inputs.salary ||
+                           inputs.monthlyIncome ||
+                           inputs.currentSalary ||
+                           0;
+                
+                // For couple mode, combine partner salaries if individual salary is missing or zero
+                if (inputs.planningType === 'couple' && salary === 0) {
+                    const partner1 = parseFloat(inputs.partner1Salary) || 0;
+                    const partner2 = parseFloat(inputs.partner2Salary) || 0;
+                    
+                    if (partner1 > 0 || partner2 > 0) {
+                        salary = partner1 + partner2;
+                        console.log('🤝 Couple mode: Combined partner salaries', { partner1, partner2, combined: salary });
+                    }
+                }
+                
+                return salary;
+            })(),
             
-            // Contribution rate field mapping
-            pensionContributionRate: inputs.pensionContributionRate || 
-                                   inputs.pensionEmployeeRate ||
-                                   inputs.pensionEmployee ||
-                                   inputs.employeePensionRate ||
-                                   0,
+            // Enhanced contribution rate field mapping with couple mode support
+            pensionContributionRate: (() => {
+                let rate = inputs.pensionContributionRate || 
+                          inputs.pensionEmployeeRate ||
+                          inputs.pensionEmployee ||
+                          inputs.employeePensionRate ||
+                          0;
+                
+                // For couple mode, use individual rates or combine if needed
+                if (inputs.planningType === 'couple' && rate === 0) {
+                    const partner1Rate = parseFloat(inputs.partner1PensionRate) || 0;
+                    const partner2Rate = parseFloat(inputs.partner2PensionRate) || 0;
+                    
+                    if (partner1Rate > 0 || partner2Rate > 0) {
+                        // Use weighted average based on salaries, or simple average if no salary data
+                        const partner1Salary = parseFloat(inputs.partner1Salary) || 0;
+                        const partner2Salary = parseFloat(inputs.partner2Salary) || 0;
+                        const totalSalary = partner1Salary + partner2Salary;
+                        
+                        if (totalSalary > 0) {
+                            rate = ((partner1Rate * partner1Salary) + (partner2Rate * partner2Salary)) / totalSalary;
+                        } else {
+                            rate = (partner1Rate + partner2Rate) / 2;
+                        }
+                        console.log('🤝 Couple mode: Combined pension rates', { partner1Rate, partner2Rate, combined: rate });
+                    }
+                }
+                
+                return rate;
+            })(),
             
-            trainingFundContributionRate: inputs.trainingFundContributionRate ||
-                                        inputs.trainingFundEmployeeRate ||
-                                        inputs.trainingFundEmployee ||
-                                        inputs.employeeTrainingFundRate ||
-                                        0,
+            trainingFundContributionRate: (() => {
+                let rate = inputs.trainingFundContributionRate ||
+                          inputs.trainingFundEmployeeRate ||
+                          inputs.trainingFundEmployee ||
+                          inputs.employeeTrainingFundRate ||
+                          0;
+                
+                // For couple mode, use individual rates or combine if needed
+                if (inputs.planningType === 'couple' && rate === 0) {
+                    const partner1Rate = parseFloat(inputs.partner1TrainingFundRate) || 0;
+                    const partner2Rate = parseFloat(inputs.partner2TrainingFundRate) || 0;
+                    
+                    if (partner1Rate > 0 || partner2Rate > 0) {
+                        // Use weighted average based on salaries, or simple average if no salary data
+                        const partner1Salary = parseFloat(inputs.partner1Salary) || 0;
+                        const partner2Salary = parseFloat(inputs.partner2Salary) || 0;
+                        const totalSalary = partner1Salary + partner2Salary;
+                        
+                        if (totalSalary > 0) {
+                            rate = ((partner1Rate * partner1Salary) + (partner2Rate * partner2Salary)) / totalSalary;
+                        } else {
+                            rate = (partner1Rate + partner2Rate) / 2;
+                        }
+                        console.log('🤝 Couple mode: Combined training fund rates', { partner1Rate, partner2Rate, combined: rate });
+                    }
+                }
+                
+                return rate;
+            })(),
                                         
-            // Emergency Fund mapping
-            emergencyFund: inputs.emergencyFund ||
+            // Enhanced Emergency Fund mapping with couple mode support
+            emergencyFund: (() => {
+                let fund = inputs.emergencyFund ||
                           inputs.emergencyFundAmount ||
                           inputs.currentEmergencyFund ||
-                          0,
+                          0;
+                
+                // For couple mode, combine partner emergency funds if main fund is missing
+                if (inputs.planningType === 'couple' && fund === 0) {
+                    const partner1Fund = parseFloat(inputs.partner1EmergencyFund) || 0;
+                    const partner2Fund = parseFloat(inputs.partner2EmergencyFund) || 0;
+                    
+                    if (partner1Fund > 0 || partner2Fund > 0) {
+                        fund = partner1Fund + partner2Fund;
+                        console.log('🤝 Couple mode: Combined emergency funds', { partner1Fund, partner2Fund, combined: fund });
+                    }
+                }
+                
+                return fund;
+            })(),
                           
             // Risk alignment mapping
             riskTolerance: inputs.riskTolerance || 
@@ -146,14 +223,60 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                      inputs.currentMonthlyExpenses ||
                      {},
                      
-            // Monthly expenses for emergency fund calculation
-            currentMonthlyExpenses: inputs.currentMonthlyExpenses ||
-                                  inputs.monthlyExpenses ||
-                                  inputs.totalMonthlyExpenses ||
-                                  0
+            // Enhanced monthly expenses mapping with couple mode support
+            currentMonthlyExpenses: (() => {
+                let expenses = inputs.currentMonthlyExpenses ||
+                              inputs.monthlyExpenses ||
+                              inputs.totalMonthlyExpenses ||
+                              0;
+                
+                // For couple mode, combine partner expenses if main expenses are missing
+                if (inputs.planningType === 'couple' && expenses === 0) {
+                    const partner1Expenses = parseFloat(inputs.partner1MonthlyExpenses) || 0;
+                    const partner2Expenses = parseFloat(inputs.partner2MonthlyExpenses) || 0;
+                    const sharedExpenses = parseFloat(inputs.sharedMonthlyExpenses) || 0;
+                    
+                    if (partner1Expenses > 0 || partner2Expenses > 0 || sharedExpenses > 0) {
+                        expenses = partner1Expenses + partner2Expenses + sharedExpenses;
+                        console.log('🤝 Couple mode: Combined monthly expenses', { 
+                            partner1Expenses, 
+                            partner2Expenses, 
+                            sharedExpenses, 
+                            combined: expenses 
+                        });
+                    }
+                }
+                
+                return expenses;
+            })()
         };
         
-        console.log('🔧 WizardStepReview - Processed inputs for Financial Health Score:', {
+        // Enhanced validation and logging for couple mode
+        const dataValidation = {
+            criticalFields: {
+                currentMonthlySalary: mappedInputs.currentMonthlySalary > 0,
+                pensionContributionRate: mappedInputs.pensionContributionRate >= 0,
+                trainingFundContributionRate: mappedInputs.trainingFundContributionRate >= 0,
+                emergencyFund: mappedInputs.emergencyFund >= 0,
+                currentMonthlyExpenses: mappedInputs.currentMonthlyExpenses >= 0
+            },
+            missingFields: [],
+            coupleDataStatus: inputs.planningType === 'couple' ? {
+                hasPartner1Data: !!(inputs.partner1Salary || inputs.partner1PensionRate),
+                hasPartner2Data: !!(inputs.partner2Salary || inputs.partner2PensionRate),
+                hasCombinedData: mappedInputs.currentMonthlySalary > 0
+            } : null
+        };
+        
+        // Identify missing critical fields
+        Object.keys(dataValidation.criticalFields).forEach(field => {
+            if (!dataValidation.criticalFields[field]) {
+                dataValidation.missingFields.push(field);
+            }
+        });
+        
+        console.log('🔧 WizardStepReview - Enhanced Financial Health Score inputs:', {
+            planningType: inputs.planningType || 'individual',
             currentMonthlySalary: mappedInputs.currentMonthlySalary,
             pensionContributionRate: mappedInputs.pensionContributionRate,
             trainingFundContributionRate: mappedInputs.trainingFundContributionRate,
@@ -161,39 +284,79 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
             riskTolerance: mappedInputs.riskTolerance,
             hasPortfolioAllocations: !!mappedInputs.portfolioAllocations?.length,
             hasExpenses: !!Object.keys(mappedInputs.expenses || {}).length,
-            currentMonthlyExpenses: mappedInputs.currentMonthlyExpenses
+            currentMonthlyExpenses: mappedInputs.currentMonthlyExpenses,
+            dataValidation: dataValidation,
+            missingCriticalFields: dataValidation.missingFields
         });
         
         return mappedInputs;
     })();
     
-    // Financial health scoring (test patterns: financialHealthScore, calculateHealthScore)
+    // Enhanced Financial health scoring with fallback logic
     const calculateHealthScore = (inputs) => {
         const adaptedInputs = window.adaptInputsForFinancialHealth ? window.adaptInputsForFinancialHealth(inputs) : inputs;
 
-        // Use processed inputs for couple mode compatibility
-        const inputsToUse = adaptedInputs.planningType === 'couple' ? processedInputs : adaptedInputs;
-        // Add comprehensive input validation logging
-        console.log('🔍 Inputs passed to Financial Health Score:', {
-            hasSalary: !!inputsToUse.currentMonthlySalary,
-            salaryValue: inputsToUse.currentMonthlySalary,
-            hasContributions: !!inputsToUse.monthlyContribution,
-            contributionValue: inputsToUse.monthlyContribution,
-            hasPortfolioAllocations: !!inputsToUse.portfolioAllocations,
-            portfolioCount: inputsToUse.portfolioAllocations ? inputsToUse.portfolioAllocations.length : 0,
-            hasPensionContributions: !!inputsToUse.pensionContributionRate,
-            pensionRate: inputsToUse.pensionContributionRate,
-            hasEmergencyFund: !!inputsToUse.emergencyFund,
-            emergencyFundValue: inputsToUse.emergencyFund,
-            hasExpenses: !!inputsToUse.expenses,
-            expenseCategories: inputsToUse.expenses ? Object.keys(inputsToUse.expenses) : [],
-            planningType: inputsToUse.planningType,
-            country: inputsToUse.country || inputsToUse.taxCountry || 'unknown'
+        // Always use processed inputs for better field mapping
+        const inputsToUse = { ...processedInputs, ...adaptedInputs };
+        
+        // Apply fallback values for critical missing fields
+        const inputsWithFallbacks = {
+            ...inputsToUse,
+            // Ensure minimum required fields have sensible defaults
+            currentMonthlySalary: inputsToUse.currentMonthlySalary || 0,
+            pensionContributionRate: inputsToUse.pensionContributionRate || 0,
+            trainingFundContributionRate: inputsToUse.trainingFundContributionRate || 0,
+            emergencyFund: inputsToUse.emergencyFund || 0,
+            currentMonthlyExpenses: inputsToUse.currentMonthlyExpenses || 0,
+            riskTolerance: inputsToUse.riskTolerance || 'moderate',
+            portfolioAllocations: inputsToUse.portfolioAllocations || []
+        };
+        
+        // Enhanced input validation logging with fallback status
+        console.log('🔍 Enhanced inputs passed to Financial Health Score:', {
+            originalPlanningType: inputs.planningType,
+            finalInputs: {
+                hasSalary: !!inputsWithFallbacks.currentMonthlySalary,
+                salaryValue: inputsWithFallbacks.currentMonthlySalary,
+                hasContributions: !!inputsWithFallbacks.monthlyContribution,
+                contributionValue: inputsWithFallbacks.monthlyContribution,
+                hasPortfolioAllocations: !!inputsWithFallbacks.portfolioAllocations?.length,
+                portfolioCount: inputsWithFallbacks.portfolioAllocations?.length || 0,
+                hasPensionContributions: inputsWithFallbacks.pensionContributionRate > 0,
+                pensionRate: inputsWithFallbacks.pensionContributionRate,
+                hasTrainingFundContributions: inputsWithFallbacks.trainingFundContributionRate > 0,
+                trainingFundRate: inputsWithFallbacks.trainingFundContributionRate,
+                hasEmergencyFund: inputsWithFallbacks.emergencyFund > 0,
+                emergencyFundValue: inputsWithFallbacks.emergencyFund,
+                hasExpenses: inputsWithFallbacks.currentMonthlyExpenses > 0,
+                expensesValue: inputsWithFallbacks.currentMonthlyExpenses,
+                riskTolerance: inputsWithFallbacks.riskTolerance,
+                planningType: inputsWithFallbacks.planningType,
+                country: inputsWithFallbacks.country || inputsWithFallbacks.taxCountry || 'unknown'
+            },
+            fallbacksApplied: {
+                salaryFallback: inputsToUse.currentMonthlySalary !== inputsWithFallbacks.currentMonthlySalary,
+                pensionFallback: inputsToUse.pensionContributionRate !== inputsWithFallbacks.pensionContributionRate,
+                emergencyFallback: inputsToUse.emergencyFund !== inputsWithFallbacks.emergencyFund,
+                expensesFallback: inputsToUse.currentMonthlyExpenses !== inputsWithFallbacks.currentMonthlyExpenses
+            }
         });
         
         if (window.calculateFinancialHealthScore) {
-            return window.calculateFinancialHealthScore(inputsToUse);
+            const result = window.calculateFinancialHealthScore(inputsWithFallbacks);
+            
+            // Log the result for debugging
+            console.log('💯 Financial Health Score Result:', {
+                totalScore: result.totalScore,
+                hasFactors: !!result.factors,
+                factorKeys: result.factors ? Object.keys(result.factors) : [],
+                isValidScore: typeof result.totalScore === 'number' && result.totalScore >= 0
+            });
+            
+            return result;
         }
+        
+        console.warn('⚠️ calculateFinancialHealthScore function not available');
         return { totalScore: 0, factors: {} };
     };
     
@@ -682,6 +845,101 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
             ])
         ]),
         
+        // Hidden Data Storage (for debugging and test inspection)
+        createElement('div', {
+            key: 'hidden-data-storage',
+            id: 'wizard-data-storage',
+            style: { display: 'none' },
+            'data-testid': 'wizard-complete-data',
+            'data-original-inputs': JSON.stringify(inputs),
+            'data-processed-inputs': JSON.stringify(processedInputs),
+            'data-financial-health-score': JSON.stringify(financialHealthScore),
+            'data-retirement-projections': JSON.stringify(retirementProjections),
+            'data-overall-score': overallScore,
+            'data-validation-results': JSON.stringify(inputValidation),
+            'data-planning-type': inputs.planningType || 'individual',
+            'data-field-mapping-status': JSON.stringify({
+                currentMonthlySalary: {
+                    original: inputs.currentMonthlySalary || null,
+                    processed: processedInputs.currentMonthlySalary,
+                    status: processedInputs.currentMonthlySalary > 0 ? 'valid' : 'missing',
+                    isCoupleMode: inputs.planningType === 'couple',
+                    coupleModeCombined: inputs.planningType === 'couple' ? {
+                        partner1: inputs.partner1Salary || 0,
+                        partner2: inputs.partner2Salary || 0,
+                        combined: processedInputs.currentMonthlySalary
+                    } : null
+                },
+                pensionContributionRate: {
+                    original: inputs.pensionContributionRate || null,
+                    processed: processedInputs.pensionContributionRate,
+                    status: processedInputs.pensionContributionRate >= 0 ? 'valid' : 'missing',
+                    coupleData: inputs.planningType === 'couple' ? {
+                        partner1Rate: inputs.partner1PensionRate || 0,
+                        partner2Rate: inputs.partner2PensionRate || 0,
+                        weightedAverage: processedInputs.pensionContributionRate
+                    } : null
+                },
+                trainingFundContributionRate: {
+                    original: inputs.trainingFundContributionRate || null,
+                    processed: processedInputs.trainingFundContributionRate,
+                    status: processedInputs.trainingFundContributionRate >= 0 ? 'valid' : 'missing',
+                    coupleData: inputs.planningType === 'couple' ? {
+                        partner1Rate: inputs.partner1TrainingFundRate || 0,
+                        partner2Rate: inputs.partner2TrainingFundRate || 0,
+                        weightedAverage: processedInputs.trainingFundContributionRate
+                    } : null
+                },
+                emergencyFund: {
+                    original: inputs.emergencyFund || null,
+                    processed: processedInputs.emergencyFund,
+                    status: processedInputs.emergencyFund >= 0 ? 'valid' : 'missing',
+                    coupleData: inputs.planningType === 'couple' ? {
+                        partner1Fund: inputs.partner1EmergencyFund || 0,
+                        partner2Fund: inputs.partner2EmergencyFund || 0,
+                        combined: processedInputs.emergencyFund
+                    } : null
+                },
+                monthlyExpenses: {
+                    original: inputs.currentMonthlyExpenses || null,
+                    processed: processedInputs.currentMonthlyExpenses,
+                    status: processedInputs.currentMonthlyExpenses >= 0 ? 'valid' : 'missing',
+                    coupleData: inputs.planningType === 'couple' ? {
+                        partner1Expenses: inputs.partner1MonthlyExpenses || 0,
+                        partner2Expenses: inputs.partner2MonthlyExpenses || 0,
+                        sharedExpenses: inputs.sharedMonthlyExpenses || 0,
+                        combined: processedInputs.currentMonthlyExpenses
+                    } : null
+                },
+                dataValidation: typeof dataValidation !== 'undefined' ? dataValidation : null,
+                calculatorReadiness: {
+                    hasAllRequiredFields: processedInputs.currentMonthlySalary > 0 && 
+                                         processedInputs.pensionContributionRate >= 0 && 
+                                         processedInputs.trainingFundContributionRate >= 0,
+                    missingCriticalData: typeof dataValidation !== 'undefined' ? dataValidation.missingFields : [],
+                    coupleeModeStatus: inputs.planningType === 'couple' ? 'enabled' : 'disabled'
+                }
+            }),
+            'data-couple-mode-details': inputs.planningType === 'couple' ? JSON.stringify({
+                detectedPartnerFields: {
+                    partner1Fields: Object.keys(inputs).filter(key => key.includes('partner1')),
+                    partner2Fields: Object.keys(inputs).filter(key => key.includes('partner2')),
+                    sharedFields: Object.keys(inputs).filter(key => key.includes('shared'))
+                },
+                combinationLogic: {
+                    salaryLogic: 'partner1Salary + partner2Salary = currentMonthlySalary',
+                    pensionLogic: 'weighted average by salary',
+                    emergencyLogic: 'partner1EmergencyFund + partner2EmergencyFund = emergencyFund',
+                    expensesLogic: 'partner1Expenses + partner2Expenses + sharedExpenses = currentMonthlyExpenses'
+                }
+            }) : null
+        }, [
+            createElement('div', {
+                key: 'data-summary',
+                className: 'data-summary'
+            }, 'Complete wizard data stored for debugging and testing')
+        ]),
+
         // Next steps
         createElement('div', {
             key: 'next-steps',

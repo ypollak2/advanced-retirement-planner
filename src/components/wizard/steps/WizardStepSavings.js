@@ -330,8 +330,40 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                 type: 'number',
                                 value: inputs.partner1PersonalPortfolio || 0,
                                 onChange: (e) => setInputs({...inputs, partner1PersonalPortfolio: parseInt(e.target.value) || 0}),
-                                className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
-                            })
+                                className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500 mb-2"
+                            }),
+                            // Partner 1 Portfolio tax rate input
+                            inputs.partner1PersonalPortfolio > 0 && createElement('div', { key: 'p1-tax-rate-section' }, [
+                                createElement('label', { 
+                                    key: 'p1-tax-rate-label',
+                                    className: "block text-xs font-medium text-pink-600 mb-1" 
+                                }, language === 'he' ? 'מס רווחי הון (%)' : 'Capital Gains Tax (%)'),
+                                createElement('input', {
+                                    key: 'p1-tax-rate-input',
+                                    type: 'number',
+                                    min: '0',
+                                    max: '50',
+                                    step: '0.1',
+                                    value: (inputs.partner1PortfolioTaxRate * 100) || 25,
+                                    onChange: (e) => setInputs({...inputs, partner1PortfolioTaxRate: (parseFloat(e.target.value) || 25) / 100}),
+                                    className: "w-full p-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
+                                }),
+                                createElement('div', {
+                                    key: 'p1-tax-help',
+                                    className: "text-xs text-pink-500 mt-1"
+                                }, language === 'he' ? 
+                                    'ישראל: 25% (תושבים), 30% (תושבי חוץ)' :
+                                    'Israel: 25% (residents), 30% (non-residents)')
+                            ]),
+                            // Partner 1 Net value after tax
+                            inputs.partner1PersonalPortfolio > 0 && createElement('div', { key: 'p1-net-value-section' }, [
+                                createElement('div', { 
+                                    key: 'p1-net-value-amount',
+                                    className: "text-sm font-bold text-pink-700 mt-1" 
+                                }, language === 'he' ? 
+                                    `נטו: ${formatCurrency(inputs.partner1PersonalPortfolio * (1 - (inputs.partner1PortfolioTaxRate || 0.25)))}` :
+                                    `Net: ${formatCurrency(inputs.partner1PersonalPortfolio * (1 - (inputs.partner1PortfolioTaxRate || 0.25)))}`)
+                            ])
                         ]),
                         createElement('div', { key: 'p1-real-estate' }, [
                             createElement('label', { 
@@ -418,8 +450,40 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                 type: 'number',
                                 value: inputs.partner2PersonalPortfolio || 0,
                                 onChange: (e) => setInputs({...inputs, partner2PersonalPortfolio: parseInt(e.target.value) || 0}),
-                                className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
-                            })
+                                className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 mb-2"
+                            }),
+                            // Partner 2 Portfolio tax rate input
+                            inputs.partner2PersonalPortfolio > 0 && createElement('div', { key: 'p2-tax-rate-section' }, [
+                                createElement('label', { 
+                                    key: 'p2-tax-rate-label',
+                                    className: "block text-xs font-medium text-purple-600 mb-1" 
+                                }, language === 'he' ? 'מס רווחי הון (%)' : 'Capital Gains Tax (%)'),
+                                createElement('input', {
+                                    key: 'p2-tax-rate-input',
+                                    type: 'number',
+                                    min: '0',
+                                    max: '50',
+                                    step: '0.1',
+                                    value: (inputs.partner2PortfolioTaxRate * 100) || 25,
+                                    onChange: (e) => setInputs({...inputs, partner2PortfolioTaxRate: (parseFloat(e.target.value) || 25) / 100}),
+                                    className: "w-full p-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
+                                }),
+                                createElement('div', {
+                                    key: 'p2-tax-help',
+                                    className: "text-xs text-purple-500 mt-1"
+                                }, language === 'he' ? 
+                                    'ישראל: 25% (תושבים), 30% (תושבי חוץ)' :
+                                    'Israel: 25% (residents), 30% (non-residents)')
+                            ]),
+                            // Partner 2 Net value after tax
+                            inputs.partner2PersonalPortfolio > 0 && createElement('div', { key: 'p2-net-value-section' }, [
+                                createElement('div', { 
+                                    key: 'p2-net-value-amount',
+                                    className: "text-sm font-bold text-purple-700 mt-1" 
+                                }, language === 'he' ? 
+                                    `נטו: ${formatCurrency(inputs.partner2PersonalPortfolio * (1 - (inputs.partner2PortfolioTaxRate || 0.25)))}` :
+                                    `Net: ${formatCurrency(inputs.partner2PersonalPortfolio * (1 - (inputs.partner2PortfolioTaxRate || 0.25)))}`)
+                            ])
                         ]),
                         createElement('div', { key: 'p2-real-estate' }, [
                             createElement('label', { 
