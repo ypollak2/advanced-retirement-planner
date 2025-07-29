@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v7.0.0 ✨
+# 🚀 Advanced Retirement Planner v7.0.1 ✨
 
-[![Version](https://img.shields.io/badge/version-7.0.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-7.0.1-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -26,6 +26,28 @@
 > **📋 Deployment Status**: GitHub Pages is the primary deployment and is fully operational with the reorganized component structure. Netlify is currently rebuilding after the repository reorganization and should be available shortly.
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
+
+## 🎨 What's New in v7.0.1 - CRITICAL FINANCIAL HEALTH SCORE FIX 🎯
+
+### **🔧 FINANCIAL HEALTH SCORE CALCULATION FIXES** (July 2025)
+
+#### **🎯 Core Score Engine Improvements**
+- **Fixed Zero Score Issues**: Resolved critical bug where Financial Health Score showed 0% for all metrics despite valid user data
+- **Enhanced Field Mapping**: Improved field detection between wizard steps and score calculation engine
+- **Couple Mode Fix**: Partner salary data now properly combines for accurate scoring in couple planning mode
+- **Fallback Detection**: Added clear warnings when default values are used instead of actual user input
+
+#### **🔍 Debug & Visibility Enhancements**
+- **ScoreDebugPanel**: New debug panel shows when scores are low (<30) or with `?debug=true` URL parameter
+- **Enhanced Logging**: Detailed console logs identify missing fields and data flow issues
+- **Input Validation**: Clear indicators showing which required fields are missing vs properly detected
+- **Real-time Feedback**: Users now see exactly why scores might be unexpectedly low
+
+#### **🛡️ Application Stability**
+- **Fixed React Crashes**: Resolved undefined component errors preventing app from loading
+- **Syntax Error Fix**: Fixed conditional rendering issue in RetirementWizard.js
+- **Loading States**: Added proper fallback UI when components are still loading
+- **100% Test Coverage**: All 245/245 tests passing with deployment requirements met
 
 ## 🎨 What's New in v6.8.2 - ENHANCED TAX TRANSPARENCY & UX IMPROVEMENTS 📊
 

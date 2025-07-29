@@ -79,18 +79,93 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     
     const inputValidation = validateInputs();
     
-    // Partner field mapping integration for couple mode
-    const processedInputs = inputs.planningType === 'couple' && window.getFieldValue ? 
-        {
-            ...inputs,
-            currentSalary: window.getFieldValue(inputs, ['currentSalary'], { combinePartners: true }),
-            monthlyExpenses: window.getFieldValue(inputs, ['currentMonthlyExpenses'], { combinePartners: true }),
-            currentSavings: window.getFieldValue(inputs, ['currentSavings'], { combinePartners: true }),
-            monthlyContribution: window.getFieldValue(inputs, ['monthlyContribution'], { combinePartners: true }),
-            // Ensure partner1 and partner2 field consistency for test validation
-            partner1Salary: inputs.partner1Salary || inputs.currentSalary,
-            partner2Salary: inputs.partner2Salary || inputs.partnerSalary
-        } : inputs;
+    // Enhanced field mapping for Financial Health Score compatibility
+    // Uses financialHealthEngine-compatible field mapping for partner data
+    const processedInputs = (() => {
+        const baseInputs = { ...inputs };
+        
+        // Debug: Log the original inputs structure
+        console.log('🔍 WizardStepReview - Original inputs structure:', {
+            keys: Object.keys(inputs),
+            planningType: inputs.planningType,
+            hasPartner1Salary: !!inputs.partner1Salary,
+            hasPartner2Salary: !!inputs.partner2Salary,
+            hasCurrentMonthlySalary: !!inputs.currentMonthlySalary,
+            hasPensionContributionRate: !!inputs.pensionContributionRate,
+            hasTrainingFundContributionRate: !!inputs.trainingFundContributionRate,
+            hasEmergencyFund: !!inputs.emergencyFund
+        });
+        
+        // Enhanced field mapping for Financial Health Score engine compatibility
+        const mappedInputs = {
+            ...baseInputs,
+            
+            // Salary field mapping - ensure currentMonthlySalary is available
+            currentMonthlySalary: inputs.currentMonthlySalary || 
+                                  inputs.monthlySalary || 
+                                  inputs.salary ||
+                                  inputs.monthlyIncome ||
+                                  inputs.currentSalary ||
+                                  // For couple mode, combine partner salaries if individual salary missing
+                                  (inputs.planningType === 'couple' && inputs.partner1Salary && inputs.partner2Salary ? 
+                                   (parseFloat(inputs.partner1Salary) || 0) + (parseFloat(inputs.partner2Salary) || 0) : 0),
+            
+            // Contribution rate field mapping
+            pensionContributionRate: inputs.pensionContributionRate || 
+                                   inputs.pensionEmployeeRate ||
+                                   inputs.pensionEmployee ||
+                                   inputs.employeePensionRate ||
+                                   0,
+            
+            trainingFundContributionRate: inputs.trainingFundContributionRate ||
+                                        inputs.trainingFundEmployeeRate ||
+                                        inputs.trainingFundEmployee ||
+                                        inputs.employeeTrainingFundRate ||
+                                        0,
+                                        
+            // Emergency Fund mapping
+            emergencyFund: inputs.emergencyFund ||
+                          inputs.emergencyFundAmount ||
+                          inputs.currentEmergencyFund ||
+                          0,
+                          
+            // Risk alignment mapping
+            riskTolerance: inputs.riskTolerance || 
+                          inputs.riskProfile ||
+                          inputs.investmentRisk ||
+                          'moderate',
+                          
+            // Portfolio allocation mapping
+            portfolioAllocations: inputs.portfolioAllocations || 
+                                inputs.assetAllocation ||
+                                [],
+                                
+            // Expenses mapping
+            expenses: inputs.expenses ||
+                     inputs.monthlyExpenses ||
+                     inputs.currentMonthlyExpenses ||
+                     {},
+                     
+            // Monthly expenses for emergency fund calculation
+            currentMonthlyExpenses: inputs.currentMonthlyExpenses ||
+                                  inputs.monthlyExpenses ||
+                                  inputs.totalMonthlyExpenses ||
+                                  0
+        };
+        
+        console.log('🔧 WizardStepReview - Processed inputs for Financial Health Score:', {
+            currentMonthlySalary: mappedInputs.currentMonthlySalary,
+            pensionContributionRate: mappedInputs.pensionContributionRate,
+            trainingFundContributionRate: mappedInputs.trainingFundContributionRate,
+            emergencyFund: mappedInputs.emergencyFund,
+            riskTolerance: mappedInputs.riskTolerance,
+            hasPortfolioAllocations: !!mappedInputs.portfolioAllocations?.length,
+            hasExpenses: !!Object.keys(mappedInputs.expenses || {}).length,
+            currentMonthlyExpenses: mappedInputs.currentMonthlyExpenses
+        });
+        
+        return mappedInputs;
+    })();
     
     // Financial health scoring (test patterns: financialHealthScore, calculateHealthScore)
     const calculateHealthScore = (inputs) => {
@@ -237,11 +312,29 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         }, [
             createElement(window.FinancialHealthScoreEnhanced, {
                 key: 'enhanced-score',
-                inputs: inputs,
+                inputs: processedInputs, // Use processed inputs that handle couple mode properly
                 language: language,
                 className: "financial-health-score"
             })
         ]),
+        
+        // Debug Panel (only show if score is very low or URL parameter ?debug=true)
+        (() => {
+            const showDebug = (new URLSearchParams(window.location.search)).get('debug') === 'true' || 
+                            (financialHealthScore.totalScore !== undefined && financialHealthScore.totalScore < 30);
+            
+            return showDebug && window.ScoreDebugPanel && createElement('div', {
+                key: 'debug-panel-wrapper',
+                className: 'mb-8'
+            }, [
+                createElement(window.ScoreDebugPanel, {
+                    key: 'debug-panel',
+                    financialHealthScore: financialHealthScore,
+                    inputs: processedInputs,
+                    language: language
+                })
+            ]);
+        })(),
         
         // Component Scores Section (test pattern: component-scores)
         createElement('div', {

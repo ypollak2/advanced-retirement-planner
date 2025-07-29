@@ -477,7 +477,11 @@ function calculateSavingsRateScore(inputs) {
     console.log('🔍 Validating calculation inputs...');
     
     if (monthlyIncome === 0 || isNaN(monthlyIncome)) {
-        console.warn('❌ No monthly income found');
+        console.warn('❌ FINANCIAL HEALTH SCORE: No monthly income found');
+        console.warn('🔍 Available income-related fields:', Object.keys(inputs).filter(key => 
+            key.toLowerCase().includes('salary') || key.toLowerCase().includes('income')
+        ));
+        console.warn('📋 Planning type:', inputs.planningType);
         
         const availableIncomeFields = Object.keys(inputs).filter(key => 
             key.toLowerCase().includes('salary') || key.toLowerCase().includes('income')
@@ -518,7 +522,15 @@ function calculateSavingsRateScore(inputs) {
     
     // Check if contribution data is completely missing
     if (monthlyContributions === 0 && pensionRate === 0 && trainingFundRate === 0) {
-        console.warn('❌ No contribution data found');
+        console.warn('❌ FINANCIAL HEALTH SCORE: No contribution data found');
+        console.warn('💰 Pension rate found:', pensionRate);
+        console.warn('🎓 Training fund rate found:', trainingFundRate);
+        console.warn('💼 Monthly contributions found:', monthlyContributions);
+        console.warn('🔍 Available contribution-related fields:', Object.keys(inputs).filter(key => 
+            key.toLowerCase().includes('contribution') || 
+            key.toLowerCase().includes('pension') || 
+            key.toLowerCase().includes('training')
+        ));
         
         const availableContributionFields = Object.keys(inputs).filter(key => 
             key.toLowerCase().includes('contribution') || 

@@ -1,5 +1,5 @@
 // Advanced Retirement Planner - Guided Intelligence UI Design
-// Created by Yali Pollak (יהלי פולק) - v7.0.0
+// Created by Yali Pollak (יהלי פולק) - v7.0.1
 
 function RetirementPlannerApp() {
     var languageState = React.useState('en');
@@ -1305,7 +1305,7 @@ function RetirementPlannerApp() {
             
             // Wizard View with lazy-loaded components
             // Includes: WizardStepSalary, WizardStepSavings, WizardStepContributions, WizardStepFees
-            viewMode === 'wizard' && React.createElement(window.RetirementWizard, {
+            viewMode === 'wizard' && window.RetirementWizard && React.createElement(window.RetirementWizard, {
                 key: 'wizard',
                 inputs: inputs,
                 setInputs: setInputs,
@@ -1324,6 +1324,26 @@ function RetirementPlannerApp() {
                 previousStep: previousStep,
                 setCurrentStep: setCurrentStep
             }),
+            
+            // Fallback for when wizard is loading
+            viewMode === 'wizard' && !window.RetirementWizard && React.createElement('div', {
+                key: 'wizard-loading',
+                className: 'flex items-center justify-center min-h-96 bg-gray-50 rounded-lg'
+            }, [
+                React.createElement('div', {
+                    key: 'loading-content',
+                    className: 'text-center'
+                }, [
+                    React.createElement('div', {
+                        key: 'spinner',
+                        className: 'animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4'
+                    }),
+                    React.createElement('p', {
+                        key: 'loading-text',
+                        className: 'text-gray-600'
+                    }, language === 'en' ? 'Loading Planning Wizard...' : 'טוען אשף תכנון...')
+                ])
+            ]),
 
             // Dashboard View with Integrated Control Panel
             viewMode === 'dashboard' && React.createElement('div', {
@@ -1965,7 +1985,7 @@ function RetirementPlannerApp() {
                 React.createElement('span', {
                     key: 'version',
                     className: 'version'
-                }, window.versionInfo ? `v${window.versionInfo.number}` : 'v7.0.0'),
+                }, window.versionInfo ? `v${window.versionInfo.number}` : 'v7.0.1'),
                 ' • Created by ',
                 React.createElement('span', {
                     key: 'author',
