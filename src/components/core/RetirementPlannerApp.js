@@ -1,5 +1,5 @@
 // Advanced Retirement Planner - Guided Intelligence UI Design
-// Created by Yali Pollak (יהלי פולק) - v7.0.3
+// Created by Yali Pollak (יהלי פולק) - v7.0.5
 
 function RetirementPlannerApp() {
     var languageState = React.useState('en');
@@ -181,6 +181,55 @@ function RetirementPlannerApp() {
     });
     var inputs = inputsState[0];
     var setInputs = inputsState[1];
+
+    // Automatic state persistence to prevent data loss
+    React.useEffect(function() {
+        try {
+            // Save inputs to localStorage whenever they change
+            var dataToSave = {
+                inputs: inputs,
+                wizardCompleted: wizardCompleted,
+                currentStep: currentStep,
+                timestamp: Date.now()
+            };
+            
+            // Use JSON.stringify with limited size to prevent storage issues
+            var serializedData = JSON.stringify(dataToSave);
+            if (serializedData.length < 1024 * 1024) { // Limit to 1MB
+                localStorage.setItem('retirementWizardData', serializedData);
+                console.log('\ud83d\udcbe Auto-saved inputs to localStorage:', Object.keys(inputs).length, 'fields');
+            } else {
+                console.warn('\ud83d\udcbe Data too large for localStorage, skipping save');
+            }
+        } catch (error) {
+            console.warn('\ud83d\udcbe Failed to save to localStorage:', error.message);
+        }
+    }, [inputs, wizardCompleted, currentStep]);
+
+    // Load saved data on app initialization
+    React.useEffect(function() {
+        try {
+            var savedData = localStorage.getItem('retirementWizardData');
+            if (savedData) {
+                var parsedData = JSON.parse(savedData);
+                if (parsedData.inputs && Object.keys(parsedData.inputs).length > 0) {
+                    console.log('\ud83d\udcbe Loaded saved inputs from localStorage:', Object.keys(parsedData.inputs).length, 'fields');
+                    setInputs(function(prev) { 
+                        return { ...prev, ...parsedData.inputs }; 
+                    });
+                    
+                    if (parsedData.wizardCompleted) {
+                        setWizardCompleted(parsedData.wizardCompleted);
+                    }
+                    if (parsedData.currentStep && parsedData.currentStep > 1) {
+                        setCurrentStep(parsedData.currentStep);
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn('\ud83d\udcbe Failed to load from localStorage:', error.message);
+        }
+    }, []); // Run only once on mount
 
     var workPeriodsState = React.useState([
         {
@@ -1985,7 +2034,7 @@ function RetirementPlannerApp() {
                 React.createElement('span', {
                     key: 'version',
                     className: 'version'
-                }, window.versionInfo ? `v${window.versionInfo.number}` : 'v7.0.3'),
+                }, window.versionInfo ? `v${window.versionInfo.number}` : 'v7.0.5'),
                 ' • Created by ',
                 React.createElement('span', {
                     key: 'author',

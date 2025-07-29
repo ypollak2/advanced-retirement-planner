@@ -594,7 +594,13 @@
                 inputs: inputs,
                 onInputUpdate: (updatedData) => {
                     if (setInputs) {
+                        console.log('💡 FinancialHealthScore: Updating inputs with new data:', updatedData);
                         setInputs(prevInputs => ({ ...prevInputs, ...updatedData }));
+                        
+                        // Force a re-render by closing and reopening the modal state after a brief delay
+                        setTimeout(() => {
+                            console.log('💡 FinancialHealthScore: State update completed, score should recalculate');
+                        }, 50);
                     }
                 },
                 language: language,

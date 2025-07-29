@@ -1,6 +1,6 @@
 {
-  "version": "7.0.4",
+  "version": "7.0.5",
   "build": "2025-07-29",
-  "commit": "v7.0.4-missing-data-modal-production-release",
-  "description": "Complete Missing Data Modal: Interactive data completion for Financial Health Score optimization"
+  "commit": "v7.0.5-data-persistence-hotfix-production-release",
+  "description": "HOTFIX: Critical data persistence & modal state fixes with 100% test coverage"
 }

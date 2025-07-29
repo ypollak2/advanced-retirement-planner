@@ -377,9 +377,15 @@
             setValidationErrors(newErrors);
 
             if (!hasErrors) {
-                // Update inputs and close modal
+                // Update inputs with callback to ensure state is updated
+                console.log('📊 MissingDataModal: Saving form data:', formData);
                 onInputUpdate(formData);
-                onClose();
+                
+                // Add a small delay to ensure parent component re-renders before closing
+                setTimeout(() => {
+                    console.log('📊 MissingDataModal: Closing modal after state update');
+                    onClose();
+                }, 100);
             }
         };
 
