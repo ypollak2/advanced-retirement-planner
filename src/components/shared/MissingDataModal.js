@@ -12,7 +12,7 @@
         language = 'en',
         healthReport 
     }) => {
-        const { createElement, useState, useEffect } = React;
+        const { createElement, useState, useEffect, useMemo } = React;
         
         const [formData, setFormData] = useState({});
         const [currentStep, setCurrentStep] = useState(0);
@@ -256,48 +256,66 @@
             return uniqueItems;
         };
 
-        const missingDataItems = analyzeMissingData();
+        const missingDataItems = useMemo(() => analyzeMissingData(), [inputs, healthReport]);
 
         // Group missing items by step
-        const groupedSteps = missingDataItems.reduce((acc, item) => {
-            if (!acc[item.step]) {
-                acc[item.step] = [];
-            }
-            acc[item.step].push(item);
-            return acc;
-        }, {});
+        const groupedSteps = useMemo(() => {
+            return missingDataItems.reduce((acc, item) => {
+                if (!acc[item.step]) {
+                    acc[item.step] = [];
+                }
+                acc[item.step].push(item);
+                return acc;
+            }, {});
+        }, [missingDataItems]);
 
         const stepKeys = Object.keys(groupedSteps);
 
         // Initialize form data
         useEffect(() => {
+            if (missingDataItems.length === 0) return;
+            
             const initialData = {};
             missingDataItems.forEach(item => {
                 initialData[item.field] = inputs[item.field] || '';
             });
-            setFormData(initialData);
+            
+            // Only update if the form data has actually changed
+            setFormData(prevData => {
+                const hasChanged = missingDataItems.some(item => 
+                    prevData[item.field] !== initialData[item.field]
+                );
+                return hasChanged ? initialData : prevData;
+            });
         }, [missingDataItems, inputs]);
 
         // Calculate preview score when form data changes
         useEffect(() => {
-            if (Object.keys(formData).length > 0) {
-                setIsCalculating(true);
-                
-                // Simulate calculation delay
-                const timer = setTimeout(() => {
-                    if (window.calculateFinancialHealthScore) {
-                        const updatedInputs = { ...inputs, ...formData };
-                        const newReport = window.calculateFinancialHealthScore(updatedInputs, {
-                            combinePartners: inputs.planningType === 'couple',
-                            debugMode: false
-                        });
-                        setPreviewScore(newReport?.totalScore || 0);
-                    }
-                    setIsCalculating(false);
-                }, 500);
-
-                return () => clearTimeout(timer);
+            if (Object.keys(formData).length === 0 || !window.calculateFinancialHealthScore) {
+                return;
             }
+            
+            setIsCalculating(true);
+            
+            // Simulate calculation delay
+            const timer = setTimeout(() => {
+                try {
+                    const updatedInputs = { ...inputs, ...formData };
+                    const newReport = window.calculateFinancialHealthScore(updatedInputs, {
+                        combinePartners: inputs.planningType === 'couple',
+                        debugMode: false
+                    });
+                    const newScore = newReport?.totalScore || 0;
+                    
+                    // Only update if score actually changed
+                    setPreviewScore(prevScore => prevScore !== newScore ? newScore : prevScore);
+                } catch (error) {
+                    console.warn('Error calculating preview score:', error);
+                }
+                setIsCalculating(false);
+            }, 500);
+
+            return () => clearTimeout(timer);
         }, [formData, inputs]);
 
         // Validate field values
