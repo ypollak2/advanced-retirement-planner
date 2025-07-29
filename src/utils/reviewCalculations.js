@@ -160,37 +160,16 @@ function calculateRiskAlignmentScore(inputs) {
  * Calculate overall financial health score
  */
 function calculateOverallFinancialHealthScore(inputs) {
-    // Use the comprehensive financial health engine if available
+    // Always use the comprehensive financial health engine
+    // This prevents calling the local number-returning functions
     if (window.calculateFinancialHealthScore) {
         const healthReport = window.calculateFinancialHealthScore(inputs);
         return healthReport.totalScore || 0;
     }
     
-    // Fallback calculation using individual score functions
-    const savingsRateScore = calculateSavingsRateScore(inputs);
-    const readinessScore = calculateRetirementReadinessScore(inputs);
-    const diversificationScore = calculateDiversificationScore(inputs);
-    const taxEfficiencyScore = calculateTaxEfficiencyScore(inputs);
-    const riskAlignmentScore = calculateRiskAlignmentScore(inputs);
-    
-    // Weighted average
-    const weights = {
-        savingsRate: 0.25,
-        readiness: 0.20,
-        diversification: 0.15,
-        taxEfficiency: 0.15,
-        riskAlignment: 0.25
-    };
-    
-    const totalScore = (
-        savingsRateScore * weights.savingsRate +
-        readinessScore * weights.readiness +
-        diversificationScore * weights.diversification +
-        taxEfficiencyScore * weights.taxEfficiency +
-        riskAlignmentScore * weights.riskAlignment
-    );
-    
-    return Math.round(totalScore);
+    // If financial health engine is not loaded, return 0
+    console.warn('Financial Health Engine not loaded - returning 0');
+    return 0;
 }
 
 /**
