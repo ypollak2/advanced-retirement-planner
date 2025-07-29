@@ -127,46 +127,57 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
             
             // Enhanced contribution rate field mapping with couple mode support
             pensionContributionRate: (() => {
-                // For couple mode, prioritize combining partner rates
+                // For couple mode, combine partner rates if available
                 if (inputs.planningType === 'couple') {
-                    const partner1Rate = parseFloat(inputs.partner1PensionRate) || 0;
-                    const partner2Rate = parseFloat(inputs.partner2PensionRate) || 0;
+                    // Correct field names: partner1EmployeeRate + partner1EmployerRate
+                    const partner1Employee = parseFloat(inputs.partner1EmployeeRate) || 0;
+                    const partner1Employer = parseFloat(inputs.partner1EmployerRate) || 0;
+                    const partner1Total = partner1Employee + partner1Employer;
                     
-                    if (partner1Rate > 0 || partner2Rate > 0) {
-                        // Use weighted average based on salaries, or simple average if no salary data
+                    // For partner 2, use main person rates
+                    const partner2Employee = parseFloat(inputs.employeePensionRate) || 0;
+                    const partner2Employer = parseFloat(inputs.employerPensionRate) || 0;
+                    const partner2Total = partner2Employee + partner2Employer;
+                    
+                    if (partner1Total > 0 || partner2Total > 0) {
+                        // Use weighted average based on salaries
                         const partner1Salary = parseFloat(inputs.partner1Salary) || 0;
                         const partner2Salary = parseFloat(inputs.partner2Salary) || 0;
                         const totalSalary = partner1Salary + partner2Salary;
                         
                         let combinedRate;
                         if (totalSalary > 0) {
-                            combinedRate = ((partner1Rate * partner1Salary) + (partner2Rate * partner2Salary)) / totalSalary;
+                            combinedRate = ((partner1Total * partner1Salary) + (partner2Total * partner2Salary)) / totalSalary;
                         } else {
-                            combinedRate = (partner1Rate + partner2Rate) / 2;
+                            combinedRate = (partner1Total + partner2Total) / 2;
                         }
-                        console.log('🤝 Couple mode: Combined pension rates', { partner1Rate, partner2Rate, combined: combinedRate });
+                        console.log('🤝 Couple mode: Combined pension rates', { 
+                            partner1: partner1Total, 
+                            partner2: partner2Total, 
+                            combined: combinedRate 
+                        });
                         return combinedRate;
                     }
                 }
                 
-                // Fall back to individual rate fields
-                let rate = inputs.pensionContributionRate || 
-                          inputs.pensionEmployeeRate ||
-                          inputs.pensionEmployee ||
-                          inputs.employeePensionRate ||
-                          0;
+                // Fall back to individual rate fields (employee + employer)
+                const employee = parseFloat(inputs.employeePensionRate) || 0;
+                const employer = parseFloat(inputs.employerPensionRate) || 0;
+                const total = employee + employer;
                 
-                return rate;
+                return total || inputs.pensionContributionRate || 0;
             })(),
             
             trainingFundContributionRate: (() => {
-                // For couple mode, prioritize combining partner rates
+                // For couple mode, combine partner rates if available
                 if (inputs.planningType === 'couple') {
+                    // Correct field name: partner1TrainingFundRate
                     const partner1Rate = parseFloat(inputs.partner1TrainingFundRate) || 0;
-                    const partner2Rate = parseFloat(inputs.partner2TrainingFundRate) || 0;
+                    // Partner 2 uses the main training fund rate
+                    const partner2Rate = parseFloat(inputs.trainingFundContributionRate) || 0;
                     
                     if (partner1Rate > 0 || partner2Rate > 0) {
-                        // Use weighted average based on salaries, or simple average if no salary data
+                        // Use weighted average based on salaries
                         const partner1Salary = parseFloat(inputs.partner1Salary) || 0;
                         const partner2Salary = parseFloat(inputs.partner2Salary) || 0;
                         const totalSalary = partner1Salary + partner2Salary;
@@ -177,19 +188,17 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                         } else {
                             combinedRate = (partner1Rate + partner2Rate) / 2;
                         }
-                        console.log('🤝 Couple mode: Combined training fund rates', { partner1Rate, partner2Rate, combined: combinedRate });
+                        console.log('🤝 Couple mode: Combined training fund rates', { 
+                            partner1Rate, 
+                            partner2Rate, 
+                            combined: combinedRate 
+                        });
                         return combinedRate;
                     }
                 }
                 
                 // Fall back to individual rate fields
-                let rate = inputs.trainingFundContributionRate ||
-                          inputs.trainingFundEmployeeRate ||
-                          inputs.trainingFundEmployee ||
-                          inputs.employeeTrainingFundRate ||
-                          0;
-                
-                return rate;
+                return inputs.trainingFundContributionRate || 0;
             })(),
                                         
             // Enhanced Emergency Fund mapping with couple mode support
@@ -229,6 +238,11 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                                 inputs.assetAllocation ||
                                 [],
                                 
+            // Stock percentage for risk alignment
+            stockPercentage: inputs.stockPercentage || 
+                           inputs.stockAllocation || 
+                           60,  // Default to balanced 60% stocks
+                                
             // Expenses mapping
             expenses: inputs.expenses ||
                      inputs.monthlyExpenses ||
@@ -237,7 +251,19 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                      
             // Enhanced monthly expenses mapping with couple mode support
             currentMonthlyExpenses: (() => {
-                // For couple mode, prioritize combining partner expenses
+                // First check if we have expense breakdown object
+                if (inputs.expenses && typeof inputs.expenses === 'object') {
+                    const totalFromBreakdown = Object.values(inputs.expenses)
+                        .filter(val => typeof val === 'number' && !isNaN(val))
+                        .reduce((sum, val) => sum + val, 0);
+                    
+                    if (totalFromBreakdown > 0) {
+                        console.log('💰 Using expense breakdown total:', totalFromBreakdown);
+                        return totalFromBreakdown;
+                    }
+                }
+                
+                // For couple mode, check partner-specific expenses
                 if (inputs.planningType === 'couple') {
                     const partner1Expenses = parseFloat(inputs.partner1MonthlyExpenses) || 0;
                     const partner2Expenses = parseFloat(inputs.partner2MonthlyExpenses) || 0;
@@ -256,12 +282,7 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                 }
                 
                 // Fall back to individual expense fields
-                let expenses = inputs.currentMonthlyExpenses ||
-                              inputs.monthlyExpenses ||
-                              inputs.totalMonthlyExpenses ||
-                              0;
-                
-                return expenses;
+                return inputs.currentMonthlyExpenses || 0;
             })()
         };
         
@@ -310,17 +331,21 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     const calculateHealthScore = (inputs) => {
         const adaptedInputs = window.adaptInputsForFinancialHealth ? window.adaptInputsForFinancialHealth(inputs) : inputs;
 
-        // Always use processed inputs for better field mapping
-        const inputsToUse = { ...processedInputs, ...adaptedInputs };
+        // Combine ALL original inputs with processed mappings to preserve all data
+        const inputsToUse = { 
+            ...inputs,  // Keep ALL original data first
+            ...processedInputs,  // Then apply processed mappings
+            ...adaptedInputs  // Finally apply any adaptations
+        };
         
-        // Apply fallback values for critical missing fields
+        // Apply fallback values for critical missing fields without overriding existing data
         const inputsWithFallbacks = {
             ...inputsToUse,
-            // Ensure minimum required fields have sensible defaults
+            // Only set defaults if the field is truly missing or invalid
             currentMonthlySalary: inputsToUse.currentMonthlySalary || 0,
-            pensionContributionRate: inputsToUse.pensionContributionRate || 0,
-            trainingFundContributionRate: inputsToUse.trainingFundContributionRate || 0,
-            emergencyFund: inputsToUse.emergencyFund || 0,
+            pensionContributionRate: inputsToUse.pensionContributionRate >= 0 ? inputsToUse.pensionContributionRate : 0,
+            trainingFundContributionRate: inputsToUse.trainingFundContributionRate >= 0 ? inputsToUse.trainingFundContributionRate : 0,
+            emergencyFund: inputsToUse.emergencyFund >= 0 ? inputsToUse.emergencyFund : 0,
             currentMonthlyExpenses: inputsToUse.currentMonthlyExpenses || 0,
             riskTolerance: inputsToUse.riskTolerance || 'moderate',
             portfolioAllocations: inputsToUse.portfolioAllocations || []
@@ -329,6 +354,14 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         // Enhanced input validation logging with fallback status
         console.log('🔍 Enhanced inputs passed to Financial Health Score:', {
             originalPlanningType: inputs.planningType,
+            preservedData: {
+                partner1Salary: inputsWithFallbacks.partner1Salary,
+                partner2Salary: inputsWithFallbacks.partner2Salary,
+                partner1CurrentPension: inputsWithFallbacks.partner1CurrentPension,
+                partner2CurrentPension: inputsWithFallbacks.partner2CurrentPension,
+                partner1BankAccount: inputsWithFallbacks.partner1BankAccount,
+                partner2BankAccount: inputsWithFallbacks.partner2BankAccount
+            },
             finalInputs: {
                 hasSalary: !!inputsWithFallbacks.currentMonthlySalary,
                 salaryValue: inputsWithFallbacks.currentMonthlySalary,
@@ -336,9 +369,9 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                 contributionValue: inputsWithFallbacks.monthlyContribution,
                 hasPortfolioAllocations: !!inputsWithFallbacks.portfolioAllocations?.length,
                 portfolioCount: inputsWithFallbacks.portfolioAllocations?.length || 0,
-                hasPensionContributions: inputsWithFallbacks.pensionContributionRate > 0,
+                hasPensionContributions: inputsWithFallbacks.pensionContributionRate >= 0,
                 pensionRate: inputsWithFallbacks.pensionContributionRate,
-                hasTrainingFundContributions: inputsWithFallbacks.trainingFundContributionRate > 0,
+                hasTrainingFundContributions: inputsWithFallbacks.trainingFundContributionRate >= 0,
                 trainingFundRate: inputsWithFallbacks.trainingFundContributionRate,
                 hasEmergencyFund: inputsWithFallbacks.emergencyFund > 0,
                 emergencyFundValue: inputsWithFallbacks.emergencyFund,
