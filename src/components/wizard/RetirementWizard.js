@@ -47,31 +47,54 @@ const RetirementWizard = ({
     const [showSaveNotification, setShowSaveNotification] = React.useState(false);
     const [lastSaved, setLastSaved] = React.useState(savedProgress?.lastSaved || null);
     
-    // Immediate save function for critical operations
+    // Use refs to store current values and prevent infinite loops
+    const currentStepRef = React.useRef(currentStep);
+    const completedStepsRef = React.useRef(completedSteps);
+    const skippedStepsRef = React.useRef(skippedSteps);
+    const inputsRef = React.useRef(inputs);
+    
+    // Update refs when values change
+    React.useEffect(() => {
+        currentStepRef.current = currentStep;
+    }, [currentStep]);
+    
+    React.useEffect(() => {
+        completedStepsRef.current = completedSteps;
+    }, [completedSteps]);
+    
+    React.useEffect(() => {
+        skippedStepsRef.current = skippedSteps;
+    }, [skippedSteps]);
+    
+    React.useEffect(() => {
+        inputsRef.current = inputs;
+    }, [inputs]);
+
+    // Immediate save function for critical operations - now dependency-free
     const saveProgressImmediate = React.useCallback((criticalData = false) => {
         try {
             const progress = {
-                currentStep,
-                completedSteps,
-                skippedSteps,
+                currentStep: currentStepRef.current,
+                completedSteps: completedStepsRef.current,
+                skippedSteps: skippedStepsRef.current,
                 lastSaved: new Date().toISOString()
             };
             localStorage.setItem(WIZARD_STORAGE_KEY, JSON.stringify(progress));
-            localStorage.setItem(WIZARD_INPUTS_KEY, JSON.stringify(inputs));
+            localStorage.setItem(WIZARD_INPUTS_KEY, JSON.stringify(inputsRef.current));
             setLastSaved(new Date().toISOString());
             
             if (criticalData) {
                 // Trigger immediate Financial Health recalculation
                 setTimeout(() => {
                     window.dispatchEvent(new CustomEvent('wizardDataUpdated', { 
-                        detail: { inputs, immediate: true } 
+                        detail: { inputs: inputsRef.current, immediate: true } 
                     }));
                 }, 0);
             }
         } catch (error) {
             console.error('Failed to save wizard progress:', error);
         }
-    }, [currentStep, completedSteps, skippedSteps, inputs]);
+    }, []);
 
     // Auto-save progress to localStorage with enhanced timing
     React.useEffect(() => {
@@ -100,7 +123,7 @@ const RetirementWizard = ({
         return () => clearTimeout(timer);
     }, [currentStep, completedSteps, skippedSteps, inputs]);
     
-    // Load saved inputs on mount with modal completion handler
+    // Load saved inputs on mount only (runs once)
     React.useEffect(() => {
         if (savedProgress) {
             try {
@@ -113,13 +136,15 @@ const RetirementWizard = ({
                 console.warn('Failed to load saved inputs:', error);
             }
         }
-        
-        // Add modal completion handler for immediate score updates
+    }, []); // Empty dependency array - runs only on mount
+    
+    // Modal completion handler - separate effect with no inputs dependency
+    React.useEffect(() => {
         const handleModalCompletion = (event) => {
             const { updatedInputs } = event.detail;
             
-            // Merge modal data with existing inputs
-            const mergedInputs = { ...inputs, ...updatedInputs };
+            // Merge modal data with current inputs from ref
+            const mergedInputs = { ...inputsRef.current, ...updatedInputs };
             setInputs(mergedInputs);
             
             // Immediate save and recalculation
@@ -130,7 +155,7 @@ const RetirementWizard = ({
         
         window.addEventListener('modalDataCompleted', handleModalCompletion);
         return () => window.removeEventListener('modalDataCompleted', handleModalCompletion);
-    }, [inputs, saveProgressImmediate]);
+    }, [saveProgressImmediate]); // Only depends on saveProgressImmediate (now stable)
     
     // Clear saved progress when wizard is completed
     const clearSavedProgress = () => {
