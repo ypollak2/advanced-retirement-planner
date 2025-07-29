@@ -135,45 +135,36 @@
             const mappingTests = [
                 {
                     component: 'Savings Rate',
-                    expectedFields: ['currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome'],
-                    testFunction: window.getFieldValue ? 
-                        () => window.getFieldValue(inputs, ['currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome'], { debugMode: true }) : 
-                        null
+                    expectedFields: ['currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome']
                 },
                 {
                     component: 'Retirement Readiness',
-                    expectedFields: ['currentPensionSavings', 'pensionSavings', 'retirementSavings'],
-                    testFunction: window.getFieldValue ? 
-                        () => window.getFieldValue(inputs, ['currentPensionSavings', 'pensionSavings', 'retirementSavings'], { debugMode: true }) : 
-                        null
+                    expectedFields: ['currentPensionSavings', 'pensionSavings', 'retirementSavings']
                 },
                 {
                     component: 'Emergency Fund',
-                    expectedFields: ['emergencyFund', 'currentSavings', 'liquidSavings'],
-                    testFunction: window.getFieldValue ? 
-                        () => window.getFieldValue(inputs, ['emergencyFund', 'currentSavings', 'liquidSavings'], { debugMode: true }) : 
-                        null
+                    expectedFields: ['emergencyFund', 'currentSavings', 'liquidSavings']
                 },
                 {
                     component: 'Tax Efficiency',
-                    expectedFields: ['pensionEmployeeRate', 'pensionEmployerRate', 'trainingFundRate'],
-                    testFunction: window.getFieldValue ? 
-                        () => window.getFieldValue(inputs, ['pensionEmployeeRate', 'pensionEmployerRate', 'trainingFundRate'], { debugMode: true }) : 
-                        null
+                    expectedFields: ['pensionEmployeeRate', 'pensionEmployerRate', 'trainingFundRate']
                 }
             ];
 
-            return mappingTests.map(test => {
-                let result = null;
-                let error = null;
-                
-                if (test.testFunction) {
-                    try {
-                        result = test.testFunction();
-                    } catch (e) {
-                        error = e.message;
-                    }
+            // Safe static test function execution
+            const executeFieldValueTest = (testFields) => {
+                if (!window.getFieldValue) return null;
+                try {
+                    return window.getFieldValue(inputs, testFields, { debugMode: true });
+                } catch (e) {
+                    return { error: e.message };
                 }
+            };
+
+            return mappingTests.map(test => {
+                // Use safe static function call instead of dynamic testFunction
+                const result = executeFieldValueTest(test.expectedFields);
+                const error = result && result.error ? result.error : null;
 
                 const foundFields = test.expectedFields.filter(field => 
                     inputs[field] !== undefined && inputs[field] !== null && inputs[field] !== ''

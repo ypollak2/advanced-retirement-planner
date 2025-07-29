@@ -64,7 +64,7 @@ jobs:
           
       - name: Archive test results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: unit-test-results
           path: test-results/unit/
@@ -94,7 +94,7 @@ jobs:
           
       - name: Archive test results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: integration-test-results
           path: test-results/integration/
@@ -130,14 +130,14 @@ jobs:
           
       - name: Upload screenshots
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: e2e-screenshots-${{ matrix.browser }}
           path: test-results/screenshots/
           
       - name: Upload videos
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: e2e-videos-${{ matrix.browser }}
           path: test-results/videos/
@@ -174,7 +174,7 @@ jobs:
           temporaryPublicStorage: true
           
       - name: Archive performance results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: performance-results
           path: test-results/performance/
@@ -217,7 +217,7 @@ jobs:
           
       - name: Archive security results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: security-results
           path: test-results/security/
@@ -274,7 +274,7 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: test-artifacts/
           
@@ -306,7 +306,7 @@ jobs:
           EOF
           
       - name: Upload test summary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-summary-report
           path: test-summary/
@@ -336,26 +336,26 @@ jobs:
               description: 'All tests passed'
             });
 
-# Notification job
-notify:
-  name: Notify Test Results
-  runs-on: ubuntu-latest
-  needs: [test-report]
-  if: always() && (github.event_name == 'push' || github.event_name == 'pull_request')
+  # Notification job
+  notify:
+    name: Notify Test Results
+    runs-on: ubuntu-latest
+    needs: [test-report]
+    if: always() && (github.event_name == 'push' || github.event_name == 'pull_request')
   
-  steps:
-    - name: Send notification
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const { data: { jobs } } = await github.rest.actions.listJobsForWorkflowRun({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            run_id: context.runId
-          });
-          
-          const failed = jobs.filter(job => job.conclusion === 'failure');
-          
-          if (failed.length > 0) {
-            core.setFailed(`${failed.length} test job(s) failed: ${failed.map(j => j.name).join(', ')}`);
-          }
+    steps:
+      - name: Send notification
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: { jobs } } = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            });
+            
+            const failed = jobs.filter(job => job.conclusion === 'failure');
+            
+            if (failed.length > 0) {
+              core.setFailed(`${failed.length} test job(s) failed: ${failed.map(j => j.name).join(', ')}`);
+            }
