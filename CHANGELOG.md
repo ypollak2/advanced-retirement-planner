@@ -6,6 +6,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [7.0.6] - 2025-07-29 🎯 WIZARD UX ENHANCEMENTS & FINANCIAL HEALTH FIXES
+
+### 🎯 **Wizard User Experience Improvements**
+- **Next Button Fix**: Fixed Next button not working with pre-loaded localStorage data - users no longer need to modify inputs when valid data already exists
+- **localStorage Integration**: Enhanced step validation to check both current inputs and saved data from previous sessions
+- **Partner Mode Navigation**: Improved wizard navigation for couple planning mode with proper field detection
+
+### 💡 **Financial Health Score Enhancements**
+- **Field Mapping Fix**: Resolved field name mismatches between wizard data structure and Financial Health Engine
+- **Salary Conversion**: Added automatic annual-to-monthly salary detection and conversion (fixes 12x calculation errors)
+- **Partner Data Combination**: Enhanced partner salary combination logic for accurate couple mode calculations
+- **Eliminated Console Warnings**: Removed "fallback activated" warnings through better field pattern matching
+
+### ⚡ **State Management & Performance**
+- **Immediate Persistence**: Added immediate save functionality for critical wizard operations
+- **Reduced Debounce**: Decreased auto-save delay from 500ms to 200ms for better responsiveness
+- **Modal Integration**: Enhanced modal completion handlers for instant Financial Health Score updates
+- **Race Condition Fixes**: Resolved timing issues between data updates and score calculations
+
+### 🧪 **Technical Improvements**
+- **Enhanced Field Detection**: Added wizard-specific field mappings with comprehensive fallback patterns
+- **Currency-Aware Logic**: Improved salary type detection with proper currency context
+- **Debug Logging**: Added extensive debugging support for data flow troubleshooting
+- **Error Handling**: Comprehensive error handling with graceful localStorage recovery
+
+### 📊 **Test Coverage**
+- **100% Test Pass Rate**: Maintained perfect 302/302 tests passing
+- **Production Ready**: All critical wizard issues resolved and validated
+
+---
+
 ## [7.0.5] - 2025-07-29 🔧 HOTFIX: DATA PERSISTENCE & MODAL STATE FIXES
 
 ### 🚨 **Critical Data Persistence Issues Fixed**

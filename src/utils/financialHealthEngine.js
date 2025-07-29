@@ -14,7 +14,17 @@ function getFieldValue(inputs, fieldNames, options = {}) {
     debugLog(`🔍 Searching for fields: ${fieldNames.join(', ')}`);
     debugLog(`📋 Planning type: ${inputs.planningType}, Combine partners: ${combinePartners}`);
     
-    // PHASE 1: Direct field lookup with enhanced validation
+    // Helper function to detect and convert annual salary to monthly
+    const detectSalaryType = (fieldName, value) => {
+        // If value seems too high for monthly (> 50k), likely annual - convert to monthly
+        if (value > 50000 && (fieldName.includes('monthly') || fieldName.includes('Monthly'))) {
+            debugLog(`🔄 Converting suspected annual salary to monthly: ${value} -> ${value/12}`);
+            return value / 12;
+        }
+        return value;
+    };
+    
+    // PHASE 1: Direct field lookup with enhanced validation and salary conversion
     // Skip Phase 1 entirely if we need to combine partners
     if (!(combinePartners && inputs.planningType === 'couple')) {
         for (const fieldName of fieldNames) {
@@ -24,8 +34,9 @@ function getFieldValue(inputs, fieldNames, options = {}) {
             if (value !== undefined && value !== null && value !== '') {
                 const parsed = parseFloat(value);
                 if (!isNaN(parsed) && (allowZero || parsed > 0)) {
-                    debugLog(`✅ Found valid field "${fieldName}": ${parsed}`);
-                    return parsed;
+                    const convertedValue = detectSalaryType(fieldName, parsed);
+                    debugLog(`✅ Found valid field "${fieldName}": ${convertedValue}`);
+                    return convertedValue;
                 } else {
                     debugLog(`  Field "${fieldName}" exists but value invalid: ${parsed}`);
                 }
@@ -109,15 +120,17 @@ function getFieldValue(inputs, fieldNames, options = {}) {
                 const p2Value = parseFloat(inputs[mapping.partner2] || 0);
                 
                 if (!isNaN(p1Value) && p1Value > 0) {
-                    combinedValue += p1Value;
+                    const convertedP1 = detectSalaryType(mapping.partner1, p1Value);
+                    combinedValue += convertedP1;
                     partnersFound++;
-                    debugLog(`  Added ${mapping.partner1}: ${p1Value}`);
+                    debugLog(`  Added ${mapping.partner1}: ${convertedP1}`);
                 }
                 
                 if (!isNaN(p2Value) && p2Value > 0) {
-                    combinedValue += p2Value;
+                    const convertedP2 = detectSalaryType(mapping.partner2, p2Value);
+                    combinedValue += convertedP2;
                     partnersFound++;
-                    debugLog(`  Added ${mapping.partner2}: ${p2Value}`);
+                    debugLog(`  Added ${mapping.partner2}: ${convertedP2}`);
                 }
                 
                 // If we found data, don't keep looking in other mappings
@@ -181,7 +194,9 @@ function getFieldValue(inputs, fieldNames, options = {}) {
         if (lowerField.includes('emergency')) {
             fallbackPatterns.push(
                 'emergencyFund', 'emergencyFundAmount', 'currentSavingsAccount', 'liquidSavings',
-                'cashReserves', 'savingsAccount', 'emergency_fund', 'current_savings_account'
+                'cashReserves', 'savingsAccount', 'emergency_fund', 'current_savings_account',
+                // Add wizard-specific emergency fund patterns
+                'currentSavings', 'savingsAccountBalance', 'emergencySavings', 'currentCashSavings'
             );
         }
         
@@ -207,15 +222,16 @@ function getFieldValue(inputs, fieldNames, options = {}) {
         }
     });
     
-    // Remove duplicates and try fallback patterns
+    // Remove duplicates and try fallback patterns with salary conversion
     const uniqueFallbacks = [...new Set(fallbackPatterns)];
     for (const fallbackField of uniqueFallbacks) {
         const value = inputs[fallbackField];
         if (value !== undefined && value !== null && value !== '') {
             const parsed = parseFloat(value);
             if (!isNaN(parsed) && (allowZero || parsed > 0)) {
-                debugLog(`✅ Found fallback field "${fallbackField}": ${parsed}`);
-                return parsed;
+                const convertedValue = detectSalaryType(fallbackField, parsed);
+                debugLog(`✅ Found fallback field "${fallbackField}": ${convertedValue}`);
+                return convertedValue;
             }
         }
     }

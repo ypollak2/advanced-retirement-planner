@@ -47,7 +47,33 @@ const RetirementWizard = ({
     const [showSaveNotification, setShowSaveNotification] = React.useState(false);
     const [lastSaved, setLastSaved] = React.useState(savedProgress?.lastSaved || null);
     
-    // Auto-save progress to localStorage
+    // Immediate save function for critical operations
+    const saveProgressImmediate = React.useCallback((criticalData = false) => {
+        try {
+            const progress = {
+                currentStep,
+                completedSteps,
+                skippedSteps,
+                lastSaved: new Date().toISOString()
+            };
+            localStorage.setItem(WIZARD_STORAGE_KEY, JSON.stringify(progress));
+            localStorage.setItem(WIZARD_INPUTS_KEY, JSON.stringify(inputs));
+            setLastSaved(new Date().toISOString());
+            
+            if (criticalData) {
+                // Trigger immediate Financial Health recalculation
+                setTimeout(() => {
+                    window.dispatchEvent(new CustomEvent('wizardDataUpdated', { 
+                        detail: { inputs, immediate: true } 
+                    }));
+                }, 0);
+            }
+        } catch (error) {
+            console.error('Failed to save wizard progress:', error);
+        }
+    }, [currentStep, completedSteps, skippedSteps, inputs]);
+
+    // Auto-save progress to localStorage with enhanced timing
     React.useEffect(() => {
         const saveProgress = () => {
             try {
@@ -69,12 +95,12 @@ const RetirementWizard = ({
             }
         };
         
-        // Save after a short delay to debounce rapid changes
-        const timer = setTimeout(saveProgress, 500);
+        // Reduced debounce delay for better responsiveness
+        const timer = setTimeout(saveProgress, 200);
         return () => clearTimeout(timer);
     }, [currentStep, completedSteps, skippedSteps, inputs]);
     
-    // Load saved inputs on mount
+    // Load saved inputs on mount with modal completion handler
     React.useEffect(() => {
         if (savedProgress) {
             try {
@@ -87,7 +113,24 @@ const RetirementWizard = ({
                 console.warn('Failed to load saved inputs:', error);
             }
         }
-    }, []);
+        
+        // Add modal completion handler for immediate score updates
+        const handleModalCompletion = (event) => {
+            const { updatedInputs } = event.detail;
+            
+            // Merge modal data with existing inputs
+            const mergedInputs = { ...inputs, ...updatedInputs };
+            setInputs(mergedInputs);
+            
+            // Immediate save and recalculation
+            setTimeout(() => {
+                saveProgressImmediate(true);
+            }, 0);
+        };
+        
+        window.addEventListener('modalDataCompleted', handleModalCompletion);
+        return () => window.removeEventListener('modalDataCompleted', handleModalCompletion);
+    }, [inputs, saveProgressImmediate]);
     
     // Clear saved progress when wizard is completed
     const clearSavedProgress = () => {
@@ -150,15 +193,23 @@ const RetirementWizard = ({
         return ((step - 1) / (totalSteps - 1)) * 100;
     };
 
-    // Navigation handlers
+    // Navigation handlers with immediate persistence
     const handleNext = () => {
         if (currentStep < totalSteps) {
             setCompletedSteps(prev => [...new Set([...prev, currentStep])]);
             setCurrentStep(Math.min(currentStep + 1, totalSteps));
+            
+            // Immediate save for step completion
+            setTimeout(() => {
+                saveProgressImmediate(true);
+            }, 0);
         } else {
-            // Final step - complete wizard
-            clearSavedProgress();
-            onComplete && onComplete();
+            // Final step - ensure all data is saved before completion
+            saveProgressImmediate(true);
+            setTimeout(() => {
+                clearSavedProgress();
+                onComplete && onComplete();
+            }, 100);
         }
     };
 
@@ -193,62 +244,75 @@ const RetirementWizard = ({
         return hasWillStatus || hasLifeInsuranceInfo;
     };
 
-    // Enhanced step validation with realistic business rules
+    // Enhanced step validation with localStorage data support
     const isCurrentStepValid = () => {
+        // Helper function to get saved data from localStorage
+        const getSavedInputs = () => {
+            try {
+                const savedInputs = localStorage.getItem(WIZARD_INPUTS_KEY);
+                return savedInputs ? JSON.parse(savedInputs) : {};
+            } catch (error) {
+                return {};
+            }
+        };
+        
+        // Merge current inputs with saved data for validation
+        const savedInputs = getSavedInputs();
+        const mergedInputs = { ...savedInputs, ...inputs };
+        
         switch (currentStep) {
             case 1: 
-                // Personal Information validation
-                const currentAge = inputs.currentAge || 0;
-                const retirementAge = inputs.retirementAge || 0;
+                // Personal Information validation - check both current and saved data
+                const currentAge = mergedInputs.currentAge || 0;
+                const retirementAge = mergedInputs.retirementAge || 0;
                 return currentAge >= 18 && currentAge <= 100 && 
                        retirementAge > currentAge && retirementAge <= 75;
             
             case 2: 
-                // Salary validation - at least one income source
-                const mainSalary = inputs.currentMonthlySalary || 0;
-                const partner1Salary = inputs.partner1Salary || 0;
-                const partner2Salary = inputs.partner2Salary || 0;
+                // Salary validation - at least one income source from current or saved data
+                const mainSalary = mergedInputs.currentMonthlySalary || 0;
+                const partner1Salary = mergedInputs.partner1Salary || 0;
+                const partner2Salary = mergedInputs.partner2Salary || 0;
                 const totalSalary = mainSalary + partner1Salary + partner2Salary;
                 return totalSalary > 0 && totalSalary <= 1000000; // Reasonable upper limit
             
             case 3: 
-                // Savings validation - non-negative values
-                return (inputs.currentSavings || 0) >= 0 && 
-                       (inputs.currentTrainingFundSavings || 0) >= 0;
+                // Expenses validation - non-negative values from current or saved data
+                return (mergedInputs.currentMonthlyExpenses || 0) >= 0;
             
             case 4: 
-                // Current Savings validation - non-negative values
-                return (inputs.currentSavings || 0) >= 0 && 
-                       (inputs.currentTrainingFundSavings || 0) >= 0;
+                // Current Savings validation - non-negative values from current or saved data
+                return (mergedInputs.currentSavings || 0) >= 0 && 
+                       (mergedInputs.currentTrainingFundSavings || 0) >= 0;
             
             case 5: 
-                // Contribution validation - reasonable percentage ranges
-                const pensionRate = inputs.pensionContributionRate || 0;
-                const trainingRate = inputs.trainingFundContributionRate || 0;
+                // Contribution validation - reasonable percentage ranges from current or saved data
+                const pensionRate = mergedInputs.pensionContributionRate || 0;
+                const trainingRate = mergedInputs.trainingFundContributionRate || 0;
                 return pensionRate >= 0 && pensionRate <= 30 && 
                        trainingRate >= 0 && trainingRate <= 15;
             
             case 6: 
-                // Fees validation - reasonable fee ranges
-                const contribFees = inputs.contributionFees || 0;
-                const accumFees = inputs.accumulationFees || 0;
+                // Fees validation - reasonable fee ranges from current or saved data
+                const contribFees = mergedInputs.contributionFees || 0;
+                const accumFees = mergedInputs.accumulationFees || 0;
                 return contribFees >= 0 && contribFees <= 5 && 
                        accumFees >= 0 && accumFees <= 3;
             
             case 7: 
-                // Investment validation - reasonable return expectations
-                const expectedReturn = inputs.expectedReturn || 0;
-                const inflationRate = inputs.inflationRate || 0;
+                // Investment validation - reasonable return expectations from current or saved data
+                const expectedReturn = mergedInputs.expectedReturn || 0;
+                const inflationRate = mergedInputs.inflationRate || 0;
                 
                 // Check couple mode partner investments
-                if (inputs.planningType === 'couple') {
-                    // Validate partner 1 investment preferences
-                    const partner1Valid = inputs.partner1RiskProfile && 
-                                        (inputs.partner1ExpectedReturn >= 0 && inputs.partner1ExpectedReturn <= 20);
+                if (mergedInputs.planningType === 'couple') {
+                    // Validate partner 1 investment preferences from current or saved data
+                    const partner1Valid = mergedInputs.partner1RiskProfile && 
+                                        (mergedInputs.partner1ExpectedReturn >= 0 && mergedInputs.partner1ExpectedReturn <= 20);
                     
-                    // Validate partner 2 investment preferences
-                    const partner2Valid = inputs.partner2RiskProfile && 
-                                        (inputs.partner2ExpectedReturn >= 0 && inputs.partner2ExpectedReturn <= 20);
+                    // Validate partner 2 investment preferences from current or saved data
+                    const partner2Valid = mergedInputs.partner2RiskProfile && 
+                                        (mergedInputs.partner2ExpectedReturn >= 0 && mergedInputs.partner2ExpectedReturn <= 20);
                     
                     // All partner fields must be valid
                     return partner1Valid && partner2Valid && 
@@ -260,14 +324,14 @@ const RetirementWizard = ({
                        inflationRate >= 0 && inflationRate <= 15;
             
             case 8: 
-                // Goals validation - positive values
-                return (inputs.retirementGoal || 0) > 0 && 
-                       (inputs.currentMonthlyExpenses || 0) > 0;
+                // Goals validation - positive values from current or saved data
+                return (mergedInputs.retirementGoal || 0) > 0 && 
+                       (mergedInputs.currentMonthlyExpenses || 0) > 0;
             
             case 9: 
-                // Final review step - check if we have minimum required data
-                return inputs.currentAge && inputs.retirementAge && 
-                       (inputs.currentMonthlySalary || inputs.partner1Salary || inputs.partner2Salary);
+                // Final review step - check if we have minimum required data from current or saved
+                return mergedInputs.currentAge && mergedInputs.retirementAge && 
+                       (mergedInputs.currentMonthlySalary || mergedInputs.partner1Salary || mergedInputs.partner2Salary);
             
             default: 
                 return true;

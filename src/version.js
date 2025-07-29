@@ -1,8 +1,8 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "7.0.5",
+    number: "7.0.6",
     build: "2025-07-29",
-    commit: "v7.0.5-version-update",
+    commit: "v7.0.6-version-update",
     description: "Complete Missing Data Modal: Interactive data completion for Financial Health Score optimization"
 };
 
