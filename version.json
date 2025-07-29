@@ -1,6 +1,6 @@
 {
-  "version": "7.0.1",
-  "build": "2025-07-22",
-  "commit": "v6.6.2-update",
-  "description": "Version update to 6.6.2"
+  "version": "7.0.3",
+  "build": "2025-07-29",
+  "commit": "v7.0.3-repository-organization",
+  "description": "Repository reorganization and structure optimization"
 }

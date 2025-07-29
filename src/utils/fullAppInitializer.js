@@ -5,36 +5,73 @@
 (function() {
     'use strict';
     
+    // Track initialization state to prevent double initialization
+    let isInitialized = false;
+    let reactRoot = null;
+    
     // Enhanced error handling and component validation
     function validateComponents() {
-        const requiredComponents = [
-            'RetirementPlannerApp', 'Dashboard', 'CurrencySelector', 'BasicInputs', 'AdvancedInputs', 'ResultsPanel',
-            'ReadinessScore', 'HelpTooltip', 'calculateRetirement', 'formatCurrency', 'currencyAPI',
+        // Only check for truly essential components that are needed at startup
+        const essentialComponents = [
+            'RetirementPlannerApp', 
+            'calculateRetirement', 
+            'formatCurrency'
+        ];
+        
+        // Optional components that can be lazy-loaded
+        const optionalComponents = [
+            'Dashboard', 'CurrencySelector', 'BasicInputs', 'AdvancedInputs', 'ResultsPanel',
+            'ReadinessScore', 'HelpTooltip', 'currencyAPI',
             'ScenarioComparison', 'ScenarioEditor', 'ScenarioChart', 'GoalTrackingDashboard', 
             'CoupleValidationPanel', 'CoupleValidation', 'PortfolioOptimizer', 'PortfolioOptimizationPanel'
         ];
         
-        const missing = requiredComponents.filter(comp => !window[comp]);
-        if (missing.length > 0) {
-            console.warn('⚠️ Missing components:', missing);
+        const missingEssential = essentialComponents.filter(comp => !window[comp]);
+        const missingOptional = optionalComponents.filter(comp => !window[comp]);
+        
+        if (missingEssential.length > 0) {
+            console.error('❌ Missing ESSENTIAL components:', missingEssential);
             return false;
         }
+        
+        if (missingOptional.length > 0) {
+            console.warn('⚠️ Missing optional components (will load later):', missingOptional);
+        }
+        
         return true;
     }
 
     // Enhanced component loading with retry logic
     function attemptInitialization(attempt = 1, maxAttempts = 10) {
         try {
+            // Prevent double initialization
+            if (isInitialized) {
+                console.log('ℹ️ App already initialized, skipping...');
+                return;
+            }
+            
             if (window.RetirementPlannerApp && validateComponents()) {
+                const rootElement = document.getElementById('root');
+                
+                if (!rootElement) {
+                    throw new Error('Root element not found');
+                }
+                
                 if (ReactDOM.createRoot) {
-                    const root = ReactDOM.createRoot(document.getElementById('root'));
-                    root.render(React.createElement(window.RetirementPlannerApp));
+                    // React 18+ mode
+                    if (!reactRoot) {
+                        reactRoot = ReactDOM.createRoot(rootElement);
+                    }
+                    reactRoot.render(React.createElement(window.RetirementPlannerApp));
+                    isInitialized = true;
                     console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '7.0.0'} initialized successfully`);
                 } else if (ReactDOM.render) {
+                    // React 17 mode
                     ReactDOM.render(
                         React.createElement(window.RetirementPlannerApp),
-                        document.getElementById('root')
+                        rootElement
                     );
+                    isInitialized = true;
                     console.log(`✅ Advanced Retirement Planner v${window.APP_VERSION || '7.0.0'} initialized (React 17 mode)`);
                 }
             } else {

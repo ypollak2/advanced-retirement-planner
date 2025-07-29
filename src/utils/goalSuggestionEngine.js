@@ -152,7 +152,9 @@ function suggestRetirementSavingsGoal(inputs) {
     const cappedRequiredSavings = applyValueCaps(requiredSavings, 'maxSavingsGoal', 'required savings');
     
     // Project current savings growth with caps
-    const currentSavings = window.calculateTotalCurrentSavings(inputs);
+    const currentSavings = window.calculateTotalCurrentSavings ? 
+        window.calculateTotalCurrentSavings(inputs) : 
+        (console.warn('⚠️ calculateTotalCurrentSavings not found, using 0'), 0);
     const rawYearsToRetirement = retirementAge - (inputs.currentAge || 30);
     const yearsToRetirement = Math.max(
         applyValueCaps(rawYearsToRetirement, 'minYearsToRetirement', 'years to retirement'),
@@ -193,7 +195,9 @@ function calculateBlendedReturnRate(inputs) {
         applyValueCaps(rawPortfolioReturn, 'maxReturnRate', 'portfolio return')
     );
     
-    const currentSavings = window.calculateTotalCurrentSavings(inputs);
+    const currentSavings = window.calculateTotalCurrentSavings ? 
+        window.calculateTotalCurrentSavings(inputs) : 
+        (console.warn('⚠️ calculateTotalCurrentSavings not found, using 0'), 0);
     const pensionSavings = parseFloat(inputs.currentSavings) || 0;
     const portfolioSavings = parseFloat(inputs.currentPersonalPortfolio) || 0;
     
@@ -232,7 +236,9 @@ function suggestEmergencyFund(inputs) {
  * Calculate gap analysis between current trajectory and goals
  */
 function calculateGapAnalysis(inputs, suggestions) {
-    const currentSavings = window.calculateTotalCurrentSavings(inputs);
+    const currentSavings = window.calculateTotalCurrentSavings ? 
+        window.calculateTotalCurrentSavings(inputs) : 
+        (console.warn('⚠️ calculateTotalCurrentSavings not found, using 0'), 0);
     const rawYearsToRetirement = (inputs.retirementAge || 67) - (inputs.currentAge || 30);
     const yearsToRetirement = Math.max(
         applyValueCaps(rawYearsToRetirement, 'minYearsToRetirement', 'years to retirement'),
@@ -273,7 +279,9 @@ function generateGoalSuggestions(inputs) {
             metadata: {
                 generatedAt: new Date().toISOString(),
                 yearsToRetirement: (inputs.retirementAge || 67) - (inputs.currentAge || 30),
-                currentTotalSavings: window.calculateTotalCurrentSavings(inputs),
+                currentTotalSavings: window.calculateTotalCurrentSavings ? 
+                    window.calculateTotalCurrentSavings(inputs) : 
+                    (console.warn('⚠️ calculateTotalCurrentSavings not found, using 0'), 0),
                 monthlyIncome: calculateMonthlyIncome(inputs),
                 blendedReturnRate: calculateBlendedReturnRate(inputs)
             }
@@ -314,7 +322,7 @@ window.generateGoalSuggestions = generateGoalSuggestions;
 window.applyValueCaps = applyValueCaps;
 window.VALUE_CAPS = VALUE_CAPS;
 window.shouldRefreshSuggestions = shouldRefreshSuggestions;
-window.calculateTotalCurrentSavings = calculateTotalCurrentSavings;
+// Note: calculateTotalCurrentSavings is expected to be defined in reviewCalculations.js
 window.calculateMonthlyIncome = calculateMonthlyIncome;
 window.suggestMonthlyRetirementExpenses = suggestMonthlyRetirementExpenses;
 window.suggestRetirementSavingsGoal = suggestRetirementSavingsGoal;
