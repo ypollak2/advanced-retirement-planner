@@ -6,6 +6,49 @@
  * Provides detailed breakdowns, actionable insights, and peer comparisons
  */
 
+// Safe calculation wrappers to prevent NaN/Infinity values
+function safeParseFloat(value, defaultValue = 0) {
+    const parsed = parseFloat(value);
+    if (isNaN(parsed) || !isFinite(parsed)) {
+        return defaultValue;
+    }
+    return parsed;
+}
+
+function safeDivide(numerator, denominator, defaultValue = 0) {
+    if (!denominator || denominator === 0 || isNaN(denominator) || !isFinite(denominator)) {
+        return defaultValue;
+    }
+    const num = safeParseFloat(numerator, 0);
+    const result = num / denominator;
+    if (isNaN(result) || !isFinite(result)) {
+        return defaultValue;
+    }
+    return result;
+}
+
+function safeMultiply(a, b, defaultValue = 0) {
+    const numA = safeParseFloat(a, 0);
+    const numB = safeParseFloat(b, 0);
+    const result = numA * numB;
+    if (isNaN(result) || !isFinite(result)) {
+        return defaultValue;
+    }
+    return result;
+}
+
+function safePercentage(value, total, defaultValue = 0) {
+    if (!total || total === 0) {
+        return defaultValue;
+    }
+    return safeDivide(value * 100, total, defaultValue);
+}
+
+function clampValue(value, min, max) {
+    const safeValue = safeParseFloat(value, min);
+    return Math.max(min, Math.min(max, safeValue));
+}
+
 // ENHANCED: Comprehensive field mapping utility with wizard compatibility and debugging
 function getFieldValue(inputs, fieldNames, options = {}) {
     const { combinePartners = false, allowZero = false, debugMode = true } = options;
@@ -451,6 +494,38 @@ function calculateSavingsRateScore(inputs) {
         console.log('👤 Individual income:', monthlyIncome);
     }
     
+    // PHASE 1.5: Add RSU income if available
+    let monthlyRSUIncome = 0;
+    if (inputs.rsuUnits && inputs.rsuCurrentStockPrice) {
+        const rsuUnits = safeParseFloat(inputs.rsuUnits, 0);
+        const stockPrice = safeParseFloat(inputs.rsuCurrentStockPrice, 0);
+        const frequency = inputs.rsuFrequency || 'quarterly';
+        
+        // Calculate monthly RSU income based on frequency
+        if (frequency === 'monthly') {
+            monthlyRSUIncome = rsuUnits * stockPrice;
+        } else if (frequency === 'quarterly') {
+            monthlyRSUIncome = (rsuUnits * stockPrice * 4) / 12; // Convert annual to monthly
+        } else if (frequency === 'yearly' || frequency === 'annual') {
+            monthlyRSUIncome = (rsuUnits * stockPrice) / 12; // Convert annual to monthly
+        }
+        
+        console.log(`💰 RSU Income: ${rsuUnits} units × $${stockPrice} (${frequency}) = $${monthlyRSUIncome.toFixed(2)}/month`);
+        
+        // Handle currency conversion if needed
+        if (inputs.currency === 'ILS' && monthlyRSUIncome > 0) {
+            // RSUs are typically in USD, convert to ILS if base currency is ILS
+            const usdToILS = 3.5; // Default exchange rate, should ideally come from inputs.exchangeRates
+            const convertedRSUIncome = monthlyRSUIncome * usdToILS;
+            console.log(`💱 Converting RSU income: $${monthlyRSUIncome.toFixed(2)} USD = ₪${convertedRSUIncome.toFixed(2)} ILS`);
+            monthlyRSUIncome = convertedRSUIncome;
+        }
+        
+        // Add RSU income to total monthly income
+        monthlyIncome += monthlyRSUIncome;
+        console.log(`💰 Total monthly income with RSUs: ${monthlyIncome}`);
+    }
+    
     // PHASE 2: Get contribution rates with enhanced field detection
     console.log('💰 Looking for contribution rates...');
     
@@ -599,8 +674,8 @@ function calculateSavingsRateScore(inputs) {
     // PHASE 5: Calculate savings rate with comprehensive validation
     console.log('📊 Calculating savings rate...');
     
-    const savingsRate = (monthlyIncome > 0) ? (monthlyContributions / monthlyIncome) * 100 : 0;
-    const validSavingsRate = (isNaN(savingsRate) || !isFinite(savingsRate)) ? 0 : savingsRate;
+    const savingsRate = safePercentage(monthlyContributions, monthlyIncome, 0);
+    const validSavingsRate = clampValue(savingsRate, 0, 100); // Savings rate should be 0-100%
     
     console.log('📊 Savings rate calculation:', {
         monthlyIncome,
@@ -699,33 +774,193 @@ function calculateSavingsRateScore(inputs) {
  * Calculate retirement readiness score
  */
 function calculateRetirementReadinessScore(inputs) {
+    console.log('🏦 === CALCULATING RETIREMENT READINESS SCORE ===');
     const currentAge = parseFloat(inputs.currentAge || 30);
     
     // Enhanced income calculation that properly handles couple mode
     let monthlyIncome = 0;
-    if (inputs.planningType === 'couple') {
-        // For couples, combine both partner salaries
-        const partner1Income = getFieldValue(inputs, ['partner1Salary', 'Partner1Salary'], { debugMode: true });
-        const partner2Income = getFieldValue(inputs, ['partner2Salary', 'Partner2Salary'], { debugMode: true });
-        monthlyIncome = (partner1Income || 0) + (partner2Income || 0);
+    
+    // Check if person is already retired (has pension income)
+    const pensionIncome = getFieldValue(inputs, [
+        'monthlyPensionIncome', 'pensionIncome', 'retirementIncome', 'monthlyRetirementIncome'
+    ], { allowZero: true, debugMode: true });
+    
+    if (pensionIncome > 0) {
+        // Person is retired, use pension income
+        monthlyIncome = pensionIncome;
+        console.log('👴 Retiree pension income:', monthlyIncome);
+    } else if (inputs.planningType === 'couple') {
+        // For couples, combine both partner salaries using getFieldValue with combinePartners
+        monthlyIncome = getFieldValue(inputs, [
+            'partner1Salary', 'partner2Salary', 'Partner1Salary', 'Partner2Salary',
+            'partner1Income', 'partner2Income', 'partner1MonthlySalary', 'partner2MonthlySalary',
+            'currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome'
+        ], { combinePartners: true, debugMode: true });
+        
+        console.log('👫 Couple income found:', monthlyIncome);
     } else {
         // For individuals, use main salary
         monthlyIncome = getFieldValue(inputs, [
             'currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome'
         ], { debugMode: true });
+        
+        console.log('👤 Individual income found:', monthlyIncome);
+    }
+    
+    // Add RSU income if available (similar to savings rate calculation)
+    let monthlyRSUIncome = 0;
+    if (inputs.rsuUnits && inputs.rsuCurrentStockPrice) {
+        const rsuUnits = safeParseFloat(inputs.rsuUnits, 0);
+        const stockPrice = safeParseFloat(inputs.rsuCurrentStockPrice, 0);
+        const frequency = inputs.rsuFrequency || 'quarterly';
+        
+        // Calculate monthly RSU income based on frequency
+        if (frequency === 'monthly') {
+            monthlyRSUIncome = rsuUnits * stockPrice;
+        } else if (frequency === 'quarterly') {
+            monthlyRSUIncome = (rsuUnits * stockPrice * 4) / 12; // Convert annual to monthly
+        } else if (frequency === 'yearly' || frequency === 'annual') {
+            monthlyRSUIncome = (rsuUnits * stockPrice) / 12; // Convert annual to monthly
+        }
+        
+        console.log(`💰 RSU Income for retirement calc: ${rsuUnits} units × $${stockPrice} (${frequency}) = $${monthlyRSUIncome.toFixed(2)}/month`);
+        
+        // Handle currency conversion if needed
+        if (inputs.currency === 'ILS' && monthlyRSUIncome > 0) {
+            const usdToILS = 3.5; // Default exchange rate
+            const convertedRSUIncome = monthlyRSUIncome * usdToILS;
+            console.log(`💱 Converting RSU: $${monthlyRSUIncome.toFixed(2)} USD = ₪${convertedRSUIncome.toFixed(2)} ILS`);
+            monthlyRSUIncome = convertedRSUIncome;
+        }
+        
+        monthlyIncome += monthlyRSUIncome;
+        console.log(`💰 Total monthly income with RSUs: ${monthlyIncome}`);
     }
     
     const annualIncome = monthlyIncome * 12;
-    const currentSavings = window.calculateTotalCurrentSavings ? 
-        window.calculateTotalCurrentSavings(inputs) : 
-        parseFloat(inputs.currentSavings || 0);
     
-    if (annualIncome === 0) return { score: 0, details: { ratio: 0, status: 'unknown' } };
+    // Enhanced calculation for total current savings using getFieldValue
+    console.log('💰 Calculating total current savings...');
+    let currentSavings = 0;
+    
+    // Get pension/retirement savings
+    const pensionSavings = getFieldValue(inputs, [
+        'currentPensionSavings', 'currentSavings', 'pensionSavings', 
+        'retirementSavings', 'currentRetirementSavings'
+    ], { allowZero: true, debugMode: true });
+    currentSavings += pensionSavings;
+    console.log('  Pension savings:', pensionSavings);
+    
+    // Get US retirement accounts (401k, IRA)
+    const retirement401k = getFieldValue(inputs, [
+        'current401k', 'current401K', 'retirement401k', '401kBalance'
+    ], { allowZero: true, debugMode: true });
+    currentSavings += retirement401k;
+    console.log('  401k savings:', retirement401k);
+    
+    const retirementIRA = getFieldValue(inputs, [
+        'currentIRA', 'currentIra', 'iraBalance', 'retirementIRA'
+    ], { allowZero: true, debugMode: true });
+    currentSavings += retirementIRA;
+    console.log('  IRA savings:', retirementIRA);
+    
+    // Get training fund
+    const trainingFund = getFieldValue(inputs, [
+        'currentTrainingFund', 'trainingFund', 'trainingFundValue'
+    ], { allowZero: true, debugMode: true });
+    currentSavings += trainingFund;
+    console.log('  Training fund:', trainingFund);
+    
+    // Get personal portfolio
+    const portfolio = getFieldValue(inputs, [
+        'currentPersonalPortfolio', 'personalPortfolio', 'stockPortfolio',
+        'investmentPortfolio', 'currentStockPortfolio'
+    ], { allowZero: true, debugMode: true });
+    currentSavings += portfolio;
+    console.log('  Portfolio:', portfolio);
+    
+    // Get real estate
+    const realEstate = getFieldValue(inputs, [
+        'currentRealEstate', 'realEstate', 'realEstateValue', 
+        'currentRealEstateValue', 'propertyValue'
+    ], { allowZero: true, debugMode: true });
+    currentSavings += realEstate;
+    console.log('  Real estate:', realEstate);
+    
+    // Get crypto
+    const crypto = getFieldValue(inputs, [
+        'currentCrypto', 'currentCryptoFiatValue', 'cryptoValue', 
+        'currentCryptocurrency', 'cryptoPortfolio'
+    ], { allowZero: true, debugMode: true });
+    currentSavings += crypto;
+    console.log('  Crypto:', crypto);
+    
+    // Get savings account/emergency fund
+    const savingsAccount = getFieldValue(inputs, [
+        'currentSavingsAccount', 'savingsAccount', 'currentBankAccount',
+        'emergencyFund', 'cashSavings', 'liquidSavings'
+    ], { allowZero: true, debugMode: true });
+    currentSavings += savingsAccount;
+    console.log('  Savings account:', savingsAccount);
+    
+    // Add partner savings for couple mode
+    if (inputs.planningType === 'couple') {
+        const partnerPension = getFieldValue(inputs, [
+            'partnerCurrentSavings', 'partner1CurrentPension', 'partner2CurrentPension',
+            'partnerPensionSavings', 'partnerRetirementSavings'
+        ], { allowZero: true, debugMode: true });
+        currentSavings += partnerPension;
+        console.log('  Partner pension:', partnerPension);
+        
+        const partnerTrainingFund = getFieldValue(inputs, [
+            'partner1CurrentTrainingFund', 'partner2CurrentTrainingFund',
+            'partnerTrainingFund'
+        ], { allowZero: true, debugMode: true });
+        currentSavings += partnerTrainingFund;
+        console.log('  Partner training fund:', partnerTrainingFund);
+        
+        const partnerPortfolio = getFieldValue(inputs, [
+            'partner1PersonalPortfolio', 'partner2PersonalPortfolio',
+            'partnerPortfolio'
+        ], { allowZero: true, debugMode: true });
+        currentSavings += partnerPortfolio;
+        console.log('  Partner portfolio:', partnerPortfolio);
+    }
+    
+    console.log('💰 Total current savings:', currentSavings);
+    
+    if (annualIncome === 0) {
+        console.warn('❌ No annual income found for retirement readiness calculation');
+        return { 
+            score: 0, 
+            details: { 
+                ratio: 0, 
+                status: 'unknown',
+                currentSavings: currentSavings,
+                targetSavings: 0,
+                gap: 0,
+                debugInfo: {
+                    reason: 'No income data found',
+                    monthlyIncomeFound: false,
+                    currentSavingsFound: currentSavings > 0
+                }
+            } 
+        };
+    }
     
     // Age-based savings targets (rule of thumb: 1x by 30, 3x by 40, etc.)
     const targetMultiplier = Math.max(1, (currentAge - 20) / 10);
-    const targetSavings = annualIncome * targetMultiplier;
-    const savingsRatio = currentSavings / targetSavings;
+    const targetSavings = safeMultiply(annualIncome, targetMultiplier);
+    const savingsRatio = safeDivide(currentSavings, targetSavings, 0);
+    
+    console.log('🎯 Retirement readiness calculation:', {
+        currentAge,
+        annualIncome,
+        targetMultiplier,
+        targetSavings,
+        currentSavings,
+        savingsRatio
+    });
     
     const maxScore = SCORE_FACTORS.retirementReadiness.weight;
     let score = 0;
@@ -748,14 +983,33 @@ function calculateRetirementReadinessScore(inputs) {
         status = 'critical';
     }
     
+    const finalScore = Math.round(score);
+    console.log(`✅ Retirement Readiness Score: ${finalScore}/${maxScore} (${status})`);
+    
     return {
-        score: Math.round(score),
+        score: finalScore,
         details: {
             ratio: savingsRatio,
             currentSavings: currentSavings,
             targetSavings: targetSavings,
             gap: Math.max(0, targetSavings - currentSavings),
-            status: status
+            status: status,
+            currentAge: currentAge,
+            targetMultiplier: targetMultiplier,
+            annualIncome: annualIncome,
+            debugInfo: {
+                savingsComponents: {
+                    pension: pensionSavings,
+                    trainingFund: trainingFund,
+                    portfolio: portfolio,
+                    realEstate: realEstate,
+                    crypto: crypto,
+                    savingsAccount: savingsAccount
+                },
+                incomeFound: monthlyIncome > 0,
+                savingsFound: currentSavings > 0,
+                calculationSuccessful: true
+            }
         }
     };
 }
@@ -973,6 +1227,24 @@ function calculateDiversificationScore(inputs) {
             console.log(`✅ Found Training Fund: ${trainingFundAmount}`);
         }
         
+        // 8. US Retirement Accounts (401k, IRA)
+        const us401kAmount = getFieldValue(inputs, [
+            'current401k', 'current401K', 'retirement401k', '401kBalance'
+        ], { allowZero: false, debugMode: true });
+        const iraAmount = getFieldValue(inputs, [
+            'currentIRA', 'currentIra', 'iraBalance', 'retirementIRA'
+        ], { allowZero: false, debugMode: true });
+        
+        if (us401kAmount > 0 || iraAmount > 0) {
+            assetClasses++;
+            assetDetails.push({ 
+                type: 'US Retirement Accounts', 
+                amount: us401kAmount + iraAmount,
+                breakdown: { '401k': us401kAmount, 'IRA': iraAmount }
+            });
+            console.log(`✅ Found US Retirement Accounts: 401k=${us401kAmount}, IRA=${iraAmount}`);
+        }
+        
         console.log(`📊 Total asset classes found: ${assetClasses}`);
         console.log('📝 Asset details:', assetDetails);
         
@@ -1160,8 +1432,8 @@ function calculateTaxEfficiencyScore(inputs) {
             if (additionalTaxInfo.totalAdditionalIncome > 0) {
                 hasAdditionalIncome = true;
                 const totalIncome = baseSalary + additionalTaxInfo.totalAdditionalIncome;
-                const totalTaxAdvantaged = baseSalary * (pensionRate + trainingFundRate) / 100;
-                const overallTaxAdvantageRate = totalIncome > 0 ? (totalTaxAdvantaged / totalIncome) * 100 : 0;
+                const totalTaxAdvantaged = safeMultiply(baseSalary, (pensionRate + trainingFundRate) / 100);
+                const overallTaxAdvantageRate = safePercentage(totalTaxAdvantaged, totalIncome, 0);
                 
                 // Adjust efficiency score based on overall tax advantage
                 additionalIncomeEfficiency = overallTaxAdvantageRate;
@@ -1201,7 +1473,7 @@ function calculateTaxEfficiencyScore(inputs) {
     }
     
     const maxScore = SCORE_FACTORS.taxEfficiency.weight;
-    const score = (efficiencyScore / 100) * maxScore;
+    const score = safeMultiply(efficiencyScore / 100, maxScore);
     
     let status = 'poor';
     if (efficiencyScore >= 90) status = 'excellent';
@@ -1258,6 +1530,8 @@ function calculateTaxEfficiencyScore(inputs) {
  * Calculate emergency fund score with debt load consideration
  */
 function calculateEmergencyFundScore(inputs) {
+    console.log('💵 === CALCULATING EMERGENCY FUND SCORE ===');
+    
     // Calculate total monthly expenses including debt payments
     let monthlyExpenses = 0;
     
@@ -1275,9 +1549,22 @@ function calculateEmergencyFundScore(inputs) {
         }, 0);
         
         monthlyExpenses += monthlyDebtPayments;
+        console.log('💸 Monthly expenses from structure:', monthlyExpenses);
     } else {
-        // Fallback to legacy field
-        monthlyExpenses = parseFloat(inputs.currentMonthlyExpenses || inputs.currentSalary || 0);
+        // Fallback to legacy field or estimate from salary
+        monthlyExpenses = parseFloat(inputs.currentMonthlyExpenses || 0);
+        
+        // If still no expenses, estimate from salary (common rule: 70-80% of income)
+        if (monthlyExpenses === 0) {
+            const monthlyIncome = getFieldValue(inputs, [
+                'currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome'
+            ], { allowZero: true });
+            
+            if (monthlyIncome > 0) {
+                monthlyExpenses = monthlyIncome * 0.75; // Estimate 75% of income as expenses
+                console.log('💸 Estimated monthly expenses from income:', monthlyExpenses);
+            }
+        }
     }
     
     // Get emergency fund amount with enhanced field mapping
@@ -1288,30 +1575,59 @@ function calculateEmergencyFundScore(inputs) {
             'emergencyFund', 'currentBankAccount', 'currentSavingsAccount', 'emergencyFundAmount',
             'cashReserves', 'liquidSavings', 'savingsAccount', 'bankAccount',
             'partner1BankAccount', 'partner2BankAccount'
-        ], { combinePartners: true });
+        ], { combinePartners: true, allowZero: true });
     } else {
         emergencyFund = getFieldValue(inputs, [
             'emergencyFund', 'currentBankAccount', 'currentSavingsAccount', 'emergencyFundAmount',
             'cashReserves', 'liquidSavings', 'savingsAccount', 'bankAccount'
-        ]);
+        ], { allowZero: true });
     }
     
+    console.log('💰 Emergency fund found:', emergencyFund);
+    console.log('💸 Monthly expenses:', monthlyExpenses);
+    
+    // Handle case where we have no expense data
     if (monthlyExpenses === 0) {
+        // If we have an emergency fund but no expenses, give partial credit
+        if (emergencyFund > 0) {
+            const maxScore = SCORE_FACTORS.emergencyFund.weight;
+            return {
+                score: Math.round(maxScore * 0.3), // Give 30% of max score for having any emergency fund
+                details: {
+                    months: Infinity, // Can't calculate months without expenses
+                    currentAmount: emergencyFund,
+                    targetAmount: 0,
+                    gap: 0,
+                    status: 'partial',
+                    debugInfo: {
+                        reason: 'No monthly expenses found but emergency fund exists',
+                        emergencyFundAmount: emergencyFund,
+                        expensesFound: false,
+                        partialCredit: true
+                    }
+                }
+            };
+        }
+        
         return { 
             score: 0, 
             details: { 
-                months: 0, 
+                months: 0,
+                currentAmount: 0,
+                targetAmount: 0,
+                gap: 0,
                 status: 'unknown',
                 debugInfo: {
                     reason: 'No monthly expenses found',
-                    fieldsChecked: ['expenses structure', 'currentMonthlyExpenses'],
+                    fieldsChecked: ['expenses structure', 'currentMonthlyExpenses', 'salary estimate'],
                     expensesFound: false
                 }
             } 
         };
     }
     
-    const monthsCovered = emergencyFund / monthlyExpenses;
+    // Calculate months covered, handling edge cases
+    const monthsCovered = safeDivide(emergencyFund, monthlyExpenses, 0);
     
     // Calculate debt-to-income ratio to adjust emergency fund recommendations
     const monthlyIncome = getFieldValue(inputs, [
@@ -1335,7 +1651,7 @@ function calculateEmergencyFundScore(inputs) {
         }, 0);
     }
     
-    const debtToIncomeRatio = totalMonthlyIncome > 0 ? monthlyDebtPayments / totalMonthlyIncome : 0;
+    const debtToIncomeRatio = safeDivide(monthlyDebtPayments, totalMonthlyIncome, 0);
     
     // Adjust target months based on debt load
     let targetMonths = SCORE_FACTORS.emergencyFund.benchmarks.good; // Default 6 months
@@ -1366,14 +1682,19 @@ function calculateEmergencyFundScore(inputs) {
         status = 'critical';
     }
     
+    const finalScore = Math.round(score);
+    console.log(`✅ Emergency Fund Score: ${finalScore}/${maxScore} (${status})`);
+    console.log(`  Months covered: ${monthsCovered.toFixed(1)}, Target: ${targetMonths}`);
+    
     return {
-        score: Math.round(score),
+        score: finalScore,
         details: {
-            months: monthsCovered,
-            currentAmount: emergencyFund,
+            months: Math.max(0, monthsCovered), // Ensure non-negative months
+            currentAmount: Math.max(0, emergencyFund), // Ensure non-negative amount
             targetAmount: monthlyExpenses * targetMonths,
             gap: Math.max(0, (monthlyExpenses * targetMonths) - emergencyFund),
             status: status,
+            monthlyExpenses: monthlyExpenses,
             adjustedTarget: targetMonths !== SCORE_FACTORS.emergencyFund.benchmarks.good,
             debtAdjustment: {
                 debtToIncomeRatio: debtToIncomeRatio,
@@ -1381,14 +1702,23 @@ function calculateEmergencyFundScore(inputs) {
                 reason: debtToIncomeRatio > 0.3 ? 'high_debt' : 
                        debtToIncomeRatio > 0.2 ? 'moderate_debt' : 'standard'
             },
-            calculationMethod: inputs.expenses ? 'expense_structure_with_debt' : 'legacy_field',
+            calculationMethod: inputs.expenses ? 'expense_structure_with_debt' : 
+                             monthlyExpenses === monthlyIncome * 0.75 ? 'estimated_from_income' : 'legacy_field',
             debugInfo: {
                 monthlyExpensesFound: monthlyExpenses > 0,
-                emergencyFundFound: emergencyFund > 0,
+                emergencyFundFound: emergencyFund >= 0,
+                emergencyFundAmount: emergencyFund,
+                monthlyExpensesAmount: monthlyExpenses,
                 debtConsideration: monthlyDebtPayments > 0 ? 'included' : 'none',
                 fieldsUsed: {
                     expenses: monthlyExpenses > 0 ? 'found' : 'missing',
-                    emergencyFund: emergencyFund > 0 ? 'found' : 'missing'
+                    emergencyFund: emergencyFund >= 0 ? 'found' : 'missing'
+                },
+                scoreCalculation: {
+                    monthsCovered: monthsCovered,
+                    targetMonths: targetMonths,
+                    benchmarks: SCORE_FACTORS.emergencyFund.benchmarks,
+                    finalScore: finalScore
                 }
             }
         }
@@ -1445,7 +1775,7 @@ function calculateDebtManagementScore(inputs) {
         };
     }
     
-    const debtToIncomeRatio = monthlyDebtPayments / totalMonthlyIncome;
+    const debtToIncomeRatio = safeDivide(monthlyDebtPayments, totalMonthlyIncome, 0);
     const maxScore = SCORE_FACTORS.debtManagement.weight;
     
     let score = maxScore;
@@ -1763,11 +2093,221 @@ function calculateFinancialHealthScore(inputs) {
     }
 }
 
+// Validate financial inputs for completeness and correctness
+function validateFinancialInputs(inputs) {
+    const errors = [];
+    const warnings = [];
+    const criticalMissing = [];
+    
+    // Helper function for safe validation
+    const validateNumericField = (fieldName, value, min, max, required = false) => {
+        if (value === undefined || value === null || value === '') {
+            if (required) {
+                errors.push(`${fieldName} is required`);
+            }
+            return false;
+        }
+        
+        const numValue = safeParseFloat(value, NaN);
+        if (isNaN(numValue)) {
+            errors.push(`${fieldName} must be a valid number`);
+            return false;
+        }
+        
+        if (min !== undefined && numValue < min) {
+            errors.push(`${fieldName} must be at least ${min}`);
+            return false;
+        }
+        
+        if (max !== undefined && numValue > max) {
+            errors.push(`${fieldName} must be no more than ${max}`);
+            return false;
+        }
+        
+        return true;
+    };
+    
+    // Required fields validation
+    if (!validateNumericField('Current age', inputs.currentAge, 18, 100, true)) {
+        criticalMissing.push('currentAge');
+    }
+    
+    if (!inputs.retirementAge) {
+        errors.push('Retirement age is required');
+        criticalMissing.push('retirementAge');
+    } else {
+        const currentAge = safeParseFloat(inputs.currentAge, 30);
+        const retirementAge = safeParseFloat(inputs.retirementAge, 67);
+        if (retirementAge <= currentAge) {
+            errors.push('Retirement age must be greater than current age');
+        }
+        if (retirementAge > 100) {
+            errors.push('Retirement age must be less than 100');
+        }
+    }
+    
+    // Currency validation
+    const validCurrencies = ['ILS', 'USD', 'EUR', 'GBP', 'BTC', 'ETH'];
+    if (!inputs.currency || !validCurrencies.includes(inputs.currency)) {
+        warnings.push('Unsupported currency, using ILS as default');
+        inputs.currency = 'ILS';
+    }
+    
+    // Planning type validation
+    if (!inputs.planningType || !['individual', 'couple'].includes(inputs.planningType)) {
+        errors.push('Planning type must be either "individual" or "couple"');
+    }
+    
+    // Couple mode specific validation
+    if (inputs.planningType === 'couple') {
+        // Check for partner age
+        if (!inputs.partnerCurrentAge || inputs.partnerCurrentAge < 18 || inputs.partnerCurrentAge > 100) {
+            warnings.push('Partner age missing or invalid');
+        }
+        
+        // Check for partner retirement age
+        if (!inputs.partnerRetirementAge || inputs.partnerRetirementAge <= inputs.partnerCurrentAge) {
+            warnings.push('Partner retirement age should be greater than partner current age');
+        }
+        
+        // Check for partner salary data
+        if (!inputs.partner1Salary && !inputs.partner2Salary) {
+            warnings.push('No partner salary data provided');
+        }
+    }
+    
+    // Numeric field validation
+    const numericFields = [
+        'currentMonthlySalary', 'monthlyPensionIncome', 'currentMonthlyExpenses',
+        'currentPensionSavings', 'currentPersonalPortfolio', 'emergencyFund',
+        'currentBankAccount', 'currentCrypto', 'currentRealEstate'
+    ];
+    
+    numericFields.forEach(field => {
+        if (inputs[field] !== undefined && inputs[field] !== null && inputs[field] !== '') {
+            const value = parseFloat(inputs[field]);
+            if (isNaN(value) || value < 0) {
+                warnings.push(`${field} must be a positive number`);
+            }
+        }
+    });
+    
+    // Percentage validation
+    const percentageFields = [
+        'pensionEmployeeRate', 'pensionEmployerRate', 
+        'trainingFundEmployeeRate', 'trainingFundEmployerRate',
+        'personalPortfolioReturn', 'cryptoReturn'
+    ];
+    
+    percentageFields.forEach(field => {
+        if (inputs[field] !== undefined && inputs[field] !== null && inputs[field] !== '') {
+            const value = parseFloat(inputs[field]);
+            if (isNaN(value) || value < 0 || value > 100) {
+                warnings.push(`${field} must be between 0 and 100`);
+            }
+        }
+    });
+    
+    // RSU validation
+    if (inputs.rsuUnits || inputs.rsuCurrentStockPrice) {
+        if (!inputs.rsuUnits || inputs.rsuUnits <= 0) {
+            warnings.push('RSU units must be greater than 0');
+        }
+        if (!inputs.rsuCurrentStockPrice || inputs.rsuCurrentStockPrice <= 0) {
+            warnings.push('RSU stock price must be greater than 0');
+        }
+        if (!inputs.rsuFrequency) {
+            warnings.push('RSU frequency not specified');
+        }
+    }
+    
+    // Expense validation
+    if (inputs.expenses && typeof inputs.expenses === 'object') {
+        Object.entries(inputs.expenses).forEach(([category, amount]) => {
+            const value = parseFloat(amount);
+            if (isNaN(value) || value < 0) {
+                warnings.push(`Expense category "${category}" must be a positive number`);
+            }
+        });
+    }
+    
+    // Risk tolerance validation
+    const validRiskLevels = ['conservative', 'moderate', 'aggressive'];
+    if (inputs.riskTolerance && !validRiskLevels.includes(inputs.riskTolerance)) {
+        warnings.push('Risk tolerance should be conservative, moderate, or aggressive');
+    }
+    
+    // Data quality assessment
+    let dataCompleteness = 0;
+    const dataFields = [
+        'currentMonthlySalary', 'currentPensionSavings', 'emergencyFund',
+        'pensionEmployeeRate', 'pensionEmployerRate', 'currentPersonalPortfolio',
+        'currentRealEstate', 'currentCrypto', 'expenses'
+    ];
+    
+    dataFields.forEach(field => {
+        if (inputs[field] && inputs[field] !== '0') {
+            dataCompleteness++;
+        }
+    });
+    
+    const completenessPercentage = Math.round((dataCompleteness / dataFields.length) * 100);
+    
+    if (completenessPercentage < 30) {
+        warnings.push(`Low data completeness (${completenessPercentage}%). Consider adding more financial information for accurate scoring.`);
+    }
+    
+    // Generate recommendations based on missing data
+    const recommendations = [];
+    
+    if (!inputs.currentMonthlySalary && !inputs.monthlyIncome) {
+        recommendations.push({
+            field: 'income',
+            message: 'Add monthly income for accurate savings rate calculation',
+            impact: 'high'
+        });
+    }
+    
+    if (!inputs.emergencyFund && !inputs.currentBankAccount) {
+        recommendations.push({
+            field: 'emergencyFund',
+            message: 'Add emergency fund amount to assess financial resilience',
+            impact: 'medium'
+        });
+    }
+    
+    if (!inputs.pensionEmployeeRate && !inputs.pensionContributionRate) {
+        recommendations.push({
+            field: 'contributions',
+            message: 'Add pension contribution rates to calculate savings rate',
+            impact: 'high'
+        });
+    }
+    
+    return {
+        isValid: errors.length === 0,
+        errors: errors,
+        warnings: warnings,
+        criticalMissing: criticalMissing,
+        recommendations: recommendations,
+        summary: {
+            errorCount: errors.length,
+            warningCount: warnings.length,
+            hasRequiredFields: criticalMissing.length === 0,
+            hasCompleteData: warnings.length === 0,
+            dataCompleteness: completenessPercentage,
+            validationLevel: errors.length === 0 ? 
+                (warnings.length === 0 ? 'complete' : 'partial') : 'invalid'
+        }
+    };
+}
+
 // Export functions to window for global access
 window.calculateFinancialHealthScore = calculateFinancialHealthScore;
 window.SCORE_FACTORS = SCORE_FACTORS;
 window.generateImprovementSuggestions = generateImprovementSuggestions;
 window.getPeerComparison = getPeerComparison;
+window.validateFinancialInputs = validateFinancialInputs;
 
 // Export individual calculator functions to prevent conflicts
 window.financialHealthEngine = {
@@ -1778,7 +2318,8 @@ window.financialHealthEngine = {
     calculateDiversificationScore,
     calculateTaxEfficiencyScore,
     calculateEmergencyFundScore,
-    calculateDebtManagementScore
+    calculateDebtManagementScore,
+    validateFinancialInputs
 };
 
 console.log('✅ Financial Health Engine loaded successfully');

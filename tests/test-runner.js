@@ -2771,6 +2771,30 @@ async function runAllTests() {
     // Missing Data Modal Tests (v7.0.3+)
     testMissingDataModalFunctionality();
     
+    // Financial Health Score Tests (AUDIT-001)
+    console.log('\n💰 Running Financial Health Tests...');
+    try {
+        const { execSync } = require('child_process');
+        const financialHealthTestPath = path.join(__dirname, 'financial-health-browser-test.js');
+        
+        if (fs.existsSync(financialHealthTestPath)) {
+            const result = execSync(`node ${financialHealthTestPath}`, { encoding: 'utf8' });
+            // Parse the output to update test counts
+            const passMatch = result.match(/Tests Passed: (\d+)/);
+            const failMatch = result.match(/Tests Failed: (\d+)/);
+            
+            if (passMatch) testsPassed += parseInt(passMatch[1]);
+            if (failMatch) testsFailed += parseInt(failMatch[1]);
+            
+            console.log('✅ Financial Health tests completed');
+        } else {
+            logTest('Financial Health test suite', false, 'Test file not found');
+        }
+    } catch (error) {
+        logTest('Financial Health test suite', false, 'Failed to run tests');
+        console.log('   Run manually: node tests/financial-health-browser-test.js');
+    }
+    
     // Summary
     console.log('\n📊 Test Summary');
     console.log('================');

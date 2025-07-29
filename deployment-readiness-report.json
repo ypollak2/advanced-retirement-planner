@@ -1,0 +1,32 @@
+{
+  "passed": [
+    "Node.js version check",
+    "Full test suite",
+    "License compliance check",
+    "Secret scanner",
+    "Correct branch"
+  ],
+  "failed": [
+    "Version consistency",
+    "Performance tests"
+  ],
+  "warnings": [
+    "NPM security audit",
+    "Uncommitted changes present"
+  ],
+  "testResults": {},
+  "versionInfo": {
+    "package": "7.1.1",
+    "versionFile": "7.1.1",
+    "readme": null,
+    "buildDate": "2025-07-29",
+    "description": "Enhanced RSU input with stock symbol selection and real-time price lookup"
+  },
+  "timestamp": "2025-07-29T14:48:55.174Z",
+  "summary": {
+    "ready": false,
+    "passedChecks": 5,
+    "failedChecks": 2,
+    "warnings": 2
+  }
+}

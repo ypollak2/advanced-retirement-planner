@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Financial Health Score Fixes</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .test-scenario {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .scenario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .scenario-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .status-pass { background: #d4edda; color: #155724; }
+        .status-fail { background: #f8d7da; color: #721c24; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .score-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .score-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .score-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        .score-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .debug-info {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .summary-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .summary-item {
+            text-align: center;
+        }
+        .summary-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .improvement { color: #28a745; }
+        .regression { color: #dc3545; }
+        .no-change { color: #6c757d; }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .console-output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 Verify Financial Health Score Fixes</h1>
+        <p>Testing Phase 1 fixes for retirement readiness, emergency fund, and field mapping</p>
+    </div>
+
+    <div class="summary-card">
+        <h2>Test Summary</h2>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="summary-label">Total Scenarios</div>
+                <div class="summary-value">10</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Tests Passed</div>
+                <div class="summary-value improvement" id="passedCount">0</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Tests Failed</div>
+                <div class="summary-value regression" id="failedCount">0</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Success Rate</div>
+                <div class="summary-value" id="successRate">0%</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin: 20px 0;">
+        <button onclick="runAllTests()">🚀 Run All Tests</button>
+        <button onclick="runSpecificTest()">🎯 Run Specific Test</button>
+        <button onclick="showConsole()">📋 Toggle Console</button>
+    </div>
+
+    <div id="testResults"></div>
+
+    <div id="consoleOutput" class="console-output" style="display: none;"></div>
+
+    <!-- Load dependencies -->
+    <script src="src/utils/financialHealthEngine.js"></script>
+    <script src="tests/scenarios/financial-health-scenarios.test.js"></script>
+
+    <script>
+        let consoleLog = '';
+        const originalConsoleLog = console.log;
+        const originalConsoleWarn = console.warn;
+        const originalConsoleError = console.error;
+
+        // Capture console output
+        console.log = function(...args) {
+            consoleLog += '[LOG] ' + args.join(' ') + '\n';
+            originalConsoleLog.apply(console, args);
+        };
+        console.warn = function(...args) {
+            consoleLog += '[WARN] ' + args.join(' ') + '\n';
+            originalConsoleWarn.apply(console, args);
+        };
+        console.error = function(...args) {
+            consoleLog += '[ERROR] ' + args.join(' ') + '\n';
+            originalConsoleError.apply(console, args);
+        };
+
+        function updateConsoleOutput() {
+            document.getElementById('consoleOutput').textContent = consoleLog;
+        }
+
+        function showConsole() {
+            const consoleEl = document.getElementById('consoleOutput');
+            consoleEl.style.display = consoleEl.style.display === 'none' ? 'block' : 'none';
+            updateConsoleOutput();
+        }
+
+        async function runAllTests() {
+            consoleLog = '=== Starting Test Run ===\n';
+            const resultsContainer = document.getElementById('testResults');
+            resultsContainer.innerHTML = '';
+            
+            let passed = 0;
+            let failed = 0;
+            
+            for (const scenario of window.TEST_SCENARIOS) {
+                const result = await testScenario(scenario);
+                displayResult(scenario, result);
+                
+                if (result.passed) {
+                    passed++;
+                } else {
+                    failed++;
+                }
+            }
+            
+            // Update summary
+            document.getElementById('passedCount').textContent = passed;
+            document.getElementById('failedCount').textContent = failed;
+            document.getElementById('successRate').textContent = 
+                Math.round((passed / window.TEST_SCENARIOS.length) * 100) + '%';
+            
+            updateConsoleOutput();
+            consoleLog += '\n=== Test Run Complete ===\n';
+        }
+
+        async function testScenario(scenario) {
+            consoleLog += `\n--- Testing Scenario ${scenario.id}: ${scenario.name} ---\n`;
+            
+            try {
+                // Run the financial health score calculation
+                const result = window.calculateFinancialHealthScore(scenario.input);
+                
+                // Check if result is within expected range
+                const totalScore = result.totalScore;
+                const expected = scenario.expected.totalScore;
+                const passed = totalScore >= expected.min && totalScore <= expected.max;
+                
+                // Check for specific issues
+                const issues = [];
+                
+                // Check retirement readiness
+                if (result.factors.retirementReadiness) {
+                    const rrScore = result.factors.retirementReadiness.score;
+                    if (rrScore === 0 && scenario.input.currentPensionSavings > 0) {
+                        issues.push('Retirement readiness still returning 0 despite savings');
+                    }
+                }
+                
+                // Check emergency fund
+                if (result.factors.emergencyFund) {
+                    const efScore = result.factors.emergencyFund.details.months;
+                    if (efScore < 0) {
+                        issues.push('Emergency fund returning negative value');
+                    }
+                }
+                
+                // Check for NaN/Infinity
+                const hasInvalidValues = checkForInvalidValues(result);
+                if (hasInvalidValues) {
+                    issues.push('Contains NaN or Infinity values');
+                }
+                
+                return {
+                    passed: passed && issues.length === 0,
+                    actualScore: totalScore,
+                    expectedRange: { min: expected.min, max: expected.max },
+                    factors: result.factors,
+                    issues: issues,
+                    debugInfo: result.debugInfo
+                };
+                
+            } catch (error) {
+                consoleLog += `ERROR: ${error.message}\n`;
+                return {
+                    passed: false,
+                    error: error.message,
+                    issues: ['Calculation threw an error']
+                };
+            }
+        }
+
+        function checkForInvalidValues(obj) {
+            for (const key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    const value = obj[key];
+                    if (typeof value === 'number' && (isNaN(value) || !isFinite(value))) {
+                        return true;
+                    }
+                    if (typeof value === 'object' && value !== null) {
+                        if (checkForInvalidValues(value)) return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function displayResult(scenario, result) {
+            const container = document.getElementById('testResults');
+            const scenarioDiv = document.createElement('div');
+            scenarioDiv.className = 'test-scenario';
+            
+            const statusClass = result.passed ? 'status-pass' : 'status-fail';
+            const statusText = result.passed ? 'PASS' : 'FAIL';
+            
+            let debugInfo = '';
+            if (result.factors) {
+                debugInfo = `
+                    <div class="debug-info">
+                        <strong>Factor Scores:</strong><br>
+                        Savings Rate: ${result.factors.savingsRate?.score || 0}/${SCORE_FACTORS.savingsRate.weight}<br>
+                        Retirement Readiness: ${result.factors.retirementReadiness?.score || 0}/${SCORE_FACTORS.retirementReadiness.weight}<br>
+                        Emergency Fund: ${result.factors.emergencyFund?.score || 0}/${SCORE_FACTORS.emergencyFund.weight}<br>
+                        ${result.issues.length > 0 ? '<br><strong>Issues:</strong><br>' + result.issues.join('<br>') : ''}
+                    </div>
+                `;
+            }
+            
+            scenarioDiv.innerHTML = `
+                <div class="scenario-header">
+                    <div class="scenario-title">${scenario.id}. ${scenario.name}</div>
+                    <div class="status-badge ${statusClass}">${statusText}</div>
+                </div>
+                <div class="score-details">
+                    <div class="score-item">
+                        <div class="score-label">Actual Score</div>
+                        <div class="score-value">${result.actualScore || 0}</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Expected Range</div>
+                        <div class="score-value">${result.expectedRange.min}-${result.expectedRange.max}</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Status</div>
+                        <div class="score-value">${result.passed ? '✅' : '❌'}</div>
+                    </div>
+                </div>
+                ${debugInfo}
+            `;
+            
+            container.appendChild(scenarioDiv);
+        }
+
+        function runSpecificTest() {
+            const id = prompt('Enter scenario ID (1-10):');
+            if (id && id >= 1 && id <= 10) {
+                const scenario = window.TEST_SCENARIOS.find(s => s.id === parseInt(id));
+                if (scenario) {
+                    consoleLog = `=== Testing Single Scenario ${id} ===\n`;
+                    testScenario(scenario).then(result => {
+                        document.getElementById('testResults').innerHTML = '';
+                        displayResult(scenario, result);
+                        updateConsoleOutput();
+                    });
+                }
+            }
+        }
+
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                console.log('Test environment loaded. Click "Run All Tests" to begin.');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

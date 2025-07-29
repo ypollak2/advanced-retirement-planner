@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Health Score Test Runner - AUDIT-001</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .status-bar {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .status-ready {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-running {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-complete {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .main-content {
+            padding: 30px;
+        }
+        
+        .results-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .summary-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .summary-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .summary-passed { color: #27ae60; }
+        .summary-failed { color: #e74c3c; }
+        .summary-rate { color: #3498db; }
+        .summary-time { color: #9b59b6; }
+        
+        .test-results {
+            margin-top: 30px;
+        }
+        
+        .scenario {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .scenario-header {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+        
+        .scenario-header:hover {
+            background: #f8f9fa;
+        }
+        
+        .scenario-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .scenario-status {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .status-pass {
+            background: #27ae60;
+        }
+        
+        .status-fail {
+            background: #e74c3c;
+        }
+        
+        .status-pending {
+            background: #95a5a6;
+        }
+        
+        .scenario-info h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .scenario-profile {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .scenario-score {
+            text-align: right;
+        }
+        
+        .actual-score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .expected-range {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .scenario-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .scenario-details.expanded {
+            max-height: 2000px;
+        }
+        
+        .details-content {
+            padding: 0 20px 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .factor-breakdown, .validation-results {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+        }
+        
+        .factor-breakdown h5, .validation-results h5 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .factor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .factor-item:last-child {
+            border-bottom: none;
+        }
+        
+        .factor-score {
+            font-weight: bold;
+        }
+        
+        .factor-expected {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+        
+        .validation-item {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .validation-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+        
+        .validation-pass {
+            background: #27ae60;
+        }
+        
+        .validation-fail {
+            background: #e74c3c;
+        }
+        
+        .validation-warning {
+            background: #f39c12;
+        }
+        
+        .error-list {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .error-item {
+            color: #721c24;
+            margin: 5px 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .log-output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 6px;
+            padding: 20px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .status-bar {
+                justify-content: center;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Financial Health Score Test Runner</h1>
+            <p>AUDIT-001: Comprehensive validation of all 10 test scenarios</p>
+        </div>
+        
+        <div class="controls">
+            <div>
+                <button id="runTests" class="btn btn-primary">▶️ Run All Tests</button>
+                <button id="runSingle" class="btn btn-warning">🎯 Run Single Test</button>
+                <button id="clearResults" class="btn btn-danger">🗑️ Clear Results</button>
+            </div>
+            <div class="status-bar">
+                <div id="testStatus" class="status-indicator status-ready">Ready to Test</div>
+                <div id="progressText">0/10 tests completed</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            
+            <div class="results-summary">
+                <div class="summary-card">
+                    <h3>Tests Passed</h3>
+                    <div id="passedCount" class="summary-value summary-passed">0</div>
+                    <small>Scenarios within expected range</small>
+                </div>
+                <div class="summary-card">
+                    <h3>Tests Failed</h3>
+                    <div id="failedCount" class="summary-value summary-failed">0</div>
+                    <small>Scenarios outside expected range</small>
+                </div>
+                <div class="summary-card">
+                    <h3>Success Rate</h3>
+                    <div id="successRate" class="summary-value summary-rate">0%</div>
+                    <small>Overall test success percentage</small>
+                </div>
+                <div class="summary-card">
+                    <h3>Execution Time</h3>
+                    <div id="executionTime" class="summary-value summary-time">0ms</div>
+                    <small>Total time for all tests</small>
+                </div>
+            </div>
+            
+            <div class="test-results">
+                <h2>Test Scenarios</h2>
+                <div id="scenarioResults"></div>
+            </div>
+            
+            <div id="logOutput" class="log-output" style="display: none;">
+                <h3>Execution Log</h3>
+                <pre id="logContent"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load dependencies -->
+    <script src="src/utils/testValidation.js"></script>
+    <script src="src/utils/inputValidation.js"></script>
+    <script src="src/utils/retirementCalculations.js"></script>
+    <script src="src/utils/financialHealthEngine.js"></script>
+    <script src="tests/scenarios/financial-health-scenarios.test.js"></script>
+
+    <script>
+        class TestRunnerUI {
+            constructor() {
+                this.currentTest = 0;
+                this.results = [];
+                this.startTime = 0;
+                this.endTime = 0;
+                this.isRunning = false;
+                
+                this.initializeEventListeners();
+                this.renderInitialScenarios();
+            }
+            
+            initializeEventListeners() {
+                document.getElementById('runTests').addEventListener('click', () => this.runAllTests());
+                document.getElementById('runSingle').addEventListener('click', () => this.showSingleTestModal());
+                document.getElementById('clearResults').addEventListener('click', () => this.clearResults());
+                
+                // Listen for test completion events
+                window.addEventListener('scenarioTestsComplete', (event) => {
+                    this.handleTestCompletion(event.detail);
+                });
+            }
+            
+            renderInitialScenarios() {
+                const container = document.getElementById('scenarioResults');
+                container.innerHTML = '';
+                
+                window.TEST_SCENARIOS.forEach((scenario, index) => {
+                    container.appendChild(this.createScenarioElement(scenario, index));
+                });
+            }
+            
+            createScenarioElement(scenario, index) {
+                const element = document.createElement('div');
+                element.className = 'scenario';
+                element.id = `scenario-${scenario.id}`;
+                
+                element.innerHTML = `
+                    <div class="scenario-header" onclick="this.parentElement.querySelector('.scenario-details').classList.toggle('expanded')">
+                        <div class="scenario-title">
+                            <div class="scenario-status status-pending" id="status-${scenario.id}">
+                                ${scenario.id}
+                            </div>
+                            <div class="scenario-info">
+                                <h4>${scenario.name}</h4>
+                                <div class="scenario-profile">${scenario.profile}</div>
+                            </div>
+                        </div>
+                        <div class="scenario-score">
+                            <div class="actual-score" id="actual-${scenario.id}">--</div>
+                            <div class="expected-range">Expected: ${scenario.expected.totalScore.min}-${scenario.expected.totalScore.max}</div>
+                        </div>
+                    </div>
+                    <div class="scenario-details">
+                        <div class="details-content">
+                            <div class="details-grid">
+                                <div class="factor-breakdown">
+                                    <h5>Factor Breakdown</h5>
+                                    <div id="factors-${scenario.id}">
+                                        ${Object.entries(scenario.expected.factors).map(([factor, expected]) => `
+                                            <div class="factor-item">
+                                                <span>${this.formatFactorName(factor)}</span>
+                                                <div>
+                                                    <span class="factor-score" id="factor-${scenario.id}-${factor}">--</span>
+                                                    <span class="factor-expected">/${expected.outOf} (${expected.min}-${expected.max})</span>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                <div class="validation-results">
+                                    <h5>Validations</h5>
+                                    <div id="validations-${scenario.id}">
+                                        ${scenario.validations.map((validation, vIndex) => `
+                                            <div class="validation-item">
+                                                <div class="validation-icon" id="validation-${scenario.id}-${vIndex}"></div>
+                                                <span>${validation}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="errors-${scenario.id}" class="error-list" style="display: none;">
+                                <h5>Errors</h5>
+                                <div id="error-content-${scenario.id}"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                return element;
+            }
+            
+            formatFactorName(factor) {
+                return factor.replace(/([A-Z])/g, ' $1')
+                    .replace(/^./, str => str.toUpperCase());
+            }
+            
+            async runAllTests() {
+                if (this.isRunning) return;
+                
+                // Validate environment first
+                const validation = window.TestValidation.validate();
+                if (!validation.isReady) {
+                    alert(`Cannot run tests: Environment validation failed with ${validation.errors.length} errors.\n\n${validation.errors.join('\n')}\n\nCheck console for details.`);
+                    return;
+                }
+                
+                this.isRunning = true;
+                this.startTime = Date.now();
+                this.updateStatus('Running tests...', 'status-running');
+                
+                try {
+                    const runner = new window.ScenarioTestRunner();
+                    const results = await runner.runAllScenarios();
+                    this.handleTestCompletion(results);
+                } catch (error) {
+                    console.error('Test execution failed:', error);
+                    this.updateStatus('Test execution failed', 'status-ready');
+                    this.isRunning = false;
+                }
+            }
+            
+            handleTestCompletion(results) {
+                this.endTime = Date.now();
+                this.results = results.results;
+                this.isRunning = false;
+                
+                this.updateSummary(results);
+                this.updateScenarioResults();
+                this.updateStatus('Tests completed', 'status-complete');
+                
+                // Show log output
+                document.getElementById('logOutput').style.display = 'block';
+            }
+            
+            updateSummary(results) {
+                document.getElementById('passedCount').textContent = results.passed;
+                document.getElementById('failedCount').textContent = results.failed;
+                document.getElementById('successRate').textContent = results.successRate.toFixed(1) + '%';
+                document.getElementById('executionTime').textContent = (this.endTime - this.startTime) + 'ms';
+                document.getElementById('progressText').textContent = `${results.total}/${results.total} tests completed`;
+                document.getElementById('progressFill').style.width = '100%';
+            }
+            
+            updateScenarioResults() {
+                this.results.forEach(result => {
+                    const statusEl = document.getElementById(`status-${result.scenarioId}`);
+                    const actualEl = document.getElementById(`actual-${result.scenarioId}`);
+                    const errorsEl = document.getElementById(`errors-${result.scenarioId}`);
+                    const errorContentEl = document.getElementById(`error-content-${result.scenarioId}`);
+                    
+                    // Update status indicator
+                    statusEl.className = `scenario-status ${result.passed ? 'status-pass' : 'status-fail'}`;
+                    statusEl.innerHTML = result.passed ? '✓' : '✗';
+                    
+                    // Update actual score
+                    const score = result.actualScore?.totalScore || 0;
+                    actualEl.textContent = score.toFixed(1);
+                    actualEl.style.color = result.passed ? '#27ae60' : '#e74c3c';
+                    
+                    // Update factor scores
+                    if (result.factorBreakdown) {
+                        Object.entries(result.factorBreakdown).forEach(([factor, score]) => {
+                            const factorEl = document.getElementById(`factor-${result.scenarioId}-${factor}`);
+                            if (factorEl) {
+                                factorEl.textContent = score.toFixed(1);
+                            }
+                        });
+                    }
+                    
+                    // Update validation results
+                    const scenario = window.TEST_SCENARIOS.find(s => s.id === result.scenarioId);
+                    if (scenario) {
+                        scenario.validations.forEach((validation, index) => {
+                            const validationEl = document.getElementById(`validation-${result.scenarioId}-${index}`);
+                            if (validationEl) {
+                                validationEl.className = `validation-icon ${result.passed ? 'validation-pass' : 'validation-warning'}`;
+                            }
+                        });
+                    }
+                    
+                    // Show errors if any
+                    if (result.errors && result.errors.length > 0) {
+                        errorsEl.style.display = 'block';
+                        errorContentEl.innerHTML = result.errors.map(error => 
+                            `<div class="error-item">• ${error}</div>`
+                        ).join('');
+                    } else {
+                        errorsEl.style.display = 'none';
+                    }
+                });
+            }
+            
+            updateStatus(text, className) {
+                const statusEl = document.getElementById('testStatus');
+                statusEl.textContent = text;
+                statusEl.className = `status-indicator ${className}`;
+            }
+            
+            clearResults() {
+                this.results = [];
+                this.currentTest = 0;
+                
+                // Reset summary
+                document.getElementById('passedCount').textContent = '0';
+                document.getElementById('failedCount').textContent = '0';
+                document.getElementById('successRate').textContent = '0%';
+                document.getElementById('executionTime').textContent = '0ms';
+                document.getElementById('progressText').textContent = '0/10 tests completed';
+                document.getElementById('progressFill').style.width = '0%';
+                
+                // Reset scenarios
+                window.TEST_SCENARIOS.forEach(scenario => {
+                    const statusEl = document.getElementById(`status-${scenario.id}`);
+                    const actualEl = document.getElementById(`actual-${scenario.id}`);
+                    const errorsEl = document.getElementById(`errors-${scenario.id}`);
+                    
+                    statusEl.className = 'scenario-status status-pending';
+                    statusEl.textContent = scenario.id;
+                    actualEl.textContent = '--';
+                    actualEl.style.color = '#2c3e50';
+                    errorsEl.style.display = 'none';
+                    
+                    // Reset factor scores
+                    Object.keys(scenario.expected.factors).forEach(factor => {
+                        const factorEl = document.getElementById(`factor-${scenario.id}-${factor}`);
+                        if (factorEl) {
+                            factorEl.textContent = '--';
+                        }
+                    });
+                    
+                    // Reset validation icons
+                    scenario.validations.forEach((validation, index) => {
+                        const validationEl = document.getElementById(`validation-${scenario.id}-${index}`);
+                        if (validationEl) {
+                            validationEl.className = 'validation-icon';
+                        }
+                    });
+                });
+                
+                this.updateStatus('Ready to test', 'status-ready');
+                document.getElementById('logOutput').style.display = 'none';
+            }
+            
+            showSingleTestModal() {
+                const scenarioId = prompt('Enter scenario ID (1-10):');
+                if (scenarioId && scenarioId >= 1 && scenarioId <= 10) {
+                    this.runSingleTest(parseInt(scenarioId));
+                }
+            }
+            
+            async runSingleTest(scenarioId) {
+                const scenario = window.TEST_SCENARIOS.find(s => s.id === scenarioId);
+                if (!scenario) return;
+                
+                this.updateStatus(`Running scenario ${scenarioId}...`, 'status-running');
+                
+                try {
+                    const runner = new window.ScenarioTestRunner();
+                    const result = await runner.runScenario(scenario);
+                    this.results[scenarioId - 1] = result;
+                    this.updateScenarioResults();
+                    this.updateStatus('Single test completed', 'status-complete');
+                } catch (error) {
+                    console.error('Single test failed:', error);
+                    this.updateStatus('Single test failed', 'status-ready');
+                }
+            }
+        }
+        
+        // Initialize the UI when the page loads
+        window.addEventListener('load', () => {
+            // Wait for all dependencies to load
+            setTimeout(() => {
+                new TestRunnerUI();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

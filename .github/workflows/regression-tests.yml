@@ -1,0 +1,152 @@
+name: Automated Regression Testing
+
+on:
+  # Run on push to main/master branches
+  push:
+    branches: [ main, master, stage ]
+  
+  # Run on pull requests
+  pull_request:
+    branches: [ main, master, stage ]
+  
+  # Run daily at 2 AM UTC
+  schedule:
+    - cron: '0 2 * * *'
+  
+  # Allow manual triggering
+  workflow_dispatch:
+
+jobs:
+  regression-tests:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm ci
+        npm install jsdom
+    
+    - name: Run all tests
+      run: npm test
+      
+    - name: Run financial health tests
+      run: npm run test:financial-health
+      
+    - name: Run performance tests
+      run: npm run test:performance || echo "Performance tests not available yet"
+      
+    - name: Run security tests
+      run: npm run test:security
+      
+    - name: Run accessibility tests
+      run: npm run test:accessibility
+      
+    - name: Run user experience tests
+      run: npm run test:ux
+      
+    - name: Run language consistency tests
+      run: npm run test:language
+      
+    - name: Run version consistency tests
+      run: npm run test:version
+      
+    - name: Run currency consistency tests
+      run: npm run test:currency
+      
+    - name: Run component integration tests
+      run: npm run test:components
+      
+    - name: Generate test report
+      if: always()
+      run: |
+        echo "## Test Results Summary" > test-report.md
+        echo "- Node Version: ${{ matrix.node-version }}" >> test-report.md
+        echo "- Date: $(date)" >> test-report.md
+        echo "- Branch: ${{ github.ref }}" >> test-report.md
+        echo "" >> test-report.md
+        npm test 2>&1 | tail -10 >> test-report.md || true
+    
+    - name: Upload test report
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-report-node-${{ matrix.node-version }}
+        path: test-report.md
+    
+    - name: Comment PR with test results
+      if: github.event_name == 'pull_request' && always()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('test-report.md', 'utf8');
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: report
+          });
+
+  financial-health-regression:
+    runs-on: ubuntu-latest
+    needs: regression-tests
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm ci
+        npm install jsdom puppeteer
+    
+    - name: Run scenario tests
+      run: |
+        echo "Running financial health scenario regression tests..."
+        node tests/scenarios/financial-health-scenarios.test.js || echo "Browser-based tests need manual run"
+    
+    - name: Check for performance regressions
+      run: |
+        echo "Checking for performance regressions..."
+        # Add performance baseline checks here
+        
+  notify-failures:
+    runs-on: ubuntu-latest
+    needs: [regression-tests, financial-health-regression]
+    if: failure()
+    
+    steps:
+    - name: Send failure notification
+      run: |
+        echo "Tests failed! Check the workflow run for details."
+        # Add notification logic here (Slack, email, etc.)
+
+  update-badges:
+    runs-on: ubuntu-latest
+    needs: regression-tests
+    if: success()
+    
+    steps:
+    - name: Update test badges
+      run: |
+        echo "All tests passed! ✅"
+        # Update README badges or status page

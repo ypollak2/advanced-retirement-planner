@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify RSU Fix - High Earner Scenario</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2c3e50; }
+        .test-input {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .result {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .score-breakdown {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .score-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .console {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 RSU Fix Verification - Scenario 4: High Earner</h1>
+        
+        <div class="test-input">
+            <h3>Test Input Data:</h3>
+            <pre>{
+    planningType: "individual",
+    currentAge: 38,
+    retirementAge: 60,
+    country: "israel",
+    currentMonthlySalary: 40000,
+    currency: "ILS",
+    rsuCompany: "AAPL",
+    rsuUnits: 100,
+    rsuFrequency: "quarterly",
+    rsuCurrentStockPrice: 190.75,
+    currentPensionSavings: 300000,
+    emergencyFund: 200000
+}</pre>
+        </div>
+        
+        <button onclick="runTest()">Run RSU Test</button>
+        
+        <div id="result"></div>
+        <div id="console" class="console" style="display: none;"></div>
+    </div>
+
+    <script src="src/utils/financialHealthEngine.js"></script>
+    
+    <script>
+        let consoleLog = '';
+        const originalLog = console.log;
+        console.log = function(...args) {
+            consoleLog += args.join(' ') + '\n';
+            originalLog.apply(console, args);
+        };
+
+        function runTest() {
+            consoleLog = '';
+            
+            const testInput = {
+                planningType: "individual",
+                currentAge: 38,
+                retirementAge: 60,
+                country: "israel",
+                currentMonthlySalary: 40000,
+                currency: "ILS",
+                rsuCompany: "AAPL",
+                rsuUnits: 100,
+                rsuFrequency: "quarterly",
+                rsuCurrentStockPrice: 190.75,
+                annualBonus: 150000,
+                currentPensionSavings: 300000,
+                currentCrypto: 100000,
+                currentPersonalPortfolio: 500000,
+                emergencyFund: 200000,
+                pensionEmployeeRate: 7,
+                pensionEmployerRate: 14.33,
+                trainingFundEmployeeRate: 2.5,
+                trainingFundEmployerRate: 7.5,
+                currentMonthlyExpenses: 25000
+            };
+            
+            try {
+                const result = window.calculateFinancialHealthScore(testInput);
+                
+                // Calculate expected RSU monthly income
+                const expectedMonthlyRSU = (100 * 190.75 * 4) / 12; // units × price × quarterly / 12
+                const expectedMonthlyRSUInILS = expectedMonthlyRSU * 3.5; // Convert USD to ILS
+                const totalMonthlyIncome = 40000 + expectedMonthlyRSUInILS;
+                
+                // Check if RSU income was included
+                const savingsRateDetails = result.factors.savingsRate.details;
+                const rsuIncluded = savingsRateDetails.monthlyIncome > 40000;
+                
+                let html = '<div class="result ' + (rsuIncluded ? 'success' : 'error') + '">';
+                html += '<h3>' + (rsuIncluded ? '✅ RSU Fix Verified!' : '❌ RSU Fix Failed') + '</h3>';
+                
+                html += '<div class="score-breakdown">';
+                html += '<div class="score-item">';
+                html += '<strong>Total Score:</strong> ' + result.totalScore + '/100<br>';
+                html += '<strong>Status:</strong> ' + result.status;
+                html += '</div>';
+                
+                html += '<div class="score-item">';
+                html += '<strong>Monthly Salary:</strong> ₪40,000<br>';
+                html += '<strong>RSU Income (USD):</strong> $' + expectedMonthlyRSU.toFixed(2) + '/month<br>';
+                html += '<strong>RSU Income (ILS):</strong> ₪' + expectedMonthlyRSUInILS.toFixed(2) + '/month<br>';
+                html += '<strong>Total Income:</strong> ₪' + savingsRateDetails.monthlyIncome.toFixed(2) + '/month';
+                html += '</div>';
+                
+                html += '<div class="score-item">';
+                html += '<strong>Savings Rate Score:</strong> ' + result.factors.savingsRate.score + '/25<br>';
+                html += '<strong>Savings Rate:</strong> ' + savingsRateDetails.rate.toFixed(2) + '%<br>';
+                html += '<strong>Monthly Contributions:</strong> ₪' + savingsRateDetails.monthlyAmount.toFixed(2);
+                html += '</div>';
+                
+                html += '<div class="score-item">';
+                html += '<strong>Retirement Readiness:</strong> ' + result.factors.retirementReadiness.score + '/20<br>';
+                html += '<strong>Current Savings:</strong> ₪' + result.factors.retirementReadiness.details.currentSavings.toLocaleString();
+                html += '</div>';
+                html += '</div>';
+                
+                if (rsuIncluded) {
+                    html += '<p style="margin-top: 20px;"><strong>✅ Success:</strong> RSU income of ₪' + 
+                            expectedMonthlyRSUInILS.toFixed(2) + '/month was correctly included in the total income calculation.</p>';
+                } else {
+                    html += '<p style="margin-top: 20px;"><strong>❌ Issue:</strong> RSU income was not included. ' +
+                            'Expected total income: ₪' + totalMonthlyIncome.toFixed(2) + 
+                            ', Actual: ₪' + savingsRateDetails.monthlyIncome.toFixed(2) + '</p>';
+                }
+                
+                html += '</div>';
+                
+                document.getElementById('result').innerHTML = html;
+                
+                // Show console
+                document.getElementById('console').style.display = 'block';
+                document.getElementById('console').innerHTML = '<h4>Console Output:</h4>' + consoleLog;
+                
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    '<div class="result error">' +
+                    '<h3>❌ Test Failed</h3>' +
+                    '<p>Error: ' + error.message + '</p>' +
+                    '</div>';
+            }
+        }
+    </script>
+</body>
+</html>
