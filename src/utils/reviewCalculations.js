@@ -110,7 +110,7 @@ function calculateRetirementReadinessScore(inputs) {
 /**
  * Calculate diversification score
  */
-function calculateDiversificationScore(inputs) {
+function calculateSimpleDiversificationScore(inputs) {
     let assetClasses = 0;
     
     // Count asset classes with meaningful amounts
@@ -134,7 +134,7 @@ function calculateDiversificationScore(inputs) {
 /**
  * Calculate risk alignment score
  */
-function calculateRiskAlignmentScore(inputs) {
+function calculateSimpleRiskAlignmentScore(inputs) {
     const currentAge = parseFloat(inputs.currentAge || 30);
     const riskTolerance = inputs.riskTolerance || 'moderate';
     const stockPercentage = parseFloat(inputs.stockPercentage || 60);
@@ -180,7 +180,7 @@ function generateImprovementSuggestions(inputs, language = 'en') {
     
     const savingsRate = calculateSavingsRateScore(inputs);
     const readiness = calculateRetirementReadinessScore(inputs);
-    const diversification = calculateDiversificationScore(inputs);
+    const diversification = calculateSimpleDiversificationScore(inputs);
     const taxEfficiency = calculateTaxEfficiencyScore(inputs);
     
     if (savingsRate < 70) {
@@ -264,8 +264,9 @@ window.calculateTotalCurrentSavings = calculateTotalCurrentSavings;
 window.calculateTaxEfficiencyScore = calculateTaxEfficiencyScore;
 window.calculateSavingsRateScore = calculateSavingsRateScore;
 window.calculateRetirementReadinessScore = calculateRetirementReadinessScore;
-// NOTE: calculateDiversificationScore and calculateRiskAlignmentScore are NOT exported
-// to avoid conflicts with the proper implementations in financialHealthEngine.js
+// Export renamed functions to avoid conflicts with financialHealthEngine.js
+window.calculateSimpleDiversificationScore = calculateSimpleDiversificationScore;
+window.calculateSimpleRiskAlignmentScore = calculateSimpleRiskAlignmentScore;
 window.calculateOverallFinancialHealthScore = calculateOverallFinancialHealthScore;
 window.generateImprovementSuggestions = generateImprovementSuggestions;
 window.validateReviewInputs = validateReviewInputs;

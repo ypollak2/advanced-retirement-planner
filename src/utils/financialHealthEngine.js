@@ -1709,7 +1709,7 @@ function calculateFinancialHealthScore(inputs) {
         // Debug logging for factor scores
         console.log('📈 Factor Scores Breakdown:');
         Object.entries(factors).forEach(([name, factor]) => {
-            console.log(`  ${name}: ${factor.score}/${window.SCORE_FACTORS[name]?.weight || 'unknown'} (${factor.details?.status || 'no status'})`);
+            console.log(`  ${name}: ${factor.score}/${SCORE_FACTORS[name]?.weight || 'unknown'} (${factor.details?.status || 'no status'})`);
         });
         
         // CRITICAL FIX: Add comprehensive NaN prevention and validation
@@ -1768,5 +1768,17 @@ window.calculateFinancialHealthScore = calculateFinancialHealthScore;
 window.SCORE_FACTORS = SCORE_FACTORS;
 window.generateImprovementSuggestions = generateImprovementSuggestions;
 window.getPeerComparison = getPeerComparison;
+
+// Export individual calculator functions to prevent conflicts
+window.financialHealthEngine = {
+    calculateSavingsRateScore,
+    calculateRetirementReadinessScore,
+    calculateTimeHorizonScore,
+    calculateRiskAlignmentScore,
+    calculateDiversificationScore,
+    calculateTaxEfficiencyScore,
+    calculateEmergencyFundScore,
+    calculateDebtManagementScore
+};
 
 console.log('✅ Financial Health Engine loaded successfully');
