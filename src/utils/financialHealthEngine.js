@@ -78,14 +78,30 @@ function getFieldValue(inputs, fieldNames, options = {}) {
         let partnersFound = 0;
         
         // Enhanced partner field detection with comprehensive patterns
-        const partnerFieldMappings = [
-            { partner1: 'partner1Salary', partner2: 'partner2Salary' },
-            { partner1: 'Partner1Salary', partner2: 'Partner2Salary' },
-            { partner1: 'partner1Income', partner2: 'partner2Income' },
-            { partner1: 'partner1MonthlySalary', partner2: 'partner2MonthlySalary' },
-            { partner1: 'partner_1_salary', partner2: 'partner_2_salary' },
-            { partner1: 'partnerOneSalary', partner2: 'partnerTwoSalary' }
-        ];
+        const partnerFieldMappings = [];
+        
+        // Determine which field types we're looking for based on input field names
+        const isLookingForBank = fieldNames.some(f => f.toLowerCase().includes('bank') || f.toLowerCase().includes('emergency'));
+        const isLookingForSalary = fieldNames.some(f => f.toLowerCase().includes('salary') || f.toLowerCase().includes('income'));
+        
+        if (isLookingForBank) {
+            partnerFieldMappings.push(
+                { partner1: 'partner1BankAccount', partner2: 'partner2BankAccount' },
+                { partner1: 'partner1Bank', partner2: 'partner2Bank' },
+                { partner1: 'partner1Emergency', partner2: 'partner2Emergency' }
+            );
+        }
+        
+        if (isLookingForSalary || partnerFieldMappings.length === 0) {
+            partnerFieldMappings.push(
+                { partner1: 'partner1Salary', partner2: 'partner2Salary' },
+                { partner1: 'Partner1Salary', partner2: 'Partner2Salary' },
+                { partner1: 'partner1Income', partner2: 'partner2Income' },
+                { partner1: 'partner1MonthlySalary', partner2: 'partner2MonthlySalary' },
+                { partner1: 'partner_1_salary', partner2: 'partner_2_salary' },
+                { partner1: 'partnerOneSalary', partner2: 'partnerTwoSalary' }
+            );
+        }
         
         // Also check in wizard step structures
         for (let stepNum = 1; stepNum <= 10; stepNum++) {
@@ -193,10 +209,11 @@ function getFieldValue(inputs, fieldNames, options = {}) {
         
         if (lowerField.includes('emergency')) {
             fallbackPatterns.push(
-                'emergencyFund', 'emergencyFundAmount', 'currentSavingsAccount', 'liquidSavings',
+                'emergencyFund', 'emergencyFundAmount', 'currentBankAccount', 'currentSavingsAccount', 'liquidSavings',
                 'cashReserves', 'savingsAccount', 'emergency_fund', 'current_savings_account',
                 // Add wizard-specific emergency fund patterns
-                'currentSavings', 'savingsAccountBalance', 'emergencySavings', 'currentCashSavings'
+                'currentSavings', 'savingsAccountBalance', 'emergencySavings', 'currentCashSavings',
+                'bankAccount', 'partner1BankAccount', 'partner2BankAccount'
             );
         }
         
@@ -927,7 +944,7 @@ function calculateDiversificationScore(inputs) {
         
         // 5. Cash/Savings Account
         const cashAmount = getFieldValue(inputs, [
-            'currentSavingsAccount', 'savingsAccount', 'cashSavings',
+            'currentBankAccount', 'currentSavingsAccount', 'savingsAccount', 'cashSavings',
             'currentCash', 'liquidSavings', 'bankAccount'
         ], { allowZero: false, debugMode: true });
         if (cashAmount > 0) {
@@ -1264,10 +1281,20 @@ function calculateEmergencyFundScore(inputs) {
     }
     
     // Get emergency fund amount with enhanced field mapping
-    const emergencyFund = getFieldValue(inputs, [
-        'emergencyFund', 'currentSavingsAccount', 'emergencyFundAmount',
-        'cashReserves', 'liquidSavings', 'savingsAccount'
-    ]);
+    // For couple mode, combine partner bank accounts
+    let emergencyFund = 0;
+    if (inputs.planningType === 'couple') {
+        emergencyFund = getFieldValue(inputs, [
+            'emergencyFund', 'currentBankAccount', 'currentSavingsAccount', 'emergencyFundAmount',
+            'cashReserves', 'liquidSavings', 'savingsAccount', 'bankAccount',
+            'partner1BankAccount', 'partner2BankAccount'
+        ], { combinePartners: true });
+    } else {
+        emergencyFund = getFieldValue(inputs, [
+            'emergencyFund', 'currentBankAccount', 'currentSavingsAccount', 'emergencyFundAmount',
+            'cashReserves', 'liquidSavings', 'savingsAccount', 'bankAccount'
+        ]);
+    }
     
     if (monthlyExpenses === 0) {
         return { 

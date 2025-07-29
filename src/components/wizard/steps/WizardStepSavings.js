@@ -16,6 +16,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             personalPortfolio: 'תיק השקעות אישי',
             realEstate: 'נדל״ן',
             cryptocurrency: 'מטבעות דיגיטליים',
+            bankAccount: 'חשבון בנק',
             totalSavings: 'סך החיסכונות',
             investmentCategories: 'קטגוריות השקעה',
             partnerBreakdown: 'פירוט בני הזוג',
@@ -33,6 +34,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             personalPortfolio: 'Personal Portfolio',
             realEstate: 'Real Estate',
             cryptocurrency: 'Cryptocurrency',
+            bankAccount: 'Bank Account',
             totalSavings: 'Total Savings',
             investmentCategories: 'Investment Categories',
             partnerBreakdown: 'Partner Breakdown',
@@ -69,6 +71,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             const currentRealEstate = inputs.currentRealEstate || 0;
             const currentCrypto = inputs.currentDigitalAssetFiatValue || inputs.currentCryptoFiatValue || inputs.currentCrypto || 0;
             const currentSavingsAccount = inputs.currentSavingsAccount || 0;
+            const currentBankAccount = inputs.currentBankAccount || 0;
             
             // Partner savings if couple
             const partner1Pension = inputs.partner1CurrentPension || 0;
@@ -81,11 +84,13 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             const partner2Portfolio = inputs.partner2PersonalPortfolio || 0;
             const partner2RealEstate = inputs.partner2RealEstate || 0;
             const partner2Crypto = inputs.partner2DigitalAssetFiatValue || inputs.partner2CryptoFiatValue || inputs.partner2Crypto || 0;
+            const partner1BankAccount = inputs.partner1BankAccount || 0;
+            const partner2BankAccount = inputs.partner2BankAccount || 0;
             
             const total = currentSavings + currentTrainingFund + currentPersonalPortfolio + 
-                         currentRealEstate + currentCrypto + currentSavingsAccount +
-                         partner1Pension + partner1TrainingFund + partner1Portfolio + partner1RealEstate + partner1Crypto +
-                         partner2Pension + partner2TrainingFund + partner2Portfolio + partner2RealEstate + partner2Crypto;
+                         currentRealEstate + currentCrypto + currentSavingsAccount + currentBankAccount +
+                         partner1Pension + partner1TrainingFund + partner1Portfolio + partner1RealEstate + partner1Crypto + partner1BankAccount +
+                         partner2Pension + partner2TrainingFund + partner2Portfolio + partner2RealEstate + partner2Crypto + partner2BankAccount;
             
             // Validate result
             if (isNaN(total) || !isFinite(total)) {
@@ -267,6 +272,24 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                         onChange: (e) => setInputs({...inputs, currentSavingsAccount: parseInt(e.target.value) || 0}),
                         className: "w-full p-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500"
                     })
+                ]),
+                
+                // Bank Account
+                createElement('div', { 
+                    key: 'bank-account',
+                    className: "bg-gray-50 rounded-xl p-6 border border-gray-200" 
+                }, [
+                    createElement('label', { 
+                        key: 'bank-account-label',
+                        className: "block text-lg font-medium text-gray-700 mb-2" 
+                    }, t.bankAccount),
+                    createElement('input', {
+                        key: 'bank-account-input',
+                        type: 'number',
+                        value: inputs.currentBankAccount || 0,
+                        onChange: (e) => setInputs({...inputs, currentBankAccount: parseInt(e.target.value) || 0}),
+                        className: "w-full p-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500"
+                    })
                 ])
             ])
         ]),
@@ -400,6 +423,19 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                 onChange: (e) => setInputs({...inputs, partner1Crypto: parseInt(e.target.value) || 0}),
                                 className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
                             })
+                        ]),
+                        createElement('div', { key: 'p1-bank-account' }, [
+                            createElement('label', { 
+                                key: 'p1-bank-account-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.bankAccount),
+                            createElement('input', {
+                                key: 'p1-bank-account-input',
+                                type: 'number',
+                                value: inputs.partner1BankAccount || 0,
+                                onChange: (e) => setInputs({...inputs, partner1BankAccount: parseInt(e.target.value) || 0}),
+                                className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
+                            })
                         ])
                     ])
                 ]),
@@ -518,6 +554,19 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                 type: 'number',
                                 value: inputs.partner2Crypto || 0,
                                 onChange: (e) => setInputs({...inputs, partner2Crypto: parseInt(e.target.value) || 0}),
+                                className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'p2-bank-account' }, [
+                            createElement('label', { 
+                                key: 'p2-bank-account-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.bankAccount),
+                            createElement('input', {
+                                key: 'p2-bank-account-input',
+                                type: 'number',
+                                value: inputs.partner2BankAccount || 0,
+                                onChange: (e) => setInputs({...inputs, partner2BankAccount: parseInt(e.target.value) || 0}),
                                 className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
                             })
                         ])

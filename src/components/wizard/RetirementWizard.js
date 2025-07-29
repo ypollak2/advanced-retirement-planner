@@ -308,7 +308,7 @@ const RetirementWizard = ({
             case 4: 
                 // Current Savings validation - non-negative values from current or saved data
                 return (mergedInputs.currentSavings || 0) >= 0 && 
-                       (mergedInputs.currentTrainingFundSavings || 0) >= 0;
+                       (mergedInputs.currentTrainingFund || 0) >= 0;
             
             case 5: 
                 // Contribution validation - reasonable percentage ranges from current or saved data

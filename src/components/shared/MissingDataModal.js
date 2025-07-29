@@ -214,13 +214,13 @@
                             
                         case 'emergencyFund':
                             missingItems.push({
-                                field: 'emergencyFund',
+                                field: 'currentBankAccount',
                                 label: t.emergencyFund,
                                 type: 'currency',
                                 step: 'investments',
                                 priority: 'medium',
                                 instruction: t.instructions.emergency,
-                                wizardStep: 3
+                                wizardStep: 4
                             });
                             break;
                             
