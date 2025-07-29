@@ -78,12 +78,18 @@ jobs:
       uses: actions/github-script@v7
       with:
         script: |
+          const repoName = context.payload.repository?.name || context.repo.repo;
+          const repoOwner = context.payload.repository?.owner?.login || context.repo.owner;
+          
           github.rest.repos.createCommitComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
             commit_sha: context.sha,
             body: '🚀 **Stage Deployment Complete!**\n\n' +
-                  '**Stage URL:** https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/stage/\n\n' +
+                  `**Stage URL:** https://${repoOwner}.github.io/${repoName}/stage/\n\n` +
                   '**Tests:** ✅ All tests passed\n' +
-                  '**Ready for:** Production merge review'
+                  '**Ready for:** Production merge review\n\n' +
+                  `**Commit:** ${context.sha.substring(0, 7)}\n` +
+                  `**Branch:** ${context.ref.replace('refs/heads/', '')}\n` +
+                  `**Deployed at:** ${new Date().toISOString()}`
           })

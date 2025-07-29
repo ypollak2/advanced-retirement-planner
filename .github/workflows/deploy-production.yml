@@ -80,14 +80,20 @@ jobs:
       uses: actions/github-script@v7
       with:
         script: |
+          const repoName = context.payload.repository?.name || context.repo.repo;
+          const repoOwner = context.payload.repository?.owner?.login || context.repo.owner;
+          
           github.rest.repos.createCommitComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
             commit_sha: context.sha,
             body: '🎉 **Production Deployment Complete!**\n\n' +
-                  '**Production URL:** https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/\n' +
+                  `**Production URL:** https://${repoOwner}.github.io/${repoName}/\n` +
                   '**Mirror URL:** https://advanced-retirement-planner.netlify.app/\n\n' +
-                  '**Tests:** ✅ All 289 tests passed\n' +
+                  '**Tests:** ✅ Full test suite passed\n' +
                   '**Validation:** ✅ Deployment validated\n' +
-                  '**Status:** 🟢 Live for users'
+                  '**Status:** 🟢 Live for users\n\n' +
+                  `**Commit:** ${context.sha.substring(0, 7)}\n` +
+                  `**Branch:** ${context.ref.replace('refs/heads/', '')}\n` +
+                  `**Deployed at:** ${new Date().toISOString()}`
           })
