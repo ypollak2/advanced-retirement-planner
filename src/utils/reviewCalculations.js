@@ -285,8 +285,8 @@ window.calculateTotalCurrentSavings = calculateTotalCurrentSavings;
 window.calculateTaxEfficiencyScore = calculateTaxEfficiencyScore;
 window.calculateSavingsRateScore = calculateSavingsRateScore;
 window.calculateRetirementReadinessScore = calculateRetirementReadinessScore;
-window.calculateDiversificationScore = calculateDiversificationScore;
-window.calculateRiskAlignmentScore = calculateRiskAlignmentScore;
+// NOTE: calculateDiversificationScore and calculateRiskAlignmentScore are NOT exported
+// to avoid conflicts with the proper implementations in financialHealthEngine.js
 window.calculateOverallFinancialHealthScore = calculateOverallFinancialHealthScore;
 window.generateImprovementSuggestions = generateImprovementSuggestions;
 window.validateReviewInputs = validateReviewInputs;
