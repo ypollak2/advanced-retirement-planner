@@ -245,6 +245,10 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                     currentMonthlySalary: inputs.partner1Salary || 0,
                     annualBonus: inputs.partnerAnnualBonus || 0,
                     quarterlyRSU: inputs.partnerQuarterlyRSU || 0,
+                    // Enhanced partner RSU fields
+                    rsuUnits: inputs.partnerRsuUnits || 0,
+                    rsuCurrentStockPrice: inputs.partnerRsuCurrentStockPrice || 0,
+                    rsuFrequency: inputs.partnerRsuFrequency || 'quarterly',
                     freelanceIncome: inputs.partnerFreelanceIncome || 0,
                     rentalIncome: inputs.partnerRentalIncome || 0,
                     dividendIncome: inputs.partnerDividendIncome || 0,
@@ -701,28 +705,89 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         key: 'rsu-label',
                         className: "block text-sm font-medium text-gray-700 mb-2" 
                     }, t.rsuAmount),
-                    createElement('div', { key: 'rsu-inputs', className: "grid grid-cols-2 gap-2" }, [
-                        createElement('input', {
-                            key: 'rsu-amount-input',
-                            type: 'number',
-                            value: inputs.rsuAmount || inputs.quarterlyRSU || 0,
-                            onChange: (e) => {
-                                const amount = parseInt(e.target.value) || 0;
-                                setInputs({...inputs, rsuAmount: amount, quarterlyRSU: amount});
-                            },
-                            placeholder: "Amount",
-                            className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                        }),
-                        createElement('select', {
-                            key: 'rsu-frequency-select',
-                            value: inputs.rsuFrequency || 'quarterly',
-                            onChange: (e) => setInputs({...inputs, rsuFrequency: e.target.value}),
-                            className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                        }, [
-                            createElement('option', { key: 'monthly-option', value: 'monthly' }, t.monthly),
-                            createElement('option', { key: 'quarterly-option', value: 'quarterly' }, t.quarterly),
-                            createElement('option', { key: 'yearly-option', value: 'yearly' }, t.yearly)
+                    
+                    // Enhanced RSU Company Selector
+                    window.EnhancedRSUCompanySelector && createElement(window.EnhancedRSUCompanySelector, {
+                        key: 'rsu-company-selector',
+                        inputs: inputs,
+                        setInputs: setInputs,
+                        language: language
+                    }),
+                    
+                    // RSU Units and Frequency
+                    createElement('div', { key: 'rsu-details', className: "mt-3 grid grid-cols-2 gap-2" }, [
+                        createElement('div', { key: 'rsu-units-container' }, [
+                            createElement('label', {
+                                key: 'rsu-units-label',
+                                className: "block text-xs font-medium text-gray-600 mb-1"
+                            }, language === 'he' ? 'מספר יחידות RSU' : 'RSU Units'),
+                            createElement('input', {
+                                key: 'rsu-units-input',
+                                type: 'number',
+                                value: inputs.rsuUnits || 0,
+                                onChange: (e) => {
+                                    const units = parseInt(e.target.value) || 0;
+                                    // Update quarterlyRSU for backward compatibility
+                                    if (inputs.rsuCurrentStockPrice) {
+                                        const frequency = inputs.rsuFrequency || 'quarterly';
+                                        let annualValue = 0;
+                                        if (frequency === 'monthly') {
+                                            annualValue = units * inputs.rsuCurrentStockPrice * 12;
+                                        } else if (frequency === 'quarterly') {
+                                            annualValue = units * inputs.rsuCurrentStockPrice * 4;
+                                        } else if (frequency === 'yearly') {
+                                            annualValue = units * inputs.rsuCurrentStockPrice;
+                                        }
+                                        const quarterlyValue = annualValue / 4;
+                                        setInputs(prev => ({...prev, rsuUnits: units, quarterlyRSU: quarterlyValue}));
+                                    } else {
+                                        setInputs({...inputs, rsuUnits: units});
+                                    }
+                                },
+                                placeholder: language === 'he' ? "כמות" : "Units",
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            })
+                        ]),
+                        createElement('div', { key: 'rsu-frequency-container' }, [
+                            createElement('label', {
+                                key: 'rsu-frequency-label',
+                                className: "block text-xs font-medium text-gray-600 mb-1"
+                            }, language === 'he' ? 'תדירות הענקה' : 'Vesting Frequency'),
+                            createElement('select', {
+                                key: 'rsu-frequency-select',
+                                value: inputs.rsuFrequency || 'quarterly',
+                                onChange: (e) => setInputs({...inputs, rsuFrequency: e.target.value}),
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            }, [
+                                createElement('option', { key: 'monthly-option', value: 'monthly' }, t.monthly),
+                                createElement('option', { key: 'quarterly-option', value: 'quarterly' }, t.quarterly),
+                                createElement('option', { key: 'yearly-option', value: 'yearly' }, t.yearly)
+                            ])
                         ])
+                    ]),
+                    
+                    // RSU Value Display
+                    (inputs.rsuUnits > 0 && inputs.rsuCurrentStockPrice > 0) && createElement('div', {
+                        key: 'rsu-value-display',
+                        className: "mt-2 p-2 bg-green-50 rounded-lg text-sm"
+                    }, [
+                        createElement('div', {
+                            key: 'rsu-calculation',
+                            className: "text-green-700"
+                        }, [
+                            createElement('span', { key: 'calc-text' }, 
+                                `${inputs.rsuUnits} ${language === 'he' ? 'יחידות' : 'units'} × ${currencySymbol}${inputs.rsuCurrentStockPrice} = `),
+                            createElement('span', { 
+                                key: 'calc-value',
+                                className: "font-semibold"
+                            }, formatCurrency(inputs.rsuUnits * inputs.rsuCurrentStockPrice))
+                        ]),
+                        createElement('div', {
+                            key: 'rsu-frequency-info',
+                            className: "text-xs text-green-600 mt-1"
+                        }, language === 'he' ? 
+                            `הענקה ${inputs.rsuFrequency === 'monthly' ? 'חודשית' : inputs.rsuFrequency === 'quarterly' ? 'רבעונית' : 'שנתית'}` :
+                            `Vesting ${inputs.rsuFrequency || 'quarterly'}`)
                     ])
                 ]),
                 createElement('div', { key: 'other-income' }, [
@@ -822,14 +887,54 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                             createElement('label', { 
                                 key: 'main-rsu-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, t.quarterlyRSU),
-                            createElement('input', {
-                                key: 'main-rsu-input',
-                                type: 'number',
-                                value: inputs.quarterlyRSU || 0,
-                                onChange: (e) => setInputs({...inputs, quarterlyRSU: parseInt(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                            })
+                            }, language === 'he' ? 'מניות RSU' : 'RSU Stock Options'),
+                            
+                            // Enhanced RSU Company Selector for main person
+                            window.EnhancedRSUCompanySelector && createElement(window.EnhancedRSUCompanySelector, {
+                                key: 'main-rsu-company-selector',
+                                inputs: inputs,
+                                setInputs: setInputs,
+                                language: language
+                            }),
+                            
+                            // RSU Units and Frequency for main person
+                            createElement('div', { key: 'main-rsu-details', className: "mt-2 grid grid-cols-2 gap-2" }, [
+                                createElement('input', {
+                                    key: 'main-rsu-units',
+                                    type: 'number',
+                                    value: inputs.rsuUnits || 0,
+                                    onChange: (e) => {
+                                        const units = parseInt(e.target.value) || 0;
+                                        if (inputs.rsuCurrentStockPrice) {
+                                            const frequency = inputs.rsuFrequency || 'quarterly';
+                                            let annualValue = 0;
+                                            if (frequency === 'monthly') {
+                                                annualValue = units * inputs.rsuCurrentStockPrice * 12;
+                                            } else if (frequency === 'quarterly') {
+                                                annualValue = units * inputs.rsuCurrentStockPrice * 4;
+                                            } else if (frequency === 'yearly') {
+                                                annualValue = units * inputs.rsuCurrentStockPrice;
+                                            }
+                                            const quarterlyValue = annualValue / 4;
+                                            setInputs(prev => ({...prev, rsuUnits: units, quarterlyRSU: quarterlyValue}));
+                                        } else {
+                                            setInputs({...inputs, rsuUnits: units});
+                                        }
+                                    },
+                                    placeholder: language === 'he' ? "כמות יחידות" : "Units",
+                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                }),
+                                createElement('select', {
+                                    key: 'main-rsu-frequency',
+                                    value: inputs.rsuFrequency || 'quarterly',
+                                    onChange: (e) => setInputs({...inputs, rsuFrequency: e.target.value}),
+                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                }, [
+                                    createElement('option', { key: 'monthly', value: 'monthly' }, t.monthly),
+                                    createElement('option', { key: 'quarterly', value: 'quarterly' }, t.quarterly),
+                                    createElement('option', { key: 'yearly', value: 'yearly' }, t.yearly)
+                                ])
+                            ])
                         ]),
                         createElement('div', { key: 'main-other' }, [
                             createElement('label', { 
@@ -913,14 +1018,81 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                             createElement('label', { 
                                 key: 'partner-rsu-label',
                                 className: "block text-sm font-medium text-gray-700 mb-1" 
-                            }, t.quarterlyRSU),
+                            }, language === 'he' ? 'מניות RSU בן/בת זוג' : 'Partner RSU Stock Options'),
+                            
+                            // Partner RSU Company Input (simplified for partner)
                             createElement('input', {
-                                key: 'partner-rsu-input',
-                                type: 'number',
-                                value: inputs.partnerQuarterlyRSU || 0,
-                                onChange: (e) => setInputs({...inputs, partnerQuarterlyRSU: parseInt(e.target.value) || 0}),
-                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                            })
+                                key: 'partner-rsu-company',
+                                type: 'text',
+                                value: inputs.partnerRsuCompany || '',
+                                onChange: (e) => setInputs({...inputs, partnerRsuCompany: e.target.value.toUpperCase()}),
+                                placeholder: language === 'he' ? "סמל מניה (למשל AAPL)" : "Stock Symbol (e.g. AAPL)",
+                                className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 mb-2"
+                            }),
+                            
+                            // Partner RSU Details
+                            createElement('div', { key: 'partner-rsu-details', className: "grid grid-cols-3 gap-2" }, [
+                                createElement('input', {
+                                    key: 'partner-rsu-units',
+                                    type: 'number',
+                                    value: inputs.partnerRsuUnits || 0,
+                                    onChange: (e) => {
+                                        const units = parseInt(e.target.value) || 0;
+                                        if (inputs.partnerRsuCurrentStockPrice) {
+                                            const frequency = inputs.partnerRsuFrequency || 'quarterly';
+                                            let annualValue = 0;
+                                            if (frequency === 'monthly') {
+                                                annualValue = units * inputs.partnerRsuCurrentStockPrice * 12;
+                                            } else if (frequency === 'quarterly') {
+                                                annualValue = units * inputs.partnerRsuCurrentStockPrice * 4;
+                                            } else if (frequency === 'yearly') {
+                                                annualValue = units * inputs.partnerRsuCurrentStockPrice;
+                                            }
+                                            const quarterlyValue = annualValue / 4;
+                                            setInputs(prev => ({...prev, partnerRsuUnits: units, partnerQuarterlyRSU: quarterlyValue}));
+                                        } else {
+                                            setInputs({...inputs, partnerRsuUnits: units});
+                                        }
+                                    },
+                                    placeholder: language === 'he' ? "יחידות" : "Units",
+                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                                }),
+                                createElement('input', {
+                                    key: 'partner-rsu-price',
+                                    type: 'number',
+                                    value: inputs.partnerRsuCurrentStockPrice || '',
+                                    onChange: (e) => {
+                                        const price = parseFloat(e.target.value) || 0;
+                                        setInputs({...inputs, partnerRsuCurrentStockPrice: price});
+                                        // Recalculate quarterlyRSU
+                                        if (inputs.partnerRsuUnits && price) {
+                                            const frequency = inputs.partnerRsuFrequency || 'quarterly';
+                                            let annualValue = 0;
+                                            if (frequency === 'monthly') {
+                                                annualValue = inputs.partnerRsuUnits * price * 12;
+                                            } else if (frequency === 'quarterly') {
+                                                annualValue = inputs.partnerRsuUnits * price * 4;
+                                            } else if (frequency === 'yearly') {
+                                                annualValue = inputs.partnerRsuUnits * price;
+                                            }
+                                            const quarterlyValue = annualValue / 4;
+                                            setInputs(prev => ({...prev, partnerRsuCurrentStockPrice: price, partnerQuarterlyRSU: quarterlyValue}));
+                                        }
+                                    },
+                                    placeholder: language === 'he' ? `מחיר (${currencySymbol})` : `Price (${currencySymbol})`,
+                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                                }),
+                                createElement('select', {
+                                    key: 'partner-rsu-frequency',
+                                    value: inputs.partnerRsuFrequency || 'quarterly',
+                                    onChange: (e) => setInputs({...inputs, partnerRsuFrequency: e.target.value}),
+                                    className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                                }, [
+                                    createElement('option', { key: 'monthly', value: 'monthly' }, t.monthly),
+                                    createElement('option', { key: 'quarterly', value: 'quarterly' }, t.quarterly),
+                                    createElement('option', { key: 'yearly', value: 'yearly' }, t.yearly)
+                                ])
+                            ])
                         ]),
                         createElement('div', { key: 'partner-other' }, [
                             createElement('label', { 
@@ -993,7 +1165,11 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                                 language === 'he' ? 'הכנסות נוספות נטו:' : 'Additional Income Net:'),
                             createElement('span', { key: 'additional-value', className: "font-medium" }, 
                                 formatCurrency(mainAdditionalNet))
-                        ])
+                        ]),
+                        // RSU Details
+                        (inputs.rsuUnits > 0 && inputs.rsuCompany) && createElement('div', { key: 'rsu-details', className: "text-xs text-gray-500 mt-1" }, 
+                            `${language === 'he' ? 'כולל' : 'Includes'} ${inputs.rsuUnits} ${inputs.rsuCompany} RSU (${inputs.rsuFrequency || 'quarterly'})`
+                        )
                     ])
                 ];
             })()),
@@ -1012,6 +1188,10 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                     currentMonthlySalary: inputs.partner1Salary || 0,
                     annualBonus: inputs.partnerAnnualBonus || 0,
                     quarterlyRSU: inputs.partnerQuarterlyRSU || 0,
+                    // Enhanced partner RSU fields
+                    rsuUnits: inputs.partnerRsuUnits || 0,
+                    rsuCurrentStockPrice: inputs.partnerRsuCurrentStockPrice || 0,
+                    rsuFrequency: inputs.partnerRsuFrequency || 'quarterly',
                     freelanceIncome: inputs.partnerFreelanceIncome || 0,
                     rentalIncome: inputs.partnerRentalIncome || 0,
                     dividendIncome: inputs.partnerDividendIncome || 0,
@@ -1059,7 +1239,11 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                                 language === 'he' ? 'הכנסות נוספות נטו:' : 'Additional Income Net:'),
                             createElement('span', { key: 'partner-additional-value', className: "font-medium" }, 
                                 formatCurrency(partnerAdditionalNet))
-                        ])
+                        ]),
+                        // Partner RSU Details
+                        (inputs.partnerRsuUnits > 0 && inputs.partnerRsuCompany) && createElement('div', { key: 'partner-rsu-details', className: "text-xs text-gray-500 mt-1" }, 
+                            `${language === 'he' ? 'כולל' : 'Includes'} ${inputs.partnerRsuUnits} ${inputs.partnerRsuCompany} RSU (${inputs.partnerRsuFrequency || 'quarterly'})`
+                        )
                     ])
                 ];
             })()),

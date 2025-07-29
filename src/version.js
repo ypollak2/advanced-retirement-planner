@@ -1,9 +1,9 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "7.0.6",
+    number: "7.1.0",
     build: "2025-07-29",
-    commit: "v7.0.6-version-update",
-    description: "Complete Missing Data Modal: Interactive data completion for Financial Health Score optimization"
+    commit: "v7.1.0-rsu-stock-enhancement",
+    description: "Enhanced RSU input with stock symbol selection and real-time price lookup"
 };
 
 // Export version for use in other modules

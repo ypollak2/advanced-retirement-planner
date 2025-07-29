@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v7.0.6 ✨
+# 🚀 Advanced Retirement Planner v7.1.0 ✨
 
-[![Version](https://img.shields.io/badge/version-7.0.6-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-7.1.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -26,6 +26,22 @@
 > **📋 Deployment Status**: GitHub Pages is the primary deployment and is fully operational with the reorganized component structure. Netlify is currently rebuilding after the repository reorganization and should be available shortly.
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
+
+## 🎨 What's New in v7.1.0 - ENHANCED RSU INPUT WITH STOCK PRICES 📈✨
+
+### Major Enhancement: RSU Stock Symbol & Real-Time Price Integration
+- **Stock Symbol Selection**: Choose from 40+ pre-configured tech companies or enter custom symbols
+- **Real-Time Price Lookup**: Automatic price fetching via Yahoo Finance API
+- **Smart Calculation**: RSU value calculated as units × stock price × vesting frequency
+- **Offline Support**: Fallback prices and manual entry for offline scenarios
+- **Partner RSU Support**: Full RSU functionality for couple planning mode
+- **Transparent Display**: Shows stock symbol, units, price, and total value in income summary
+
+### Technical Improvements:
+- Integrated EnhancedRSUCompanySelector component with smart search
+- Updated tax calculations to use actual RSU values (units × price)
+- Added caching with 5-minute TTL to reduce API calls
+- Maintained backward compatibility with legacy RSU fields
 
 ## 🎨 What's New in v7.0.4 - COMPLETE MISSING DATA MODAL 🔧✨
 

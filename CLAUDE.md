@@ -24,6 +24,11 @@
 - To memorize - you need to have 100% QA testing pass
 - NEVER deploy unless `npm test` shows 245/245 tests passing
 - Fix any failing tests before deployment, no matter how urgent the fix seems
+- When user shares error messages, use different specialized agents to investigate:
+  - Use Search agent for finding related error patterns in codebase
+  - Use Debug agent for analyzing console logs and stack traces
+  - Use Test agent for running specific test scenarios
+  - Split complex debugging across multiple agents working in parallel
 
 ## Task Planning Standards
 

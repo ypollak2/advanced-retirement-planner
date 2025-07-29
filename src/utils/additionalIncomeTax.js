@@ -240,7 +240,31 @@ window.AdditionalIncomeTax = (() => {
         
         // Get all additional income sources
         const annualBonus = parseFloat(inputs.annualBonus) || 0;
-        const quarterlyRSU = (parseFloat(inputs.quarterlyRSU) || 0) * 4; // Annual RSU value
+        
+        // Enhanced RSU calculation with stock prices
+        let annualRSU = 0;
+        if (inputs.rsuUnits && inputs.rsuCurrentStockPrice) {
+            // Calculate RSU value based on units × stock price
+            const rsuUnits = parseFloat(inputs.rsuUnits) || 0;
+            const stockPrice = parseFloat(inputs.rsuCurrentStockPrice) || 0;
+            const frequency = inputs.rsuFrequency || 'quarterly';
+            
+            // Calculate annual RSU value based on vesting frequency
+            if (frequency === 'monthly') {
+                annualRSU = rsuUnits * stockPrice * 12; // Monthly vesting
+            } else if (frequency === 'quarterly') {
+                annualRSU = rsuUnits * stockPrice * 4; // Quarterly vesting
+            } else if (frequency === 'yearly') {
+                annualRSU = rsuUnits * stockPrice; // Yearly vesting
+            }
+            
+            console.log(`🎯 RSU Calculation: ${rsuUnits} units × $${stockPrice} (${frequency}) = $${annualRSU} annually`);
+        } else {
+            // Fallback to legacy calculation for backward compatibility
+            annualRSU = (parseFloat(inputs.quarterlyRSU) || 0) * 4; // Annual RSU value
+        }
+        const quarterlyRSU = annualRSU; // Keep variable name for compatibility
+        
         const freelanceIncome = (parseFloat(inputs.freelanceIncome) || 0) * 12;
         const rentalIncome = (parseFloat(inputs.rentalIncome) || 0) * 12;
         const dividendIncome = (parseFloat(inputs.dividendIncome) || 0) * 12;
