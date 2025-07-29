@@ -17,7 +17,7 @@
         const [formData, setFormData] = useState({});
         const [currentStep, setCurrentStep] = useState(0);
         const [isCalculating, setIsCalculating] = useState(false);
-        const [previewScore, setPreviewScore] = useState(null);
+        const [previewScore, setPreviewScore] = useState(healthReport?.totalScore || 0);
         const [validationErrors, setValidationErrors] = useState({});
 
         // Multi-language content
@@ -338,7 +338,7 @@
                 if (item.type === 'percentage' && numValue > 100) {
                     errors[field] = 'Maximum 100%';
                 }
-                if (item.type === 'currency' && numValue > 1000000) {
+                if (item.type === 'currency' && numValue > 100000000) {
                     errors[field] = 'Value seems too high';
                 }
             }
