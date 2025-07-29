@@ -9,16 +9,16 @@
 // ENHANCED: Comprehensive field mapping utility with wizard compatibility and debugging
 function getFieldValue(inputs, fieldNames, options = {}) {
     const { combinePartners = false, allowZero = false, debugMode = true } = options;
-    const debugLog = debugMode ? console.log : () => {};
+    const logger = window.logger || { fieldSearch: () => {}, fieldFound: () => {}, debug: () => {} };
     
-    debugLog(`🔍 Searching for fields: ${fieldNames.join(', ')}`);
-    debugLog(`📋 Planning type: ${inputs.planningType}, Combine partners: ${combinePartners}`);
+    logger.fieldSearch(`Searching for fields: ${fieldNames.join(', ')}`);
+    logger.debug(`Planning type: ${inputs.planningType}, Combine partners: ${combinePartners}`);
     
     // Helper function to detect and convert annual salary to monthly
     const detectSalaryType = (fieldName, value) => {
         // If value seems too high for monthly (> 50k), likely annual - convert to monthly
         if (value > 50000 && (fieldName.includes('monthly') || fieldName.includes('Monthly'))) {
-            debugLog(`🔄 Converting suspected annual salary to monthly: ${value} -> ${value/12}`);
+            logger.debug(`Converting suspected annual salary to monthly: ${value} -> ${value/12}`);
             return value / 12;
         }
         return value;
@@ -29,27 +29,27 @@ function getFieldValue(inputs, fieldNames, options = {}) {
     if (!(combinePartners && inputs.planningType === 'couple')) {
         for (const fieldName of fieldNames) {
             const value = inputs[fieldName];
-            debugLog(`  Checking field "${fieldName}": ${value} (type: ${typeof value})`);
+            logger.debug(`  Checking field "${fieldName}": ${value} (type: ${typeof value})`);
             
             if (value !== undefined && value !== null && value !== '') {
                 const parsed = parseFloat(value);
                 if (!isNaN(parsed) && (allowZero || parsed > 0)) {
                     const convertedValue = detectSalaryType(fieldName, parsed);
-                    debugLog(`✅ Found valid field "${fieldName}": ${convertedValue}`);
+                    logger.fieldFound(`Found valid field "${fieldName}": ${convertedValue}`);
                     return convertedValue;
                 } else {
-                    debugLog(`  Field "${fieldName}" exists but value invalid: ${parsed}`);
+                    logger.debug(`  Field "${fieldName}" exists but value invalid: ${parsed}`);
                 }
             }
         }
     } else {
-        debugLog(`👫 Skipping Phase 1 direct lookup to combine partners...`);
+        logger.debug(`Skipping Phase 1 direct lookup to combine partners...`);
     }
     
     // PHASE 1.5: Enhanced wizard step-specific field detection
     // Skip Phase 1.5 entirely if we need to combine partners
     if (!(combinePartners && inputs.planningType === 'couple')) {
-        debugLog(`🧙 Checking wizard step-specific patterns...`);
+        logger.debug(`Checking wizard step-specific patterns...`);
         
         // Check for step-based field structures (step1, step2, etc.)
         for (let stepNum = 1; stepNum <= 10; stepNum++) {
@@ -60,7 +60,7 @@ function getFieldValue(inputs, fieldNames, options = {}) {
                     if (stepValue !== undefined && stepValue !== null && stepValue !== '') {
                         const parsed = parseFloat(stepValue);
                         if (!isNaN(parsed) && (allowZero || parsed > 0)) {
-                            debugLog(`✅ Found in step${stepNum}.${fieldName}: ${parsed}`);
+                            logger.fieldFound(`Found in step${stepNum}.${fieldName}: ${parsed}`);
                             return parsed;
                         }
                     }
@@ -68,12 +68,12 @@ function getFieldValue(inputs, fieldNames, options = {}) {
             }
         }
     } else {
-        debugLog(`👫 Skipping Phase 1.5 wizard steps to combine partners...`);
+        logger.debug(`Skipping Phase 1.5 wizard steps to combine partners...`);
     }
     
     // PHASE 2: Enhanced partner field combination for couple mode
     if (combinePartners && inputs.planningType === 'couple') {
-        debugLog(`🤝 Attempting to combine partner fields with enhanced detection...`);
+        logger.debug(`Attempting to combine partner fields with enhanced detection...`);
         let combinedValue = 0;
         let partnersFound = 0;
         
@@ -98,13 +98,13 @@ function getFieldValue(inputs, fieldNames, options = {}) {
                     if (!isNaN(p1Value) && p1Value > 0) {
                         combinedValue += p1Value;
                         partnersFound++;
-                        debugLog(`  Added step${stepNum}.${mapping.partner1}: ${p1Value}`);
+                        logger.debug(`  Added step${stepNum}.${mapping.partner1}: ${p1Value}`);
                     }
                     
                     if (!isNaN(p2Value) && p2Value > 0) {
                         combinedValue += p2Value;
                         partnersFound++;
-                        debugLog(`  Added step${stepNum}.${mapping.partner2}: ${p2Value}`);
+                        logger.debug(`  Added step${stepNum}.${mapping.partner2}: ${p2Value}`);
                     }
                     
                     if (partnersFound > 0) break;
@@ -123,14 +123,14 @@ function getFieldValue(inputs, fieldNames, options = {}) {
                     const convertedP1 = detectSalaryType(mapping.partner1, p1Value);
                     combinedValue += convertedP1;
                     partnersFound++;
-                    debugLog(`  Added ${mapping.partner1}: ${convertedP1}`);
+                    logger.debug(`  Added ${mapping.partner1}: ${convertedP1}`);
                 }
                 
                 if (!isNaN(p2Value) && p2Value > 0) {
                     const convertedP2 = detectSalaryType(mapping.partner2, p2Value);
                     combinedValue += convertedP2;
                     partnersFound++;
-                    debugLog(`  Added ${mapping.partner2}: ${convertedP2}`);
+                    logger.debug(`  Added ${mapping.partner2}: ${convertedP2}`);
                 }
                 
                 // If we found data, don't keep looking in other mappings
@@ -139,15 +139,15 @@ function getFieldValue(inputs, fieldNames, options = {}) {
         }
         
         if (combinedValue > 0) {
-            debugLog(`✅ Combined ${partnersFound} partner fields: ${combinedValue}`);
+            logger.fieldFound(`Combined ${partnersFound} partner fields: ${combinedValue}`);
             return combinedValue;
         } else {
-            debugLog(`  No valid partner field data found in any structure`);
+            logger.debug(`  No valid partner field data found in any structure`);
         }
     }
     
     // PHASE 3: Enhanced fallback attempts with comprehensive field patterns
-    debugLog(`🔄 Trying enhanced fallback field patterns...`);
+    logger.debug(`Trying enhanced fallback field patterns...`);
     const fallbackPatterns = [];
     
     // Generate comprehensive fallback patterns based on original field names
@@ -230,14 +230,14 @@ function getFieldValue(inputs, fieldNames, options = {}) {
             const parsed = parseFloat(value);
             if (!isNaN(parsed) && (allowZero || parsed > 0)) {
                 const convertedValue = detectSalaryType(fallbackField, parsed);
-                debugLog(`✅ Found fallback field "${fallbackField}": ${convertedValue}`);
+                logger.fieldFound(`Found fallback field "${fallbackField}": ${convertedValue}`);
                 return convertedValue;
             }
         }
     }
     
     // PHASE 4: Special handling for wizard-specific field structures
-    debugLog(`🧙 Checking wizard-specific field structures...`);
+    logger.debug(`Checking wizard-specific field structures...`);
     
     // Try to extract from nested structures
     if (inputs.expenses && typeof inputs.expenses === 'object') {
@@ -250,7 +250,7 @@ function getFieldValue(inputs, fieldNames, options = {}) {
                 if (!isNaN(categoryValue)) totalDebt += categoryValue;
             });
             if (totalDebt > 0) {
-                debugLog(`✅ Found debt from expenses structure: ${totalDebt}`);
+                logger.fieldFound(`Found debt from expenses structure: ${totalDebt}`);
                 return totalDebt;
             }
         }
@@ -268,7 +268,7 @@ function getFieldValue(inputs, fieldNames, options = {}) {
             if (stockAllocation && stockAllocation.percentage) {
                 const stockPercentage = parseFloat(stockAllocation.percentage);
                 if (!isNaN(stockPercentage)) {
-                    debugLog(`✅ Found stock percentage from portfolio allocations: ${stockPercentage}`);
+                    logger.fieldFound(`Found stock percentage from portfolio allocations: ${stockPercentage}`);
                     return stockPercentage;
                 }
             }
@@ -1642,12 +1642,7 @@ function calculateFinancialHealthScore(inputs) {
         // Helper function to safely calculate each factor
         const safeCalculate = (factorName, calculator) => {
             try {
-                console.log(`🔧 Calculating ${factorName}...`);
-                console.log(`🔧 Calculator function type: ${typeof calculator}`);
-                console.log(`🔧 Calculator function name: ${calculator.name}`);
                 const result = calculator(inputs);
-                console.log(`🔧 ${factorName} result:`, result);
-                console.log(`🔧 ${factorName} result type:`, typeof result);
                 
                 // Validate result structure - be more specific about what we expect
                 if (!result) {

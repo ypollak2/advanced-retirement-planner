@@ -360,11 +360,20 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         return { totalScore: 0, factors: {} };
     };
     
-    const financialHealthScore = calculateHealthScore(inputs);
+    // Memoize expensive calculations to prevent re-render loops
+    const financialHealthScore = React.useMemo(() => {
+        return calculateHealthScore(inputs);
+    }, [inputs.currentMonthlySalary, inputs.pensionContributionRate, inputs.trainingFundContributionRate, 
+        inputs.emergencyFund, inputs.currentMonthlyExpenses, inputs.riskTolerance, 
+        inputs.portfolioAllocations, inputs.planningType]);
     
-    // Calculate overall assessment
-    const overallScore = window.calculateOverallFinancialHealthScore ? 
-        window.calculateOverallFinancialHealthScore(inputs) : financialHealthScore.totalScore || 0;
+    // Calculate overall assessment with memoization
+    const overallScore = React.useMemo(() => {
+        return window.calculateOverallFinancialHealthScore ? 
+            window.calculateOverallFinancialHealthScore(inputs) : financialHealthScore.totalScore || 0;
+    }, [inputs.currentMonthlySalary, inputs.pensionContributionRate, inputs.trainingFundContributionRate, 
+        inputs.emergencyFund, inputs.currentMonthlyExpenses, inputs.riskTolerance, 
+        inputs.portfolioAllocations, inputs.planningType, financialHealthScore.totalScore]);
     
     const getOverallStatus = (score) => {
         if (score >= 80) return { status: t.readyForRetirement, color: 'green' };
@@ -389,16 +398,22 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         exchangeRates: inputs.exchangeRates ? Object.keys(inputs.exchangeRates) : 'none'
     });
     
-    const retirementProjections = window.calculateRetirement ? 
-        window.calculateRetirement(inputs) : {};
+    // Memoize retirement projections to prevent recalculation loops
+    const retirementProjections = React.useMemo(() => {
+        return window.calculateRetirement ? window.calculateRetirement(inputs) : {};
+    }, [inputs.currentAge, inputs.retirementAge, inputs.currentSavings, 
+        inputs.monthlyContribution, inputs.inflationRate]);
     
     const totalAccumulation = retirementProjections.totalAccumulation || 0;
     const projectedIncome = retirementProjections.projectedIncome || 0;
     const monthlyRetirementIncome = retirementProjections.monthlyIncome || 0;
     
-    // Retirement readiness assessment (test pattern: readinessScore)
-    const readinessScore = window.calculateRetirementReadinessScore ? 
-        window.calculateRetirementReadinessScore(inputs) : Math.round(overallScore);
+    // Retirement readiness assessment with memoization (test pattern: readinessScore)
+    const readinessScore = React.useMemo(() => {
+        return window.calculateRetirementReadinessScore ? 
+            window.calculateRetirementReadinessScore(inputs) : Math.round(overallScore);
+    }, [inputs.currentAge, inputs.retirementAge, inputs.currentSavings, 
+        inputs.monthlyContribution, overallScore]);
     
     // Risk assessment integration (test patterns: riskTolerance, riskLevel)
     const riskTolerance = inputs.riskTolerance || inputs.riskProfile || 'moderate';
@@ -430,9 +445,12 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         } : null
     };
     
-    // Generate improvement suggestions
-    const suggestions = window.generateImprovementSuggestions ? 
-        window.generateImprovementSuggestions(inputs, language) : [];
+    // Generate improvement suggestions with memoization
+    const suggestions = React.useMemo(() => {
+        return window.generateImprovementSuggestions ? 
+            window.generateImprovementSuggestions(inputs, language) : [];
+    }, [inputs.currentMonthlySalary, inputs.monthlyContribution, inputs.currentSavings, 
+        inputs.emergencyFund, inputs.riskTolerance, language]);
     
     return createElement('div', { 
         className: "review-step space-y-8" 

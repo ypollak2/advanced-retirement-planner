@@ -1923,11 +1923,12 @@ function testCouplePartnerFieldMappingEngine() {
                                       engineContent.includes('Alternative field patterns');
             logTest('Partner Field Mapping: Fallback patterns for missing fields', hasFallbackPatterns);
             
-            // Test 5: Debug mode logging for field mapping
-            const hasDebugLogging = engineContent.includes('debugLog') &&
-                                  engineContent.includes('Searching for fields') &&
-                                  engineContent.includes('Planning type');
-            logTest('Partner Field Mapping: Debug mode logging implemented', hasDebugLogging);
+            // Test 5: Environment-aware logging for field mapping  
+            const hasEnvironmentLogging = engineContent.includes('logger.fieldSearch') &&
+                                        engineContent.includes('Searching for fields') &&
+                                        engineContent.includes('Planning type') &&
+                                        engineContent.includes('window.logger');
+            logTest('Partner Field Mapping: Environment-aware logging implemented', hasEnvironmentLogging);
             
             // Test 6: Enhanced validation with allowZero option
             const hasEnhancedValidation = engineContent.includes('allowZero') &&
