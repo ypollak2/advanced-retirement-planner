@@ -82,7 +82,7 @@ runTest('Portfolio Tax Rates: Input validation range (0-50%)', () => {
 
 // Test 9: Default Tax Rate (25%)
 runTest('Portfolio Tax Rates: Default tax rate is 25%', () => {
-    const defaultRatePattern = /\|\| 25\) \/ 100/g;
+    const defaultRatePattern = /\|\| 0\.25\)/g;
     const matches = wizardStepSavingsContent.match(defaultRatePattern);
     return matches && matches.length >= 3; // Main + Partner1 + Partner2
 });
@@ -110,8 +110,9 @@ runTest('Portfolio Tax Help: Consistent Israel tax guidance across all portfolio
 
 // Test 13: formatCurrency Function Usage
 runTest('Portfolio Tax Display: Uses formatCurrency for net value display', () => {
-    const formatCurrencyUsage = wizardStepSavingsContent.match(/formatCurrency\([^)]*\(1 - \([^)]*TaxRate/g);
-    return formatCurrencyUsage && formatCurrencyUsage.length >= 3; // Main + Partner1 + Partner2
+    // Check for renderNetValue usage which calls formatCurrency internally
+    const renderNetValueUsage = wizardStepSavingsContent.match(/renderNetValue\(inputs\.[^,]*PersonalPortfolio, inputs\.[^,]*TaxRate/g);
+    return renderNetValueUsage && renderNetValueUsage.length >= 3; // Main + Partner1 + Partner2
 });
 
 // Test 14: Tax Rate Storage in inputs

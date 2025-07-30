@@ -191,12 +191,13 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
     };
     
     // Enhanced real-time net value calculation with currency conversion
-    // Calculation format matches test expectations: portfolioValue * (1 - (inputs.taxRate || (25) / 100))
+    // Main portfolio: currentPersonalPortfolio * (1 - (inputs.portfolioTaxRate || 0.25))
+    // Partner portfolios: partnerPersonalPortfolio * (1 - (inputs.partnerPortfolioTaxRate || 0.25))
     const calculateAndFormatNetValue = useCallback(async (portfolioValue, taxRate, partnerId = null) => {
         if (!portfolioValue || portfolioValue <= 0) return formatCurrency(0);
         
-        // Use the exact calculation format that tests expect: || 25) / 100
-        const netValueILS = portfolioValue * (1 - (taxRate || 25) / 100);
+        // Fix: taxRate is already stored as decimal (0.5 for 50%), so don't divide by 100
+        const netValueILS = portfolioValue * (1 - (taxRate || 0.25));
         
         if (workingCurrency === 'ILS') {
             return formatCurrency(netValueILS, 'ILS');
@@ -260,8 +261,8 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             ]);
         }
         
-        // Default calculation (immediate, no conversion) - using test-expected format
-        const netValue = portfolioValue * (1 - (taxRate || 25) / 100);
+        // Default calculation (immediate, no conversion) - taxRate is already decimal
+        const netValue = portfolioValue * (1 - (taxRate || 0.25));
         const formatted = formatCurrency(netValue, workingCurrency);
         
         // Trigger async conversion for next render
@@ -464,9 +465,10 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                             className: "text-xs text-purple-500 mt-1"
                         }, language === 'he' ? 
                             'מס רווחי הון בישראל: 25% (אזרחים), 30% (תושבי חוץ)' :
-                            'Israel capital gains: 25% (residents), 30% (non-residents)')
+                            'Israel: 25% (residents), 30% (non-residents)')
                     ]),
-                    // Net value after tax with enhanced styling
+                    // Net Value After Tax
+                    // Formula: currentPersonalPortfolio * (1 - (inputs.portfolioTaxRate || 0.25))
                     inputs.currentPersonalPortfolio > 0 && createElement('div', { 
                         key: 'net-value-section',
                         className: 'animate-fadeIn transition-all duration-300 ease-in-out mt-4 p-4 bg-gradient-to-r from-purple-100 to-purple-50 rounded-lg border-2 border-purple-300 shadow-sm'

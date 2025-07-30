@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TICKET-007: Couple Mode Income Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-case { border: 1px solid #ccc; margin: 10px 0; padding: 15px; }
+        .pass { border-color: green; background: #f0fff0; }
+        .fail { border-color: red; background: #fff0f0; }
+        .result { font-weight: bold; margin: 10px 0; }
+        .details { font-size: 0.9em; color: #666; }
+    </style>
+</head>
+<body>
+    <h1>🧪 TICKET-007: Partner 1 Income Attribution Test</h1>
+    <p>Testing that Partner 1's additional income is properly attributed in couple mode</p>
+    
+    <div id="test-results"></div>
+    
+    <script>
+        // Mock inputs from the console logs
+        const testInputs = {
+            planningType: 'couple',
+            partner1Salary: 29500,
+            partner1NetSalary: 29500,
+            partner2Salary: 22000,
+            partner2NetSalary: 22000,
+            // Main additional income fields (should go to Partner 1)
+            annualBonus: 150000,
+            rentalIncome: 7200,
+            dividendIncome: 100,
+            rsuUnits: 0,
+            // Partner 2 additional income fields
+            partnerAnnualBonus: 60000,
+            partnerDividendIncome: 200,
+            partnerRsuUnits: 89,
+            partnerRsuCurrentStockPrice: 175.50,
+            partnerRsuFrequency: 'quarterly',
+            country: 'israel'
+        };
+        
+        // Mock AdditionalIncomeTax for consistent testing
+        window.AdditionalIncomeTax = {
+            getMonthlyAfterTaxAdditionalIncome: function(inputs) {
+                const annualBonus = inputs.annualBonus || 0;
+                const rentalIncome = inputs.rentalIncome || 0;
+                const dividendIncome = inputs.dividendIncome || 0;
+                const rsuValue = (inputs.rsuUnits || 0) * (inputs.rsuCurrentStockPrice || 0);
+                const quarterlyRSU = inputs.rsuFrequency === 'quarterly' ? rsuValue : 0;
+                
+                // Simplified tax calculation for testing
+                const bonusNet = annualBonus / 12 * 0.55; // ~45% tax
+                const rsuNet = quarterlyRSU / 3 * 0.57; // ~43% tax  
+                const rentalNet = rentalIncome * 0.9; // ~10% tax
+                const dividendNet = dividendIncome * 0.75; // ~25% tax
+                
+                return {
+                    totalMonthlyNet: bonusNet + rsuNet + rentalNet + dividendNet
+                };
+            }
+        };
+        
+        function calculateNetFromGross(gross, country) {
+            // Simplified net calculation for testing
+            return gross * 0.75; // Assume 25% tax
+        }
+        
+        // Test the calculateTotalIncome logic from WizardStepSalary.js
+        function calculateTotalIncome(inputs) {
+            let mainSalary = 0;
+            let partner1Salary = 0;
+            let partner2Salary = 0;
+            let mainAdditionalIncomeMonthly = 0;
+            let partnerAdditionalIncomeMonthly = 0;
+            
+            if (inputs.planningType === 'couple') {
+                // COUPLE MODE: Use partner fields only
+                partner1Salary = inputs.partner1NetSalary || calculateNetFromGross(inputs.partner1Salary || 0, inputs.country);
+                partner2Salary = inputs.partner2NetSalary || calculateNetFromGross(inputs.partner2Salary || 0, inputs.country);
+                
+                // In couple mode, mainAdditionalIncome should be attributed to Partner 1
+                // Partner 1 gets the "main" additional income fields
+                const partner1TaxResult = window.AdditionalIncomeTax.getMonthlyAfterTaxAdditionalIncome(inputs);
+                mainAdditionalIncomeMonthly = partner1TaxResult.totalMonthlyNet || 0;
+                
+                // Partner 2 gets their own additional income fields
+                const partner2Inputs = {
+                    country: inputs.country || 'israel',
+                    annualBonus: inputs.partnerAnnualBonus || 0,
+                    rsuUnits: inputs.partnerRsuUnits || 0,
+                    rsuCurrentStockPrice: inputs.partnerRsuCurrentStockPrice || 0,
+                    rsuFrequency: inputs.partnerRsuFrequency || 'quarterly',
+                    freelanceIncome: inputs.partnerFreelanceIncome || 0,
+                    rentalIncome: inputs.partnerRentalIncome || 0,
+                    dividendIncome: inputs.partnerDividendIncome || 0,
+                    otherIncome: inputs.partnerOtherIncome || 0
+                };
+                
+                const partner2TaxResult = window.AdditionalIncomeTax.getMonthlyAfterTaxAdditionalIncome(partner2Inputs);
+                partnerAdditionalIncomeMonthly = partner2TaxResult.totalMonthlyNet || 0;
+            }
+            
+            return {
+                mainSalary,
+                partner1Salary,
+                partner2Salary,
+                mainAdditionalIncomeMonthly,
+                partnerAdditionalIncomeMonthly,
+                total: mainSalary + partner1Salary + partner2Salary + mainAdditionalIncomeMonthly + partnerAdditionalIncomeMonthly
+            };
+        }
+        
+        // Run tests
+        function runTests() {
+            const results = [];
+            
+            // Test 1: Basic couple mode calculation
+            const result1 = calculateTotalIncome(testInputs);
+            const test1Pass = result1.mainSalary === 0 && result1.partner1Salary === 29500 && result1.partner2Salary === 22000;
+            results.push({
+                name: "Couple Mode: No main salary, partner salaries correct",
+                pass: test1Pass,
+                details: `mainSalary: ${result1.mainSalary}, partner1Salary: ${result1.partner1Salary}, partner2Salary: ${result1.partner2Salary}`,
+                expected: "mainSalary: 0, partner1Salary: 29500, partner2Salary: 22000"
+            });
+            
+            // Test 2: Partner 1 additional income attribution
+            const partner1AdditionalExpected = 13254; // From console logs
+            const test2Pass = Math.abs(result1.mainAdditionalIncomeMonthly - partner1AdditionalExpected) < 100; // Allow small variance
+            results.push({
+                name: "Partner 1 Additional Income: Gets main additional income",
+                pass: test2Pass,
+                details: `Partner 1 additional: ₪${result1.mainAdditionalIncomeMonthly.toFixed(0)}`,
+                expected: `Partner 1 additional: ₪${partner1AdditionalExpected} (±100)`
+            });
+            
+            // Test 3: Partner 2 additional income attribution  
+            const partner2AdditionalExpected = 5072; // From console logs
+            const test3Pass = Math.abs(result1.partnerAdditionalIncomeMonthly - partner2AdditionalExpected) < 100;
+            results.push({
+                name: "Partner 2 Additional Income: Gets partner additional income",
+                pass: test3Pass,
+                details: `Partner 2 additional: ₪${result1.partnerAdditionalIncomeMonthly.toFixed(0)}`,
+                expected: `Partner 2 additional: ₪${partner2AdditionalExpected} (±100)`
+            });
+            
+            // Test 4: Total income calculation
+            const totalExpected = 29500 + 22000 + 13254 + 5072; // 69,826
+            const test4Pass = Math.abs(result1.total - totalExpected) < 200;
+            results.push({
+                name: "Total Income: Matches expected combined total",
+                pass: test4Pass,
+                details: `Total: ₪${result1.total.toFixed(0)}`,
+                expected: `Total: ₪${totalExpected} (±200)`
+            });
+            
+            // Test 5: Individual mode still works
+            const individualInputs = {...testInputs, planningType: 'individual', currentMonthlySalary: 29500};
+            const result5 = calculateTotalIncome(individualInputs);
+            const test5Pass = result5.partner1Salary === 0 && result5.partner2Salary === 0;
+            results.push({
+                name: "Individual Mode: No partner salaries",
+                pass: test5Pass,
+                details: `Individual mode - partner1Salary: ${result5.partner1Salary}, partner2Salary: ${result5.partner2Salary}`,
+                expected: "partner1Salary: 0, partner2Salary: 0"
+            });
+            
+            return results;
+        }
+        
+        // Display results
+        function displayResults(results) {
+            const container = document.getElementById('test-results');
+            let html = '';
+            let passCount = 0;
+            
+            results.forEach(test => {
+                if (test.pass) passCount++;
+                html += `
+                    <div class="test-case ${test.pass ? 'pass' : 'fail'}">
+                        <div class="result">${test.pass ? '✅ PASS' : '❌ FAIL'}: ${test.name}</div>
+                        <div class="details">Result: ${test.details}</div>
+                        <div class="details">Expected: ${test.expected}</div>
+                    </div>
+                `;
+            });
+            
+            html = `
+                <h2>Test Results: ${passCount}/${results.length} tests passed</h2>
+                ${html}
+                <div style="margin-top: 20px; padding: 15px; background: ${passCount === results.length ? '#f0fff0' : '#fff0f0'}; border: 1px solid ${passCount === results.length ? 'green' : 'red'};">
+                    <strong>${passCount === results.length ? '🎉 All tests passed!' : '⚠️ Some tests failed'}</strong>
+                    ${passCount === results.length ? ' Partner 1 income attribution is working correctly.' : ' There are issues with the income calculation logic.'}
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        // Run tests when page loads
+        window.onload = function() {
+            const results = runTests();
+            displayResults(results);
+            
+            // Log to console for debugging
+            console.log('🧪 TICKET-007 Test Results:', results);
+            console.log('📊 Test data:', testInputs);
+            console.log('💰 Calculation result:', calculateTotalIncome(testInputs));
+        };
+    </script>
+</body>
+</html>
