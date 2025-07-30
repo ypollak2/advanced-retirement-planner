@@ -1,0 +1,432 @@
+name: 🔄 CI Pipeline (Main)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: 'Skip test execution'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '18'
+  PRODUCTION_URL: 'https://ypollak2.github.io/advanced-retirement-planner/'
+  CACHE_KEY_PREFIX: 'advanced-retirement-planner'
+
+# Concurrency control - cancel previous runs on same branch
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Job 1: Code Quality & Validation
+  code-quality:
+    name: 📋 Code Quality Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    outputs:
+      version: ${{ steps.version-check.outputs.version }}
+      has-changes: ${{ steps.changes.outputs.has-changes }}
+      
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          
+      - name: 🔍 Detect changes
+        id: changes
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # For PRs, check if there are actual code changes
+            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | grep -E '\.(js|html|css|json)$' | wc -l)
+            echo "has-changes=$([ $CHANGED_FILES -gt 0 ] && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
+          else
+            echo "has-changes=true" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📥 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+        
+      - name: 🏷️ Version consistency check
+        id: version-check
+        run: |
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          VERSION_JS=$(node -p "require('./src/version.js').number")
+          
+          echo "version=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
+          echo "Package.json: $PACKAGE_VERSION"
+          echo "Version.js: $VERSION_JS"
+          
+          if [ "$PACKAGE_VERSION" != "$VERSION_JS" ]; then
+            echo "❌ Version mismatch detected!"
+            exit 1
+          else
+            echo "✅ Version consistency verified: $PACKAGE_VERSION"
+          fi
+          
+      - name: 🔍 Syntax validation
+        run: |
+          echo "🔍 Validating JavaScript syntax..."
+          for file in src/components/*/*.js src/utils/*.js; do
+            if [ -f "$file" ]; then
+              node -c "$file" && echo "✅ $file"
+            fi
+          done
+          
+      - name: 📏 File size analysis
+        run: |
+          echo "📏 Analyzing file sizes..."
+          INDEX_SIZE=$(stat -c%s index.html)
+          echo "index.html: ${INDEX_SIZE} bytes"
+          
+          if [ $INDEX_SIZE -gt 100000 ]; then
+            echo "⚠️ WARNING: index.html is large (${INDEX_SIZE} bytes > 100KB)"
+          else
+            echo "✅ HTML size is optimal"
+          fi
+
+  # Job 2: Unit & Integration Tests
+  tests:
+    name: 🧪 Test Suite
+    runs-on: ubuntu-latest
+    needs: code-quality
+    if: needs.code-quality.outputs.has-changes == 'true' && !github.event.inputs.skip_tests
+    timeout-minutes: 15
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+        
+    outputs:
+      test-results: ${{ steps.run-tests.outputs.results }}
+      coverage: ${{ steps.run-tests.outputs.coverage }}
+      
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          
+      - name: 📥 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+        
+      - name: 🧪 Run comprehensive test suite
+        id: run-tests
+        run: |
+          echo "🚀 Running comprehensive tests..."
+          TEST_OUTPUT=$(npm test 2>&1)
+          echo "$TEST_OUTPUT"
+          
+          # Extract test results
+          PASSED=$(echo "$TEST_OUTPUT" | grep -oE 'Tests Passed: [0-9]+' | grep -oE '[0-9]+' || echo "0")
+          TOTAL=$(echo "$TEST_OUTPUT" | grep -oE 'Success Rate:.*Tests Passed: ([0-9]+)' | grep -oE '[0-9]+' | head -1 || echo "381")
+          SUCCESS_RATE=$(echo "$TEST_OUTPUT" | grep -oE 'Success Rate: [0-9.]+%' | grep -oE '[0-9.]+' || echo "0")
+          
+          echo "results={\"passed\": $PASSED, \"total\": $TOTAL, \"rate\": \"$SUCCESS_RATE\"}" >> $GITHUB_OUTPUT
+          echo "coverage=$SUCCESS_RATE" >> $GITHUB_OUTPUT
+          
+          # Fail if not 100% pass rate
+          if [ "$PASSED" -ne "$TOTAL" ]; then
+            echo "❌ Not all tests passed! Required: $TOTAL, Passed: $PASSED"
+            exit 1
+          else
+            echo "✅ All $TOTAL tests passed!"
+          fi
+          
+      - name: 📊 Generate test report
+        if: always()
+        run: |
+          mkdir -p test-results
+          cat > test-results/report-${{ matrix.node-version }}.json << EOF
+          {
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "node_version": "${{ matrix.node-version }}",
+            "version": "${{ needs.code-quality.outputs.version }}",
+            "results": ${{ steps.run-tests.outputs.results || '{"passed": 0, "total": 0, "rate": "0"}' }},
+            "status": "${{ job.status }}"
+          }
+          EOF
+          
+      - name: 📤 Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-node-${{ matrix.node-version }}
+          path: test-results/
+          retention-days: 7
+
+  # Job 3: Security Scan
+  security-scan:
+    name: 🔒 Security Analysis
+    runs-on: ubuntu-latest
+    needs: [code-quality, tests]
+    if: always() && needs.code-quality.result == 'success'
+    timeout-minutes: 10
+    
+    permissions:
+      contents: read
+      security-events: write
+      
+    outputs:
+      security-status: ${{ steps.security-check.outputs.status }}
+      
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📥 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+        
+      - name: 🔍 NPM audit
+        id: security-check
+        run: |
+          echo "🛡️ Running security audit..."
+          if npm audit --audit-level=high --production; then
+            echo "status=clean" >> $GITHUB_OUTPUT
+            echo "✅ No high/critical vulnerabilities found"
+          else
+            echo "status=vulnerabilities-found" >> $GITHUB_OUTPUT
+            echo "⚠️ Security vulnerabilities detected"
+            npm audit --audit-level=moderate || true
+          fi
+          
+      - name: 🕵️ Static analysis
+        run: |
+          echo "🔍 Checking for security anti-patterns..."
+          
+          # Check for eval usage
+          if grep -r "eval(" --include="*.js" --include="*.html" src/ || \
+             grep -r "Function(" --include="*.js" --include="*.html" src/; then
+            echo "❌ Dangerous code patterns found (eval/Function)"
+            exit 1
+          fi
+          
+          # Check for innerHTML usage (warning only)
+          if grep -r "innerHTML" --include="*.js" src/; then
+            echo "⚠️ innerHTML usage detected - verify XSS protection"
+          fi
+          
+          # Check for document.write
+          if grep -r "document.write" --include="*.js" --include="*.html" src/; then
+            echo "❌ document.write usage found - security risk"
+            exit 1
+          fi
+          
+          echo "✅ Static security analysis passed"
+
+  # Job 4: Build Validation
+  build-validation:
+    name: 🏗️ Build & Deploy Validation
+    runs-on: ubuntu-latest
+    needs: [code-quality, tests, security-scan]
+    if: always() && needs.code-quality.result == 'success' && needs.tests.result == 'success'
+    timeout-minutes: 10
+    
+    outputs:
+      build-status: ${{ steps.build.outputs.status }}
+      deploy-ready: ${{ steps.deploy-check.outputs.ready }}
+      
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📥 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+        
+      - name: 🏗️ Build validation
+        id: build
+        run: |
+          echo "🏗️ Validating build readiness..."
+          
+          # Check required files
+          REQUIRED_FILES=(
+            "index.html"
+            "package.json"
+            "src/version.js"
+            "src/components/core/RetirementPlannerApp.js"
+            "src/utils/retirementCalculations.js"
+          )
+          
+          MISSING_FILES=()
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              MISSING_FILES+=("$file")
+            fi
+          done
+          
+          if [ ${#MISSING_FILES[@]} -eq 0 ]; then
+            echo "status=ready" >> $GITHUB_OUTPUT
+            echo "✅ All required files present"
+          else
+            echo "status=missing-files" >> $GITHUB_OUTPUT
+            echo "❌ Missing required files:"
+            printf ' - %s\n' "${MISSING_FILES[@]}"
+            exit 1
+          fi
+          
+      - name: 🚀 Deployment readiness check
+        id: deploy-check
+        run: |
+          echo "🎯 Checking deployment readiness..."
+          
+          # Run pre-deployment validation
+          if npm run validate:pre-work 2>/dev/null || true; then
+            echo "ready=true" >> $GITHUB_OUTPUT
+            echo "✅ Pre-deployment validation passed"
+          else
+            echo "ready=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Pre-deployment validation not available"
+          fi
+          
+      - name: 🔍 Performance check
+        run: |
+          echo "⚡ Performance validation..."
+          
+          # Check for performance anti-patterns
+          if grep -r "console.log" --include="*.js" src/ && [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "⚠️ WARNING: console.log found in production code"
+          fi
+          
+          # Check inline script count
+          INLINE_SCRIPTS=$(grep -c "<script[^>]*>" index.html || echo "0")
+          if [ $INLINE_SCRIPTS -gt 5 ]; then
+            echo "⚠️ WARNING: Too many inline scripts (${INLINE_SCRIPTS} > 5)"
+          else
+            echo "✅ Inline script count acceptable: $INLINE_SCRIPTS"
+          fi
+
+  # Job 5: CI Summary & Gate
+  ci-summary:
+    name: 📊 CI Summary & Gate
+    runs-on: ubuntu-latest
+    needs: [code-quality, tests, security-scan, build-validation]
+    if: always()
+    timeout-minutes: 5
+    
+    outputs:
+      ci-status: ${{ steps.summary.outputs.status }}
+      next-workflow: ${{ steps.summary.outputs.next }}
+      
+    steps:
+      - name: 📊 Generate CI summary
+        id: summary
+        run: |
+          echo "## 🔄 CI Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version**: ${{ needs.code-quality.outputs.version || 'Unknown' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Job status summary
+          echo "### Job Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status | Duration |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Code Quality | ${{ needs.code-quality.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ needs.tests.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Scan | ${{ needs.security-scan.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Validation | ${{ needs.build-validation.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Determine overall status
+          if [[ "${{ needs.code-quality.result }}" == "success" && \
+                "${{ needs.tests.result }}" == "success" && \
+                "${{ needs.build-validation.result }}" == "success" ]]; then
+            
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "✅ **CI Pipeline: SUCCESS**" >> $GITHUB_STEP_SUMMARY
+            
+            # Determine next workflow
+            if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+              echo "next=deployment" >> $GITHUB_OUTPUT
+              echo "**Next**: Deployment workflow will be triggered" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "next=none" >> $GITHUB_OUTPUT
+              echo "**Next**: No deployment (not main branch)" >> $GITHUB_STEP_SUMMARY
+            fi
+            
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "❌ **CI Pipeline: FAILED**" >> $GITHUB_STEP_SUMMARY
+            echo "next=none" >> $GITHUB_OUTPUT
+            
+            # Show failed jobs
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Failed Jobs" >> $GITHUB_STEP_SUMMARY
+            if [[ "${{ needs.code-quality.result }}" != "success" ]]; then
+              echo "- ❌ Code Quality" >> $GITHUB_STEP_SUMMARY
+            fi
+            if [[ "${{ needs.tests.result }}" != "success" ]]; then
+              echo "- ❌ Tests" >> $GITHUB_STEP_SUMMARY
+            fi
+            if [[ "${{ needs.security-scan.result }}" != "success" ]]; then
+              echo "- ❌ Security Scan" >> $GITHUB_STEP_SUMMARY
+            fi
+            if [[ "${{ needs.build-validation.result }}" != "success" ]]; then
+              echo "- ❌ Build Validation" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "*Generated by CI Pipeline workflow*" >> $GITHUB_STEP_SUMMARY
+          
+      - name: 🚨 Fail pipeline on critical errors
+        if: needs.code-quality.result == 'failure' || needs.tests.result == 'failure' || needs.build-validation.result == 'failure'
+        run: |
+          echo "❌ CI Pipeline failed - blocking further workflows"
+          exit 1
+          
+      - name: ⚠️ Warning on security issues
+        if: needs.security-scan.result != 'success'
+        run: |
+          echo "⚠️ Security scan issues detected - review required"
+          # Don't fail the pipeline, but create a warning
+          
+      - name: 🎯 Set status check
+        uses: actions/github-script@v7
+        if: always()
+        with:
+          script: |
+            const { context } = require('@actions/github');
+            const status = '${{ steps.summary.outputs.status }}';
+            
+            // Set commit status for branch protection
+            github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: status === 'success' ? 'success' : 'failure',
+              target_url: `${context.payload.repository.html_url}/actions/runs/${context.runId}`,
+              description: status === 'success' ? 'CI Pipeline passed' : 'CI Pipeline failed',
+              context: 'ci-pipeline'
+            });

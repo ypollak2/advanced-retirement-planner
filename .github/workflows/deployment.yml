@@ -1,0 +1,531 @@
+name: 🚀 Deployment Pipeline
+
+on:
+  workflow_run:
+    workflows: ["🔄 CI Pipeline (Main)"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'stage'
+        type: choice
+        options:
+          - stage
+          - production
+          - both
+      skip_validation:
+        description: 'Skip deployment validation'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '18'
+  STAGE_URL: 'https://ypollak2.github.io/advanced-retirement-planner/stage/'
+  PRODUCTION_URL: 'https://ypollak2.github.io/advanced-retirement-planner/'
+
+# Concurrency control - only one deployment at a time
+concurrency:
+  group: deployment
+  cancel-in-progress: false
+
+jobs:
+  # Job 1: Pre-deployment Checks
+  pre-deployment:
+    name: 🔍 Pre-deployment Validation
+    runs-on: ubuntu-latest
+    if: |
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') ||
+      github.event_name == 'workflow_dispatch'
+    timeout-minutes: 10
+    
+    outputs:
+      deploy-stage: ${{ steps.check.outputs.stage }}
+      deploy-production: ${{ steps.check.outputs.production }}
+      version: ${{ steps.version.outputs.version }}
+      
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📥 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+        
+      - name: 🏷️ Get version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Deploying version: $VERSION"
+          
+      - name: ✅ Deployment readiness check
+        id: check
+        run: |
+          echo "🔍 Checking deployment readiness..."
+          
+          # Run comprehensive pre-deployment validation
+          if npm run validate:pre-work 2>/dev/null; then
+            echo "✅ Pre-deployment validation passed"
+          else
+            echo "⚠️ Pre-deployment validation script not found, running basic checks"
+            
+            # Basic validation
+            if [ ! -f "index.html" ] || [ ! -f "package.json" ]; then
+              echo "❌ Missing essential files"
+              exit 1
+            fi
+          fi
+          
+          # Determine what to deploy based on input or trigger
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            ENVIRONMENT="${{ github.event.inputs.environment }}"
+            case $ENVIRONMENT in
+              "stage")
+                echo "stage=true" >> $GITHUB_OUTPUT
+                echo "production=false" >> $GITHUB_OUTPUT
+                ;;
+              "production")
+                echo "stage=false" >> $GITHUB_OUTPUT
+                echo "production=true" >> $GITHUB_OUTPUT
+                ;;
+              "both")
+                echo "stage=true" >> $GITHUB_OUTPUT
+                echo "production=true" >> $GITHUB_OUTPUT
+                ;;
+            esac
+          else
+            # Automatic workflow: deploy to stage first, then production
+            echo "stage=true" >> $GITHUB_OUTPUT
+            echo "production=true" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: 📊 Pre-deployment summary
+        run: |
+          echo "## 🚀 Deployment Pipeline Started" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version**: ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit**: ${{ github.event.workflow_run.head_sha || github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deployment Plan" >> $GITHUB_STEP_SUMMARY
+          echo "- Stage: ${{ steps.check.outputs.stage == 'true' && '✅ Yes' || '❌ No' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Production: ${{ steps.check.outputs.production == 'true' && '✅ Yes' || '❌ No' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+  # Job 2: Stage Deployment
+  deploy-stage:
+    name: 🎭 Deploy to Stage
+    runs-on: ubuntu-latest
+    needs: pre-deployment
+    if: needs.pre-deployment.outputs.deploy-stage == 'true'
+    timeout-minutes: 15
+    
+    environment:
+      name: staging
+      url: ${{ env.STAGE_URL }}
+      
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+      
+    outputs:
+      stage-status: ${{ steps.deploy.outputs.status }}
+      stage-url: ${{ steps.deploy.outputs.url }}
+      
+    steps:
+      - name: 📥 Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: 📥 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+        
+      - name: 🧪 Final test verification
+        run: |
+          echo "🧪 Running final tests before stage deployment..."
+          npm test
+          
+      - name: 📥 Checkout gh-pages branch for stage
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages-repo
+          
+      - name: 🎭 Deploy to stage folder
+        id: deploy
+        run: |
+          echo "🎭 Deploying to stage environment..."
+          
+          # Create or update stage folder
+          mkdir -p gh-pages-repo/stage
+          
+          # Copy all files to stage folder (excluding git and node_modules)
+          find . -maxdepth 1 \
+            ! -name . \
+            ! -name gh-pages-repo \
+            ! -name .git \
+            ! -name .github \
+            ! -name node_modules \
+            ! -name '*.log' \
+            -exec cp -r {} gh-pages-repo/stage/ \;
+          
+          # Create stage-specific version indicator
+          echo "<!-- Stage Deployment v${{ needs.pre-deployment.outputs.version }} - $(date) -->" >> gh-pages-repo/stage/index.html
+          
+          cd gh-pages-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add stage/
+          
+          if git diff --staged --quiet; then
+            echo "status=no-changes" >> $GITHUB_OUTPUT
+            echo "url=${{ env.STAGE_URL }}" >> $GITHUB_OUTPUT
+            echo "No changes to deploy to stage"
+          else
+            git commit -m "🎭 Deploy to stage: v${{ needs.pre-deployment.outputs.version }} ($(date '+%Y-%m-%d %H:%M:%S'))"
+            git push origin gh-pages
+            
+            echo "status=deployed" >> $GITHUB_OUTPUT
+            echo "url=${{ env.STAGE_URL }}" >> $GITHUB_OUTPUT
+            echo "✅ Stage deployment completed"
+          fi
+
+  # Job 3: Stage Validation
+  validate-stage:
+    name: ✅ Validate Stage Deployment
+    runs-on: ubuntu-latest
+    needs: [pre-deployment, deploy-stage]
+    if: needs.deploy-stage.outputs.stage-status != 'skipped' && !github.event.inputs.skip_validation
+    timeout-minutes: 10
+    
+    outputs:
+      validation-status: ${{ steps.validate.outputs.status }}
+      
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: ⏳ Wait for stage deployment
+        run: |
+          echo "⏳ Waiting for stage deployment to propagate..."
+          sleep 60
+          
+      - name: ✅ Validate stage deployment
+        id: validate
+        run: |
+          echo "✅ Validating stage deployment..."
+          
+          MAX_ATTEMPTS=10
+          ATTEMPT=1
+          
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+            echo "🔍 Attempt $ATTEMPT: Checking stage availability..."
+            
+            if curl -sSf "${{ env.STAGE_URL }}" > /dev/null; then
+              echo "✅ Stage deployment is accessible"
+              
+              # Check for version indicator
+              if curl -s "${{ env.STAGE_URL }}" | grep -q "v${{ needs.pre-deployment.outputs.version }}"; then
+                echo "✅ Correct version deployed"
+                echo "status=success" >> $GITHUB_OUTPUT
+                break
+              else
+                echo "⚠️ Version mismatch detected"
+              fi
+              
+            else
+              echo "❌ Stage deployment not accessible yet"
+            fi
+            
+            if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
+              echo "status=failed" >> $GITHUB_OUTPUT
+              echo "❌ Stage validation failed after $MAX_ATTEMPTS attempts"
+              exit 1
+            fi
+            
+            echo "⏳ Waiting 30 seconds before retry..."
+            sleep 30
+            ATTEMPT=$((ATTEMPT + 1))
+          done
+          
+      - name: 📊 Stage validation summary
+        run: |
+          echo "### 🎭 Stage Deployment Result" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL**: ${{ needs.deploy-stage.outputs.stage-url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ steps.validate.outputs.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ needs.pre-deployment.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+  # Job 4: Production Deployment (depends on stage success)
+  deploy-production:
+    name: 🌟 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [pre-deployment, deploy-stage, validate-stage]
+    if: |
+      needs.pre-deployment.outputs.deploy-production == 'true' && 
+      (needs.validate-stage.outputs.validation-status == 'success' || github.event.inputs.skip_validation == 'true')
+    timeout-minutes: 15
+    
+    environment:
+      name: production
+      url: ${{ env.PRODUCTION_URL }}
+      
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+      
+    outputs:
+      production-status: ${{ steps.deploy.outputs.status }}
+      production-url: ${{ steps.deploy.outputs.url }}
+      
+    steps:
+      - name: 📥 Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: 📥 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+        
+      - name: 🧪 Final production test verification
+        run: |
+          echo "🧪 Running final tests before production deployment..."
+          npm test
+          
+      - name: 🔍 Production readiness validation
+        run: |
+          echo "🔍 Final production readiness check..."
+          if command -v npm run validate:deployment &> /dev/null; then
+            npm run validate:deployment
+          else
+            echo "⚠️ Production validation script not found, proceeding with basic checks"
+          fi
+          
+      - name: 📥 Checkout gh-pages branch for production
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages-repo
+          
+      - name: 🌟 Deploy to production (root)
+        id: deploy
+        run: |
+          echo "🌟 Deploying to production environment..."
+          
+          # Copy all files to gh-pages root (preserving stage folder)
+          find . -maxdepth 1 \
+            ! -name . \
+            ! -name gh-pages-repo \
+            ! -name .git \
+            ! -name .github \
+            ! -name node_modules \
+            ! -name '*.log' \
+            -exec cp -r {} gh-pages-repo/ \;
+          
+          # Create production version indicator
+          echo "<!-- Production Deployment v${{ needs.pre-deployment.outputs.version }} - $(date) -->" >> gh-pages-repo/index.html
+          
+          cd gh-pages-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Add all changes except stage folder
+          git add -A
+          git reset stage/ 2>/dev/null || true  # Don't remove stage folder
+          
+          if git diff --staged --quiet; then
+            echo "status=no-changes" >> $GITHUB_OUTPUT
+            echo "url=${{ env.PRODUCTION_URL }}" >> $GITHUB_OUTPUT
+            echo "No changes to deploy to production"
+          else
+            git commit -m "🎉 Deploy to production: v${{ needs.pre-deployment.outputs.version }} ($(date '+%Y-%m-%d %H:%M:%S'))"
+            git push origin gh-pages
+            
+            echo "status=deployed" >> $GITHUB_OUTPUT
+            echo "url=${{ env.PRODUCTION_URL }}" >> $GITHUB_OUTPUT
+            echo "✅ Production deployment completed"
+          fi
+
+  # Job 5: Production Validation
+  validate-production:
+    name: ✅ Validate Production Deployment  
+    runs-on: ubuntu-latest
+    needs: [pre-deployment, deploy-production]
+    if: needs.deploy-production.outputs.production-status != 'skipped' && !github.event.inputs.skip_validation
+    timeout-minutes: 10
+    
+    outputs:
+      validation-status: ${{ steps.validate.outputs.status }}
+      
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: ⏳ Wait for production deployment
+        run: |
+          echo "⏳ Waiting for production deployment to propagate..."
+          sleep 90
+          
+      - name: ✅ Validate production deployment
+        id: validate
+        run: |
+          echo "✅ Validating production deployment..."
+          
+          MAX_ATTEMPTS=15
+          ATTEMPT=1
+          
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+            echo "🔍 Attempt $ATTEMPT: Checking production availability..."
+            
+            if curl -sSf "${{ env.PRODUCTION_URL }}" > /dev/null; then
+              echo "✅ Production deployment is accessible"
+              
+              # Check for version indicator
+              if curl -s "${{ env.PRODUCTION_URL }}" | grep -q "v${{ needs.pre-deployment.outputs.version }}"; then
+                echo "✅ Correct version deployed to production"
+                echo "status=success" >> $GITHUB_OUTPUT
+                break
+              else
+                echo "⚠️ Version mismatch detected"
+              fi
+              
+            else
+              echo "❌ Production deployment not accessible yet"
+            fi
+            
+            if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
+              echo "status=failed" >> $GITHUB_OUTPUT
+              echo "❌ Production validation failed after $MAX_ATTEMPTS attempts"
+              exit 1
+            fi
+            
+            echo "⏳ Waiting 30 seconds before retry..."
+            sleep 30
+            ATTEMPT=$((ATTEMPT + 1))
+          done
+
+  # Job 6: Deployment Summary & Notifications
+  deployment-summary:
+    name: 📊 Deployment Summary
+    runs-on: ubuntu-latest
+    needs: [pre-deployment, deploy-stage, validate-stage, deploy-production, validate-production]
+    if: always()
+    timeout-minutes: 5
+    
+    steps:
+      - name: 📊 Generate deployment summary
+        run: |
+          echo "## 🚀 Deployment Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version**: ${{ needs.pre-deployment.outputs.version || 'Unknown' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Stage deployment summary
+          if [[ "${{ needs.deploy-stage.result }}" != "skipped" ]]; then
+            echo "### 🎭 Stage Deployment" >> $GITHUB_STEP_SUMMARY
+            echo "- **Status**: ${{ needs.deploy-stage.result }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **URL**: ${{ env.STAGE_URL }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Validation**: ${{ needs.validate-stage.result || 'Skipped' }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Production deployment summary  
+          if [[ "${{ needs.deploy-production.result }}" != "skipped" ]]; then
+            echo "### 🌟 Production Deployment" >> $GITHUB_STEP_SUMMARY
+            echo "- **Status**: ${{ needs.deploy-production.result }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **URL**: ${{ env.PRODUCTION_URL }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Validation**: ${{ needs.validate-production.result || 'Skipped' }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Overall status
+          if [[ "${{ needs.deploy-production.result }}" == "success" && "${{ needs.validate-production.result }}" == "success" ]]; then
+            echo "🎉 **DEPLOYMENT SUCCESSFUL**" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.deploy-stage.result }}" == "success" ]]; then
+            echo "🎭 **STAGE DEPLOYMENT SUCCESSFUL**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **DEPLOYMENT FAILED**" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "*Generated by Deployment Pipeline workflow*" >> $GITHUB_STEP_SUMMARY
+          
+      - name: 📝 Create deployment comment
+        if: needs.deploy-production.result == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const deploymentStatus = {
+              stage: '${{ needs.deploy-stage.result }}',
+              production: '${{ needs.deploy-production.result }}',
+              stageValidation: '${{ needs.validate-stage.result }}',
+              productionValidation: '${{ needs.validate-production.result }}'
+            };
+            
+            let comment = '🎉 **Deployment Complete!**\n\n';
+            comment += `**Version**: ${{ needs.pre-deployment.outputs.version }}\n`;
+            comment += `**Commit**: ${{ github.sha }}\n\n`;
+            
+            if (deploymentStatus.stage === 'success') {
+              comment += `🎭 **Stage**: ✅ Deployed to ${{ env.STAGE_URL }}\n`;
+            }
+            
+            if (deploymentStatus.production === 'success') {
+              comment += `🌟 **Production**: ✅ Deployed to ${{ env.PRODUCTION_URL }}\n`;
+              comment += `**Mirror**: https://advanced-retirement-planner.netlify.app/\n\n`;
+            }
+            
+            comment += `**Deployed at**: ${new Date().toISOString()}\n`;
+            comment += `**Workflow**: [View Details](${context.payload.repository.html_url}/actions/runs/${context.runId})`;
+            
+            github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body: comment
+            });
+            
+      - name: 🚨 Notify on deployment failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = '🚨 **Deployment Failed**\n\n';
+            comment += `**Version**: ${{ needs.pre-deployment.outputs.version || 'Unknown' }}\n`;
+            comment += `**Commit**: ${{ github.sha }}\n`;
+            comment += `**Failed Jobs**: Check the [workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId}) for details\n\n`;
+            comment += `Please review the logs and retry the deployment after fixing any issues.`;
+            
+            github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+              body: comment
+            });

@@ -1,0 +1,680 @@
+name: 📡 Production Monitoring & Health Checks
+
+on:
+  workflow_run:
+    workflows: ["🚀 Deployment Pipeline"]
+    types: [completed]
+    branches: [main]
+  schedule:
+    # Run every 6 hours
+    - cron: '0 */6 * * *'
+    # Daily comprehensive check at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      monitoring_scope:
+        description: 'Monitoring scope'
+        required: false
+        default: 'comprehensive'
+        type: choice
+        options:
+          - health-check
+          - e2e-tests
+          - comprehensive
+          - uptime-only
+      create_issue_on_failure:
+        description: 'Create GitHub issue on failure'
+        required: false
+        default: true
+        type: boolean
+      notify_on_success:
+        description: 'Send notification on success'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  PRODUCTION_URL: 'https://ypollak2.github.io/advanced-retirement-planner/'
+  STAGE_URL: 'https://ypollak2.github.io/advanced-retirement-planner/stage/'
+  MIRROR_URL: 'https://advanced-retirement-planner.netlify.app/'
+  NODE_VERSION: '18'
+  TIMEOUT_SECONDS: 30
+
+# No concurrency limits - monitoring should run independently
+jobs:
+  # Job 1: Basic Health Check
+  health-check:
+    name: 🏥 Health Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    outputs:
+      production-status: ${{ steps.health.outputs.production }}
+      stage-status: ${{ steps.health.outputs.stage }}
+      mirror-status: ${{ steps.health.outputs.mirror }}
+      response-times: ${{ steps.health.outputs.response_times }}
+      overall-health: ${{ steps.health.outputs.overall }}
+      
+    steps:
+      - name: 🏥 Production health check
+        id: health
+        run: |
+          echo "🏥 Running comprehensive health checks..."
+          
+          # Initialize status tracking
+          PRODUCTION_OK=false
+          STAGE_OK=false
+          MIRROR_OK=false
+          RESPONSE_TIMES="{}"
+          
+          # Check production
+          echo "🔍 Checking production: ${{ env.PRODUCTION_URL }}"
+          PROD_START=$(date +%s%N)
+          if curl -sSf --max-time ${{ env.TIMEOUT_SECONDS }} "${{ env.PRODUCTION_URL }}" > /dev/null; then
+            PROD_END=$(date +%s%N)
+            PROD_TIME=$(( (PROD_END - PROD_START) / 1000000 ))
+            echo "✅ Production OK (${PROD_TIME}ms)"
+            PRODUCTION_OK=true
+          else
+            echo "❌ Production FAILED"
+            PROD_TIME=0
+          fi
+          
+          # Check stage
+          echo "🔍 Checking stage: ${{ env.STAGE_URL }}"
+          STAGE_START=$(date +%s%N)
+          if curl -sSf --max-time ${{ env.TIMEOUT_SECONDS }} "${{ env.STAGE_URL }}" > /dev/null; then
+            STAGE_END=$(date +%s%N)
+            STAGE_TIME=$(( (STAGE_END - STAGE_START) / 1000000 ))
+            echo "✅ Stage OK (${STAGE_TIME}ms)"
+            STAGE_OK=true
+          else
+            echo "⚠️ Stage FAILED or not available"
+            STAGE_TIME=0
+          fi
+          
+          # Check mirror
+          echo "🔍 Checking mirror: ${{ env.MIRROR_URL }}"
+          MIRROR_START=$(date +%s%N)
+          if curl -sSf --max-time ${{ env.TIMEOUT_SECONDS }} "${{ env.MIRROR_URL }}" > /dev/null; then
+            MIRROR_END=$(date +%s%N)
+            MIRROR_TIME=$(( (MIRROR_END - MIRROR_START) / 1000000 ))
+            echo "✅ Mirror OK (${MIRROR_TIME}ms)"
+            MIRROR_OK=true
+          else
+            echo "⚠️ Mirror FAILED or not available"
+            MIRROR_TIME=0
+          fi
+          
+          # Set outputs
+          echo "production=$PRODUCTION_OK" >> $GITHUB_OUTPUT
+          echo "stage=$STAGE_OK" >> $GITHUB_OUTPUT
+          echo "mirror=$MIRROR_OK" >> $GITHUB_OUTPUT
+          echo "response_times={\"production\": $PROD_TIME, \"stage\": $STAGE_TIME, \"mirror\": $MIRROR_TIME}" >> $GITHUB_OUTPUT
+          
+          # Overall health assessment
+          if $PRODUCTION_OK; then
+            echo "overall=healthy" >> $GITHUB_OUTPUT
+            echo "🎉 Overall health: HEALTHY"
+          else
+            echo "overall=unhealthy" >> $GITHUB_OUTPUT
+            echo "🚨 Overall health: UNHEALTHY"
+          fi
+          
+      - name: 📊 Health check summary
+        run: |
+          echo "## 🏥 Health Check Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | Status | Response Time |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|---------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Production | ${{ steps.health.outputs.production == 'true' && '✅ UP' || '❌ DOWN' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| Stage | ${{ steps.health.outputs.stage == 'true' && '✅ UP' || '⚠️ DOWN' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| Mirror | ${{ steps.health.outputs.mirror == 'true' && '✅ UP' || '⚠️ DOWN' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Overall Health**: ${{ steps.health.outputs.overall == 'healthy' && '🟢 HEALTHY' || '🔴 UNHEALTHY' }}" >> $GITHUB_STEP_SUMMARY
+
+  # Job 2: E2E Production Tests
+  e2e-production-tests:
+    name: 🌐 E2E Production Tests
+    runs-on: ubuntu-latest
+    needs: health-check
+    if: |
+      needs.health-check.outputs.production-status == 'true' &&
+      (github.event.inputs.monitoring_scope == 'e2e-tests' || 
+       github.event.inputs.monitoring_scope == 'comprehensive' ||
+       github.event_name == 'schedule' ||
+       (github.event.workflow_run && github.event.workflow_run.conclusion == 'success'))
+    timeout-minutes: 20
+    
+    outputs:
+      e2e-status: ${{ steps.e2e.outputs.status }}
+      test-results: ${{ steps.e2e.outputs.results }}
+      error-count: ${{ steps.e2e.outputs.errors }}
+      
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📥 Install dependencies
+        run: |
+          npm ci --prefer-offline --no-audit
+          npm install puppeteer playwright-chromium
+          
+      - name: 🌐 Run E2E production tests
+        id: e2e
+        run: |
+          echo "🌐 Running E2E tests on production..."
+          
+          # Create E2E test runner
+          cat > e2e-production-test.js << 'EOF'
+          const puppeteer = require('puppeteer');
+          
+          class ProductionE2EMonitor {
+            constructor() {
+              this.results = {
+                passed: 0,
+                failed: 0,
+                total: 0,
+                errors: [],
+                performance: {},
+                startTime: Date.now()
+              };
+            }
+            
+            async runTests() {
+              console.log('🚀 Starting E2E production monitoring...');
+              
+              const browser = await puppeteer.launch({
+                headless: true,
+                args: ['--no-sandbox', '--disable-setuid-sandbox']
+              });
+              
+              try {
+                const context = await browser.createIncognitoBrowserContext();
+                await this.runTestSuite(context);
+              } finally {
+                await browser.close();
+              }
+              
+              this.generateReport();
+              this.setOutputs();
+              
+              // Exit with error if tests failed
+              process.exit(this.results.failed > 0 ? 1 : 0);
+            }
+            
+            async runTestSuite(context) {
+              const page = await context.newPage();
+              
+              // Set up error monitoring
+              const errors = [];
+              page.on('console', msg => {
+                if (msg.type() === 'error') {
+                  errors.push({
+                    type: 'console-error',
+                    message: msg.text(),
+                    timestamp: new Date()
+                  });
+                }
+              });
+              
+              page.on('pageerror', err => {
+                errors.push({
+                  type: 'page-error',
+                  message: err.message,
+                  stack: err.stack,
+                  timestamp: new Date()
+                });
+              });
+              
+              // Define test cases
+              const tests = [
+                { name: 'Page loads successfully', fn: () => this.testPageLoad(page) },
+                { name: 'No critical JavaScript errors', fn: () => this.testNoJSErrors(errors) },
+                { name: 'Core UI elements present', fn: () => this.testUIElements(page) },
+                { name: 'Navigation functional', fn: () => this.testNavigation(page) },
+                { name: 'Performance acceptable', fn: () => this.testPerformance(page) },
+                { name: 'Version information present', fn: () => this.testVersionInfo(page) }
+              ];
+              
+              for (const test of tests) {
+                await this.runSingleTest(test);
+              }
+              
+              this.results.errors.push(...errors);
+            }
+            
+            async runSingleTest(test) {
+              const startTime = Date.now();
+              
+              try {
+                console.log(`  ▶️ ${test.name}`);
+                await test.fn();
+                
+                this.results.passed++;
+                console.log(`  ✅ ${test.name} (${Date.now() - startTime}ms)`);
+              } catch (error) {
+                this.results.failed++;
+                this.results.errors.push({
+                  test: test.name,
+                  error: error.message,
+                  timestamp: new Date(),
+                  duration: Date.now() - startTime
+                });
+                
+                console.log(`  ❌ ${test.name}: ${error.message}`);
+              }
+              
+              this.results.total++;
+            }
+            
+            async testPageLoad(page) {
+              const response = await page.goto(process.env.PRODUCTION_URL, {
+                waitUntil: 'networkidle2',
+                timeout: 30000
+              });
+              
+              if (!response.ok()) {
+                throw new Error(`Page failed to load: ${response.status()}`);
+              }
+              
+              // Wait for content to load
+              await page.waitForTimeout(3000);
+            }
+            
+            async testNoJSErrors(errors) {
+              const criticalErrors = errors.filter(err => 
+                err.message.includes('is not defined') ||
+                err.message.includes('Cannot read property') ||
+                err.message.includes('RangeError') ||
+                err.message.includes('TypeError')
+              );
+              
+              if (criticalErrors.length > 0) {
+                throw new Error(`${criticalErrors.length} critical JS errors detected`);
+              }
+              
+              if (errors.length > 5) {
+                throw new Error(`Too many JS errors: ${errors.length}`);
+              }
+            }
+            
+            async testUIElements(page) {
+              const selectors = [
+                'body',
+                'h1, h2, .title, [class*="title"]',
+                'button, .btn, [class*="button"]',
+                'input, select, textarea',
+                '[id*="app"], [class*="app"], [id*="root"], [class*="root"]'
+              ];
+              
+              let foundElements = 0;
+              for (const selector of selectors) {
+                try {
+                  const element = await page.waitForSelector(selector, { timeout: 5000 });
+                  if (element) foundElements++;
+                } catch (e) {
+                  // Element not found, continue
+                }
+              }
+              
+              if (foundElements < 3) {
+                throw new Error(`Insufficient UI elements: ${foundElements}/5`);
+              }
+            }
+            
+            async testNavigation(page) {
+              const navSelectors = [
+                'nav, .nav, .navigation',
+                'button, .btn',
+                'a[href]',
+                '[role="button"], [role="link"]'
+              ];
+              
+              let navElements = 0;
+              for (const selector of navSelectors) {
+                try {
+                  const elements = await page.$$(selector);
+                  navElements += elements.length;
+                } catch (e) {
+                  // Continue if selector fails
+                }
+              }
+              
+              if (navElements < 3) {
+                throw new Error(`Insufficient navigation elements: ${navElements}`);
+              }
+            }
+            
+            async testPerformance(page) {
+              const metrics = await page.evaluate(() => {
+                const perfData = performance.getEntriesByType('navigation')[0];
+                return {
+                  loadTime: perfData ? perfData.loadEventEnd - perfData.navigationStart : null,
+                  domContentLoaded: perfData ? perfData.domContentLoadedEventEnd - perfData.navigationStart : null
+                };
+              });
+              
+              this.results.performance = metrics;
+              
+              if (metrics.loadTime && metrics.loadTime > 15000) {
+                throw new Error(`Page load too slow: ${metrics.loadTime}ms`);
+              }
+            }
+            
+            async testVersionInfo(page) {
+              const pageContent = await page.content();
+              
+              // Check for version indicator
+              if (pageContent.includes('v7.') || pageContent.includes('version')) {
+                return; // Version info found
+              }
+              
+              throw new Error('Version information not found');
+            }
+            
+            generateReport() {
+              const successRate = this.results.total > 0 
+                ? ((this.results.passed / this.results.total) * 100).toFixed(1)
+                : 0;
+              
+              console.log(`\n📊 E2E Test Summary:`);
+              console.log(`✅ Passed: ${this.results.passed}`);
+              console.log(`❌ Failed: ${this.results.failed}`);
+              console.log(`📈 Success Rate: ${successRate}%`);
+              console.log(`⏱️ Duration: ${Date.now() - this.results.startTime}ms`);
+              
+              if (this.results.failed > 0) {
+                console.log(`\n❌ Failed Tests:`);
+                this.results.errors.forEach(error => {
+                  if (error.test) {
+                    console.log(`  • ${error.test}: ${error.error}`);
+                  }
+                });
+              }
+            }
+            
+            setOutputs() {
+              const successRate = this.results.total > 0 
+                ? ((this.results.passed / this.results.total) * 100).toFixed(1)
+                : 0;
+                
+              const status = this.results.failed === 0 ? 'success' : 'failed';
+              
+              console.log(`::set-output name=status::${status}`);
+              console.log(`::set-output name=results::${JSON.stringify({
+                passed: this.results.passed,
+                failed: this.results.failed,
+                total: this.results.total,
+                successRate: successRate
+              })}`);
+              console.log(`::set-output name=errors::${this.results.errors.length}`);
+            }
+          }
+          
+          // Set environment variables
+          process.env.PRODUCTION_URL = '${{ env.PRODUCTION_URL }}';
+          
+          // Run the tests
+          const monitor = new ProductionE2EMonitor();
+          monitor.runTests().catch(console.error);
+          EOF
+          
+          # Execute the E2E tests
+          node e2e-production-test.js
+          
+      - name: 📤 Upload E2E results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-production-results
+          path: |
+            e2e-*.json
+            screenshots/
+          retention-days: 14
+
+  # Job 3: Comprehensive Monitoring
+  comprehensive-monitoring:
+    name: 📊 Comprehensive Monitoring
+    runs-on: ubuntu-latest
+    needs: [health-check, e2e-production-tests]
+    if: |
+      always() &&
+      (github.event.inputs.monitoring_scope == 'comprehensive' ||
+       github.event_name == 'schedule' && github.event.schedule == '0 6 * * *')
+    timeout-minutes: 15
+    
+    outputs:
+      monitoring-status: ${{ steps.comprehensive.outputs.status }}
+      issues-found: ${{ steps.comprehensive.outputs.issues }}
+      
+    steps:
+      - name: 📊 Comprehensive monitoring analysis
+        id: comprehensive
+        run: |
+          echo "📊 Running comprehensive monitoring analysis..."
+          
+          TOTAL_ISSUES=0
+          CRITICAL_ISSUES=0
+          
+          # Analyze health check results
+          if [[ "${{ needs.health-check.outputs.production-status }}" != "true" ]]; then
+            echo "🚨 CRITICAL: Production is down"
+            CRITICAL_ISSUES=$((CRITICAL_ISSUES + 1))
+            TOTAL_ISSUES=$((TOTAL_ISSUES + 1))
+          fi
+          
+          if [[ "${{ needs.health-check.outputs.stage-status }}" != "true" ]]; then
+            echo "⚠️ WARNING: Stage environment is down"
+            TOTAL_ISSUES=$((TOTAL_ISSUES + 1))
+          fi
+          
+          if [[ "${{ needs.health-check.outputs.mirror-status }}" != "true" ]]; then
+            echo "⚠️ WARNING: Mirror is down"
+            TOTAL_ISSUES=$((TOTAL_ISSUES + 1))
+          fi
+          
+          # Analyze E2E results
+          if [[ "${{ needs.e2e-production-tests.outputs.e2e-status }}" == "failed" ]]; then
+            echo "🚨 CRITICAL: E2E tests failed"
+            CRITICAL_ISSUES=$((CRITICAL_ISSUES + 1))
+            TOTAL_ISSUES=$((TOTAL_ISSUES + 1))
+          fi
+          
+          # Error count analysis
+          E2E_ERRORS="${{ needs.e2e-production-tests.outputs.error-count || '0' }}"
+          if [[ "$E2E_ERRORS" != "0" && "$E2E_ERRORS" != "" ]]; then
+            if [[ "$E2E_ERRORS" -gt 3 ]]; then
+              echo "🚨 CRITICAL: High error count in E2E tests: $E2E_ERRORS"
+              CRITICAL_ISSUES=$((CRITICAL_ISSUES + 1))
+            else
+              echo "⚠️ WARNING: Errors found in E2E tests: $E2E_ERRORS"
+            fi
+            TOTAL_ISSUES=$((TOTAL_ISSUES + 1))
+          fi
+          
+          echo "issues=$TOTAL_ISSUES" >> $GITHUB_OUTPUT
+          
+          # Determine overall status
+          if [[ $CRITICAL_ISSUES -eq 0 && $TOTAL_ISSUES -eq 0 ]]; then
+            echo "status=excellent" >> $GITHUB_OUTPUT
+            echo "🎉 Monitoring Status: EXCELLENT - All systems operational"
+          elif [[ $CRITICAL_ISSUES -eq 0 ]]; then
+            echo "status=good" >> $GITHUB_OUTPUT
+            echo "✅ Monitoring Status: GOOD - Minor issues detected"
+          else
+            echo "status=critical" >> $GITHUB_OUTPUT
+            echo "🚨 Monitoring Status: CRITICAL - Immediate attention required"
+          fi
+          
+          echo ""
+          echo "📊 Summary:"
+          echo "- Total Issues: $TOTAL_ISSUES"
+          echo "- Critical Issues: $CRITICAL_ISSUES"
+          echo "- Production Status: ${{ needs.health-check.outputs.overall-health }}"
+          echo "- E2E Status: ${{ needs.e2e-production-tests.outputs.e2e-status || 'skipped' }}"
+
+  # Job 4: Monitoring Summary & Alerts
+  monitoring-summary:
+    name: 📋 Monitoring Summary & Alerts
+    runs-on: ubuntu-latest
+    needs: [health-check, e2e-production-tests, comprehensive-monitoring]
+    if: always()
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📋 Generate monitoring summary
+        run: |
+          echo "## 📡 Production Monitoring Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "**Monitoring Scope**: ${{ github.event.inputs.monitoring_scope || 'automatic' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Health Status
+          echo "### 🏥 Health Status" >> $GITHUB_STEP_SUMMARY
+          echo "- **Production**: ${{ needs.health-check.outputs.production-status == 'true' && '🟢 UP' || '🔴 DOWN' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Stage**: ${{ needs.health-check.outputs.stage-status == 'true' && '🟢 UP' || '🟡 DOWN' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Mirror**: ${{ needs.health-check.outputs.mirror-status == 'true' && '🟢 UP' || '🟡 DOWN' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # E2E Test Results
+          if [[ "${{ needs.e2e-production-tests.result }}" != "skipped" ]]; then
+            echo "### 🌐 E2E Test Results" >> $GITHUB_STEP_SUMMARY
+            echo "- **Status**: ${{ needs.e2e-production-tests.outputs.e2e-status == 'success' && '✅ PASSED' || '❌ FAILED' }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Errors**: ${{ needs.e2e-production-tests.outputs.error-count || '0' }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Overall Assessment
+          echo "### 📊 Overall Assessment" >> $GITHUB_STEP_SUMMARY
+          OVERALL_STATUS="${{ needs.comprehensive-monitoring.outputs.monitoring-status || needs.health-check.outputs.overall-health }}"
+          case $OVERALL_STATUS in
+            "excellent"|"healthy")
+              echo "🎉 **STATUS: EXCELLENT** - All systems operational" >> $GITHUB_STEP_SUMMARY
+              ;;
+            "good")
+              echo "✅ **STATUS: GOOD** - Minor issues detected" >> $GITHUB_STEP_SUMMARY
+              ;;
+            "critical"|"unhealthy")
+              echo "🚨 **STATUS: CRITICAL** - Issues require attention" >> $GITHUB_STEP_SUMMARY
+              ;;
+            *)
+              echo "❓ **STATUS: UNKNOWN** - Check individual results" >> $GITHUB_STEP_SUMMARY
+              ;;
+          esac
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "*Generated by Production Monitoring Pipeline*" >> $GITHUB_STEP_SUMMARY
+          
+      - name: 🚨 Create alert issue on critical failure
+        if: |
+          failure() && 
+          (needs.health-check.outputs.production-status != 'true' || 
+           needs.e2e-production-tests.outputs.e2e-status == 'failed') &&
+          (github.event.inputs.create_issue_on_failure == 'true' || 
+           github.event_name == 'schedule')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🚨 Production Monitoring Alert - System Issues Detected';
+            
+            const body = `
+            ## 🚨 Production Monitoring Alert
+            
+            **Alert Triggered**: ${new Date().toISOString()}
+            **Monitoring Scope**: ${{ github.event.inputs.monitoring_scope || 'automatic' }}
+            **Workflow Run**: [#${context.runNumber}](${context.payload.repository.html_url}/actions/runs/${context.runId})
+            
+            ### 🔍 Issue Summary
+            - **Production Health**: ${{ needs.health-check.outputs.production-status == 'true' && '✅ UP' || '❌ DOWN' }}
+            - **E2E Tests**: ${{ needs.e2e-production-tests.outputs.e2e-status == 'success' && '✅ PASSED' || '❌ FAILED' }}
+            - **Error Count**: ${{ needs.e2e-production-tests.outputs.error-count || '0' }}
+            - **Total Issues**: ${{ needs.comprehensive-monitoring.outputs.issues-found || 'Unknown' }}
+            
+            ### 🔗 URLs to Check
+            - **Production**: ${{ env.PRODUCTION_URL }}
+            - **Stage**: ${{ env.STAGE_URL }}
+            - **Mirror**: ${{ env.MIRROR_URL }}
+            
+            ### 🛠️ Next Steps
+            1. Check the [workflow logs](${context.payload.repository.html_url}/actions/runs/${context.runId}) for detailed error information
+            2. Verify the production deployment status
+            3. Test the application manually if needed
+            4. Investigate any console errors or performance issues
+            5. Consider running a manual deployment if the issue persists
+            
+            ### 📊 Monitoring Data
+            - **Health Check**: ${{ needs.health-check.result }}
+            - **E2E Tests**: ${{ needs.e2e-production-tests.result }}
+            - **Comprehensive Check**: ${{ needs.comprehensive-monitoring.result }}
+            
+            ---
+            
+            *This alert was automatically generated by the Production Monitoring workflow.*
+            *Issue will be auto-closed when monitoring returns to normal.*
+            
+            /label bug, production, monitoring, automated
+            /assign @${{ github.actor }}
+            `;
+            
+            // Check for existing monitoring issues
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'production,monitoring'
+            });
+            
+            const existingIssue = issues.data.find(issue => 
+              issue.title.includes('Production Monitoring Alert')
+            );
+            
+            if (existingIssue) {
+              // Update existing issue with new alert
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: `## 🔄 Updated Alert\n\n${body}`
+              });
+              
+              console.log(`Updated existing monitoring issue #${existingIssue.number}`);
+            } else {
+              // Create new monitoring issue
+              const issue = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['bug', 'production', 'monitoring', 'automated']
+              });
+              
+              console.log(`Created new monitoring issue #${issue.data.number}`);
+            }
+            
+      - name: ✅ Success notification
+        if: |
+          success() && 
+          github.event.inputs.notify_on_success == 'true' &&
+          (needs.health-check.outputs.overall-health == 'healthy' || 
+           needs.comprehensive-monitoring.outputs.monitoring-status == 'excellent')
+        run: |
+          echo "✅ Production monitoring completed successfully"
+          echo "🎉 All systems operational and healthy"
+          
+      - name: 🚨 Fail on critical monitoring issues
+        if: needs.health-check.outputs.production-status != 'true'
+        run: |
+          echo "🚨 Critical monitoring failure detected"
+          echo "Production system is not accessible - immediate attention required"
+          exit 1

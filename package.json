@@ -121,6 +121,7 @@
     "commander": "^12.0.0",
     "gh-pages": "^6.0.0",
     "glob": "7.2.3",
+    "js-yaml": "^4.1.0",
     "license-checker": "^25.0.1",
     "puppeteer": "^22.0.0",
     "vite": "^5.4.10"

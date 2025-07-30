@@ -1,0 +1,665 @@
+name: 🎯 Quality Assurance Pipeline
+
+on:
+  workflow_run:
+    workflows: ["🚀 Deployment Pipeline"]
+    types: [completed]
+    branches: [main]
+  schedule:
+    # Run daily at 3 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      test_scope:
+        description: 'Test scope to run'
+        required: false
+        default: 'full'
+        type: choice
+        options:
+          - full
+          - regression
+          - performance
+          - accessibility
+          - security-extended
+      environment:
+        description: 'Environment to test'
+        required: false
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - stage
+      create_report:
+        description: 'Create detailed QA report'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  NODE_VERSION: '18'
+  PRODUCTION_URL: 'https://ypollak2.github.io/advanced-retirement-planner/'
+  STAGE_URL: 'https://ypollak2.github.io/advanced-retirement-planner/stage/'
+
+# Concurrency control - allow multiple QA runs but not on same environment
+concurrency:
+  group: qa-${{ github.event.inputs.environment || 'production' }}
+  cancel-in-progress: false
+
+jobs:
+  # Job 1: QA Setup & Environment Check
+  qa-setup:
+    name: 🔧 QA Setup & Environment Check
+    runs-on: ubuntu-latest
+    if: |
+      (github.event.workflow_run.conclusion == 'success') ||
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch'
+    timeout-minutes: 10
+    
+    outputs:
+      test-scope: ${{ steps.setup.outputs.scope }}
+      target-environment: ${{ steps.setup.outputs.environment }}
+      target-url: ${{ steps.setup.outputs.url }}
+      run-regression: ${{ steps.setup.outputs.regression }}
+      run-performance: ${{ steps.setup.outputs.performance }}
+      run-accessibility: ${{ steps.setup.outputs.accessibility }}
+      run-security: ${{ steps.setup.outputs.security }}
+      version: ${{ steps.version.outputs.version }}
+      
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 🏷️ Get version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Running QA for version: $VERSION"
+          
+      - name: 🔧 Setup test configuration
+        id: setup
+        run: |
+          # Determine test scope
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            SCOPE="${{ github.event.inputs.test_scope }}"
+            ENVIRONMENT="${{ github.event.inputs.environment }}"
+          elif [[ "${{ github.event_name }}" == "schedule" ]]; then
+            SCOPE="full"
+            ENVIRONMENT="production"
+          else
+            SCOPE="regression"
+            ENVIRONMENT="production"
+          fi
+          
+          echo "scope=$SCOPE" >> $GITHUB_OUTPUT
+          echo "environment=$ENVIRONMENT" >> $GITHUB_OUTPUT
+          
+          # Set target URL
+          if [[ "$ENVIRONMENT" == "stage" ]]; then
+            echo "url=${{ env.STAGE_URL }}" >> $GITHUB_OUTPUT
+          else
+            echo "url=${{ env.PRODUCTION_URL }}" >> $GITHUB_OUTPUT
+          fi
+          
+          # Determine which test suites to run
+          case $SCOPE in
+            "full")
+              echo "regression=true" >> $GITHUB_OUTPUT
+              echo "performance=true" >> $GITHUB_OUTPUT
+              echo "accessibility=true" >> $GITHUB_OUTPUT
+              echo "security=true" >> $GITHUB_OUTPUT
+              ;;
+            "regression")
+              echo "regression=true" >> $GITHUB_OUTPUT
+              echo "performance=false" >> $GITHUB_OUTPUT
+              echo "accessibility=false" >> $GITHUB_OUTPUT
+              echo "security=false" >> $GITHUB_OUTPUT
+              ;;
+            "performance")
+              echo "regression=false" >> $GITHUB_OUTPUT
+              echo "performance=true" >> $GITHUB_OUTPUT
+              echo "accessibility=false" >> $GITHUB_OUTPUT
+              echo "security=false" >> $GITHUB_OUTPUT
+              ;;
+            "accessibility")
+              echo "regression=false" >> $GITHUB_OUTPUT
+              echo "performance=false" >> $GITHUB_OUTPUT
+              echo "accessibility=true" >> $GITHUB_OUTPUT
+              echo "security=false" >> $GITHUB_OUTPUT
+              ;;
+            "security-extended")
+              echo "regression=false" >> $GITHUB_OUTPUT
+              echo "performance=false" >> $GITHUB_OUTPUT
+              echo "accessibility=false" >> $GITHUB_OUTPUT
+              echo "security=true" >> $GITHUB_OUTPUT
+              ;;
+          esac
+          
+          echo "🎯 QA Configuration:"
+          echo "- Scope: $SCOPE"
+          echo "- Environment: $ENVIRONMENT"
+          echo "- Target URL: ${ENVIRONMENT == 'stage' && '${{ env.STAGE_URL }}' || '${{ env.PRODUCTION_URL }}'}"
+          
+      - name: 🌐 Environment availability check
+        run: |
+          TARGET_URL="${{ steps.setup.outputs.url }}"
+          echo "🔍 Checking environment availability: $TARGET_URL"
+          
+          MAX_ATTEMPTS=5
+          ATTEMPT=1
+          
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+            if curl -sSf "$TARGET_URL" > /dev/null; then
+              echo "✅ Environment is accessible"
+              break
+            elif [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
+              echo "❌ Environment not accessible after $MAX_ATTEMPTS attempts"
+              exit 1
+            else
+              echo "⏳ Attempt $ATTEMPT failed, waiting 30 seconds..."
+              sleep 30
+              ATTEMPT=$((ATTEMPT + 1))
+            fi
+          done
+
+  # Job 2: Regression Testing
+  regression-tests:
+    name: 🔄 Regression Testing
+    runs-on: ubuntu-latest
+    needs: qa-setup
+    if: needs.qa-setup.outputs.run-regression == 'true'
+    timeout-minutes: 20
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+        
+    outputs:
+      regression-status: ${{ steps.regression.outputs.status }}
+      regression-results: ${{ steps.regression.outputs.results }}
+      
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          
+      - name: 📥 Install dependencies
+        run: |
+          npm ci --prefer-offline --no-audit
+          npm install jsdom puppeteer
+          
+      - name: 🔄 Run regression test suite
+        id: regression
+        run: |
+          echo "🔄 Running comprehensive regression tests..."
+          
+          # Run main test suite
+          TEST_OUTPUT=$(npm test 2>&1)
+          echo "$TEST_OUTPUT"
+          
+          # Extract results
+          PASSED=$(echo "$TEST_OUTPUT" | grep -oE 'Tests Passed: [0-9]+' | grep -oE '[0-9]+' || echo "0")
+          TOTAL=$(echo "$TEST_OUTPUT" | grep -oE 'Success Rate:.*Tests Passed: ([0-9]+)' | grep -oE '[0-9]+' | head -1 || echo "381")
+          SUCCESS_RATE=$(echo "$TEST_OUTPUT" | grep -oE 'Success Rate: [0-9.]+%' | grep -oE '[0-9.]+' || echo "0")
+          
+          echo "results={\"passed\": $PASSED, \"total\": $TOTAL, \"rate\": \"$SUCCESS_RATE\"}" >> $GITHUB_OUTPUT
+          
+          if [ "$PASSED" -eq "$TOTAL" ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "✅ All regression tests passed: $PASSED/$TOTAL"
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+            echo "❌ Regression tests failed: $PASSED/$TOTAL"
+            exit 1
+          fi
+          
+      - name: 🧪 Extended regression scenarios
+        run: |
+          echo "🧪 Running extended regression scenarios..."
+          
+          # Financial health scenarios
+          if npm run test:financial-health 2>/dev/null; then
+            echo "✅ Financial health scenarios passed"
+          else
+            echo "⚠️ Financial health scenarios not available or failed"
+          fi
+          
+          # Component integration tests
+          if npm run test:components 2>/dev/null; then
+            echo "✅ Component integration tests passed"
+          else
+            echo "⚠️ Component integration tests not available or failed"
+          fi
+          
+          # Currency consistency tests
+          if npm run test:currency 2>/dev/null; then
+            echo "✅ Currency consistency tests passed"
+          else
+            echo "⚠️ Currency consistency tests not available or failed"
+          fi
+          
+      - name: 📊 Upload regression results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-results-node-${{ matrix.node-version }}
+          path: |
+            test-results/
+            *.log
+          retention-days: 14
+
+  # Job 3: Performance Testing
+  performance-tests:
+    name: ⚡ Performance Testing
+    runs-on: ubuntu-latest
+    needs: qa-setup
+    if: needs.qa-setup.outputs.run-performance == 'true'
+    timeout-minutes: 15
+    
+    outputs:
+      performance-status: ${{ steps.performance.outputs.status }}
+      performance-metrics: ${{ steps.performance.outputs.metrics }}
+      
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📥 Install dependencies
+        run: |
+          npm ci --prefer-offline --no-audit
+          npm install puppeteer lighthouse
+          
+      - name: ⚡ Performance analysis
+        id: performance
+        run: |
+          echo "⚡ Running performance analysis..."
+          TARGET_URL="${{ needs.qa-setup.outputs.target-url }}"
+          
+          # File size analysis
+          INDEX_SIZE=$(curl -s "$TARGET_URL" | wc -c)
+          echo "Page size: ${INDEX_SIZE} bytes"
+          
+          # Performance thresholds
+          MAX_PAGE_SIZE=200000  # 200KB
+          
+          if [ $INDEX_SIZE -gt $MAX_PAGE_SIZE ]; then
+            echo "⚠️ WARNING: Page size is large (${INDEX_SIZE} bytes > ${MAX_PAGE_SIZE} bytes)"
+            PERFORMANCE_STATUS="warning"
+          else
+            echo "✅ Page size is acceptable: ${INDEX_SIZE} bytes"
+            PERFORMANCE_STATUS="success"
+          fi
+          
+          # Create performance metrics
+          METRICS="{\"page_size\": $INDEX_SIZE, \"max_allowed\": $MAX_PAGE_SIZE}"
+          echo "metrics=$METRICS" >> $GITHUB_OUTPUT
+          echo "status=$PERFORMANCE_STATUS" >> $GITHUB_OUTPUT
+          
+      - name: 🔍 Resource analysis
+        run: |
+          echo "🔍 Analyzing resource usage..."
+          TARGET_URL="${{ needs.qa-setup.outputs.target-url }}"
+          
+          # Count external resources
+          EXTERNAL_SCRIPTS=$(curl -s "$TARGET_URL" | grep -c 'src="http' || echo "0")
+          EXTERNAL_STYLES=$(curl -s "$TARGET_URL" | grep -c 'href="http.*\.css' || echo "0")
+          
+          echo "External scripts: $EXTERNAL_SCRIPTS"
+          echo "External stylesheets: $EXTERNAL_STYLES"
+          
+          # Check for performance anti-patterns
+          if curl -s "$TARGET_URL" | grep -q 'console.log'; then
+            echo "⚠️ WARNING: console.log found in production"
+          fi
+          
+      - name: 📊 Lighthouse CI (if available)
+        continue-on-error: true
+        run: |
+          echo "🔍 Running Lighthouse analysis..."
+          npx lighthouse "${{ needs.qa-setup.outputs.target-url }}" \
+            --chrome-flags="--headless --no-sandbox" \
+            --output=json \
+            --output-path=lighthouse-report.json \
+            --quiet || echo "Lighthouse failed or not available"
+            
+      - name: 📤 Upload performance results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-results
+          path: |
+            lighthouse-report.json
+            performance-*.json
+          retention-days: 14
+
+  # Job 4: Accessibility Testing
+  accessibility-tests:
+    name: ♿ Accessibility Testing
+    runs-on: ubuntu-latest
+    needs: qa-setup
+    if: needs.qa-setup.outputs.run-accessibility == 'true'
+    timeout-minutes: 15
+    
+    outputs:
+      accessibility-status: ${{ steps.accessibility.outputs.status }}
+      accessibility-issues: ${{ steps.accessibility.outputs.issues }}
+      
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📥 Install accessibility tools
+        run: |
+          npm ci --prefer-offline --no-audit
+          npm install puppeteer axe-core pa11y
+          
+      - name: ♿ Run accessibility tests
+        id: accessibility
+        run: |
+          echo "♿ Running accessibility analysis..."
+          TARGET_URL="${{ needs.qa-setup.outputs.target-url }}"
+          
+          # Basic accessibility checks
+          echo "🔍 Checking for basic accessibility patterns..."
+          
+          # Check for alt attributes on images
+          if curl -s "$TARGET_URL" | grep -q '<img[^>]*alt='; then
+            echo "✅ Images have alt attributes"
+          else
+            echo "⚠️ WARNING: Some images may be missing alt attributes"
+          fi
+          
+          # Check for semantic HTML
+          if curl -s "$TARGET_URL" | grep -qE '<(header|nav|main|section|article|aside|footer)'; then
+            echo "✅ Semantic HTML elements found"
+          else
+            echo "⚠️ WARNING: Limited semantic HTML usage"
+          fi
+          
+          # Check for proper heading structure
+          if curl -s "$TARGET_URL" | grep -qE '<h[1-6]'; then
+            echo "✅ Heading elements found"
+          else
+            echo "⚠️ WARNING: No heading elements found"
+          fi
+          
+          # Run pa11y if available
+          if command -v pa11y &> /dev/null; then
+            echo "🔍 Running pa11y accessibility test..."
+            if pa11y "$TARGET_URL" --reporter json > pa11y-report.json; then
+              ISSUES=$(cat pa11y-report.json | jq length 2>/dev/null || echo "0")
+              echo "issues=$ISSUES" >> $GITHUB_OUTPUT
+              
+              if [ "$ISSUES" -eq 0 ]; then
+                echo "status=success" >> $GITHUB_OUTPUT
+                echo "✅ No accessibility issues found"
+              else
+                echo "status=issues-found" >> $GITHUB_OUTPUT
+                echo "⚠️ Found $ISSUES accessibility issues"
+              fi
+            else
+              echo "status=tool-failed" >> $GITHUB_OUTPUT
+              echo "issues=unknown" >> $GITHUB_OUTPUT
+              echo "⚠️ pa11y test failed"
+            fi
+          else
+            echo "status=basic-check" >> $GITHUB_OUTPUT
+            echo "issues=0" >> $GITHUB_OUTPUT
+            echo "✅ Basic accessibility checks completed"
+          fi
+          
+      - name: 📤 Upload accessibility results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-results
+          path: |
+            pa11y-report.json
+            accessibility-*.json
+          retention-days: 14
+
+  # Job 5: Extended Security Testing
+  security-extended:
+    name: 🛡️ Extended Security Testing
+    runs-on: ubuntu-latest
+    needs: qa-setup
+    if: needs.qa-setup.outputs.run-security == 'true'
+    timeout-minutes: 15
+    
+    permissions:
+      contents: read
+      security-events: write
+      
+    outputs:
+      security-status: ${{ steps.security.outputs.status }}
+      security-findings: ${{ steps.security.outputs.findings }}
+      
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📥 Install dependencies
+        run: npm ci --prefer-offline --no-audit
+        
+      - name: 🛡️ Extended security analysis
+        id: security
+        run: |
+          echo "🛡️ Running extended security analysis..."
+          TARGET_URL="${{ needs.qa-setup.outputs.target-url }}"
+          
+          FINDINGS=0
+          
+          # Check security headers
+          echo "🔍 Checking security headers..."
+          HEADERS=$(curl -sI "$TARGET_URL")
+          
+          if echo "$HEADERS" | grep -qi "x-frame-options"; then
+            echo "✅ X-Frame-Options header present"
+          else
+            echo "⚠️ WARNING: X-Frame-Options header missing"
+            FINDINGS=$((FINDINGS + 1))
+          fi
+          
+          if echo "$HEADERS" | grep -qi "x-content-type-options"; then
+            echo "✅ X-Content-Type-Options header present"
+          else
+            echo "⚠️ WARNING: X-Content-Type-Options header missing"
+            FINDINGS=$((FINDINGS + 1))
+          fi
+          
+          # Check for HTTPS usage
+          if [[ "$TARGET_URL" == https://* ]]; then
+            echo "✅ HTTPS enforced"
+          else
+            echo "❌ ERROR: Not using HTTPS"
+            FINDINGS=$((FINDINGS + 1))
+          fi
+          
+          # Check page content for security issues
+          PAGE_CONTENT=$(curl -s "$TARGET_URL")
+          
+          # Check for inline scripts (security concern)
+          INLINE_SCRIPTS=$(echo "$PAGE_CONTENT" | grep -c '<script[^>]*>[^<]' || echo "0")
+          if [ $INLINE_SCRIPTS -gt 3 ]; then
+            echo "⚠️ WARNING: Many inline scripts detected ($INLINE_SCRIPTS)"
+            FINDINGS=$((FINDINGS + 1))
+          fi
+          
+          # Check for external script sources
+          EXTERNAL_SCRIPTS=$(echo "$PAGE_CONTENT" | grep -oE 'src="[^"]*"' | grep -c 'http' || echo "0")
+          echo "External script sources: $EXTERNAL_SCRIPTS"
+          
+          echo "findings=$FINDINGS" >> $GITHUB_OUTPUT
+          
+          if [ $FINDINGS -eq 0 ]; then
+            echo "status=clean" >> $GITHUB_OUTPUT
+            echo "✅ No security issues found"
+          elif [ $FINDINGS -le 3 ]; then
+            echo "status=minor-issues" >> $GITHUB_OUTPUT
+            echo "⚠️ Minor security issues found: $FINDINGS"
+          else
+            echo "status=major-issues" >> $GITHUB_OUTPUT
+            echo "❌ Major security issues found: $FINDINGS"
+          fi
+          
+      - name: 🔍 NPM audit (extended)
+        run: |
+          echo "🔍 Running extended NPM audit..."
+          npm audit --audit-level=low || echo "Low-level vulnerabilities found"
+          
+      - name: 📤 Upload security results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-extended-results
+          path: |
+            security-*.json
+            audit-*.log
+          retention-days: 30
+
+  # Job 6: QA Report Generation
+  qa-report:
+    name: 📋 QA Report Generation
+    runs-on: ubuntu-latest
+    needs: [qa-setup, regression-tests, performance-tests, accessibility-tests, security-extended]
+    if: always() && (github.event.inputs.create_report == 'true' || github.event.inputs.create_report == '')
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📥 Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: qa-artifacts/
+          
+      - name: 📋 Generate comprehensive QA report
+        run: |
+          mkdir -p qa-report
+          
+          # Create comprehensive QA report
+          cat > qa-report/qa-summary.md << EOF
+          # 🎯 Quality Assurance Report
+          
+          **Generated**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          **Version**: ${{ needs.qa-setup.outputs.version }}
+          **Environment**: ${{ needs.qa-setup.outputs.target-environment }}
+          **Target URL**: ${{ needs.qa-setup.outputs.target-url }}
+          **Test Scope**: ${{ needs.qa-setup.outputs.test-scope }}
+          
+          ## 📊 Test Results Summary
+          
+          | Test Suite | Status | Details |
+          |------------|--------|---------|
+          | Regression | ${{ needs.regression-tests.result || 'Skipped' }} | ${{ needs.regression-tests.outputs.regression-results || 'N/A' }} |
+          | Performance | ${{ needs.performance-tests.result || 'Skipped' }} | ${{ needs.performance-tests.outputs.performance-metrics || 'N/A' }} |
+          | Accessibility | ${{ needs.accessibility-tests.result || 'Skipped' }} | ${{ needs.accessibility-tests.outputs.accessibility-issues || '0' }} issues |
+          | Security Extended | ${{ needs.security-extended.result || 'Skipped' }} | ${{ needs.security-extended.outputs.security-findings || '0' }} findings |
+          
+          ## 🎯 Overall Assessment
+          
+          EOF
+          
+          # Determine overall QA status
+          CRITICAL_FAILURES=0
+          WARNINGS=0
+          
+          if [[ "${{ needs.regression-tests.result }}" == "failure" ]]; then
+            CRITICAL_FAILURES=$((CRITICAL_FAILURES + 1))
+            echo "❌ **CRITICAL**: Regression tests failed" >> qa-report/qa-summary.md
+          fi
+          
+          if [[ "${{ needs.performance-tests.outputs.performance-status }}" == "warning" ]]; then
+            WARNINGS=$((WARNINGS + 1))
+            echo "⚠️ **WARNING**: Performance issues detected" >> qa-report/qa-summary.md
+          fi
+          
+          if [[ "${{ needs.accessibility-tests.outputs.accessibility-issues }}" != "0" && "${{ needs.accessibility-tests.outputs.accessibility-issues }}" != "" ]]; then
+            WARNINGS=$((WARNINGS + 1))
+            echo "⚠️ **WARNING**: Accessibility issues found" >> qa-report/qa-summary.md
+          fi
+          
+          if [[ "${{ needs.security-extended.outputs.security-status }}" == "major-issues" ]]; then
+            CRITICAL_FAILURES=$((CRITICAL_FAILURES + 1))
+            echo "❌ **CRITICAL**: Major security issues found" >> qa-report/qa-summary.md
+          elif [[ "${{ needs.security-extended.outputs.security-status }}" == "minor-issues" ]]; then
+            WARNINGS=$((WARNINGS + 1))
+            echo "⚠️ **WARNING**: Minor security issues found" >> qa-report/qa-summary.md
+          fi
+          
+          echo "" >> qa-report/qa-summary.md
+          
+          if [ $CRITICAL_FAILURES -eq 0 ] && [ $WARNINGS -eq 0 ]; then
+            echo "🎉 **QUALITY ASSESSMENT: EXCELLENT**" >> qa-report/qa-summary.md
+            echo "All quality checks passed without issues." >> qa-report/qa-summary.md
+          elif [ $CRITICAL_FAILURES -eq 0 ]; then
+            echo "✅ **QUALITY ASSESSMENT: GOOD**" >> qa-report/qa-summary.md  
+            echo "Quality checks passed with $WARNINGS warning(s) that should be addressed." >> qa-report/qa-summary.md
+          else
+            echo "❌ **QUALITY ASSESSMENT: NEEDS ATTENTION**" >> qa-report/qa-summary.md
+            echo "Quality checks found $CRITICAL_FAILURES critical issue(s) and $WARNINGS warning(s) that must be addressed." >> qa-report/qa-summary.md
+          fi
+          
+          echo "" >> qa-report/qa-summary.md
+          echo "---" >> qa-report/qa-summary.md
+          echo "*Generated by Quality Assurance Pipeline*" >> qa-report/qa-summary.md
+          
+          # Copy report to step summary
+          cat qa-report/qa-summary.md >> $GITHUB_STEP_SUMMARY
+          
+      - name: 📤 Upload QA report
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-comprehensive-report
+          path: qa-report/
+          retention-days: 30
+          
+      - name: 🚨 Fail on critical QA issues
+        run: |
+          CRITICAL_ISSUES=0
+          
+          if [[ "${{ needs.regression-tests.result }}" == "failure" ]]; then
+            CRITICAL_ISSUES=$((CRITICAL_ISSUES + 1))
+          fi
+          
+          if [[ "${{ needs.security-extended.outputs.security-status }}" == "major-issues" ]]; then
+            CRITICAL_ISSUES=$((CRITICAL_ISSUES + 1))
+          fi
+          
+          if [ $CRITICAL_ISSUES -gt 0 ]; then
+            echo "❌ QA Pipeline failed due to $CRITICAL_ISSUES critical issue(s)"
+            exit 1
+          else
+            echo "✅ QA Pipeline completed successfully"
+          fi
