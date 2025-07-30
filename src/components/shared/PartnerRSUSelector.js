@@ -12,7 +12,7 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
     const [manualPrice, setManualPrice] = React.useState('');
     const [priceSource, setPriceSource] = React.useState('');
     const [lastUpdated, setLastUpdated] = React.useState(null);
-    const [currencyRate, setCurrencyRate] = React.useState(1);
+    const [currencyRate, setCurrencyRate] = React.useState(null);
     
     // Partner-specific field names
     const companyField = `${partnerKey}RsuCompany`;
@@ -124,11 +124,11 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
         
         if (symbol && symbol !== 'OTHER' && symbol !== '') {
             // Wait for currency rate if needed before fetching stock price
-            if (workingCurrency !== 'USD' && (!currencyRate || currencyRate <= 0)) {
+            if (workingCurrency !== 'USD' && (currencyRate === null || currencyRate <= 0)) {
                 console.log('⏳ Partner RSU: Waiting for currency rate to load...');
                 // Try to wait up to 3 seconds for currency rate
                 let waitTime = 0;
-                while ((!currencyRate || currencyRate <= 0) && waitTime < 3000) {
+                while ((currencyRate === null || currencyRate <= 0) && waitTime < 3000) {
                     await new Promise(resolve => setTimeout(resolve, 100));
                     waitTime += 100;
                 }
@@ -581,7 +581,7 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
                 workingCurrency !== 'USD' && React.createElement('div', {
                     key: 'currency-status',
                     className: "mt-2 text-xs text-gray-500 italic"
-                }, currencyRate > 0 ? 
+                }, currencyRate !== null && currencyRate > 0 ? 
                     `${language === 'he' ? 'שער חליפין' : 'Exchange rate'}: 1 USD = ${currencySymbol}${currencyRate.toFixed(2)} ${workingCurrency}` :
                     `${language === 'he' ? 'טוען שער חליפין...' : 'Loading exchange rate...'}`
                 )

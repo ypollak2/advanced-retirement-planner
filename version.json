@@ -1,5 +1,5 @@
 {
-  "version": "7.3.3",
+  "version": "7.3.4",
   "build": "2025-07-30",
   "commit": "v7.3.3-keyboard-ux-fix",
   "description": "Removed number key navigation that interfered with form inputs, improved keyboard UX"
