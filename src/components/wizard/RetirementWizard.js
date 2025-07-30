@@ -70,6 +70,68 @@ const RetirementWizard = ({
         inputsRef.current = inputs;
     }, [inputs]);
     
+    // Immediate save function for critical operations - now dependency-free
+    const saveProgressImmediate = React.useCallback((criticalData = false) => {
+        try {
+            const progress = {
+                currentStep: currentStepRef.current,
+                completedSteps: completedStepsRef.current,
+                skippedSteps: skippedStepsRef.current,
+                lastSaved: new Date().toISOString()
+            };
+            localStorage.setItem(WIZARD_STORAGE_KEY, JSON.stringify(progress));
+            localStorage.setItem(WIZARD_INPUTS_KEY, JSON.stringify(inputsRef.current));
+            setLastSaved(new Date().toISOString());
+            
+            if (criticalData) {
+                // Trigger immediate Financial Health recalculation
+                setTimeout(() => {
+                    window.dispatchEvent(new CustomEvent('wizardDataUpdated', { 
+                        detail: { inputs: inputsRef.current, immediate: true } 
+                    }));
+                }, 0);
+            }
+        } catch (error) {
+            console.error('Failed to save wizard progress:', error);
+        }
+    }, []);
+
+    // Clear saved progress when wizard is completed
+    const clearSavedProgress = React.useCallback(() => {
+        try {
+            localStorage.removeItem(WIZARD_STORAGE_KEY);
+            localStorage.removeItem(WIZARD_INPUTS_KEY);
+        } catch (error) {
+            console.error('Failed to clear saved progress:', error);
+        }
+    }, []);
+    
+    // Define navigation handlers early to avoid initialization errors
+    const handleNext = React.useCallback(() => {
+        if (currentStep < totalSteps) {
+            setCompletedSteps(prev => [...new Set([...prev, currentStep])]);
+            setCurrentStep(Math.min(currentStep + 1, totalSteps));
+            
+            // Immediate save for step completion
+            setTimeout(() => {
+                saveProgressImmediate(true);
+            }, 0);
+        } else {
+            // Final step - ensure all data is saved before completion
+            saveProgressImmediate(true);
+            setTimeout(() => {
+                clearSavedProgress();
+                onComplete && onComplete();
+            }, 100);
+        }
+    }, [currentStep, totalSteps, saveProgressImmediate, clearSavedProgress, onComplete]);
+
+    const handlePrevious = React.useCallback(() => {
+        if (currentStep > 1) {
+            setCurrentStep(Math.max(currentStep - 1, 1));
+        }
+    }, [currentStep]);
+    
     // Keyboard navigation support
     React.useEffect(() => {
         const handleKeyDown = (event) => {
@@ -109,32 +171,6 @@ const RetirementWizard = ({
             window.removeEventListener('wizardStepChange', handleStepChange);
         };
     }, [currentStep, totalSteps, handleNext, handlePrevious, language, t.steps]);
-
-    // Immediate save function for critical operations - now dependency-free
-    const saveProgressImmediate = React.useCallback((criticalData = false) => {
-        try {
-            const progress = {
-                currentStep: currentStepRef.current,
-                completedSteps: completedStepsRef.current,
-                skippedSteps: skippedStepsRef.current,
-                lastSaved: new Date().toISOString()
-            };
-            localStorage.setItem(WIZARD_STORAGE_KEY, JSON.stringify(progress));
-            localStorage.setItem(WIZARD_INPUTS_KEY, JSON.stringify(inputsRef.current));
-            setLastSaved(new Date().toISOString());
-            
-            if (criticalData) {
-                // Trigger immediate Financial Health recalculation
-                setTimeout(() => {
-                    window.dispatchEvent(new CustomEvent('wizardDataUpdated', { 
-                        detail: { inputs: inputsRef.current, immediate: true } 
-                    }));
-                }, 0);
-            }
-        } catch (error) {
-            console.error('Failed to save wizard progress:', error);
-        }
-    }, []);
 
     // Auto-save progress to localStorage with enhanced timing
     React.useEffect(() => {
@@ -196,16 +232,6 @@ const RetirementWizard = ({
         window.addEventListener('modalDataCompleted', handleModalCompletion);
         return () => window.removeEventListener('modalDataCompleted', handleModalCompletion);
     }, [saveProgressImmediate]); // Only depends on saveProgressImmediate (now stable)
-    
-    // Clear saved progress when wizard is completed
-    const clearSavedProgress = () => {
-        try {
-            localStorage.removeItem(WIZARD_STORAGE_KEY);
-            localStorage.removeItem(WIZARD_INPUTS_KEY);
-        } catch (error) {
-            console.error('Failed to clear saved progress:', error);
-        }
-    };
 
     // Multi-language content
     const content = {
@@ -258,32 +284,7 @@ const RetirementWizard = ({
         return ((step - 1) / (totalSteps - 1)) * 100;
     };
 
-    // Navigation handlers with immediate persistence
-    const handleNext = () => {
-        if (currentStep < totalSteps) {
-            setCompletedSteps(prev => [...new Set([...prev, currentStep])]);
-            setCurrentStep(Math.min(currentStep + 1, totalSteps));
-            
-            // Immediate save for step completion
-            setTimeout(() => {
-                saveProgressImmediate(true);
-            }, 0);
-        } else {
-            // Final step - ensure all data is saved before completion
-            saveProgressImmediate(true);
-            setTimeout(() => {
-                clearSavedProgress();
-                onComplete && onComplete();
-            }, 100);
-        }
-    };
-
-    const handlePrevious = () => {
-        if (currentStep > 1) {
-            setCurrentStep(Math.max(currentStep - 1, 1));
-        }
-    };
-
+    // Skip handler
     const handleSkip = () => {
         if (currentStep < totalSteps) {
             setSkippedSteps(prev => [...new Set([...prev, currentStep])]);
