@@ -164,6 +164,11 @@ class CurrencyAPI {
         return fallbackRates;
     }
 
+    // Backward compatibility alias for fetchExchangeRates
+    async getExchangeRates() {
+        return await this.fetchExchangeRates();
+    }
+
     // Get specific currency rate
     async getRate(fromCurrency, toCurrency = 'ILS') {
         const rates = await this.fetchExchangeRates();
