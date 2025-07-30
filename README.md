@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v7.3.0 ✨
+# 🚀 Advanced Retirement Planner v7.3.1 ✨
 
-[![Version](https://img.shields.io/badge/version-7.3.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-7.3.1-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-374%2F374-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -26,6 +26,14 @@
 > **📋 Deployment Status**: GitHub Pages is the primary deployment and is fully operational with the reorganized component structure. Netlify is currently rebuilding after the repository reorganization and should be available shortly.
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki) | **📊 Repository Statistics:** [View Stats](REPOSITORY-STATISTICS.md)
+
+## 🎨 What's New in v7.3.1 - PARTNER 1 INCOME ATTRIBUTION FIX 💰👫
+
+### Major Fix: Partner 1 Income Attribution
+- **🐛 Fixed Partner 1 Income Display**: Partner 1's additional income (bonuses, rental, dividends) now properly shows as part of their total income instead of being displayed separately
+- **💰 Correct Income Attribution**: In couple mode, "main" additional income fields are now correctly attributed to Partner 1
+- **📊 Clear Partner Breakdowns**: Enhanced display shows individual partner totals with salary + additional income combined
+- **✅ Test Coverage**: Comprehensive tests added to ensure correct income attribution logic
 
 ## 🎨 What's New in v7.3.0 - COMPREHENSIVE TEST SUITE & PRODUCTION DEPLOYMENT 🧪🚀
 

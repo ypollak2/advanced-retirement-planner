@@ -132,6 +132,52 @@ const RetirementWizard = ({
         }
     }, [currentStep]);
     
+    // Multi-language content - Define BEFORE using in useEffect
+    const content = {
+        he: {
+            wizardTitle: 'אשף תכנון פנסיה מתקדם',
+            wizardSubtitle: 'נאסוף את כל המידע הדרוש לחישוב מקיף של תכנית הפנסיה שלך',
+            saveStatus: 'נשמר אוטומטית',
+            lastSavedAt: 'נשמר לאחרונה ב',
+            clearProgress: 'נקה התקדמות',
+            resumeProgress: 'המשך מהמקום שבו הפסקת',
+            startFresh: 'התחל מחדש',
+            steps: {
+                1: { title: 'פרטים אישיים', subtitle: 'גיל, גיל פרישה וסוג התכנון' },
+                2: { title: 'משכורת והכנסות', subtitle: 'משכורת חודשית ומקורות הכנסה נוספים' },
+                3: { title: 'הוצאות חודשיות', subtitle: 'מעקב אחר הוצאות לפי קטגוריות ותחזית שנתית' },
+                4: { title: 'חיסכונות קיימים', subtitle: 'פנסיה, קרן השתלמות והשקעות אישיות' },
+                5: { title: 'הגדרות הפקדה', subtitle: 'אחוזי הפקדה וכללים לפי מדינה' },
+                6: { title: 'דמי ניהול', subtitle: 'עמלות ועלויות ניהול השקעות' },
+                7: { title: 'העדפות השקעה', subtitle: 'סיכון, תשואה וחלוקת נכסים' },
+                8: { title: 'יעדי פרישה', subtitle: 'הכנסה רצויה בפרישה ותכנון אורח חיים' },
+                9: { title: 'סקירה מקיפה', subtitle: 'ניתוח מלא עם המלצות והערכת בריאות פיננסית' }
+            }
+        },
+        en: {
+            wizardTitle: 'Advanced Retirement Planning Wizard',
+            wizardSubtitle: 'We\'ll collect all the information needed for a comprehensive retirement plan calculation',
+            saveStatus: 'Auto-saved',
+            lastSavedAt: 'Last saved at',
+            clearProgress: 'Clear Progress',
+            resumeProgress: 'Resume where you left off',
+            startFresh: 'Start Fresh',
+            steps: {
+                1: { title: 'Personal Information', subtitle: 'Age, retirement age, and planning type' },
+                2: { title: 'Salary & Income', subtitle: 'Monthly salary and additional income sources' },
+                3: { title: 'Monthly Expenses', subtitle: 'Track expenses by category and yearly predictions' },
+                4: { title: 'Current Savings', subtitle: 'Pension, training fund, and personal investments' },
+                5: { title: 'Contribution Settings', subtitle: 'Contribution percentages and country-specific rules' },
+                6: { title: 'Management Fees', subtitle: 'Investment fees and management costs' },
+                7: { title: 'Investment Preferences', subtitle: 'Risk tolerance, returns, and asset allocation' },
+                8: { title: 'Retirement Goals', subtitle: 'Target retirement income and lifestyle planning' },
+                9: { title: 'Comprehensive Review', subtitle: 'Complete analysis with recommendations and financial health scoring' }
+            }
+        }
+    };
+
+    const t = content[language];
+    
     // Keyboard navigation support
     React.useEffect(() => {
         const handleKeyDown = (event) => {
@@ -232,52 +278,6 @@ const RetirementWizard = ({
         window.addEventListener('modalDataCompleted', handleModalCompletion);
         return () => window.removeEventListener('modalDataCompleted', handleModalCompletion);
     }, [saveProgressImmediate]); // Only depends on saveProgressImmediate (now stable)
-
-    // Multi-language content
-    const content = {
-        he: {
-            wizardTitle: 'אשף תכנון פנסיה מתקדם',
-            wizardSubtitle: 'נאסוף את כל המידע הדרוש לחישוב מקיף של תכנית הפנסיה שלך',
-            saveStatus: 'נשמר אוטומטית',
-            lastSavedAt: 'נשמר לאחרונה ב',
-            clearProgress: 'נקה התקדמות',
-            resumeProgress: 'המשך מהמקום שבו הפסקת',
-            startFresh: 'התחל מחדש',
-            steps: {
-                1: { title: 'פרטים אישיים', subtitle: 'גיל, גיל פרישה וסוג התכנון' },
-                2: { title: 'משכורת והכנסות', subtitle: 'משכורת חודשית ומקורות הכנסה נוספים' },
-                3: { title: 'הוצאות חודשיות', subtitle: 'מעקב אחר הוצאות לפי קטגוריות ותחזית שנתית' },
-                4: { title: 'חיסכונות קיימים', subtitle: 'פנסיה, קרן השתלמות והשקעות אישיות' },
-                5: { title: 'הגדרות הפקדה', subtitle: 'אחוזי הפקדה וכללים לפי מדינה' },
-                6: { title: 'דמי ניהול', subtitle: 'עמלות ועלויות ניהול השקעות' },
-                7: { title: 'העדפות השקעה', subtitle: 'סיכון, תשואה וחלוקת נכסים' },
-                8: { title: 'יעדי פרישה', subtitle: 'הכנסה רצויה בפרישה ותכנון אורח חיים' },
-                9: { title: 'סקירה מקיפה', subtitle: 'ניתוח מלא עם המלצות והערכת בריאות פיננסית' }
-            }
-        },
-        en: {
-            wizardTitle: 'Advanced Retirement Planning Wizard',
-            wizardSubtitle: 'We\'ll collect all the information needed for a comprehensive retirement plan calculation',
-            saveStatus: 'Auto-saved',
-            lastSavedAt: 'Last saved at',
-            clearProgress: 'Clear Progress',
-            resumeProgress: 'Resume where you left off',
-            startFresh: 'Start Fresh',
-            steps: {
-                1: { title: 'Personal Information', subtitle: 'Age, retirement age, and planning type' },
-                2: { title: 'Salary & Income', subtitle: 'Monthly salary and additional income sources' },
-                3: { title: 'Monthly Expenses', subtitle: 'Track expenses by category and yearly predictions' },
-                4: { title: 'Current Savings', subtitle: 'Pension, training fund, and personal investments' },
-                5: { title: 'Contribution Settings', subtitle: 'Contribution percentages and country-specific rules' },
-                6: { title: 'Management Fees', subtitle: 'Investment fees and management costs' },
-                7: { title: 'Investment Preferences', subtitle: 'Risk tolerance, returns, and asset allocation' },
-                8: { title: 'Retirement Goals', subtitle: 'Target retirement income and lifestyle planning' },
-                9: { title: 'Comprehensive Review', subtitle: 'Complete analysis with recommendations and financial health scoring' }
-            }
-        }
-    };
-
-    const t = content[language];
 
     // Calculate progress percentage
     const getProgressPercent = (step) => {
