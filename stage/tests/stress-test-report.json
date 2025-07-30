@@ -1,0 +1,217 @@
+{
+  "testSuite": "Stress Testing Suite",
+  "version": "5.3.0",
+  "timestamp": "2025-07-27T13:34:34.625Z",
+  "summary": {
+    "totalTests": 34,
+    "passedTests": 23,
+    "failedTests": 11,
+    "successRate": 67.6
+  },
+  "results": [
+    {
+      "name": "Conservative scenario defined",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Optimistic scenario defined",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Market crash scenario defined",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "High inflation scenario defined",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Economic stagnation scenario defined",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "runStressTest function exists",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "generateStressTestComparison function exists",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "translateClaudeScenario function exists",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Market crash application logic",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Claude scenario parsing logic",
+      "passed": false,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Window exports for stress testing",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Stress test interface component exists",
+      "passed": false,
+      "details": "ENOENT: no such file or directory, open '/Users/yali.pollak/Projects/Pension_Planner/advanced-retirement-planner/src/components/StressTestInterface.js'",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Summary panel component exists",
+      "passed": false,
+      "details": "ENOENT: no such file or directory, open '/Users/yali.pollak/Projects/Pension_Planner/advanced-retirement-planner/src/components/SummaryPanel.js'",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Image export function (PNG/PDF)",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "LLM analysis export function",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Claude recommendations prompt generation",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Clipboard copy functionality",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Dynamic library loading",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Comprehensive export data structure",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Window exports for export functions",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Export controls component exists",
+      "passed": false,
+      "details": "ENOENT: no such file or directory, open '/Users/yali.pollak/Projects/Pension_Planner/advanced-retirement-planner/src/components/ExportControls.js'",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Stress test scenarios script loaded",
+      "passed": false,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Stress test interface script loaded",
+      "passed": false,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Summary panel script loaded",
+      "passed": false,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Export functions script loaded",
+      "passed": false,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Export controls script loaded",
+      "passed": false,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Consistent v5.3.0 versioning",
+      "passed": false,
+      "details": "Found 0 version references",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Results panel integration",
+      "passed": false,
+      "details": "ENOENT: no such file or directory, open '/Users/yali.pollak/Projects/Pension_Planner/advanced-retirement-planner/src/components/RetirementResultsPanel.js'",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Mobile-first base styles",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Comprehensive responsive breakpoints",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Touch device optimizations",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Accessibility media queries",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Print optimization styles",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    },
+    {
+      "name": "Text truncation and responsive utilities",
+      "passed": true,
+      "details": "",
+      "timestamp": "4:34:34 PM"
+    }
+  ]
+}

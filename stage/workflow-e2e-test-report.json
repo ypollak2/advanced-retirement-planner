@@ -1,0 +1,239 @@
+{
+  "timestamp": "2025-07-30T17:12:28.742Z",
+  "summary": {
+    "passed": 20,
+    "failed": 0,
+    "total": 20,
+    "successRate": "100.0%",
+    "warnings": 0
+  },
+  "workflowChain": [
+    {
+      "name": "🔄 CI Pipeline (Main)",
+      "file": "ci-pipeline.yml",
+      "triggers": {
+        "push": {
+          "branches": [
+            "main",
+            "develop"
+          ]
+        },
+        "pull_request": {
+          "branches": [
+            "main"
+          ]
+        },
+        "workflow_dispatch": {
+          "inputs": {
+            "skip_tests": {
+              "description": "Skip test execution",
+              "required": false,
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "jobs": [
+        "code-quality",
+        "tests",
+        "security-scan",
+        "build-validation",
+        "ci-summary"
+      ],
+      "dependencies": []
+    },
+    {
+      "name": "🚀 Deployment Pipeline",
+      "file": "deployment.yml",
+      "triggers": {
+        "workflow_run": {
+          "workflows": [
+            "🔄 CI Pipeline (Main)"
+          ],
+          "types": [
+            "completed"
+          ],
+          "branches": [
+            "main"
+          ]
+        },
+        "workflow_dispatch": {
+          "inputs": {
+            "environment": {
+              "description": "Deployment environment",
+              "required": true,
+              "default": "stage",
+              "type": "choice",
+              "options": [
+                "stage",
+                "production",
+                "both"
+              ]
+            },
+            "skip_validation": {
+              "description": "Skip deployment validation",
+              "required": false,
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "jobs": [
+        "pre-deployment",
+        "deploy-stage",
+        "validate-stage",
+        "deploy-production",
+        "validate-production",
+        "deployment-summary"
+      ],
+      "dependencies": [
+        "🔄 CI Pipeline (Main)"
+      ]
+    },
+    {
+      "name": "🎯 Quality Assurance Pipeline",
+      "file": "quality-assurance.yml",
+      "triggers": {
+        "workflow_run": {
+          "workflows": [
+            "🚀 Deployment Pipeline"
+          ],
+          "types": [
+            "completed"
+          ],
+          "branches": [
+            "main"
+          ]
+        },
+        "schedule": [
+          {
+            "cron": "0 3 * * *"
+          }
+        ],
+        "workflow_dispatch": {
+          "inputs": {
+            "test_scope": {
+              "description": "Test scope to run",
+              "required": false,
+              "default": "full",
+              "type": "choice",
+              "options": [
+                "full",
+                "regression",
+                "performance",
+                "accessibility",
+                "security-extended"
+              ]
+            },
+            "environment": {
+              "description": "Environment to test",
+              "required": false,
+              "default": "production",
+              "type": "choice",
+              "options": [
+                "production",
+                "stage"
+              ]
+            },
+            "create_report": {
+              "description": "Create detailed QA report",
+              "required": false,
+              "default": true,
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "jobs": [
+        "qa-setup",
+        "regression-tests",
+        "performance-tests",
+        "accessibility-tests",
+        "security-extended",
+        "qa-report"
+      ],
+      "dependencies": [
+        "🚀 Deployment Pipeline"
+      ]
+    },
+    {
+      "name": "📡 Production Monitoring & Health Checks",
+      "file": "monitoring.yml",
+      "triggers": {
+        "workflow_run": {
+          "workflows": [
+            "🚀 Deployment Pipeline"
+          ],
+          "types": [
+            "completed"
+          ],
+          "branches": [
+            "main"
+          ]
+        },
+        "schedule": [
+          {
+            "cron": "0 */6 * * *"
+          },
+          {
+            "cron": "0 6 * * *"
+          }
+        ],
+        "workflow_dispatch": {
+          "inputs": {
+            "monitoring_scope": {
+              "description": "Monitoring scope",
+              "required": false,
+              "default": "comprehensive",
+              "type": "choice",
+              "options": [
+                "health-check",
+                "e2e-tests",
+                "comprehensive",
+                "uptime-only"
+              ]
+            },
+            "create_issue_on_failure": {
+              "description": "Create GitHub issue on failure",
+              "required": false,
+              "default": true,
+              "type": "boolean"
+            },
+            "notify_on_success": {
+              "description": "Send notification on success",
+              "required": false,
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "jobs": [
+        "health-check",
+        "e2e-production-tests",
+        "comprehensive-monitoring",
+        "monitoring-summary"
+      ],
+      "dependencies": [
+        "🚀 Deployment Pipeline"
+      ]
+    }
+  ],
+  "errors": [],
+  "warnings": [],
+  "simulatedOutputs": {
+    "ciPipelineOutput": {
+      "ci-status": "success",
+      "version": "7.3.0",
+      "test-results": "{\"passed\": 374, \"total\": 374}",
+      "build-status": "ready"
+    },
+    "deploymentOutput": {
+      "deployment-status": "success",
+      "stage-url": "https://ypollak2.github.io/advanced-retirement-planner/stage/",
+      "production-url": "https://ypollak2.github.io/advanced-retirement-planner/"
+    }
+  }
+}

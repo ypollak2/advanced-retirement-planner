@@ -1,0 +1,813 @@
+{
+  "total": 3,
+  "passed": 0,
+  "failed": 3,
+  "scenarios": [
+    {
+      "name": "Complete Individual Journey - Tech Professional",
+      "passed": false,
+      "issues": [
+        "Total accumulation 17744489 outside expected range",
+        "Monthly retirement income 59148 outside expected range"
+      ],
+      "warnings": [
+        "Required calculation 'readinessScore' not performed"
+      ],
+      "calculationResults": {
+        "financialHealthScore": {
+          "totalScore": 86,
+          "factors": {
+            "savingsRate": {
+              "score": 25,
+              "details": {
+                "rate": 25,
+                "monthlyAmount": 7500,
+                "monthlyIncome": 30000,
+                "status": "excellent",
+                "benchmarkLevel": "excellent",
+                "target": 15,
+                "improvement": 0,
+                "calculationMethod": "calculated_from_rates",
+                "pensionRate": 17.5,
+                "trainingFundRate": 7.5,
+                "successfulCalculation": true,
+                "debugInfo": {
+                  "phase": "successful_calculation",
+                  "dataQuality": {
+                    "monthlyIncomeFound": true,
+                    "contributionDataFound": true,
+                    "calculationSuccessful": true,
+                    "benchmarkMet": true
+                  },
+                  "fieldsUsed": {
+                    "income": "found",
+                    "contributions": "found",
+                    "pensionRate": "found",
+                    "trainingFundRate": "found"
+                  },
+                  "recommendations": []
+                }
+              }
+            },
+            "retirementReadiness": {
+              "score": 10,
+              "details": {
+                "ratio": 0.5555555555555556,
+                "currentSavings": 200000,
+                "targetSavings": 360000,
+                "gap": 160000,
+                "status": "poor"
+              }
+            },
+            "timeHorizon": {
+              "score": 15,
+              "details": {
+                "yearsToRetirement": 35,
+                "status": "excellent"
+              }
+            },
+            "riskAlignment": {
+              "score": 10,
+              "details": {
+                "stockPercentage": 60,
+                "recommendedPercentage": 70,
+                "deviation": 10,
+                "alignmentScore": 80,
+                "status": "fair",
+                "dataSource": "direct_field"
+              }
+            },
+            "diversification": {
+              "score": 10,
+              "details": {
+                "assetClasses": 6,
+                "status": "excellent",
+                "missingClasses": 0,
+                "assets": [
+                  {
+                    "type": "Pension/Retirement",
+                    "amount": 200000
+                  },
+                  {
+                    "type": "Stocks/Bonds Portfolio",
+                    "amount": 80000
+                  },
+                  {
+                    "type": "Cryptocurrency",
+                    "amount": 15000
+                  },
+                  {
+                    "type": "Cash/Savings",
+                    "amount": 50000
+                  },
+                  {
+                    "type": "Emergency Fund",
+                    "amount": 60000
+                  },
+                  {
+                    "type": "Training Fund",
+                    "amount": 120000
+                  }
+                ],
+                "debugInfo": {
+                  "totalAssetClassesFound": 6,
+                  "assetsDetected": [
+                    "Pension/Retirement: 200000",
+                    "Stocks/Bonds Portfolio: 80000",
+                    "Cryptocurrency: 15000",
+                    "Cash/Savings: 50000",
+                    "Emergency Fund: 60000",
+                    "Training Fund: 120000"
+                  ],
+                  "calculationMethod": "enhanced_field_mapping",
+                  "benchmarkTargets": {
+                    "excellent": 4,
+                    "good": 3,
+                    "fair": 2,
+                    "poor": 1
+                  },
+                  "userGuidance": "Good diversification! You have 6 asset classes. Consider adding 0 more for better diversification."
+                }
+              }
+            },
+            "taxEfficiency": {
+              "score": 8,
+              "details": {
+                "currentRate": 25,
+                "optimalRate": 21.333,
+                "efficiencyScore": 100,
+                "status": "excellent",
+                "pensionRate": 17.5,
+                "trainingFundRate": 7.5,
+                "country": "israel",
+                "baseSalary": 360000,
+                "effectiveTaxRate": 0,
+                "taxSavingsFromContributions": 0,
+                "calculationMethod": "rates_found_with_tax_integration",
+                "hasAdditionalIncome": false,
+                "additionalIncomeDetails": {},
+                "debugInfo": {
+                  "countryDetected": "israel",
+                  "optimalRateUsed": 21.333,
+                  "taxSystemIntegration": {
+                    "usedTaxCalculators": false,
+                    "effectiveTaxRate": 0,
+                    "taxSavings": 0
+                  },
+                  "ratesFound": {
+                    "pension": true,
+                    "trainingFund": true
+                  },
+                  "incomeData": {
+                    "baseSalaryFound": true,
+                    "planningType": "individual",
+                    "salaryFields": {
+                      "currentMonthlySalary": true,
+                      "partner1Salary": false,
+                      "partner2Salary": false
+                    }
+                  },
+                  "additionalIncomeConsidered": false
+                }
+              }
+            },
+            "emergencyFund": {
+              "score": 5,
+              "details": {
+                "months": 4,
+                "currentAmount": 60000,
+                "targetAmount": 90000,
+                "gap": 30000,
+                "status": "fair",
+                "adjustedTarget": false,
+                "debtAdjustment": {
+                  "debtToIncomeRatio": 0,
+                  "recommendedMonths": 6,
+                  "reason": "standard"
+                },
+                "calculationMethod": "expense_structure_with_debt",
+                "debugInfo": {
+                  "monthlyExpensesFound": true,
+                  "emergencyFundFound": true,
+                  "debtConsideration": "none",
+                  "fieldsUsed": {
+                    "expenses": "found",
+                    "emergencyFund": "found"
+                  }
+                }
+              }
+            },
+            "debtManagement": {
+              "score": 3,
+              "details": {
+                "ratio": 0,
+                "monthlyPayments": 0,
+                "monthlyIncome": 30000,
+                "status": "excellent",
+                "debtBreakdown": {
+                  "mortgage": 0,
+                  "carLoan": 0,
+                  "creditCard": 0,
+                  "otherDebt": 0
+                },
+                "calculationMethod": "expense_categories",
+                "debugInfo": {
+                  "incomeSource": "individual",
+                  "debtSource": "expense_structure",
+                  "totalIncomeFound": true,
+                  "debtPaymentsFound": false,
+                  "fieldsUsed": {
+                    "income": "found",
+                    "debt": "missing"
+                  }
+                }
+              }
+            }
+          },
+          "status": "excellent",
+          "suggestions": [
+            {
+              "priority": "high",
+              "category": "Retirement Readiness",
+              "issue": "₪160,000 behind age-appropriate savings target",
+              "action": "Increase retirement contributions or consider working longer",
+              "impact": "+7 points"
+            }
+          ],
+          "peerComparison": {
+            "ageGroup": "30-39",
+            "yourScore": 86,
+            "peerAverage": 55,
+            "topQuartile": 75,
+            "percentile": 90
+          },
+          "generatedAt": "2025-07-28T18:31:27.469Z",
+          "debugInfo": {
+            "inputFieldsFound": 27,
+            "calculationMethod": "enhanced_field_mapping",
+            "zeroScoreFactors": []
+          }
+        },
+        "retirementProjections": {
+          "totalAccumulation": 17744489,
+          "monthlyIncome": 59148,
+          "projectedIncome": 709780
+        },
+        "overallScore": 86
+      },
+      "dataIntegrity": {
+        "hasAllRequiredInputs": true,
+        "healthScoreValid": true,
+        "projectionsValid": true,
+        "noNaNValues": true,
+        "factorsCalculated": true
+      },
+      "performance": {
+        "totalCalculationTime": 64,
+        "acceptable": true
+      }
+    },
+    {
+      "name": "Complete Couple Journey - Dual Career Family",
+      "passed": false,
+      "issues": [
+        "Total accumulation 19605018 outside expected range",
+        "Monthly retirement income 65350 outside expected range"
+      ],
+      "warnings": [
+        "Required calculation 'readinessScore' not performed"
+      ],
+      "calculationResults": {
+        "financialHealthScore": {
+          "totalScore": 86,
+          "factors": {
+            "savingsRate": {
+              "score": 25,
+              "details": {
+                "rate": 25,
+                "monthlyAmount": 14250,
+                "monthlyIncome": 57000,
+                "status": "excellent",
+                "benchmarkLevel": "excellent",
+                "target": 15,
+                "improvement": 0,
+                "calculationMethod": "calculated_from_rates",
+                "pensionRate": 17.5,
+                "trainingFundRate": 7.5,
+                "successfulCalculation": true,
+                "debugInfo": {
+                  "phase": "successful_calculation",
+                  "dataQuality": {
+                    "monthlyIncomeFound": true,
+                    "contributionDataFound": true,
+                    "calculationSuccessful": true,
+                    "benchmarkMet": true
+                  },
+                  "fieldsUsed": {
+                    "income": "found",
+                    "contributions": "found",
+                    "pensionRate": "found",
+                    "trainingFundRate": "found"
+                  },
+                  "recommendations": []
+                }
+              }
+            },
+            "retirementReadiness": {
+              "score": 10,
+              "details": {
+                "ratio": 0.4061078622482131,
+                "currentSavings": 500000,
+                "targetSavings": 1231200,
+                "gap": 731200,
+                "status": "poor"
+              }
+            },
+            "timeHorizon": {
+              "score": 13,
+              "details": {
+                "yearsToRetirement": 29,
+                "status": "good"
+              }
+            },
+            "riskAlignment": {
+              "score": 12,
+              "details": {
+                "stockPercentage": 60,
+                "recommendedPercentage": 62,
+                "deviation": 2,
+                "alignmentScore": 96,
+                "status": "excellent",
+                "dataSource": "direct_field"
+              }
+            },
+            "diversification": {
+              "score": 10,
+              "details": {
+                "assetClasses": 7,
+                "status": "excellent",
+                "missingClasses": 0,
+                "assets": [
+                  {
+                    "type": "Pension/Retirement",
+                    "amount": 500000
+                  },
+                  {
+                    "type": "Stocks/Bonds Portfolio",
+                    "amount": 200000
+                  },
+                  {
+                    "type": "Real Estate",
+                    "amount": 1800000
+                  },
+                  {
+                    "type": "Cryptocurrency",
+                    "amount": 50000
+                  },
+                  {
+                    "type": "Cash/Savings",
+                    "amount": 120000
+                  },
+                  {
+                    "type": "Emergency Fund",
+                    "amount": 150000
+                  },
+                  {
+                    "type": "Training Fund",
+                    "amount": 300000
+                  }
+                ],
+                "debugInfo": {
+                  "totalAssetClassesFound": 7,
+                  "assetsDetected": [
+                    "Pension/Retirement: 500000",
+                    "Stocks/Bonds Portfolio: 200000",
+                    "Real Estate: 1800000",
+                    "Cryptocurrency: 50000",
+                    "Cash/Savings: 120000",
+                    "Emergency Fund: 150000",
+                    "Training Fund: 300000"
+                  ],
+                  "calculationMethod": "enhanced_field_mapping",
+                  "benchmarkTargets": {
+                    "excellent": 4,
+                    "good": 3,
+                    "fair": 2,
+                    "poor": 1
+                  },
+                  "userGuidance": "Good diversification! You have 7 asset classes. Consider adding 0 more for better diversification."
+                }
+              }
+            },
+            "taxEfficiency": {
+              "score": 8,
+              "details": {
+                "currentRate": 25,
+                "optimalRate": 21.333,
+                "efficiencyScore": 100,
+                "status": "excellent",
+                "pensionRate": 17.5,
+                "trainingFundRate": 7.5,
+                "country": "israel",
+                "baseSalary": 684000,
+                "effectiveTaxRate": 0,
+                "taxSavingsFromContributions": 0,
+                "calculationMethod": "rates_found_with_tax_integration",
+                "hasAdditionalIncome": false,
+                "additionalIncomeDetails": {},
+                "debugInfo": {
+                  "countryDetected": "israel",
+                  "optimalRateUsed": 21.333,
+                  "taxSystemIntegration": {
+                    "usedTaxCalculators": false,
+                    "effectiveTaxRate": 0,
+                    "taxSavings": 0
+                  },
+                  "ratesFound": {
+                    "pension": true,
+                    "trainingFund": true
+                  },
+                  "incomeData": {
+                    "baseSalaryFound": true,
+                    "planningType": "couple",
+                    "salaryFields": {
+                      "currentMonthlySalary": false,
+                      "partner1Salary": true,
+                      "partner2Salary": true
+                    }
+                  },
+                  "additionalIncomeConsidered": false
+                }
+              }
+            },
+            "emergencyFund": {
+              "score": 5,
+              "details": {
+                "months": 4.285714285714286,
+                "currentAmount": 150000,
+                "targetAmount": 210000,
+                "gap": 60000,
+                "status": "fair",
+                "adjustedTarget": false,
+                "debtAdjustment": {
+                  "debtToIncomeRatio": 0,
+                  "recommendedMonths": 6,
+                  "reason": "standard"
+                },
+                "calculationMethod": "expense_structure_with_debt",
+                "debugInfo": {
+                  "monthlyExpensesFound": true,
+                  "emergencyFundFound": true,
+                  "debtConsideration": "none",
+                  "fieldsUsed": {
+                    "expenses": "found",
+                    "emergencyFund": "found"
+                  }
+                }
+              }
+            },
+            "debtManagement": {
+              "score": 3,
+              "details": {
+                "ratio": 0,
+                "monthlyPayments": 0,
+                "monthlyIncome": 57000,
+                "status": "excellent",
+                "debtBreakdown": {
+                  "mortgage": 0,
+                  "carLoan": 0,
+                  "creditCard": 0,
+                  "otherDebt": 0
+                },
+                "calculationMethod": "expense_categories",
+                "debugInfo": {
+                  "incomeSource": "combined_partners",
+                  "debtSource": "expense_structure",
+                  "totalIncomeFound": true,
+                  "debtPaymentsFound": false,
+                  "fieldsUsed": {
+                    "income": "found",
+                    "debt": "missing"
+                  }
+                }
+              }
+            }
+          },
+          "status": "excellent",
+          "suggestions": [
+            {
+              "priority": "high",
+              "category": "Retirement Readiness",
+              "issue": "₪731,200 behind age-appropriate savings target",
+              "action": "Increase retirement contributions or consider working longer",
+              "impact": "+7 points"
+            }
+          ],
+          "peerComparison": {
+            "ageGroup": "30-39",
+            "yourScore": 86,
+            "peerAverage": 55,
+            "topQuartile": 75,
+            "percentile": 90
+          },
+          "generatedAt": "2025-07-28T18:31:27.521Z",
+          "debugInfo": {
+            "inputFieldsFound": 37,
+            "calculationMethod": "enhanced_field_mapping",
+            "zeroScoreFactors": []
+          }
+        },
+        "retirementProjections": {
+          "totalAccumulation": 19605018,
+          "monthlyIncome": 65350,
+          "projectedIncome": 784201
+        },
+        "overallScore": 86
+      },
+      "dataIntegrity": {
+        "hasAllRequiredInputs": true,
+        "healthScoreValid": true,
+        "projectionsValid": true,
+        "noNaNValues": true,
+        "factorsCalculated": true
+      },
+      "performance": {
+        "totalCalculationTime": 34,
+        "acceptable": true
+      }
+    },
+    {
+      "name": "Complete High Earner Journey - Executive Level",
+      "passed": false,
+      "issues": [
+        "Health score 83 outside expected range 85-100"
+      ],
+      "warnings": [
+        "Required calculation 'readinessScore' not performed"
+      ],
+      "calculationResults": {
+        "financialHealthScore": {
+          "totalScore": 83,
+          "factors": {
+            "savingsRate": {
+              "score": 25,
+              "details": {
+                "rate": 25,
+                "monthlyAmount": 20000,
+                "monthlyIncome": 80000,
+                "status": "excellent",
+                "benchmarkLevel": "excellent",
+                "target": 15,
+                "improvement": 0,
+                "calculationMethod": "calculated_from_rates",
+                "pensionRate": 17.5,
+                "trainingFundRate": 7.5,
+                "successfulCalculation": true,
+                "debugInfo": {
+                  "phase": "successful_calculation",
+                  "dataQuality": {
+                    "monthlyIncomeFound": true,
+                    "contributionDataFound": true,
+                    "calculationSuccessful": true,
+                    "benchmarkMet": true
+                  },
+                  "fieldsUsed": {
+                    "income": "found",
+                    "contributions": "found",
+                    "pensionRate": "found",
+                    "trainingFundRate": "found"
+                  },
+                  "recommendations": []
+                }
+              }
+            },
+            "retirementReadiness": {
+              "score": 10,
+              "details": {
+                "ratio": 0.5,
+                "currentSavings": 1200000,
+                "targetSavings": 2400000,
+                "gap": 1200000,
+                "status": "poor"
+              }
+            },
+            "timeHorizon": {
+              "score": 11,
+              "details": {
+                "yearsToRetirement": 15,
+                "status": "fair"
+              }
+            },
+            "riskAlignment": {
+              "score": 11,
+              "details": {
+                "stockPercentage": 60,
+                "recommendedPercentage": 55,
+                "deviation": 5,
+                "alignmentScore": 90,
+                "status": "good",
+                "dataSource": "direct_field"
+              }
+            },
+            "diversification": {
+              "score": 10,
+              "details": {
+                "assetClasses": 7,
+                "status": "excellent",
+                "missingClasses": 0,
+                "assets": [
+                  {
+                    "type": "Pension/Retirement",
+                    "amount": 1200000
+                  },
+                  {
+                    "type": "Stocks/Bonds Portfolio",
+                    "amount": 800000
+                  },
+                  {
+                    "type": "Real Estate",
+                    "amount": 3000000
+                  },
+                  {
+                    "type": "Cryptocurrency",
+                    "amount": 200000
+                  },
+                  {
+                    "type": "Cash/Savings",
+                    "amount": 300000
+                  },
+                  {
+                    "type": "Emergency Fund",
+                    "amount": 200000
+                  },
+                  {
+                    "type": "Training Fund",
+                    "amount": 600000
+                  }
+                ],
+                "debugInfo": {
+                  "totalAssetClassesFound": 7,
+                  "assetsDetected": [
+                    "Pension/Retirement: 1200000",
+                    "Stocks/Bonds Portfolio: 800000",
+                    "Real Estate: 3000000",
+                    "Cryptocurrency: 200000",
+                    "Cash/Savings: 300000",
+                    "Emergency Fund: 200000",
+                    "Training Fund: 600000"
+                  ],
+                  "calculationMethod": "enhanced_field_mapping",
+                  "benchmarkTargets": {
+                    "excellent": 4,
+                    "good": 3,
+                    "fair": 2,
+                    "poor": 1
+                  },
+                  "userGuidance": "Good diversification! You have 7 asset classes. Consider adding 0 more for better diversification."
+                }
+              }
+            },
+            "taxEfficiency": {
+              "score": 8,
+              "details": {
+                "currentRate": 25,
+                "optimalRate": 21.333,
+                "efficiencyScore": 100,
+                "status": "excellent",
+                "pensionRate": 17.5,
+                "trainingFundRate": 7.5,
+                "country": "israel",
+                "baseSalary": 960000,
+                "effectiveTaxRate": 0,
+                "taxSavingsFromContributions": 0,
+                "calculationMethod": "rates_found_with_tax_integration",
+                "hasAdditionalIncome": false,
+                "additionalIncomeDetails": {},
+                "debugInfo": {
+                  "countryDetected": "israel",
+                  "optimalRateUsed": 21.333,
+                  "taxSystemIntegration": {
+                    "usedTaxCalculators": false,
+                    "effectiveTaxRate": 0,
+                    "taxSavings": 0
+                  },
+                  "ratesFound": {
+                    "pension": true,
+                    "trainingFund": true
+                  },
+                  "incomeData": {
+                    "baseSalaryFound": true,
+                    "planningType": "individual",
+                    "salaryFields": {
+                      "currentMonthlySalary": true,
+                      "partner1Salary": false,
+                      "partner2Salary": false
+                    }
+                  },
+                  "additionalIncomeConsidered": false
+                }
+              }
+            },
+            "emergencyFund": {
+              "score": 5,
+              "details": {
+                "months": 5,
+                "currentAmount": 200000,
+                "targetAmount": 240000,
+                "gap": 40000,
+                "status": "fair",
+                "adjustedTarget": false,
+                "debtAdjustment": {
+                  "debtToIncomeRatio": 0,
+                  "recommendedMonths": 6,
+                  "reason": "standard"
+                },
+                "calculationMethod": "expense_structure_with_debt",
+                "debugInfo": {
+                  "monthlyExpensesFound": true,
+                  "emergencyFundFound": true,
+                  "debtConsideration": "none",
+                  "fieldsUsed": {
+                    "expenses": "found",
+                    "emergencyFund": "found"
+                  }
+                }
+              }
+            },
+            "debtManagement": {
+              "score": 3,
+              "details": {
+                "ratio": 0,
+                "monthlyPayments": 0,
+                "monthlyIncome": 80000,
+                "status": "excellent",
+                "debtBreakdown": {
+                  "mortgage": 0,
+                  "carLoan": 0,
+                  "creditCard": 0,
+                  "otherDebt": 0
+                },
+                "calculationMethod": "expense_categories",
+                "debugInfo": {
+                  "incomeSource": "individual",
+                  "debtSource": "expense_structure",
+                  "totalIncomeFound": true,
+                  "debtPaymentsFound": false,
+                  "fieldsUsed": {
+                    "income": "found",
+                    "debt": "missing"
+                  }
+                }
+              }
+            }
+          },
+          "status": "good",
+          "suggestions": [
+            {
+              "priority": "high",
+              "category": "Retirement Readiness",
+              "issue": "₪1,200,000 behind age-appropriate savings target",
+              "action": "Increase retirement contributions or consider working longer",
+              "impact": "+7 points"
+            }
+          ],
+          "peerComparison": {
+            "ageGroup": "40-49",
+            "yourScore": 83,
+            "peerAverage": 65,
+            "topQuartile": 80,
+            "percentile": 90
+          },
+          "generatedAt": "2025-07-28T18:31:27.523Z",
+          "debugInfo": {
+            "inputFieldsFound": 27,
+            "calculationMethod": "enhanced_field_mapping",
+            "zeroScoreFactors": []
+          }
+        },
+        "retirementProjections": {
+          "totalAccumulation": 11315419,
+          "monthlyIncome": 37718,
+          "projectedIncome": 452617
+        },
+        "overallScore": 83
+      },
+      "dataIntegrity": {
+        "hasAllRequiredInputs": true,
+        "healthScoreValid": true,
+        "projectionsValid": true,
+        "noNaNValues": true,
+        "factorsCalculated": true
+      },
+      "performance": {
+        "totalCalculationTime": 5,
+        "acceptable": true
+      }
+    }
+  ],
+  "overallPerformance": {
+    "totalTime": 114,
+    "averageTime": 38,
+    "maxTime": 64
+  }
+}

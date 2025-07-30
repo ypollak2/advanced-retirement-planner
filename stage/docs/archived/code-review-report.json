@@ -1,0 +1,1667 @@
+{
+  "filesReviewed": [
+    {
+      "path": "src/utils/retirementCalculations.js",
+      "issueCount": 1,
+      "issues": [
+        {
+          "severity": "minor",
+          "line": 147,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        }
+      ]
+    },
+    {
+      "path": "src/utils/financialHealthEngine.js",
+      "issueCount": 85,
+      "issues": [
+        {
+          "severity": "minor",
+          "line": 228,
+          "message": "Direct field access 'inputs[\"step${stepNum}\"]' - consider using getFieldValue()",
+          "code": "inputs[`step${stepNum}`]"
+        },
+        {
+          "severity": "minor",
+          "line": 280,
+          "message": "Direct field access 'inputs[\"step${stepNum}\"]' - consider using getFieldValue()",
+          "code": "inputs[`step${stepNum}`]"
+        },
+        {
+          "severity": "minor",
+          "line": 123,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 471,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 475,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 476,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 488,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 617,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 618,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 619,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 625,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 635,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 638,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 647,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 666,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 673,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 679,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 681,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 687,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 688,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 710,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 711,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 734,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 755,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 771,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 775,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 865,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 870,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 911,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 967,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 968,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 975,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 991,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1000,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1007,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1026,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1032,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1037,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1043,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1052,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1059,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1065,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1072,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1080,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1088,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1096,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1104,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1113,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1120,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1127,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1130,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1156,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1187,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1339,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1340,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1353,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1363,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1374,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1385,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1396,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1407,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1417,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1427,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1445,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1448,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1449,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1476,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1497,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1521,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1540,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1577,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1733,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1752,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1765,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1786,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1787,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1886,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 1887,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 2183,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 2184,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 2240,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 2242,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 2279,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 2280,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 2525,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        }
+      ]
+    },
+    {
+      "path": "src/data/marketConstants.js",
+      "issueCount": 0,
+      "issues": []
+    },
+    {
+      "path": "tests/test-runner.js",
+      "issueCount": 2,
+      "issues": [
+        {
+          "severity": "critical",
+          "line": 0,
+          "message": "Synchronous operation 'readFileSync' in application code - use async version",
+          "code": "readFileSync"
+        },
+        {
+          "severity": "critical",
+          "line": 0,
+          "message": "Synchronous operation 'existsSync' in application code - use async version",
+          "code": "existsSync"
+        }
+      ]
+    },
+    {
+      "path": "scripts/update-version.js",
+      "issueCount": 36,
+      "issues": [
+        {
+          "severity": "minor",
+          "line": 150,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 187,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 196,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 209,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 224,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 231,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 243,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 247,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 248,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 249,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 250,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 253,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 258,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 260,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 268,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 271,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 273,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 283,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 285,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 288,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 296,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 298,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 307,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 309,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 312,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 316,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 317,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 318,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 319,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 320,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 321,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 324,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 325,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 326,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 327,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        },
+        {
+          "severity": "minor",
+          "line": 331,
+          "message": "Console logging in production code - remove or guard with isDev check",
+          "code": "console.log("
+        }
+      ]
+    }
+  ],
+  "issues": {
+    "critical": [
+      {
+        "file": "tests/test-runner.js",
+        "severity": "critical",
+        "line": 0,
+        "message": "Synchronous operation 'readFileSync' in application code - use async version",
+        "code": "readFileSync"
+      },
+      {
+        "file": "tests/test-runner.js",
+        "severity": "critical",
+        "line": 0,
+        "message": "Synchronous operation 'existsSync' in application code - use async version",
+        "code": "existsSync"
+      }
+    ],
+    "major": [],
+    "minor": [
+      {
+        "file": "src/utils/retirementCalculations.js",
+        "severity": "minor",
+        "line": 147,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 228,
+        "message": "Direct field access 'inputs[\"step${stepNum}\"]' - consider using getFieldValue()",
+        "code": "inputs[`step${stepNum}`]"
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 280,
+        "message": "Direct field access 'inputs[\"step${stepNum}\"]' - consider using getFieldValue()",
+        "code": "inputs[`step${stepNum}`]"
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 123,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 471,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 475,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 476,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 488,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 617,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 618,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 619,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 625,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 635,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 638,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 647,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 666,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 673,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 679,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 681,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 687,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 688,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 710,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 711,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 734,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 755,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 771,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 775,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 865,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 870,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 911,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 967,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 968,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 975,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 991,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1000,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1007,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1026,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1032,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1037,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1043,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1052,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1059,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1065,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1072,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1080,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1088,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1096,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1104,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1113,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1120,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1127,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1130,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1156,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1187,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1339,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1340,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1353,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1363,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1374,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1385,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1396,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1407,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1417,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1427,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1445,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1448,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1449,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1476,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1497,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1521,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1540,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1577,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1733,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1752,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1765,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1786,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1787,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1886,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 1887,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 2183,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 2184,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 2240,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 2242,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 2279,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 2280,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "src/utils/financialHealthEngine.js",
+        "severity": "minor",
+        "line": 2525,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 150,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 187,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 196,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 209,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 224,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 231,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 243,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 247,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 248,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 249,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 250,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 253,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 258,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 260,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 268,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 271,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 273,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 283,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 285,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 288,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 296,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 298,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 307,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 309,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 312,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 316,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 317,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 318,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 319,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 320,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 321,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 324,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 325,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 326,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 327,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      },
+      {
+        "file": "scripts/update-version.js",
+        "severity": "minor",
+        "line": 331,
+        "message": "Console logging in production code - remove or guard with isDev check",
+        "code": "console.log("
+      }
+    ],
+    "suggestions": []
+  },
+  "stats": {
+    "totalFiles": 5,
+    "reviewedFiles": 5,
+    "skippedFiles": 0,
+    "totalIssues": 124
+  },
+  "timestamp": "2025-07-30T09:31:18.346Z",
+  "summary": {
+    "passed": false,
+    "criticalIssues": 2,
+    "majorIssues": 0,
+    "minorIssues": 122,
+    "suggestions": 0
+  }
+}

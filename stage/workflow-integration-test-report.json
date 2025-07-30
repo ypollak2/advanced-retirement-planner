@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-07-30T17:09:54.546Z",
+  "summary": {
+    "passed": 28,
+    "failed": 0,
+    "total": 28,
+    "successRate": "100.0%",
+    "warnings": 3
+  },
+  "errors": [],
+  "warnings": [
+    "Job security-scan in security.yml has no timeout",
+    "Job security-headers in security.yml has no timeout",
+    "Job license-check in security.yml has no timeout"
+  ]
+}
