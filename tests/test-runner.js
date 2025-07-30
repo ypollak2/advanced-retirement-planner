@@ -2164,7 +2164,7 @@ function testPortfolioTaxCalculation() {
         logTest('Portfolio Tax: Tax rate input validation (0-50%)', hasTaxValidation);
         
         // Test default tax rate (25%)
-        const hasDefaultTaxRate = content.includes('|| 25) / 100');
+        const hasDefaultTaxRate = content.includes('|| 0.25)');
         logTest('Portfolio Tax: Default tax rate is 25%', hasDefaultTaxRate);
         
         // Test conditional display (only when portfolio > 0)

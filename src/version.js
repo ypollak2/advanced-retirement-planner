@@ -1,8 +1,8 @@
 // Version information for the Advanced Retirement Planner
 const version = {
-    number: "7.2.1",
+    number: "7.3.0",
     build: "2025-07-29",
-    commit: "v7.2.1-version-update",
+    commit: "v7.3.0-version-update",
     description: "Enhanced RSU input with stock symbol selection and real-time price lookup"
 };
 

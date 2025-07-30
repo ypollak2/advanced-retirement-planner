@@ -196,8 +196,8 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
     const calculateAndFormatNetValue = useCallback(async (portfolioValue, taxRate, partnerId = null) => {
         if (!portfolioValue || portfolioValue <= 0) return formatCurrency(0);
         
-        // Fix: taxRate is already stored as decimal (0.5 for 50%), so don't divide by 100
-        const netValueILS = portfolioValue * (1 - (taxRate || 0.25));
+        // Tax rate is stored as percentage (50 for 50%), convert to decimal
+        const netValueILS = portfolioValue * (1 - (taxRate || 25) / 100);
         
         if (workingCurrency === 'ILS') {
             return formatCurrency(netValueILS, 'ILS');
@@ -261,8 +261,8 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             ]);
         }
         
-        // Default calculation (immediate, no conversion) - taxRate is already decimal
-        const netValue = portfolioValue * (1 - (taxRate || 0.25));
+        // Tax rate is stored as percentage (50 for 50%), convert to decimal
+        const netValue = portfolioValue * (1 - (taxRate || 25) / 100);
         const formatted = formatCurrency(netValue, workingCurrency);
         
         // Trigger async conversion for next render
@@ -403,19 +403,19 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                 max: '50',
                                 step: '0.1',
                                 placeholder: '25',
-                                value: (inputs.portfolioTaxRate * 100) || 25,
+                                value: inputs.portfolioTaxRate || 25,
                                 onChange: (e) => {
                                     const validatedRate = validateTaxRate(e.target.value);
-                                    setInputs({...inputs, portfolioTaxRate: validatedRate / 100});
+                                    setInputs({...inputs, portfolioTaxRate: validatedRate});
                                 },
                                 onBlur: (e) => {
                                     // Ensure value is within bounds on blur
                                     const validatedRate = validateTaxRate(e.target.value);
                                     e.target.value = validatedRate;
-                                    setInputs({...inputs, portfolioTaxRate: validatedRate / 100});
+                                    setInputs({...inputs, portfolioTaxRate: validatedRate});
                                 },
                                 className: `w-full p-2 text-base border rounded focus:ring-2 focus:ring-purple-500 ${
-                                    inputs.portfolioTaxRate > 0.5 || inputs.portfolioTaxRate < 0 ? 
+                                    inputs.portfolioTaxRate > 50 || inputs.portfolioTaxRate < 0 ? 
                                     'border-red-300 bg-red-50' : 'border-gray-300'
                                 }`
                             }),
@@ -432,10 +432,10 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                     min: '0',
                                     max: '50',
                                     step: '1',
-                                    value: (inputs.portfolioTaxRate * 100) || 25,
+                                    value: inputs.portfolioTaxRate || 25,
                                     onChange: (e) => {
                                         const validatedRate = validateTaxRate(e.target.value);
-                                        setInputs({...inputs, portfolioTaxRate: validatedRate / 100});
+                                        setInputs({...inputs, portfolioTaxRate: validatedRate});
                                     },
                                     className: 'w-full h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer slider-thumb-purple'
                                 }),

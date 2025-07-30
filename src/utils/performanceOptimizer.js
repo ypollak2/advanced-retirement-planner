@@ -202,8 +202,8 @@
     function optimizedFinancialHealthScore(inputs) {
         const startTime = performance.now();
         
-        // Use memoized calculation
-        const result = memoizedCalculation('financialHealthScore', window.calculateFinancialHealthScore, inputs);
+        // Use memoized calculation with original function to prevent recursion
+        const result = memoizedCalculation('financialHealthScore', window.originalCalculateFinancialHealthScore || window.calculateFinancialHealthScore, inputs);
         
         const endTime = performance.now();
         
