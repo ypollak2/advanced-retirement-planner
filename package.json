@@ -57,6 +57,8 @@
     "validate:file": "node scripts/pre-commit-enhanced.js file",
     "validate:granular": "node scripts/pre-commit-enhanced.js quick",
     "validate:syntax-only": "node scripts/pre-commit-enhanced.js syntax-only",
+    "validate:components": "node scripts/validate-components.js",
+    "validate:render": "node tests/rendering/component-render.test.js",
     "dev:watch": "node scripts/dev-watcher.js",
     "test:generate": "node scripts/test-generator.js",
     "test:generate:feature": "node scripts/test-generator.js feature",

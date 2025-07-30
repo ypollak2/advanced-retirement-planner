@@ -163,6 +163,11 @@ jobs:
           echo "🧪 Running final tests before stage deployment..."
           npm test
           
+      - name: 🔍 Component render validation
+        run: |
+          echo "🔍 Validating all components can render without errors..."
+          npm run validate:components
+          
       - name: 📥 Checkout gh-pages branch for stage
         uses: actions/checkout@v4
         with:
@@ -316,6 +321,11 @@ jobs:
         run: |
           echo "🧪 Running final tests before production deployment..."
           npm test
+          
+      - name: 🔍 Component render validation
+        run: |
+          echo "🔍 Validating all components can render without errors..."
+          npm run validate:components
           
       - name: 🔍 Production readiness validation
         run: |
