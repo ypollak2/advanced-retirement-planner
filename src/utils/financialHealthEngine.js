@@ -110,6 +110,40 @@ function safePercentageCompat(value, total, defaultValue = 0) {
     return typeof result === 'object' ? result.value : result;
 }
 
+// Calculate gross salary from net salary
+function calculateGrossFromNet(netSalary, taxCountry = 'israel') {
+    // Use binary search to find the gross salary that results in the given net salary
+    let low = netSalary;
+    let high = netSalary * 2.5; // Assume max tax rate won't exceed 60%
+    let epsilon = 0.01; // Precision of 1 cent
+    
+    // If TaxCalculators is available, use it for accurate calculation
+    if (window.TaxCalculators && window.TaxCalculators.calculateNetSalary) {
+        while (high - low > epsilon) {
+            const mid = (low + high) / 2;
+            const calculated = window.TaxCalculators.calculateNetSalary(mid, taxCountry);
+            const calculatedNet = calculated.netSalary;
+            
+            if (calculatedNet < netSalary) {
+                low = mid;
+            } else {
+                high = mid;
+            }
+        }
+        return Math.round((low + high) / 2);
+    }
+    
+    // Fallback: Use simplified calculation based on average tax rates
+    const avgTaxRates = {
+        'israel': 0.25, // 25% average tax rate
+        'uk': 0.28,
+        'us': 0.24
+    };
+    
+    const taxRate = avgTaxRates[taxCountry] || 0.25;
+    return Math.round(netSalary / (1 - taxRate));
+}
+
 // Enhanced calculation wrapper that provides detailed error context
 function enhancedSafeCalculation(calculationName, calculationFn) {
     try {
@@ -226,14 +260,27 @@ function getFieldValue(inputs, fieldNames, options = {}) {
         }
     }
     
-    // Helper function to detect and convert annual salary to monthly
+    // Helper function to detect and convert salary values
     const detectSalaryType = (fieldName, value) => {
+        const lowerField = fieldName.toLowerCase();
+        let finalValue = value;
+        
         // If value seems too high for monthly (> 50k), likely annual - convert to monthly
-        if (value > 50000 && (fieldName.includes('monthly') || fieldName.includes('Monthly'))) {
+        if (value > 50000 && (lowerField.includes('monthly') || !lowerField.includes('annual'))) {
             logger.debug(`Converting suspected annual salary to monthly: ${value} -> ${value/12}`);
-            return value / 12;
+            finalValue = value / 12;
         }
-        return value;
+        
+        // For savings rate calculation, we need GROSS income
+        // If field name indicates NET salary, convert to gross
+        if (lowerField.includes('net') && !lowerField.includes('gross')) {
+            const taxCountry = inputs.taxCountry || 'israel';
+            const grossValue = calculateGrossFromNet(finalValue, taxCountry);
+            logger.debug(`Converting net salary to gross: ${finalValue} -> ${grossValue} (${taxCountry})`);
+            return grossValue;
+        }
+        
+        return finalValue;
     };
     
     // PHASE 1: Direct field lookup with enhanced validation and salary conversion
@@ -306,6 +353,11 @@ function getFieldValue(inputs, fieldNames, options = {}) {
         
         if (isLookingForSalary || partnerFieldMappings.length === 0) {
             partnerFieldMappings.push(
+                // Net salary fields (PRIORITIZE THESE)
+                { partner1: 'partner1NetSalary', partner2: 'partner2NetSalary' },
+                { partner1: 'partner1NetIncome', partner2: 'partner2NetIncome' },
+                // Gross salary fields
+                { partner1: 'partner1GrossSalary', partner2: 'partner2GrossSalary' },
                 { partner1: 'partner1Salary', partner2: 'partner2Salary' },
                 { partner1: 'Partner1Salary', partner2: 'Partner2Salary' },
                 { partner1: 'partner1Income', partner2: 'partner2Income' },
@@ -717,6 +769,10 @@ function calculateSavingsRateScore(inputs) {
         
         // Use enhanced field mapping for couple income with expanded field list
         monthlyIncome = getFieldValue(inputs, [
+            // Net salary fields (check these first)
+            'partner1NetSalary', 'partner2NetSalary', 'partner1NetIncome', 'partner2NetIncome',
+            // Gross salary fields
+            'partner1GrossSalary', 'partner2GrossSalary',
             'partner1Salary', 'partner2Salary', 'Partner1Salary', 'Partner2Salary',
             'partner1Income', 'partner2Income', 'partner1MonthlySalary', 'partner2MonthlySalary',
             'partner_1_salary', 'partner_2_salary', 'partnerOneSalary', 'partnerTwoSalary',
@@ -772,6 +828,40 @@ function calculateSavingsRateScore(inputs) {
         console.log('💰 No RSU income found');
     }
     
+    // PHASE 1.6: Add bonus and other income if available
+    let monthlyBonusIncome = 0;
+    let monthlyOtherIncome = 0;
+    
+    if (inputs.planningType === 'couple') {
+        // Partner bonus income
+        const partner1Bonus = safeParseFloat(inputs.partner1BonusAmount, 0);
+        const partner2Bonus = safeParseFloat(inputs.partner2BonusAmount, 0);
+        monthlyBonusIncome = (partner1Bonus + partner2Bonus) / 12; // Convert annual to monthly
+        
+        // Partner other income
+        const partner1Other = safeParseFloat(inputs.partner1OtherIncome, 0);
+        const partner2Other = safeParseFloat(inputs.partner2OtherIncome, 0);
+        monthlyOtherIncome = (partner1Other + partner2Other) / 12; // Convert annual to monthly
+        
+        console.log(`💰 Bonus Income: Partner1: ₪${partner1Bonus}/year, Partner2: ₪${partner2Bonus}/year = ₪${monthlyBonusIncome.toFixed(2)}/month`);
+        console.log(`💰 Other Income: Partner1: ₪${partner1Other}/year, Partner2: ₪${partner2Other}/year = ₪${monthlyOtherIncome.toFixed(2)}/month`);
+    } else {
+        // Individual bonus income
+        const bonusAmount = safeParseFloat(inputs.bonusAmount || inputs.annualBonus || inputs.yearlyBonus, 0);
+        monthlyBonusIncome = bonusAmount / 12; // Convert annual to monthly
+        
+        // Individual other income
+        const otherIncome = safeParseFloat(inputs.otherIncome || inputs.additionalIncome, 0);
+        monthlyOtherIncome = otherIncome / 12; // Convert annual to monthly
+        
+        console.log(`💰 Bonus Income: ₪${bonusAmount}/year = ₪${monthlyBonusIncome.toFixed(2)}/month`);
+        console.log(`💰 Other Income: ₪${otherIncome}/year = ₪${monthlyOtherIncome.toFixed(2)}/month`);
+    }
+    
+    // Add bonus and other income to total
+    monthlyIncome += monthlyBonusIncome + monthlyOtherIncome;
+    console.log(`💰 Total monthly income with all sources: ₪${monthlyIncome.toFixed(2)}`);
+    
     // CRITICAL: If income is still 0, this is the problem
     if (monthlyIncome === 0) {
         console.error('❌ SAVINGS RATE ISSUE: Monthly income is 0!');
@@ -822,19 +912,27 @@ function calculateSavingsRateScore(inputs) {
         'partner1TrainingFundEmployeeRate', 'partner2TrainingFundEmployeeRate'
     ], { debugMode: true });
     
-    console.log('💰 Contribution rates found:', {
-        pension: pensionRate,
-        trainingFund: trainingFundRate,
-        total: pensionRate + trainingFundRate
+    // Use default rates if not found (standard Israeli rates)
+    const DEFAULT_PENSION_RATE = 17.5;  // Standard employee + employer pension contribution
+    const DEFAULT_TRAINING_FUND_RATE = 7.5;  // Standard employee + employer training fund
+    
+    const finalPensionRate = pensionRate || DEFAULT_PENSION_RATE;
+    const finalTrainingFundRate = trainingFundRate || DEFAULT_TRAINING_FUND_RATE;
+    
+    console.log('💰 Contribution rates:', {
+        pension: finalPensionRate,
+        trainingFund: finalTrainingFundRate,
+        total: finalPensionRate + finalTrainingFundRate,
+        usingDefaults: !pensionRate || !trainingFundRate
     });
     
     // PHASE 3: Calculate monthly contributions
     let monthlyContributions = 0;
     let calculationMethod = 'none';
     
-    if (monthlyIncome > 0 && (pensionRate > 0 || trainingFundRate > 0)) {
+    if (monthlyIncome > 0) {
         // Method 1: Calculate from rates
-        monthlyContributions = monthlyIncome * (pensionRate + trainingFundRate) / 100;
+        monthlyContributions = monthlyIncome * (finalPensionRate + finalTrainingFundRate) / 100;
         calculationMethod = 'calculated_from_rates';
         
         // Add additional monthly savings if available
@@ -845,8 +943,8 @@ function calculateSavingsRateScore(inputs) {
         monthlyContributions += additionalSavings;
         console.log('💰 Contributions calculated from rates:', {
             monthlyIncome,
-            totalRate: pensionRate + trainingFundRate,
-            calculatedContributions: monthlyIncome * (pensionRate + trainingFundRate) / 100,
+            totalRate: finalPensionRate + finalTrainingFundRate,
+            calculatedContributions: monthlyIncome * (finalPensionRate + finalTrainingFundRate) / 100,
             additionalSavings,
             totalContributions: monthlyContributions
         });
