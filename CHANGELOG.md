@@ -6,6 +6,56 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [7.2.1] - 2025-07-30 - CONSOLE LOG EXPORT FOR DEBUGGING 🐛📤
+
+### 🚀 **Added**
+- **Console Log Export System**:
+  - New `consoleInterceptor.js` utility that captures all console output
+  - New `ConsoleLogExporter.js` component with rich debugging UI
+  - Intercepts console.log, console.error, console.warn, console.info with metadata
+  - Stores last 2000 log entries in circular buffer
+  - Smart categorization: calculation, data, api, component, validation, debug
+  - Includes caller context (file name, line number) for each log
+
+- **Export Functionality**:
+  - Export as JSON with full metadata and timestamps
+  - Export as formatted text file for human reading
+  - Export as LLM-optimized format for AI debugging assistance
+  - Copy to clipboard with fallback for older browsers
+  - Download files with timestamped filenames
+
+- **Debug UI Features**:
+  - Floating debug button (🐛) in bottom-right corner
+  - Expandable panel with log viewer
+  - Real-time log streaming with auto-scroll
+  - Filter by log type (error/warn/log/info)
+  - Filter by category (calculation/data/api/component)
+  - Search functionality across all logs
+  - Clear logs functionality
+
+### 🔧 **Fixed**
+- **Export Error Handling**:
+  - Added try-catch blocks for all export functions
+  - Fixed clipboard API compatibility issues
+  - Added fallback prompt for browsers without clipboard support
+  - Fixed undefined property access in LLM export format
+
+### 🎯 **Technical Details**
+- Console interceptor loads early in index.html for complete capture
+- Debug mode activated via `?debug=true` URL parameter
+- Minimal performance impact with efficient circular buffer
+- Component only renders in debug mode to avoid production clutter
+- Works in both local development and production environments
+
+### 📚 **Usage**
+1. Add `?debug=true` to the app URL
+2. Click the floating debug button (🐛)
+3. Use filters and search to find relevant logs
+4. Export logs in your preferred format
+5. Share with developers or LLMs for debugging assistance
+
+---
+
 ## [7.2.0] - 2025-07-29 - FINANCIAL HEALTH SCORE SYSTEM REPAIR 🏥✨
 
 ### 🎯 **MAJOR SYSTEM REPAIR: Fixed Financial Health Score 0% Issues**

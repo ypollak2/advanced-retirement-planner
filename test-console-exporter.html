@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Console Log Exporter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+        h2 {
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+        .info {
+            background: #dbeafe;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐛 Console Log Exporter Test Page</h1>
+        
+        <div class="info">
+            <strong>How to test:</strong>
+            <ol>
+                <li>Open this page with ?debug=true in the URL</li>
+                <li>Click the buttons below to generate different types of logs</li>
+                <li>Look for the floating debug button (🐛) in the bottom-right corner</li>
+                <li>Click it to open the console log exporter</li>
+                <li>Try filtering, searching, and exporting logs</li>
+            </ol>
+        </div>
+        
+        <div class="section">
+            <h2>Generate Test Logs</h2>
+            <button class="btn-primary" onclick="generateCalculationLogs()">Generate Calculation Logs</button>
+            <button class="btn-success" onclick="generateDataLogs()">Generate Data Logs</button>
+            <button class="btn-danger" onclick="generateErrors()">Generate Errors</button>
+            <button class="btn-warning" onclick="generateWarnings()">Generate Warnings</button>
+            <button class="btn-primary" onclick="generateMixedLogs()">Generate Mixed Logs</button>
+        </div>
+        
+        <div class="section">
+            <h2>Test Financial Calculations</h2>
+            <button class="btn-primary" onclick="simulateFinancialCalculation()">Simulate Financial Health Score</button>
+            <button class="btn-success" onclick="simulateRetirementCalculation()">Simulate Retirement Calculation</button>
+        </div>
+        
+        <div class="section">
+            <h2>API Functions</h2>
+            <button class="btn-primary" onclick="exportLogs('json')">Export as JSON</button>
+            <button class="btn-primary" onclick="exportLogs('text')">Export as Text</button>
+            <button class="btn-primary" onclick="exportLogs('llm')">Export for LLM</button>
+            <button class="btn-danger" onclick="clearLogs()">Clear All Logs</button>
+        </div>
+        
+        <div id="status" style="margin-top: 20px; padding: 10px; display: none;"></div>
+    </div>
+    
+    <script>
+        // Generate calculation logs
+        function generateCalculationLogs() {
+            console.log('🧮 Starting financial health calculation...');
+            console.log('Input salary: 35000 ILS');
+            console.log('Calculating gross from net: 35000 / 0.75 = 46667');
+            console.log('Pension contribution: 46667 * 0.175 = 8167');
+            console.log('Training fund contribution: 46667 * 0.075 = 3500');
+            console.log('Total monthly savings: 11667 ILS');
+            console.log('Savings rate score: 75/100');
+            console.log('Retirement readiness: 65/100');
+            console.log('✅ Financial health score calculated: 70/100');
+            showStatus('Generated calculation logs', 'success');
+        }
+        
+        // Generate data logs
+        function generateDataLogs() {
+            console.log('💾 Loading user inputs from localStorage...');
+            console.log('Field mapping: partner1NetSalary -> partner1NetIncome');
+            console.log('Found alternative field name: partner1NetIncome = 28000');
+            console.log('Partner data: { age: 35, salary: 28000, pension: 150000 }');
+            console.log('Couple mode detected, processing partner fields');
+            console.log('Data validation passed: all required fields present');
+            showStatus('Generated data logs', 'success');
+        }
+        
+        // Generate errors
+        function generateErrors() {
+            console.error('❌ Missing required field: targetRetirementAge');
+            console.error('TypeError: Cannot read property "salary" of undefined');
+            console.error('API Error: Failed to fetch stock price for AAPL');
+            console.error('Validation failed: Net salary cannot be higher than gross salary');
+            console.error('Division by zero in retirement calculation');
+            showStatus('Generated error logs', 'danger');
+        }
+        
+        // Generate warnings
+        function generateWarnings() {
+            console.warn('⚠️ Using fallback currency rate for USD');
+            console.warn('LocalStorage quota exceeded, clearing old data');
+            console.warn('Retirement age 55 is below recommended minimum');
+            console.warn('High expense ratio detected: 95% of income');
+            console.warn('No emergency fund specified');
+            showStatus('Generated warning logs', 'warning');
+        }
+        
+        // Generate mixed logs
+        function generateMixedLogs() {
+            console.log('🚀 Application initialized');
+            console.info('ℹ️ Version 7.2.1 loaded');
+            console.log('📊 Loading financial data...');
+            console.warn('⚠️ Exchange rates are 24 hours old');
+            console.log('API request: GET /api/currency/rates');
+            console.log('API response: { USD: 3.7, EUR: 4.1, GBP: 4.8 }');
+            console.error('❌ Failed to load user preferences');
+            console.log('Component mounted: RetirementWizard');
+            console.debug('🔧 Debug: Render cycle #42');
+            console.log('✅ All systems operational');
+            showStatus('Generated mixed logs', 'success');
+        }
+        
+        // Simulate financial calculation
+        function simulateFinancialCalculation() {
+            console.group('Financial Health Calculation');
+            console.log('=== INPUTS ===');
+            console.log('Current Age: 35');
+            console.log('Target Retirement: 67');
+            console.log('Monthly Net Salary: 25,000 ILS');
+            console.log('Current Savings: 350,000 ILS');
+            
+            console.log('=== CALCULATIONS ===');
+            console.time('Calculation Time');
+            console.log('Years to retirement: 32');
+            console.log('Monthly gross (estimated): 33,333 ILS');
+            console.log('Monthly pension contribution: 5,833 ILS');
+            console.log('Expected annual return: 5%');
+            console.log('Projected savings at retirement: 3,450,000 ILS');
+            console.timeEnd('Calculation Time');
+            
+            console.log('=== SCORES ===');
+            console.table({
+                'Savings Rate': 75,
+                'Retirement Readiness': 68,
+                'Emergency Fund': 45,
+                'Diversification': 80,
+                'Overall Score': 67
+            });
+            console.groupEnd();
+            
+            showStatus('Simulated financial calculation', 'success');
+        }
+        
+        // Simulate retirement calculation
+        function simulateRetirementCalculation() {
+            console.group('Retirement Projection');
+            console.log('Starting detailed retirement calculation...');
+            
+            const years = [];
+            for (let i = 0; i < 5; i++) {
+                const age = 35 + i;
+                const savings = 350000 + (i * 140000);
+                years.push({
+                    Age: age,
+                    Savings: savings,
+                    Growth: savings * 0.05,
+                    Total: savings * 1.05
+                });
+                console.log(`Year ${i + 1}: Age ${age}, Savings: ${savings.toLocaleString()} ILS`);
+            }
+            
+            console.table(years);
+            console.log('✅ Retirement projection complete');
+            console.groupEnd();
+            
+            showStatus('Simulated retirement calculation', 'success');
+        }
+        
+        // Export logs
+        function exportLogs(format) {
+            try {
+                const data = window.__exportConsoleLogs(format);
+                if (format === 'llm') {
+                    console.log('📋 LLM-formatted data prepared and logged');
+                    console.log(data);
+                    showStatus('Check console for LLM-formatted output', 'info');
+                } else {
+                    console.log(`📤 Exported logs as ${format}`);
+                    showStatus(`Logs exported as ${format}`, 'success');
+                }
+            } catch (error) {
+                console.error('Export failed:', error);
+                showStatus('Export failed', 'danger');
+            }
+        }
+        
+        // Clear logs
+        function clearLogs() {
+            if (confirm('Clear all captured logs?')) {
+                window.__clearConsoleLogs();
+                showStatus('All logs cleared', 'success');
+            }
+        }
+        
+        // Show status message
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.style.display = 'block';
+            status.style.background = {
+                success: '#d1fae5',
+                danger: '#fee2e2',
+                warning: '#fed7aa',
+                info: '#dbeafe'
+            }[type] || '#f3f4f6';
+            status.style.color = {
+                success: '#065f46',
+                danger: '#991b1b',
+                warning: '#92400e',
+                info: '#1e40af'
+            }[type] || '#374151';
+            status.textContent = message;
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Check debug mode
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (!urlParams.get('debug')) {
+                const info = document.querySelector('.info');
+                info.innerHTML += '<br><strong style="color: red;">⚠️ Debug mode not enabled! Add ?debug=true to the URL to see the console exporter.</strong>';
+            } else {
+                console.log('✅ Debug mode enabled - Console exporter should be visible');
+            }
+        });
+    </script>
+</body>
+</html>

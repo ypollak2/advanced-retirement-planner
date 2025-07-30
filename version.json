@@ -1,5 +1,5 @@
 {
-  "version": "7.2.0",
+  "version": "7.2.1",
   "build": "2025-07-29",
   "commit": "v7.2.0-financial-health-score-repair",
   "description": "Major Financial Health Score system repair with 0% score fixes, real-time updates, debug tools, and enhanced UI/UX"

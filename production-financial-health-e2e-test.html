@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production E2E Test - Financial Health Scoring</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .test-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .instructions {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .test-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-case {
+            margin: 20px 0;
+            padding: 20px;
+            border-left: 4px solid #e0e0e0;
+            background: #f9f9f9;
+            border-radius: 0 8px 8px 0;
+        }
+        .test-data {
+            background: #f0f4f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .steps {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+        .steps li {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .expected {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #5a67d8;
+        }
+        .checklist {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .checklist h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .checklist label {
+            display: block;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        .checklist input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .result-box {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+        .result-box.success {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            display: block;
+        }
+        .result-box.warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            display: block;
+        }
+        .result-box.error {
+            background: #ffebee;
+            border: 1px solid #f44336;
+            display: block;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        .field-reference {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+        .screenshot-placeholder {
+            background: #f0f0f0;
+            border: 2px dashed #999;
+            padding: 40px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 15px 0;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🧪 Production E2E Test - Financial Health Scoring</h1>
+        <p>Manual test suite for validating financial health score fixes on production</p>
+        <p>URL: <a href="https://ypollak2.github.io/advanced-retirement-planner/" target="_blank" style="color: white; text-decoration: underline;">https://ypollak2.github.io/advanced-retirement-planner/</a></p>
+    </div>
+
+    <div class="instructions">
+        <h2>📋 Test Instructions</h2>
+        <p><strong>Important:</strong> This is a manual test suite. Follow each test case step-by-step and record the results.</p>
+        <ol>
+            <li>Open the production URL in a new browser tab</li>
+            <li>Clear browser cache and localStorage to ensure fresh state</li>
+            <li>Follow each test case below and check off completed steps</li>
+            <li>Take screenshots of any failures or unexpected behavior</li>
+            <li>Record actual values vs expected values for each test</li>
+        </ol>
+        <a href="https://ypollak2.github.io/advanced-retirement-planner/" target="_blank" class="btn">Open Production Site</a>
+    </div>
+
+    <div class="test-container">
+        <h2>Test Case 1: Couple Mode with Net Salaries Only</h2>
+        <p><strong>Objective:</strong> Verify financial health scores calculate correctly when only net salaries are provided in couple mode.</p>
+        
+        <div class="test-data">
+            <strong>Test Data:</strong><br>
+            Planning Type: Couple<br>
+            Country: Israel<br>
+            Partner 1 Net Salary: ₪29,500<br>
+            Partner 2 Net Salary: ₪22,000<br>
+            Current Annual Expenses: ₪636,363<br>
+            Current Age: 35<br>
+            Current Pension Savings: ₪100,000<br>
+            Current Training Fund: ₪50,000<br>
+            Current Keren Hishtalmut: ₪200,000<br>
+            Portfolio: Moderate<br>
+            Target Retirement Age: 67
+        </div>
+
+        <div class="steps">
+            <h3>Steps:</h3>
+            <ol>
+                <li>Start new planning session</li>
+                <li>Select "Planning for a couple" option</li>
+                <li>Select "Israel" as country</li>
+                <li>Enter Partner 1 details:
+                    <ul>
+                        <li>Net Salary: 29500</li>
+                        <li>Leave Gross Salary, Bonus, and RSU fields empty</li>
+                    </ul>
+                </li>
+                <li>Enter Partner 2 details:
+                    <ul>
+                        <li>Net Salary: 22000</li>
+                        <li>Leave Gross Salary, Bonus, and RSU fields empty</li>
+                    </ul>
+                </li>
+                <li>Enter expense breakdown totaling ₪636,363 annually</li>
+                <li>Enter savings: Pension: 100000, Training: 50000, Keren: 200000</li>
+                <li>Complete wizard and navigate to Financial Health Score</li>
+            </ol>
+        </div>
+
+        <div class="expected">
+            <h3>Expected Results:</h3>
+            <ul>
+                <li>✅ Total Monthly Income should be approximately ₪51,500 (29,500 + 22,000)</li>
+                <li>✅ Savings Rate Score should be > 0% (not "Missing data")</li>
+                <li>✅ Retirement Readiness Score should be > 0%</li>
+                <li>✅ Risk Alignment Score should show "Moderate" alignment</li>
+                <li>✅ No "Missing required data" warnings should appear</li>
+                <li>✅ Default contribution rates (17.5% pension, 7.5% training) should be applied</li>
+            </ul>
+        </div>
+
+        <div class="checklist">
+            <h3>Test Checklist:</h3>
+            <label><input type="checkbox"> Started new session and selected couple mode</label>
+            <label><input type="checkbox"> Entered only net salaries (no gross salaries)</label>
+            <label><input type="checkbox"> Total monthly income calculated correctly</label>
+            <label><input type="checkbox"> Savings rate score shows valid percentage</label>
+            <label><input type="checkbox"> Retirement readiness score shows valid percentage</label>
+            <label><input type="checkbox"> No "Missing data" errors displayed</label>
+            <label><input type="checkbox"> All scores display properly (no 0% or negative values)</label>
+        </div>
+
+        <div class="result-box" id="test1-result">
+            <h3>Test Result:</h3>
+            <textarea rows="5" style="width: 100%; padding: 10px;" placeholder="Record actual results here..."></textarea>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Test Case 2: Couple Mode with Additional Income</h2>
+        <p><strong>Objective:</strong> Test that bonus, RSU, and other income are properly included in calculations.</p>
+        
+        <div class="test-data">
+            <strong>Test Data:</strong><br>
+            Planning Type: Couple<br>
+            Country: Israel<br>
+            Partner 1 Gross Salary: ₪40,000<br>
+            Partner 1 Net Salary: ₪26,800<br>
+            Partner 1 Annual Bonus: ₪100,000<br>
+            Partner 1 RSU: 100 units @ $150, Quarterly vesting<br>
+            Partner 2 Gross Salary: ₪30,000<br>
+            Partner 2 Net Salary: ₪20,100<br>
+            Partner 2 Annual Bonus: ₪80,000<br>
+            Partner 2 RSU: 50 units @ $200, Quarterly vesting<br>
+            Current Annual Expenses: ₪500,000<br>
+            Other details same as Test 1
+        </div>
+
+        <div class="field-reference">
+            <strong>Field Names to Test:</strong><br>
+            • Partner 1 fields: partner1Salary, partner1NetSalary, annualBonus, rsuUnits, rsuCurrentStockPrice<br>
+            • Partner 2 fields: partner2Salary, partner2NetSalary, partnerAnnualBonus, partnerRsuUnits, partnerRsuCurrentStockPrice
+        </div>
+
+        <div class="steps">
+            <h3>Steps:</h3>
+            <ol>
+                <li>Start new planning session in couple mode</li>
+                <li>Enter BOTH gross and net salaries for each partner</li>
+                <li>Add annual bonuses for both partners</li>
+                <li>Add RSU details for both partners</li>
+                <li>Complete wizard and check Financial Health Score</li>
+                <li>Verify additional income is reflected in total income calculation</li>
+            </ol>
+        </div>
+
+        <div class="expected">
+            <h3>Expected Results:</h3>
+            <ul>
+                <li>✅ Total Monthly Income should be > ₪46,900 (base net salaries)</li>
+                <li>✅ Additional income from bonuses should be included</li>
+                <li>✅ RSU income should be calculated and included</li>
+                <li>✅ Savings Rate Score should be higher due to additional income</li>
+                <li>✅ All income types properly summed in financial health engine</li>
+            </ul>
+        </div>
+
+        <div class="checklist">
+            <h3>Test Checklist:</h3>
+            <label><input type="checkbox"> Entered gross and net salaries for both partners</label>
+            <label><input type="checkbox"> Added bonus amounts for both partners</label>
+            <label><input type="checkbox"> Added RSU details for both partners</label>
+            <label><input type="checkbox"> Total income includes base salaries + bonuses + RSUs</label>
+            <label><input type="checkbox"> Savings rate reflects higher income</label>
+            <label><input type="checkbox"> No calculation errors or NaN values</label>
+        </div>
+
+        <div class="result-box" id="test2-result">
+            <h3>Test Result:</h3>
+            <textarea rows="5" style="width: 100%; padding: 10px;" placeholder="Record actual results here..."></textarea>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Test Case 3: Field Mapping Validation</h2>
+        <p><strong>Objective:</strong> Ensure alternative field names are properly mapped and recognized.</p>
+        
+        <div class="test-data">
+            <strong>Alternative Field Names to Test:</strong><br>
+            • partner1NetIncome (instead of partner1NetSalary)<br>
+            • partner2NetIncome (instead of partner2NetSalary)<br>
+            • partner1BonusAmount (instead of annualBonus)<br>
+            • partner2BonusAmount (instead of partnerAnnualBonus)<br>
+            • netMonthlySalary variations<br>
+            • monthlyNetIncome variations
+        </div>
+
+        <div class="steps">
+            <h3>Console Testing Steps:</h3>
+            <ol>
+                <li>Open browser Developer Console (F12)</li>
+                <li>Navigate to Financial Health Score page</li>
+                <li>Run: <code>console.log(window.financialHealthEngine)</code></li>
+                <li>Check if getFieldValue function exists</li>
+                <li>Test field mapping: <code>window.financialHealthEngine.getFieldValue({partner1NetIncome: 25000}, 'partner1NetSalary')</code></li>
+                <li>Verify it returns 25000 (successful mapping)</li>
+            </ol>
+        </div>
+
+        <div class="expected">
+            <h3>Expected Console Results:</h3>
+            <ul>
+                <li>✅ financialHealthEngine object is available globally</li>
+                <li>✅ getFieldValue function handles alternative field names</li>
+                <li>✅ Field mapping returns correct values for all variations</li>
+                <li>✅ No undefined or null returns for valid field variations</li>
+            </ul>
+        </div>
+
+        <div class="checklist">
+            <h3>Test Checklist:</h3>
+            <label><input type="checkbox"> Console shows financialHealthEngine available</label>
+            <label><input type="checkbox"> getFieldValue function exists and works</label>
+            <label><input type="checkbox"> Alternative net salary fields map correctly</label>
+            <label><input type="checkbox"> Alternative bonus fields map correctly</label>
+            <label><input type="checkbox"> No console errors during field mapping</label>
+        </div>
+
+        <div class="result-box" id="test3-result">
+            <h3>Test Result:</h3>
+            <textarea rows="5" style="width: 100%; padding: 10px;" placeholder="Record console test results here..."></textarea>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Test Case 4: Default Contribution Rates</h2>
+        <p><strong>Objective:</strong> Verify 17.5% pension and 7.5% training fund defaults are applied when not specified.</p>
+        
+        <div class="test-data">
+            <strong>Test Scenario:</strong><br>
+            • Enter only net salaries (no contribution rates)<br>
+            • Do NOT specify pension or training fund contribution percentages<br>
+            • System should apply Israeli defaults: 17.5% pension, 7.5% training fund<br>
+            • Total default contribution: 25% of gross salary
+        </div>
+
+        <div class="steps">
+            <h3>Steps:</h3>
+            <ol>
+                <li>Start new couple planning session</li>
+                <li>Enter only net salaries (e.g., ₪20,000 and ₪15,000)</li>
+                <li>Do NOT enter any contribution percentages</li>
+                <li>Complete wizard and check Financial Health Score</li>
+                <li>Look at savings calculations and projections</li>
+            </ol>
+        </div>
+
+        <div class="expected">
+            <h3>Expected Results:</h3>
+            <ul>
+                <li>✅ Savings rate should reflect ~25% contribution rate</li>
+                <li>✅ Pension projections should use 17.5% rate</li>
+                <li>✅ Training fund projections should use 7.5% rate</li>
+                <li>✅ No zero or missing contribution warnings</li>
+            </ul>
+        </div>
+
+        <div class="checklist">
+            <h3>Test Checklist:</h3>
+            <label><input type="checkbox"> Entered only net salaries (no rates)</label>
+            <label><input type="checkbox"> Savings rate calculated with defaults</label>
+            <label><input type="checkbox"> Pension uses 17.5% default</label>
+            <label><input type="checkbox"> Training fund uses 7.5% default</label>
+            <label><input type="checkbox"> Total contributions equal 25% of gross</label>
+        </div>
+
+        <div class="result-box" id="test4-result">
+            <h3>Test Result:</h3>
+            <textarea rows="5" style="width: 100%; padding: 10px;" placeholder="Record actual results here..."></textarea>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Test Case 5: Score Display Validation</h2>
+        <p><strong>Objective:</strong> Comprehensive check that all scores display correctly without "Missing data" errors.</p>
+        
+        <div class="test-data">
+            <strong>Complete Test Data:</strong><br>
+            Use Test Case 1 data but also add:<br>
+            • Current Emergency Fund: ₪50,000<br>
+            • Housing expenses: ₪15,000/month<br>
+            • Transportation: ₪5,000/month<br>
+            • Food: ₪8,000/month<br>
+            • Healthcare: ₪2,000/month<br>
+            • Education: ₪3,000/month<br>
+            • Entertainment: ₪4,000/month<br>
+            • Other: ₪16,303/month
+        </div>
+
+        <div class="steps">
+            <h3>Steps:</h3>
+            <ol>
+                <li>Enter complete data set as specified</li>
+                <li>Navigate to Financial Health Score page</li>
+                <li>Check each score component individually</li>
+                <li>Take screenshot of the full scorecard</li>
+                <li>Open browser console and check for errors</li>
+            </ol>
+        </div>
+
+        <div class="expected">
+            <h3>Expected Score Display:</h3>
+            <ul>
+                <li>✅ Overall Score: Valid percentage (not 0% or "Missing data")</li>
+                <li>✅ Savings Rate Score: > 0%</li>
+                <li>✅ Retirement Readiness Score: > 0%</li>
+                <li>✅ Risk Alignment Score: Shows proper alignment</li>
+                <li>✅ Debt Management Score: Valid score</li>
+                <li>✅ Diversification Score: Valid score</li>
+                <li>✅ Emergency Fund Score: Valid score</li>
+                <li>✅ Tax Efficiency Score: Valid score</li>
+                <li>✅ No console errors or warnings</li>
+            </ul>
+        </div>
+
+        <div class="checklist">
+            <h3>Final Validation Checklist:</h3>
+            <label><input type="checkbox"> All 8 scores display valid percentages</label>
+            <label><input type="checkbox"> No "Missing data" errors anywhere</label>
+            <label><input type="checkbox"> No 0% scores for required metrics</label>
+            <label><input type="checkbox"> Color coding works (green/yellow/red)</label>
+            <label><input type="checkbox"> Console shows no errors</label>
+            <label><input type="checkbox"> Calculations complete without hanging</label>
+            <label><input type="checkbox"> Screenshot taken of working scorecard</label>
+        </div>
+
+        <div class="result-box" id="test5-result">
+            <h3>Test Result:</h3>
+            <textarea rows="5" style="width: 100%; padding: 10px;" placeholder="Record final validation results here..."></textarea>
+        </div>
+    </div>
+
+    <div class="test-container" style="background: #e3f2fd;">
+        <h2>📊 Overall Test Summary</h2>
+        <div class="checklist">
+            <h3>Production Deployment Validation:</h3>
+            <label><input type="checkbox" id="all-passed"> All 5 test cases passed successfully</label>
+            <label><input type="checkbox"> Financial health scores calculate correctly with net salaries only</label>
+            <label><input type="checkbox"> Bonus and RSU income are properly included</label>
+            <label><input type="checkbox"> Alternative field names are correctly mapped</label>
+            <label><input type="checkbox"> Default contribution rates (17.5% + 7.5%) are applied</label>
+            <label><input type="checkbox"> All scores display without "Missing data" errors</label>
+            <label><input type="checkbox"> No console errors or warnings during testing</label>
+            <label><input type="checkbox"> Performance is acceptable (no hanging or delays)</label>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h3>Final Notes:</h3>
+            <textarea rows="8" style="width: 100%; padding: 10px;" placeholder="Add any additional observations, issues found, or recommendations..."></textarea>
+        </div>
+
+        <div style="margin-top: 20px; text-align: center;">
+            <button class="btn" onclick="showResults()">Show Test Results</button>
+            <button class="btn" onclick="window.print()">Print Report</button>
+        </div>
+    </div>
+
+    <script>
+        function showResults() {
+            document.querySelectorAll('.result-box').forEach(box => {
+                box.classList.add('success');
+            });
+            
+            const allPassed = document.getElementById('all-passed').checked;
+            if (allPassed) {
+                alert('✅ All tests passed! The financial health scoring fix is working correctly in production.');
+            } else {
+                alert('⚠️ Some tests did not pass. Please review the results and provide details in the text areas.');
+            }
+        }
+
+        // Auto-save test results to localStorage
+        document.querySelectorAll('textarea').forEach(textarea => {
+            textarea.addEventListener('input', (e) => {
+                localStorage.setItem('fh-test-' + e.target.id, e.target.value);
+            });
+            
+            // Restore saved values
+            const saved = localStorage.getItem('fh-test-' + textarea.id);
+            if (saved) textarea.value = saved;
+        });
+
+        // Save checkbox states
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                localStorage.setItem('fh-check-' + e.target.id, e.target.checked);
+            });
+            
+            // Restore saved states
+            const saved = localStorage.getItem('fh-check-' + checkbox.id);
+            if (saved === 'true') checkbox.checked = true;
+        });
+    </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v7.2.0 ✨
+# 🚀 Advanced Retirement Planner v7.2.1 ✨
 
-[![Version](https://img.shields.io/badge/version-7.2.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-7.2.1-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -26,6 +26,32 @@
 > **📋 Deployment Status**: GitHub Pages is the primary deployment and is fully operational with the reorganized component structure. Netlify is currently rebuilding after the repository reorganization and should be available shortly.
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki)
+
+## 🎨 What's New in v7.2.1 - CONSOLE LOG EXPORT FOR DEBUGGING 🐛📤
+
+### Major Feature: Production Debugging Tool
+- **Console Log Capture**: Intercepts all console output (log, error, warn, info) with rich metadata
+- **Advanced Filtering**: Filter by log type (error/warn/log/info) and category (calculation/data/api/component)
+- **Smart Categorization**: Automatically categorizes logs based on content for easier analysis
+- **Export Options**: 
+  - JSON format with full metadata for detailed analysis
+  - Text format for human-readable logs
+  - LLM-optimized format for AI debugging assistance
+- **Debug Mode Only**: Accessible via ?debug=true parameter to avoid production UI clutter
+- **Rich UI Interface**: Floating debug button with expandable log viewer
+
+### Technical Details:
+- Early-loading console interceptor captures all logs from app initialization
+- Circular buffer stores last 2000 log entries to prevent memory issues
+- Includes caller context (file, line number) for each log entry
+- Real-time log streaming with auto-scroll functionality
+- Search capability across all captured logs
+
+### Usage:
+1. Add `?debug=true` to URL: `https://ypollak2.github.io/advanced-retirement-planner/?debug=true`
+2. Look for floating debug button (🐛) in bottom-right corner
+3. Click to open console log exporter
+4. Use filters, search, and export logs for debugging
 
 ## 🎨 What's New in v7.2.0 - FINANCIAL HEALTH SCORE SYSTEM REPAIR 🏥✨
 

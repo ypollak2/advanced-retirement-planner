@@ -1,0 +1,324 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Financial Health Test Report",
+  "description": "Schema for production E2E test results of the financial health scoring system",
+  "type": "object",
+  "required": ["metadata", "summary", "tests", "errors", "warnings", "logs", "recommendations"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "Test run metadata and environment information",
+      "required": ["testRunId", "timestamp", "duration", "environment"],
+      "properties": {
+        "testRunId": {
+          "type": "string",
+          "pattern": "^FH-TEST-\\d+-[a-z0-9]+$",
+          "description": "Unique identifier for this test run"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when test started"
+        },
+        "duration": {
+          "type": ["number", "null"],
+          "description": "Total test duration in milliseconds"
+        },
+        "environment": {
+          "type": "object",
+          "required": ["url", "browser", "viewport", "timezone"],
+          "properties": {
+            "url": {
+              "type": "string",
+              "format": "uri",
+              "description": "Production URL tested"
+            },
+            "browser": {
+              "type": "string",
+              "description": "User agent string"
+            },
+            "viewport": {
+              "type": "string",
+              "pattern": "^\\d+x\\d+$",
+              "description": "Browser viewport dimensions"
+            },
+            "timezone": {
+              "type": "string",
+              "description": "Timezone of test execution"
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "description": "High-level test results summary",
+      "required": ["totalTests", "passed", "failed", "skipped", "successRate", "status"],
+      "properties": {
+        "totalTests": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of tests executed"
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of tests that passed"
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of tests that failed"
+        },
+        "skipped": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of tests skipped"
+        },
+        "successRate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Percentage of tests that passed"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "running", "passed", "failed", "aborted"],
+          "description": "Overall test run status"
+        }
+      }
+    },
+    "tests": {
+      "type": "array",
+      "description": "Individual test case results",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "status", "startTime", "endTime", "duration", "assertions"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^test-\\d+$",
+            "description": "Unique test identifier"
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable test name"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "running", "passed", "failed", "skipped"],
+            "description": "Test execution status"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When test execution started"
+          },
+          "endTime": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "When test execution ended"
+          },
+          "duration": {
+            "type": "number",
+            "description": "Test execution time in milliseconds"
+          },
+          "assertions": {
+            "type": "array",
+            "description": "Individual test assertions",
+            "items": {
+              "type": "object",
+              "required": ["description", "expected", "actual", "passed"],
+              "properties": {
+                "description": {
+                  "type": "string",
+                  "description": "What is being tested"
+                },
+                "expected": {
+                  "description": "Expected value or condition"
+                },
+                "actual": {
+                  "description": "Actual value found"
+                },
+                "passed": {
+                  "type": "boolean",
+                  "description": "Whether assertion passed"
+                }
+              }
+            }
+          },
+          "errors": {
+            "type": "array",
+            "description": "Errors encountered during test",
+            "items": {
+              "type": "object",
+              "required": ["message"],
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Error message"
+                },
+                "stack": {
+                  "type": ["string", "null"],
+                  "description": "Stack trace if available"
+                }
+              }
+            }
+          },
+          "testData": {
+            "type": "object",
+            "description": "Test-specific input data",
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "description": "All errors encountered during test run",
+      "items": {
+        "type": "object",
+        "required": ["timestamp", "type", "message"],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "elapsed": {
+            "type": "string",
+            "pattern": "^\\d{2}:\\d{2}:\\d{2}$"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["error"]
+          },
+          "message": {
+            "type": "string"
+          },
+          "testId": {
+            "type": ["string", "null"]
+          },
+          "stack": {
+            "type": ["string", "null"]
+          },
+          "code": {
+            "type": "string",
+            "description": "Error code for categorization"
+          }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "description": "All warnings encountered during test run",
+      "items": {
+        "type": "object",
+        "required": ["timestamp", "type", "message"],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "elapsed": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["warning"]
+          },
+          "message": {
+            "type": "string"
+          },
+          "testId": {
+            "type": ["string", "null"]
+          }
+        }
+      }
+    },
+    "logs": {
+      "type": "array",
+      "description": "Complete test execution log",
+      "items": {
+        "type": "object",
+        "required": ["timestamp", "type", "message"],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "elapsed": {
+            "type": "string",
+            "pattern": "^\\d{2}:\\d{2}:\\d{2}$"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["info", "success", "warning", "error", "debug"]
+          },
+          "message": {
+            "type": "string"
+          },
+          "testId": {
+            "type": ["string", "null"]
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      }
+    },
+    "screenshots": {
+      "type": "array",
+      "description": "Screenshots captured during test execution",
+      "items": {
+        "type": "object",
+        "properties": {
+          "testId": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "description": {
+            "type": "string"
+          },
+          "dataUrl": {
+            "type": "string",
+            "description": "Base64 encoded image data"
+          }
+        }
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "description": "Actionable recommendations based on test results",
+      "items": {
+        "type": "object",
+        "required": ["priority", "message"],
+        "properties": {
+          "priority": {
+            "type": "string",
+            "enum": ["info", "low", "medium", "high", "critical"],
+            "description": "Recommendation priority level"
+          },
+          "message": {
+            "type": "string",
+            "description": "Recommendation description"
+          },
+          "action": {
+            "type": "string",
+            "description": "Specific action to take"
+          },
+          "relatedTests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Test IDs related to this recommendation"
+          }
+        }
+      }
+    }
+  }
+}

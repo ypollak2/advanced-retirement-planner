@@ -23,6 +23,34 @@
   - Verify all 5 test cases pass on https://ypollak2.github.io/advanced-retirement-planner/
   - Document any production-specific issues found
 
+## E2E Testing Suite
+
+**Comprehensive E2E Tests:** 25 browser-based tests covering edge cases and user flows
+- Location: `/tests/e2e/production-tests.html`
+- Categories: Navigation (5), Validation (6), Couple Mode (4), Calculations (5), UI/UX (5)
+
+### Running E2E Tests:
+1. Open `tests/e2e/production-tests.html` in browser
+2. Click "Run All Tests" or run by category
+3. Monitor console for detailed logs
+4. Export results as JSON or Markdown
+
+### Known Issues (from E2E testing):
+1. **LocalStorage restore** - Progress saved but not restored after refresh
+2. **Age validation** - Accepts 0 and negative values
+3. **Net > Gross validation** - Manual entry allows illogical values
+4. **Partner RSU fields** - Missing in couple mode
+5. **API timeouts** - Stock price fetch needs better error handling
+6. **Mobile touch targets** - Buttons < 44px minimum
+7. **Missing data modal** - Not triggering properly
+
+### E2E Test Standards:
+- Each test must be idempotent (can run multiple times)
+- Tests should clean up after themselves
+- Use realistic user data and flows
+- Test both happy paths and edge cases
+- Include accessibility and mobile scenarios
+
 ## Memory Log
 
 - To memorize - you need to have 100% QA testing pass
@@ -33,6 +61,38 @@
   - Use Debug agent for analyzing console logs and stack traces
   - Use Test agent for running specific test scenarios
   - Split complex debugging across multiple agents working in parallel
+
+## Console Log Export Tool (v7.2.1)
+
+**Purpose**: Capture and export console logs from production for debugging
+
+**Activation**: Add `?debug=true` to URL
+- Production: `https://ypollak2.github.io/advanced-retirement-planner/?debug=true`
+- Local: `http://localhost:8080/?debug=true`
+
+**Features**:
+- Captures all console output (log, error, warn, info)
+- Smart categorization (calculation, data, api, component, validation)
+- Filters by type and category
+- Search functionality
+- Export formats: JSON, Text, LLM-optimized
+
+**Usage for Debugging**:
+1. Ask user to enable debug mode with `?debug=true`
+2. Have them reproduce the issue
+3. Ask them to export logs (preferably LLM format)
+4. Analyze the logs to identify:
+   - Error patterns and stack traces
+   - Data flow issues
+   - Calculation problems
+   - Missing or invalid data
+
+**Common Issues to Look For**:
+- Division by zero in calculations
+- Missing required fields (showing as 0 or undefined)
+- Currency conversion errors
+- Partner field mapping issues
+- API failures or timeouts
 
 ## Audit Process Documentation
 
