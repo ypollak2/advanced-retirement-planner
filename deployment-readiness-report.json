@@ -1,0 +1,31 @@
+{
+  "passed": [
+    "Node.js version check",
+    "Version consistency",
+    "Full test suite",
+    "License compliance check",
+    "Secret scanner",
+    "Performance tests",
+    "Clean working directory",
+    "Correct branch"
+  ],
+  "failed": [],
+  "warnings": [
+    "NPM security audit"
+  ],
+  "testResults": {},
+  "versionInfo": {
+    "package": "7.3.3",
+    "versionFile": "7.3.3",
+    "readme": "7.3.3",
+    "buildDate": "2025-07-30",
+    "description": "Removed number key navigation that interfered with form inputs, improved keyboard UX"
+  },
+  "timestamp": "2025-07-30T20:38:46.327Z",
+  "summary": {
+    "ready": true,
+    "passedChecks": 8,
+    "failedChecks": 0,
+    "warnings": 1
+  }
+}
