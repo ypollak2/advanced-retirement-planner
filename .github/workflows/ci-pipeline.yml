@@ -134,11 +134,20 @@ jobs:
           TEST_OUTPUT=$(npm test 2>&1)
           echo "$TEST_OUTPUT"
           
-          # Extract test results
-          PASSED=$(echo "$TEST_OUTPUT" | grep -oE 'Tests Passed: [0-9]+' | grep -oE '[0-9]+' || echo "0")
-          FAILED=$(echo "$TEST_OUTPUT" | grep -oE 'Tests Failed: [0-9]+' | grep -oE '[0-9]+' || echo "0")
+          # Extract test results with debugging
+          PASSED=$(echo "$TEST_OUTPUT" | grep -oE '✅ Tests Passed: [0-9]+' | grep -oE '[0-9]+' || echo "0")
+          FAILED=$(echo "$TEST_OUTPUT" | grep -oE '❌ Tests Failed: [0-9]+' | grep -oE '[0-9]+' || echo "0")
+          SUCCESS_RATE=$(echo "$TEST_OUTPUT" | grep -oE '📈 Success Rate: [0-9.]+%' | grep -oE '[0-9.]+' || echo "0")
+          
+          # Debugging output
+          echo "🔍 Debug - PASSED: '$PASSED'"
+          echo "🔍 Debug - FAILED: '$FAILED'"
+          echo "🔍 Debug - SUCCESS_RATE: '$SUCCESS_RATE'"
+          
+          # Ensure we have valid numbers (default to 0 if empty)
+          PASSED=${PASSED:-0}
+          FAILED=${FAILED:-0}
           TOTAL=$((PASSED + FAILED))
-          SUCCESS_RATE=$(echo "$TEST_OUTPUT" | grep -oE 'Success Rate: [0-9.]+%' | grep -oE '[0-9.]+' || echo "0")
           
           echo "results={\"passed\": $PASSED, \"total\": $TOTAL, \"rate\": \"$SUCCESS_RATE\"}" >> $GITHUB_OUTPUT
           echo "coverage=$SUCCESS_RATE" >> $GITHUB_OUTPUT
@@ -423,7 +432,6 @@ jobs:
         if: always()
         with:
           script: |
-            const { context } = require('@actions/github');
             const status = '${{ steps.summary.outputs.status }}';
             
             // Set commit status for branch protection
