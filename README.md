@@ -2,10 +2,11 @@
 
 [![Version](https://img.shields.io/badge/version-7.3.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-100%25-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-374%2F374-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
 [![Accessibility](https://img.shields.io/badge/accessibility-85.7%25-brightgreen.svg)](tests/accessibility-test.js)
 [![UX](https://img.shields.io/badge/UX-92.8%25-brightgreen.svg)](tests/user-experience-test.js)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF.svg)](.github/workflows/)
 [![Deployment](https://img.shields.io/badge/deployment-Netlify%20%2B%20GitHub%20Pages-4078c0.svg)](https://advanced-pension-planner.netlify.app/)
 
 **Professional-grade retirement planning application with:**
