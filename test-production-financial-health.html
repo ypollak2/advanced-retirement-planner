@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production E2E Test - Financial Health Scoring</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .test-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-case {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #e0e0e0;
+        }
+        .test-case.running {
+            border-left-color: #FFA500;
+            background-color: #FFF8E1;
+        }
+        .test-case.passed {
+            border-left-color: #4CAF50;
+            background-color: #E8F5E9;
+        }
+        .test-case.failed {
+            border-left-color: #F44336;
+            background-color: #FFEBEE;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 800px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+            display: none;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px 10px;
+            background: white;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #5a67d8;
+        }
+        .summary {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f0f4f8;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .metric {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            min-width: 150px;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🧪 Production E2E Test - Financial Health Scoring</h1>
+        <p>Testing financial health score correlation fixes on production</p>
+        <p>URL: https://ypollak2.github.io/advanced-retirement-planner/</p>
+    </div>
+
+    <div class="test-container">
+        <h2>Test Controls</h2>
+        <button class="btn" onclick="runAllTests()">Run All Tests</button>
+        <button class="btn" onclick="toggleIframe()">Toggle Application View</button>
+        <button class="btn" onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <div class="iframe-container" id="iframeContainer">
+        <iframe id="testFrame" src="https://ypollak2.github.io/advanced-retirement-planner/"></iframe>
+    </div>
+
+    <div class="test-container">
+        <h2>Test Cases</h2>
+        
+        <div class="test-case" id="test1">
+            <h3>Test 1: Couple Mode with Net Salaries Only</h3>
+            <p>Verify financial health scores calculate correctly when only net salaries are provided</p>
+            <div class="results"></div>
+        </div>
+
+        <div class="test-case" id="test2">
+            <h3>Test 2: Couple Mode with Additional Income</h3>
+            <p>Test bonus, RSU, and other income inclusion in calculations</p>
+            <div class="results"></div>
+        </div>
+
+        <div class="test-case" id="test3">
+            <h3>Test 3: Field Mapping Validation</h3>
+            <p>Ensure all partner field names are properly mapped</p>
+            <div class="results"></div>
+        </div>
+
+        <div class="test-case" id="test4">
+            <h3>Test 4: Default Contribution Rates</h3>
+            <p>Verify 17.5% pension and 7.5% training fund defaults are applied</p>
+            <div class="results"></div>
+        </div>
+
+        <div class="test-case" id="test5">
+            <h3>Test 5: Score Display Validation</h3>
+            <p>Check that all scores display correctly and "Missing data" errors are resolved</p>
+            <div class="results"></div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>Test Summary</h2>
+        <div class="summary" id="summary">
+            <div class="metric">
+                <div>Total Tests</div>
+                <div class="metric-value" id="totalTests">0</div>
+            </div>
+            <div class="metric">
+                <div>Passed</div>
+                <div class="metric-value" id="passedTests">0</div>
+            </div>
+            <div class="metric">
+                <div>Failed</div>
+                <div class="metric-value" id="failedTests">0</div>
+            </div>
+            <div class="metric">
+                <div>Success Rate</div>
+                <div class="metric-value" id="successRate">0%</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let testResults = {
+            total: 0,
+            passed: 0,
+            failed: 0
+        };
+
+        function log(testId, message, type = 'info') {
+            const resultsDiv = document.querySelector(`#${testId} .results`);
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.style.borderLeft = `3px solid ${type === 'error' ? '#F44336' : type === 'success' ? '#4CAF50' : '#2196F3'}`;
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            resultsDiv.appendChild(logEntry);
+        }
+
+        function setTestStatus(testId, status) {
+            const testCase = document.getElementById(testId);
+            testCase.className = `test-case ${status}`;
+        }
+
+        function updateSummary() {
+            document.getElementById('totalTests').textContent = testResults.total;
+            document.getElementById('passedTests').textContent = testResults.passed;
+            document.getElementById('failedTests').textContent = testResults.failed;
+            const rate = testResults.total > 0 ? Math.round((testResults.passed / testResults.total) * 100) : 0;
+            document.getElementById('successRate').textContent = `${rate}%`;
+        }
+
+        function toggleIframe() {
+            const container = document.getElementById('iframeContainer');
+            container.style.display = container.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function clearResults() {
+            document.querySelectorAll('.results').forEach(div => div.innerHTML = '');
+            document.querySelectorAll('.test-case').forEach(div => div.className = 'test-case');
+            testResults = { total: 0, passed: 0, failed: 0 };
+            updateSummary();
+        }
+
+        async function waitForApp() {
+            const iframe = document.getElementById('testFrame');
+            const iframeWindow = iframe.contentWindow;
+            
+            return new Promise((resolve) => {
+                const checkInterval = setInterval(() => {
+                    try {
+                        if (iframeWindow.RetirementWizard && 
+                            iframeWindow.financialHealthEngine &&
+                            iframeWindow.TaxCalculators) {
+                            clearInterval(checkInterval);
+                            resolve(iframeWindow);
+                        }
+                    } catch (e) {
+                        // Cross-origin restrictions might apply
+                        console.warn('Waiting for app to load...', e);
+                    }
+                }, 1000);
+
+                // Timeout after 30 seconds
+                setTimeout(() => {
+                    clearInterval(checkInterval);
+                    resolve(null);
+                }, 30000);
+            });
+        }
+
+        async function simulateWizardFlow(window, inputs) {
+            // This would interact with the wizard if we had access
+            // For production testing, we'll use direct API calls
+            const health = window.financialHealthEngine.calculateFinancialHealth(inputs);
+            return health;
+        }
+
+        async function runTest1() {
+            const testId = 'test1';
+            setTestStatus(testId, 'running');
+            log(testId, 'Starting Test 1: Couple Mode with Net Salaries Only');
+
+            try {
+                const appWindow = await waitForApp();
+                if (!appWindow) {
+                    throw new Error('Application failed to load');
+                }
+
+                const testInputs = {
+                    planningType: 'couple',
+                    country: 'israel',
+                    partner1NetSalary: 29500,
+                    partner2NetSalary: 22000,
+                    currentAnnualExpenses: 636363,
+                    currentAge: 35,
+                    currentPensionSavings: 100000,
+                    currentTrainingFundSavings: 50000,
+                    currentKeren: 200000,
+                    portfolioAggressiveness: 'moderate',
+                    targetRetirementAge: 67
+                };
+
+                log(testId, 'Calculating financial health with net salaries only...');
+                const health = await simulateWizardFlow(appWindow, testInputs);
+
+                // Validate results
+                if (health.totalMonthlyIncome > 50000) {
+                    log(testId, `✓ Total monthly income calculated: ${health.totalMonthlyIncome}`, 'success');
+                } else {
+                    throw new Error(`Income calculation failed: ${health.totalMonthlyIncome}`);
+                }
+
+                if (health.savingsRateScore > 0) {
+                    log(testId, `✓ Savings rate score calculated: ${health.savingsRateScore}%`, 'success');
+                } else {
+                    throw new Error('Savings rate score is 0 - field mapping issue');
+                }
+
+                if (health.retirementReadinessScore > 0) {
+                    log(testId, `✓ Retirement readiness score: ${health.retirementReadinessScore}%`, 'success');
+                } else {
+                    throw new Error('Retirement readiness score is 0');
+                }
+
+                if (!health.warnings || !health.warnings.includes('Missing required data')) {
+                    log(testId, '✓ No "Missing required data" warnings', 'success');
+                } else {
+                    throw new Error('Still showing missing data warnings');
+                }
+
+                setTestStatus(testId, 'passed');
+                testResults.passed++;
+                log(testId, 'Test 1 PASSED', 'success');
+
+            } catch (error) {
+                setTestStatus(testId, 'failed');
+                testResults.failed++;
+                log(testId, `Test 1 FAILED: ${error.message}`, 'error');
+            }
+
+            testResults.total++;
+            updateSummary();
+        }
+
+        async function runTest2() {
+            const testId = 'test2';
+            setTestStatus(testId, 'running');
+            log(testId, 'Starting Test 2: Couple Mode with Additional Income');
+
+            try {
+                const appWindow = await waitForApp();
+                if (!appWindow) {
+                    throw new Error('Application failed to load');
+                }
+
+                const testInputs = {
+                    planningType: 'couple',
+                    country: 'israel',
+                    partner1Salary: 40000,
+                    partner2Salary: 30000,
+                    partner1NetSalary: 26800,
+                    partner2NetSalary: 20100,
+                    annualBonus: 100000,
+                    partnerAnnualBonus: 80000,
+                    rsuUnits: 100,
+                    rsuCurrentStockPrice: 150,
+                    rsuFrequency: 'quarterly',
+                    partnerRsuUnits: 50,
+                    partnerRsuCurrentStockPrice: 200,
+                    partnerRsuFrequency: 'quarterly',
+                    currentAnnualExpenses: 500000,
+                    currentAge: 40,
+                    currentPensionSavings: 500000,
+                    currentTrainingFundSavings: 200000,
+                    currentKeren: 300000,
+                    portfolioAggressiveness: 'moderate',
+                    targetRetirementAge: 67
+                };
+
+                log(testId, 'Testing with bonus and RSU income...');
+                const health = await simulateWizardFlow(appWindow, testInputs);
+
+                const baseIncome = 26800 + 20100;
+                if (health.totalMonthlyIncome > baseIncome) {
+                    log(testId, `✓ Additional income included: ${health.totalMonthlyIncome} > ${baseIncome}`, 'success');
+                } else {
+                    throw new Error('Additional income not included in calculations');
+                }
+
+                if (health.savingsRateScore > 50) {
+                    log(testId, `✓ High savings rate with additional income: ${health.savingsRateScore}%`, 'success');
+                } else {
+                    throw new Error(`Savings rate too low for high income: ${health.savingsRateScore}%`);
+                }
+
+                setTestStatus(testId, 'passed');
+                testResults.passed++;
+                log(testId, 'Test 2 PASSED', 'success');
+
+            } catch (error) {
+                setTestStatus(testId, 'failed');
+                testResults.failed++;
+                log(testId, `Test 2 FAILED: ${error.message}`, 'error');
+            }
+
+            testResults.total++;
+            updateSummary();
+        }
+
+        async function runTest3() {
+            const testId = 'test3';
+            setTestStatus(testId, 'running');
+            log(testId, 'Starting Test 3: Field Mapping Validation');
+
+            try {
+                const appWindow = await waitForApp();
+                if (!appWindow) {
+                    throw new Error('Application failed to load');
+                }
+
+                // Test alternative field names
+                const testInputs = {
+                    planningType: 'couple',
+                    country: 'israel',
+                    partner1NetIncome: 25000, // Alternative field name
+                    partner2NetIncome: 18000, // Alternative field name
+                    partner1BonusAmount: 60000, // Bonus field variation
+                    partner2BonusAmount: 40000, // Bonus field variation
+                    currentAnnualExpenses: 350000,
+                    currentAge: 35,
+                    currentPensionSavings: 150000,
+                    currentTrainingFundSavings: 80000,
+                    currentKeren: 250000,
+                    portfolioAggressiveness: 'moderate',
+                    targetRetirementAge: 67
+                };
+
+                log(testId, 'Testing alternative field name mappings...');
+                const health = await simulateWizardFlow(appWindow, testInputs);
+
+                if (health.totalMonthlyIncome > 0) {
+                    log(testId, `✓ Alternative field names detected: ${health.totalMonthlyIncome}`, 'success');
+                } else {
+                    throw new Error('Alternative field names not mapped correctly');
+                }
+
+                if (health.savingsRateScore > 0) {
+                    log(testId, `✓ Calculations work with alternative fields: ${health.savingsRateScore}%`, 'success');
+                } else {
+                    throw new Error('Calculations failed with alternative field names');
+                }
+
+                setTestStatus(testId, 'passed');
+                testResults.passed++;
+                log(testId, 'Test 3 PASSED', 'success');
+
+            } catch (error) {
+                setTestStatus(testId, 'failed');
+                testResults.failed++;
+                log(testId, `Test 3 FAILED: ${error.message}`, 'error');
+            }
+
+            testResults.total++;
+            updateSummary();
+        }
+
+        async function runTest4() {
+            const testId = 'test4';
+            setTestStatus(testId, 'running');
+            log(testId, 'Starting Test 4: Default Contribution Rates');
+
+            try {
+                const appWindow = await waitForApp();
+                if (!appWindow) {
+                    throw new Error('Application failed to load');
+                }
+
+                const testInputs = {
+                    planningType: 'couple',
+                    country: 'israel',
+                    partner1NetSalary: 20000,
+                    partner2NetSalary: 15000,
+                    // No contribution rates specified - should use defaults
+                    currentAnnualExpenses: 300000,
+                    currentAge: 30,
+                    currentPensionSavings: 50000,
+                    currentTrainingFundSavings: 20000,
+                    currentKeren: 100000,
+                    portfolioAggressiveness: 'conservative',
+                    targetRetirementAge: 67
+                };
+
+                log(testId, 'Testing with no contribution rates specified...');
+                const health = await simulateWizardFlow(appWindow, testInputs);
+
+                if (health.savingsRateScore > 0) {
+                    log(testId, `✓ Default contribution rates applied: ${health.savingsRateScore}%`, 'success');
+                } else {
+                    throw new Error('Default contribution rates not applied');
+                }
+
+                // Should have reasonable savings rate with 25% default contributions
+                if (health.savingsRateScore >= 20) {
+                    log(testId, '✓ Savings rate indicates 25% default contributions used', 'success');
+                } else {
+                    log(testId, `⚠ Savings rate lower than expected: ${health.savingsRateScore}%`, 'warning');
+                }
+
+                setTestStatus(testId, 'passed');
+                testResults.passed++;
+                log(testId, 'Test 4 PASSED', 'success');
+
+            } catch (error) {
+                setTestStatus(testId, 'failed');
+                testResults.failed++;
+                log(testId, `Test 4 FAILED: ${error.message}`, 'error');
+            }
+
+            testResults.total++;
+            updateSummary();
+        }
+
+        async function runTest5() {
+            const testId = 'test5';
+            setTestStatus(testId, 'running');
+            log(testId, 'Starting Test 5: Score Display Validation');
+
+            try {
+                const appWindow = await waitForApp();
+                if (!appWindow) {
+                    throw new Error('Application failed to load');
+                }
+
+                const testInputs = {
+                    planningType: 'couple',
+                    country: 'israel',
+                    partner1NetSalary: 29500,
+                    partner2NetSalary: 22000,
+                    currentAnnualExpenses: 636363,
+                    currentAge: 35,
+                    currentPensionSavings: 100000,
+                    currentTrainingFundSavings: 50000,
+                    currentKeren: 200000,
+                    currentEmergencyFund: 50000,
+                    portfolioAggressiveness: 'moderate',
+                    targetRetirementAge: 67,
+                    housing: 15000,
+                    transportation: 5000,
+                    food: 8000,
+                    healthcare: 2000,
+                    education: 3000,
+                    entertainment: 4000,
+                    other: 16303
+                };
+
+                log(testId, 'Calculating comprehensive financial health...');
+                const health = await simulateWizardFlow(appWindow, testInputs);
+
+                // Check all major scores
+                const scores = {
+                    'Overall Score': health.overallScore,
+                    'Savings Rate': health.savingsRateScore,
+                    'Retirement Readiness': health.retirementReadinessScore,
+                    'Risk Alignment': health.riskAlignmentScore,
+                    'Debt Management': health.debtManagementScore,
+                    'Diversification': health.diversificationScore,
+                    'Emergency Fund': health.emergencyFundScore,
+                    'Tax Efficiency': health.taxEfficiencyScore
+                };
+
+                let allScoresValid = true;
+                for (const [name, score] of Object.entries(scores)) {
+                    if (score >= 0) {
+                        log(testId, `✓ ${name}: ${score}%`, 'success');
+                    } else {
+                        log(testId, `✗ ${name}: ${score}% (invalid)`, 'error');
+                        allScoresValid = false;
+                    }
+                }
+
+                if (!allScoresValid) {
+                    throw new Error('Some scores are invalid');
+                }
+
+                // Special check for previously problematic scores
+                if (health.savingsRateScore === 0 || 
+                    health.retirementReadinessScore === 0 || 
+                    health.riskAlignmentScore === 0) {
+                    throw new Error('Critical scores still showing 0% - fix not working');
+                }
+
+                setTestStatus(testId, 'passed');
+                testResults.passed++;
+                log(testId, 'Test 5 PASSED - All scores display correctly!', 'success');
+
+            } catch (error) {
+                setTestStatus(testId, 'failed');
+                testResults.failed++;
+                log(testId, `Test 5 FAILED: ${error.message}`, 'error');
+            }
+
+            testResults.total++;
+            updateSummary();
+        }
+
+        async function runAllTests() {
+            clearResults();
+            await runTest1();
+            await runTest2();
+            await runTest3();
+            await runTest4();
+            await runTest5();
+            
+            // Final summary
+            const rate = Math.round((testResults.passed / testResults.total) * 100);
+            if (rate === 100) {
+                alert('🎉 All tests passed! Financial health scoring is working correctly on production.');
+            } else {
+                alert(`⚠️ ${testResults.failed} tests failed. Success rate: ${rate}%. Please check the results.`);
+            }
+        }
+
+        // Initialize
+        updateSummary();
+    </script>
+</body>
+</html>

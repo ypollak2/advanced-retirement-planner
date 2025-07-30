@@ -18,6 +18,10 @@
 - Security tests must pass (no vulnerabilities)
 - Syntax validation must pass for all JavaScript files
 - Component export validation must pass
+- AFTER DEPLOYMENT: Run E2E tests on production URL
+  - Use test-production-financial-health.html for financial health scoring validation
+  - Verify all 5 test cases pass on https://ypollak2.github.io/advanced-retirement-planner/
+  - Document any production-specific issues found
 
 ## Memory Log
 
