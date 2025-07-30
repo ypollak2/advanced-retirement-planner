@@ -136,15 +136,16 @@ jobs:
           
           # Extract test results
           PASSED=$(echo "$TEST_OUTPUT" | grep -oE 'Tests Passed: [0-9]+' | grep -oE '[0-9]+' || echo "0")
-          TOTAL=$(echo "$TEST_OUTPUT" | grep -oE 'Success Rate:.*Tests Passed: ([0-9]+)' | grep -oE '[0-9]+' | head -1 || echo "381")
+          FAILED=$(echo "$TEST_OUTPUT" | grep -oE 'Tests Failed: [0-9]+' | grep -oE '[0-9]+' || echo "0")
+          TOTAL=$((PASSED + FAILED))
           SUCCESS_RATE=$(echo "$TEST_OUTPUT" | grep -oE 'Success Rate: [0-9.]+%' | grep -oE '[0-9.]+' || echo "0")
           
           echo "results={\"passed\": $PASSED, \"total\": $TOTAL, \"rate\": \"$SUCCESS_RATE\"}" >> $GITHUB_OUTPUT
           echo "coverage=$SUCCESS_RATE" >> $GITHUB_OUTPUT
           
           # Fail if not 100% pass rate
-          if [ "$PASSED" -ne "$TOTAL" ]; then
-            echo "❌ Not all tests passed! Required: $TOTAL, Passed: $PASSED"
+          if [ -z "$PASSED" ] || [ -z "$TOTAL" ] || [ "$PASSED" -ne "$TOTAL" ]; then
+            echo "❌ Not all tests passed! Required: $TOTAL, Passed: $PASSED, Failed: $FAILED"
             exit 1
           else
             echo "✅ All $TOTAL tests passed!"
