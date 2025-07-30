@@ -26,15 +26,8 @@ function handleWizardKeyNavigation(event, currentStep, totalSteps, onNext, onPre
         }
     }
     
-    // Number keys for direct step navigation
-    if (!event.ctrlKey && !event.altKey && !event.shiftKey) {
-        const num = parseInt(key);
-        if (num >= 1 && num <= totalSteps && num <= 9) {
-            event.preventDefault();
-            // This would need to be connected to a step change handler
-            window.dispatchEvent(new CustomEvent('wizardStepChange', { detail: { step: num } }));
-        }
-    }
+    // Removed number key navigation - interferes with form inputs
+    // Users should use Alt+Arrow keys or click navigation buttons
 }
 
 // Focus management for form inputs
@@ -160,7 +153,6 @@ function getKeyboardShortcuts(language = 'en') {
             shortcuts: [
                 'Alt + Right Arrow: Next step',
                 'Alt + Left Arrow: Previous step',
-                'Number keys (1-9): Jump to step',
                 'Tab: Move between fields',
                 'Shift + Tab: Move backwards',
                 'Enter: Submit form',
@@ -172,7 +164,6 @@ function getKeyboardShortcuts(language = 'en') {
             shortcuts: [
                 'Alt + חץ ימינה: השלב הבא',
                 'Alt + חץ שמאלה: השלב הקודם',
-                'מקשי מספרים (1-9): קפיצה לשלב',
                 'Tab: מעבר בין שדות',
                 'Shift + Tab: מעבר אחורה',
                 'Enter: שליחת טופס',
