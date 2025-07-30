@@ -1,6 +1,6 @@
 {
   "version": "7.3.0",
-  "build": "2025-07-29",
-  "commit": "v7.2.0-financial-health-score-repair",
-  "description": "Major Financial Health Score system repair with 0% score fixes, real-time updates, debug tools, and enhanced UI/UX"
+  "build": "2025-07-30",
+  "commit": "v7.3.0-accessibility-improvements",
+  "description": "Comprehensive test suite with 100% pass rate, WCAG 2.1 accessibility compliance, keyboard navigation, and repository organization"
 }

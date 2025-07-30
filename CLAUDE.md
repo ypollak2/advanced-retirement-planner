@@ -160,7 +160,7 @@ When planning a task, follow these rules:
 
 ## Updated Test Requirements
 
-- All 302 tests must pass (increased from 245)
+- All 374 tests must pass (updated from 302)
 - Test categories:
   - File structure tests
   - Syntax validation tests  
@@ -168,8 +168,28 @@ When planning a task, follow these rules:
   - Integration tests
   - Couple mode tests
   - Financial calculation tests
+  - **NEW: Component render validation tests**
 - Run `npm test` before EVERY commit
+- Run `npm run validate:components` before deployment
 - New features require corresponding tests
+
+## Component Runtime Validation (CRITICAL)
+
+**Problem**: Syntax validation alone doesn't catch runtime initialization errors like "Cannot access before initialization"
+
+**Solution**: Always validate component rendering before deployment:
+1. Run `npm run validate:components` - validates all components can initialize
+2. Check for common errors:
+   - Variables used before declaration in useEffect
+   - Circular dependencies
+   - Missing React hooks dependencies
+3. CI/CD pipeline includes automatic component validation
+
+**Prevention Rules**:
+- Define all functions BEFORE useEffect hooks that use them
+- Use React.useCallback for functions used in dependencies
+- Never reference a function in useEffect before it's declared
+- Test components can mount/unmount without errors
 
 ## State and Data Persistence
 
@@ -214,16 +234,18 @@ When planning a task, follow these rules:
 ## Pre-Deployment Code Review
 
 Before ANY deployment:
-1. [ ] All 302 tests passing
-2. [ ] Version bumped correctly
-3. [ ] CHANGELOG.md updated
-4. [ ] No console.error in browser
-5. [ ] Tested in couple mode
-6. [ ] Tested offline scenario
-7. [ ] Currency conversion working
-8. [ ] Mobile responsive tested
-9. [ ] Hebrew/English both working
-10. [ ] Backward compatibility verified
+1. [ ] All 374 tests passing
+2. [ ] Component render validation passing (`npm run validate:components`)
+3. [ ] Version bumped correctly
+4. [ ] CHANGELOG.md updated
+5. [ ] No console.error in browser
+6. [ ] Tested in couple mode
+7. [ ] Tested offline scenario
+8. [ ] Currency conversion working
+9. [ ] Mobile responsive tested
+10. [ ] Hebrew/English both working
+11. [ ] Backward compatibility verified
+12. [ ] No runtime initialization errors
 
 ## Debug and Logging Standards
 
