@@ -100,7 +100,6 @@ jobs:
         if grep -r -i "api[_-]key\|secret\|password\|token" \
           --include="*.html" --include="*.js" --include="*.json" . \
           --exclude="package-lock.json" \
-          --exclude="package.json" \
           --exclude="*.credential-scanner*.json" \
           --exclude="deployment-readiness-report.json" \
           --exclude-dir="node_modules" \
@@ -123,7 +122,9 @@ jobs:
           grep -v "// crypto asset (not auth token)" | \
           grep -v "crypto asset type" | \
           grep -v "Token.*crypto asset" | \
-          grep -v "selectToken.*crypto asset selector"; then
+          grep -v "selectToken.*crypto asset selector" | \
+          grep -v "security:scan.*secret-scanner" | \
+          grep -v "scripts/secret-scanner.js"; then
           echo "⚠️ Potential sensitive data found - please review"
           echo "If this is a false positive, update the security workflow to exclude the pattern"
           exit 1
