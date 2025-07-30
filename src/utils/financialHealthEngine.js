@@ -148,6 +148,46 @@ function getFieldValue(inputs, fieldNames, options = {}) {
     logger.fieldSearch(`Searching for fields: ${fieldNames.join(', ')}`);
     logger.debug(`Planning type: ${inputs.planningType}, Combine partners: ${combinePartners}`);
     
+    // PHASE 0.5: Direct E2E Test field mapping
+    // Map common E2E test field names to standard patterns before normal lookup
+    const e2eFieldMappings = {
+        'currentMonthlySalary': ['currentMonthlySalary', 'monthlySalary', 'salary'],
+        'current401k': ['current401k', 'current401K', '401k', '401K'],
+        'currentCrypto': ['currentCrypto', 'cryptoValue', 'cryptocurrency'],
+        'currentPersonalPortfolio': ['currentPersonalPortfolio', 'currentPortfolio', 'portfolio'],
+        'currentBankAccount': ['currentBankAccount', 'bankAccount', 'savingsAccount'],
+        'currentRealEstate': ['currentRealEstate', 'realEstate', 'propertyValue'],
+        'monthlyAdditionalSavings': ['monthlyAdditionalSavings', 'additionalMonthlySavings', 'monthlyContribution'],
+        'emergencyFund': ['emergencyFund', 'currentEmergencyFund', 'emergencySavings'],
+        'currentPensionSavings': ['currentPensionSavings', 'pensionSavings', 'currentSavings']
+    };
+    
+    // Check if any fieldName has a direct E2E mapping and if that field exists
+    for (const fieldName of fieldNames) {
+        if (e2eFieldMappings[fieldName]) {
+            for (const e2eField of e2eFieldMappings[fieldName]) {
+                if (inputs[e2eField] !== undefined) {
+                    const value = parseFloat(inputs[e2eField]);
+                    if (!isNaN(value) && (allowZero || value > 0)) {
+                        logger.fieldFound(`Found E2E field ${e2eField}: ${value}`);
+                        return value;
+                    }
+                }
+            }
+        }
+    }
+    
+    // Also check if inputs contain E2E field names that match our target patterns
+    for (const [e2eField, mappings] of Object.entries(e2eFieldMappings)) {
+        if (inputs[e2eField] !== undefined && fieldNames.some(f => mappings.includes(f))) {
+            const value = parseFloat(inputs[e2eField]);
+            if (!isNaN(value) && (allowZero || value > 0)) {
+                logger.fieldFound(`Found E2E mapping ${e2eField}: ${value}`);
+                return value;
+            }
+        }
+    }
+
     // PHASE 0: Use field mapping dictionary if available
     if (fieldMappingDictionary && fieldMappingDictionary.FIELD_MAPPINGS) {
         logger.debug('Using field mapping dictionary for enhanced field detection');
@@ -348,6 +388,7 @@ function getFieldValue(inputs, fieldNames, options = {}) {
                 'monthlySalary', 'grossSalary', 'currentSalary', 'salary', 'income', 'monthlyIncome',
                 'currentMonthlySalary', 'monthly_salary', 'gross_salary', 'current_salary',
                 'netSalary', 'baseSalary', 'annualSalary', 'yearlyIncome', 'totalIncome',
+                'monthlyIncomeAmount', 'mainMonthlySalary', 'mainSalary',
                 // Partner variations
                 'partner1Salary', 'partner2Salary', 'Partner1Salary', 'Partner2Salary',
                 'partner1Income', 'partner2Income', 'partner1MonthlySalary', 'partner2MonthlySalary'
@@ -376,6 +417,56 @@ function getFieldValue(inputs, fieldNames, options = {}) {
             fallbackPatterns.push(
                 'currentSavings', 'totalSavings', 'savings', 'currentSavingsAmount',
                 'pensionSavings', 'retirementSavings', 'totalCurrentSavings'
+            );
+        }
+        
+        // For portfolio fields from E2E tests
+        if (lowerField.includes('portfolio')) {
+            fallbackPatterns.push(
+                'currentPortfolio', 'currentPersonalPortfolio', 'personalPortfolio', 'portfolio',
+                'portfolioValue', 'currentPortfolioValue', 'stockPortfolio', 'investmentPortfolio',
+                'partnerPortfolio', 'partner1Portfolio', 'partner2Portfolio'
+            );
+        }
+        
+        // For crypto fields from E2E tests
+        if (lowerField.includes('crypto')) {
+            fallbackPatterns.push(
+                'currentCrypto', 'cryptoValue', 'cryptocurrency', 'cryptoPortfolio',
+                'currentCryptocurrency', 'cryptoInvestments', 'cryptoHoldings'
+            );
+        }
+        
+        // For bank account fields from E2E tests
+        if (lowerField.includes('bank') || lowerField.includes('account')) {
+            fallbackPatterns.push(
+                'currentBankAccount', 'bankAccount', 'savingsAccount', 'currentSavingsAccount',
+                'cashSavings', 'currentCash', 'liquidSavings', 'checkingAccount'
+            );
+        }
+        
+        // For real estate fields from E2E tests
+        if (lowerField.includes('real') || lowerField.includes('estate') || lowerField.includes('property')) {
+            fallbackPatterns.push(
+                'currentRealEstate', 'realEstate', 'realEstateValue', 'currentRealEstateValue',
+                'propertyValue', 'currentProperty', 'realEstateInvestments'
+            );
+        }
+        
+        // For 401k fields from E2E tests
+        if (lowerField.includes('401k') || lowerField.includes('401')) {
+            fallbackPatterns.push(
+                'current401k', 'current401K', 'retirement401k', '401kBalance',
+                '401k', '401K', 'fourOhOneK'
+            );
+        }
+        
+        // For monthly savings fields from E2E tests
+        if (lowerField.includes('monthly') && lowerField.includes('savings')) {
+            fallbackPatterns.push(
+                'monthlyAdditionalSavings', 'additionalMonthlySavings', 'extraSavings',
+                'monthlyContribution', 'monthlyContributions', 'monthlySavings',
+                'totalMonthlyContributions', 'currentMonthlyContribution'
             );
         }
         

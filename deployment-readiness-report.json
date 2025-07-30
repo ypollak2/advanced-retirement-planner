@@ -10,22 +10,23 @@
   ],
   "failed": [],
   "warnings": [
+    "Build date not current",
     "NPM security audit",
     "Uncommitted changes present"
   ],
   "testResults": {},
   "versionInfo": {
-    "package": "7.1.1",
-    "versionFile": "7.1.1",
-    "readme": "7.1.1",
+    "package": "7.2.0",
+    "versionFile": "7.2.0",
+    "readme": "7.2.0",
     "buildDate": "2025-07-29",
-    "description": "Enhanced RSU input with stock symbol selection and real-time price lookup"
+    "description": "Major Financial Health Score system repair with 0% score fixes, real-time updates, debug tools, and enhanced UI/UX"
   },
-  "timestamp": "2025-07-29T14:51:57.161Z",
+  "timestamp": "2025-07-30T12:20:29.447Z",
   "summary": {
     "ready": true,
     "passedChecks": 7,
     "failedChecks": 0,
-    "warnings": 2
+    "warnings": 3
   }
 }
