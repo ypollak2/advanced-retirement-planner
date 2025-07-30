@@ -145,7 +145,11 @@ jobs:
           echo "🎯 QA Configuration:"
           echo "- Scope: $SCOPE"
           echo "- Environment: $ENVIRONMENT"
-          echo "- Target URL: ${ENVIRONMENT == 'stage' && '${{ env.STAGE_URL }}' || '${{ env.PRODUCTION_URL }}'}"
+          if [ "$ENVIRONMENT" = "stage" ]; then
+            echo "- Target URL: ${{ env.STAGE_URL }}"
+          else
+            echo "- Target URL: ${{ env.PRODUCTION_URL }}"
+          fi
           
       - name: 🌐 Environment availability check
         run: |
