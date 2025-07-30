@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Financial Health Score</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+</head>
+<body>
+    <div id="debug-container">
+        <h1>Financial Health Score Debug</h1>
+        <div id="debug-output"></div>
+    </div>
+
+    <!-- Load all necessary files -->
+    <script src="src/utils/financialHealthEngine.js"></script>
+    
+    <script>
+        // Test inputs that should trigger the issue
+        const testInputs = {
+            planningType: 'individual',
+            currentAge: 35,
+            retirementAge: 67,
+            currentMonthlySalary: 25000,
+            pensionContributionRate: 17.5,
+            trainingFundContributionRate: 7.5,
+            currentSavings: 150000,
+            currentPersonalPortfolio: 50000,
+            currentCrypto: 0,
+            currentRealEstate: 800000,
+            expectedReturn: 7.0,
+            inflationRate: 3.0,
+            riskProfile: 'moderate'
+        };
+
+        console.log('🧪 Starting Financial Health Score Debug');
+        console.log('📋 Test inputs:', testInputs);
+        
+        // Test the calculation
+        if (window.calculateFinancialHealthScore) {
+            console.log('✅ financialHealthEngine loaded successfully');
+            
+            try {
+                const result = window.calculateFinancialHealthScore(testInputs);
+                console.log('🎯 Final result:', result);
+                
+                // Display results
+                document.getElementById('debug-output').innerHTML = `
+                    <h2>Results:</h2>
+                    <p><strong>Total Score:</strong> ${result.totalScore}/100</p>
+                    <p><strong>Status:</strong> ${result.status}</p>
+                    <h3>Factor Breakdown:</h3>
+                    <ul>
+                        ${Object.entries(result.factors).map(([name, factor]) => 
+                            `<li>${name}: ${factor.score} (${factor.details?.status || 'no status'})</li>`
+                        ).join('')}
+                    </ul>
+                    <h3>Debug Info:</h3>
+                    <p><strong>Zero Score Factors:</strong> ${result.debugInfo.zeroScoreFactors.length}</p>
+                    <ul>
+                        ${result.debugInfo.zeroScoreFactors.map(factor => 
+                            `<li>${factor.name}: ${factor.reason}</li>`
+                        ).join('')}
+                    </ul>
+                `;
+            } catch (error) {
+                console.error('❌ Error during calculation:', error);
+                document.getElementById('debug-output').innerHTML = `
+                    <h2>Error:</h2>
+                    <p style="color: red;">${error.message}</p>
+                    <pre>${error.stack}</pre>
+                `;
+            }
+        } else {
+            console.error('❌ financialHealthEngine not loaded');
+            document.getElementById('debug-output').innerHTML = `
+                <h2>Error:</h2>
+                <p style="color: red;">financialHealthEngine not loaded</p>
+            `;
+        }
+    </script>
+</body>
+</html>
