@@ -1,6 +1,6 @@
 {
-  "version": "7.3.1",
+  "version": "7.3.2",
   "build": "2025-07-30",
-  "commit": "v7.3.0-accessibility-improvements",
-  "description": "Comprehensive test suite with 100% pass rate, WCAG 2.1 accessibility compliance, keyboard navigation, and repository organization"
+  "commit": "v7.3.2-critical-wizard-fix",
+  "description": "Critical fix for RetirementWizard initialization errors, improved deployment testing framework"
 }
