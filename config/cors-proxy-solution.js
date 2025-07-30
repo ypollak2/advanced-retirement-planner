@@ -5,10 +5,11 @@
 class CORSProxyService {
     constructor() {
         this.proxyUrls = [
-            'https://cors-anywhere.herokuapp.com/',
-            'https://api.allorigins.win/raw?url=',
             'https://corsproxy.io/?',
-            'https://proxy.cors.sh/',
+            'https://api.codetabs.com/v1/proxy?quest=',
+            'https://proxy.hoppscotch.io/',
+            'https://cors.bridged.cc/',
+            'https://api.allorigins.win/raw?url=',
         ];
         this.currentProxyIndex = 0;
     }

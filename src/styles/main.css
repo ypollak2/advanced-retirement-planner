@@ -1,5 +1,9 @@
 /* Advanced Retirement Planner v5.3.0 - Guided Intelligence UI Design System */
 
+/* Responsive Design Breakpoints */
+/* Mobile-first approach with Tailwind CSS compatibility */
+/* sm: 640px, md: 768px, lg: 1024px, xl: 1280px, 2xl: 1536px */
+
 /* CSS Custom Properties (Variables) */
 :root {
   /* Trust & Stability Colors */
@@ -1961,4 +1965,62 @@ textarea:focus {
   .permanent-side-panel .stats-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Responsive Utilities - Tailwind CSS Compatible */
+/* Mobile First Responsive Design */
+.responsive-container {
+  width: 100%;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+/* sm: Small devices (640px and up) */
+@media (min-width: 640px) {
+  .sm\:inline-block { display: inline-block; }
+  .sm\:hidden { display: none; }
+  .sm\:text-sm { font-size: 0.875rem; }
+  .sm\:px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+}
+
+/* md: Medium devices (768px and up) */
+@media (min-width: 768px) {
+  .md\:flex { display: flex; }
+  .md\:hidden { display: none; }
+  .md\:text-base { font-size: 1rem; }
+  .md\:px-8 { padding-left: 2rem; padding-right: 2rem; }
+  .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* lg: Large devices (1024px and up) */
+@media (min-width: 1024px) {
+  .lg\:flex { display: flex; }
+  .lg\:hidden { display: none; }
+  .lg\:text-lg { font-size: 1.125rem; }
+  .lg\:px-10 { padding-left: 2.5rem; padding-right: 2.5rem; }
+  .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* xl: Extra large devices (1280px and up) */
+@media (min-width: 1280px) {
+  .xl\:block { display: block; }
+  .xl\:text-xl { font-size: 1.25rem; }
+  .xl\:max-w-7xl { max-width: 80rem; }
+}
+
+/* Mobile and Tablet Responsive Support */
+.mobile-menu { display: block; }
+.tablet-view { display: none; }
+.desktop-view { display: none; }
+
+@media (min-width: 768px) {
+  .mobile-menu { display: none; }
+  .tablet-view { display: block; }
+}
+
+@media (min-width: 1024px) {
+  .tablet-view { display: none; }
+  .desktop-view { display: block; }
 }

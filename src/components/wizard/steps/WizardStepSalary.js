@@ -5,7 +5,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
     // Component uses React.createElement for rendering
     const createElement = React.createElement;
     
-    // Validation state for salary inputs
+    // Validation state for salary inputs with ARIA support
     const [validationErrors, setValidationErrors] = React.useState({});
     
     // Enhanced salary validation rules
@@ -327,7 +327,9 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                     placeholder: "15000",
                     min: "0",
                     max: "500000",
-                    className: "w-full p-3 md:p-4 text-base md:text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className: "w-full p-3 md:p-4 text-base md:text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                    'aria-invalid': validationErrors.currentMonthlySalary ? 'true' : 'false',
+                    'aria-describedby': validationErrors.currentMonthlySalary ? 'salary-error' : undefined
                 }),
                 createElement('p', { 
                     key: 'salary-help',

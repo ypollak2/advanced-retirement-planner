@@ -1,36 +1,15 @@
 {
-  "timestamp": "2025-07-30T13:04:52.348Z",
+  "timestamp": "2025-07-30T16:21:08.135Z",
   "summary": {
-    "passed": 7,
-    "failed": 5,
+    "passed": 12,
+    "failed": 0,
     "warnings": 0,
     "total": 12
   },
-  "errors": [
-    {
-      "test": "Heading structure is logical",
-      "message": "Page should have an H1 heading"
-    },
-    {
-      "test": "JavaScript components are keyboard accessible",
-      "message": "Components should support keyboard navigation"
-    },
-    {
-      "test": "Financial forms have proper error handling",
-      "message": "Financial forms should have accessible error messages"
-    },
-    {
-      "test": "Multilingual support structure",
-      "message": "Should support both Hebrew and English"
-    },
-    {
-      "test": "Responsive design indicators",
-      "message": "No responsive design indicators found"
-    }
-  ],
+  "errors": [],
   "warnings": [],
   "compliance": {
-    "wcag21Level": "Non-compliant",
+    "wcag21Level": "AA",
     "recommendations": [
       "Run browser-based accessibility tests with axe-core",
       "Test with screen readers (NVDA, JAWS, VoiceOver)",

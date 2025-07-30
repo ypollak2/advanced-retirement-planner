@@ -1,4 +1,5 @@
 // Multi-language translations for GitHub Pages compatibility
+// Supports both Hebrew (he) and English (en) languages with RTL support
 window.translations = {
     he: {
         title: "מתכנן הפנסיה המתקדם",

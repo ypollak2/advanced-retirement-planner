@@ -174,13 +174,13 @@ class CurrencyAPI {
         const rates = await this.fetchExchangeRates();
         
         if (fromCurrency === toCurrency) return 1;
-        if (fromCurrency === 'ILS') return rates[toCurrency] || 1;
-        if (toCurrency === 'ILS') return 1 / (rates[fromCurrency] || 1);
+        if (fromCurrency === 'ILS') return 1 / (rates[toCurrency] || 1);
+        if (toCurrency === 'ILS') return rates[fromCurrency] || 1;
         
         // Cross currency conversion (e.g., USD to EUR)
         const fromRate = rates[fromCurrency] || 1;
         const toRate = rates[toCurrency] || 1;
-        return toRate / fromRate;
+        return fromRate / toRate;
     }
 
     // Convert amount between currencies

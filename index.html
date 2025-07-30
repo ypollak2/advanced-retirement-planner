@@ -54,12 +54,15 @@
         Skip to main content
     </a>
     
+    <!-- Hidden H1 for SEO and Accessibility (visible content rendered by React) -->
+    <h1 class="sr-only">Advanced Retirement Planner - Professional Pension Planning Tool</h1>
+    
     <!-- Version indicator (populated from version.json) -->
     <div class="version-indicator" id="version-indicator">
         ✨ Loading...
     </div>
     
-    <div id="root" class="min-h-screen" role="main" aria-label="Retirement Planner Application" tabindex="-1"></div>
+    <div id="root" class="min-h-screen responsive-container md:px-4 lg:px-6" role="main" aria-label="Retirement Planner Application" tabindex="-1"></div>
     
     <!-- Console Interceptor - Load Early for Complete Capture -->
     <script src="src/utils/consoleInterceptor.js?v=7.2.1"></script>

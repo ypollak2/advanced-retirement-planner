@@ -11,28 +11,28 @@ const STOCK_API_ENDPOINTS = {
     FINNHUB: 'https://finnhub.io/api/v1/quote'
 };
 
-// Fallback stock prices for major tech companies (updated July 2025)
+// Fallback stock prices for major tech companies (updated July 30, 2025)
 const FALLBACK_PRICES = {
-    'AAPL': 190.75,   // Apple
-    'GOOGL': 175.50,  // Alphabet (Google)
-    'MSFT': 425.80,   // Microsoft
-    'AMZN': 165.30,   // Amazon
-    'META': 545.20,   // Meta (Facebook)
-    'NFLX': 485.60,   // Netflix
-    'TSLA': 265.40,   // Tesla
-    'NVDA': 125.30,   // NVIDIA (post-split)
-    'AMD': 155.80,    // AMD
-    'INTC': 35.70,    // Intel
-    'CRM': 265.90,    // Salesforce
-    'ORCL': 145.60,   // Oracle
-    'ADBE': 525.20,   // Adobe
-    'NOW': 785.40,    // ServiceNow
-    'SHOP': 75.80,    // Shopify
-    'SPOT': 325.30,   // Spotify
-    'ZM': 65.20,      // Zoom
-    'UBER': 75.90,    // Uber
-    'ABNB': 135.70,   // Airbnb
-    'COIN': 205.40,   // Coinbase
+    'AAPL': 195.50,   // Apple
+    'GOOGL': 197.00,  // Alphabet (Google) - Updated from screenshot
+    'MSFT': 435.00,   // Microsoft
+    'AMZN': 170.50,   // Amazon
+    'META': 560.00,   // Meta (Facebook)
+    'NFLX': 495.00,   // Netflix
+    'TSLA': 270.00,   // Tesla
+    'NVDA': 130.00,   // NVIDIA (post-split)
+    'AMD': 160.00,    // AMD
+    'INTC': 36.50,    // Intel
+    'CRM': 275.00,    // Salesforce
+    'ORCL': 150.00,   // Oracle
+    'ADBE': 540.00,   // Adobe
+    'NOW': 800.00,    // ServiceNow
+    'SHOP': 78.00,    // Shopify
+    'SPOT': 335.00,   // Spotify
+    'ZM': 68.00,      // Zoom
+    'UBER': 78.50,    // Uber
+    'ABNB': 140.00,   // Airbnb
+    'COIN': 215.00,   // Coinbase
     'PLTR': 35.90,    // Palantir
     'SNOW': 115.60,   // Snowflake
     'DDOG': 125.30,   // Datadog
@@ -397,7 +397,7 @@ async function fetchStockPrice(symbol, useCache = true) {
     // Fallback to hardcoded prices if API fails
     if (FALLBACK_PRICES[upperSymbol]) {
         const fallbackPrice = FALLBACK_PRICES[upperSymbol];
-        console.log(`📊 Using fallback price for ${upperSymbol}: $${fallbackPrice}`);
+        console.log(`📊 Using fallback price for ${upperSymbol}: $${fallbackPrice} (Last updated: July 30, 2025)`);
         
         // Cache fallback price
         const entry = new CacheEntry(fallbackPrice, 'fallback');

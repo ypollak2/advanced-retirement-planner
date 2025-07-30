@@ -2,6 +2,8 @@
 // Handles age, retirement age, and planning type (single vs couple) selection
 
 const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) => {
+    // State for field errors
+    const [errors, setErrors] = React.useState({});
     // Multi-language content
     const content = {
         he: {
@@ -228,15 +230,18 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                     }, [
                         React.createElement('label', {
                             key: 'your-name-label',
+                            htmlFor: 'your-name-input-field',
                             className: "block text-sm font-medium text-gray-700"
                         }, t.yourName),
                         React.createElement('input', {
                             key: 'your-name-input',
+                            id: 'your-name-input-field',
                             type: 'text',
                             value: inputs.userName || '',
                             onChange: (e) => setInputs(prev => ({ ...prev, userName: e.target.value })),
                             className: "w-full px-4 py-3 md:px-3 md:py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
-                            placeholder: t.yourName
+                            'aria-label': t.yourName,
+                            'aria-required': 'false'
                         })
                     ]),
                     
@@ -246,10 +251,12 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                     }, [
                         React.createElement('label', {
                             key: 'your-age-label',
+                            htmlFor: 'your-age-input-field',
                             className: "block text-sm font-medium text-gray-700"
                         }, t.yourAge),
                         React.createElement('input', {
                             key: 'your-age-input',
+                            id: 'your-age-input-field',
                             type: 'number',
                             min: '18',
                             max: '100',
@@ -257,10 +264,16 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                             onChange: (e) => setInputs(prev => ({ ...prev, currentAge: parseInt(e.target.value) || '' })),
                             className: `w-full px-4 py-3 md:px-3 md:py-2 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                                 inputs.currentAge && !isValidAge(inputs.currentAge) ? 'border-red-500' : 'border-gray-300'
-                            }`
+                            }`,
+                            'aria-invalid': inputs.currentAge && !isValidAge(inputs.currentAge) ? 'true' : 'false',
+                            'aria-describedby': inputs.currentAge && !isValidAge(inputs.currentAge) ? 'your-age-error' : undefined,
+                            'aria-required': 'true'
                         }),
                         inputs.currentAge && !isValidAge(inputs.currentAge) && React.createElement('p', {
                             key: 'your-age-error',
+                            id: 'your-age-error',
+                            role: 'alert',
+                            'aria-live': 'polite',
                             className: "text-sm text-red-600"
                         }, t.ageValidation)
                     ]),
@@ -271,10 +284,12 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                     }, [
                         React.createElement('label', {
                             key: 'your-retirement-label',
+                            htmlFor: 'your-retirement-input-field',
                             className: "block text-sm font-medium text-gray-700"
                         }, t.yourRetirementAge),
                         React.createElement('input', {
                             key: 'your-retirement-input',
+                            id: 'your-retirement-input-field',
                             type: 'number',
                             min: '50',
                             max: '100',
@@ -282,10 +297,16 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                             onChange: (e) => setInputs(prev => ({ ...prev, retirementAge: parseInt(e.target.value) || '' })),
                             className: `w-full px-4 py-3 md:px-3 md:py-2 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                                 inputs.retirementAge && !isValidRetirementAge(inputs.retirementAge, inputs.currentAge) ? 'border-red-500' : 'border-gray-300'
-                            }`
+                            }`,
+                            'aria-invalid': inputs.retirementAge && !isValidRetirementAge(inputs.retirementAge, inputs.currentAge) ? 'true' : 'false',
+                            'aria-describedby': inputs.retirementAge && !isValidRetirementAge(inputs.retirementAge, inputs.currentAge) ? 'your-retirement-error' : undefined,
+                            'aria-required': 'true'
                         }),
                         inputs.retirementAge && !isValidRetirementAge(inputs.retirementAge, inputs.currentAge) && React.createElement('p', {
                             key: 'your-retirement-error',
+                            id: 'your-retirement-error',
+                            role: 'alert',
+                            'aria-live': 'polite',
                             className: "text-sm text-red-600"
                         }, t.retirementAgeValidation)
                     ])
@@ -307,15 +328,18 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                     }, [
                         React.createElement('label', {
                             key: 'partner-name-label',
+                            htmlFor: 'partner-name-input-field',
                             className: "block text-sm font-medium text-gray-700"
                         }, t.partnerName),
                         React.createElement('input', {
                             key: 'partner-name-input',
+                            id: 'partner-name-input-field',
                             type: 'text',
                             value: inputs.partnerName || '',
                             onChange: (e) => setInputs(prev => ({ ...prev, partnerName: e.target.value })),
                             className: "w-full px-4 py-3 md:px-3 md:py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500",
-                            placeholder: t.partnerName
+                            'aria-label': t.partnerName,
+                            'aria-required': 'false'
                         })
                     ]),
                     
