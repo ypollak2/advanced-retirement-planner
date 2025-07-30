@@ -332,6 +332,11 @@ jobs:
     if: always()
     timeout-minutes: 5
     
+    permissions:
+      contents: read
+      statuses: write
+      actions: read
+    
     outputs:
       ci-status: ${{ steps.summary.outputs.status }}
       next-workflow: ${{ steps.summary.outputs.next }}
