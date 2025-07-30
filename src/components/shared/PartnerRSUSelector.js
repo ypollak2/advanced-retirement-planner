@@ -551,18 +551,18 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
                         disabled: !manualPrice || parseFloat(manualPrice) <= 0,
                         className: "px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:opacity-50"
                     }, language === 'he' ? 'שמור' : 'Set')
-                ]) : stockPrice ? React.createElement('div', {
+                ]) : stockPrice && stockPriceUSD ? React.createElement('div', {
                     key: 'price-display',
                     className: "space-y-1"
                 }, [
                     React.createElement('div', {
                         key: 'price-value',
                         className: "text-lg font-bold text-green-600"
-                    }, `${currencySymbol}${stockPrice.toFixed(2)}`),
-                    workingCurrency !== 'USD' && stockPriceUSD && React.createElement('div', {
-                        key: 'price-usd',
+                    }, `$${stockPriceUSD.toFixed(2)} USD`),
+                    workingCurrency !== 'USD' && React.createElement('div', {
+                        key: 'price-converted',
                         className: "text-xs text-gray-500"
-                    }, `($${stockPriceUSD.toFixed(2)} USD)`),
+                    }, `(${currencySymbol}${stockPrice.toFixed(2)} ${workingCurrency})`),
                     React.createElement('div', {
                         key: 'price-meta',
                         className: "text-xs text-gray-500 flex items-center gap-2"
