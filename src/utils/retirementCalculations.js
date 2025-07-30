@@ -1,12 +1,37 @@
 // Retirement calculations for GitHub Pages compatibility
 // Dependencies: countryData, riskScenarios from marketConstants.js
 
-window.formatCurrency = (amount) => {
-    return new Intl.NumberFormat('he-IL', {
-        style: 'currency',
-        currency: 'ILS',
-        minimumFractionDigits: 0
-    }).format(amount);
+window.formatCurrency = (amount, currency = 'ILS') => {
+    // Handle different currencies
+    const currencySymbols = {
+        ILS: '₪',
+        USD: '$',
+        EUR: '€',
+        GBP: '£',
+        BTC: '₿',
+        ETH: 'Ξ'
+    };
+    
+    // For crypto currencies, use fixed decimal places
+    if (currency === 'BTC' || currency === 'ETH') {
+        return `${currencySymbols[currency] || currency}${amount.toFixed(6)}`;
+    }
+    
+    // For regular currencies, use Intl.NumberFormat if available
+    try {
+        // Use en-US for all currencies to ensure thousand separators
+        const formatter = new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+            useGrouping: true
+        });
+        const symbol = currencySymbols[currency] || currency + ' ';
+        return `${symbol}${formatter.format(Math.round(amount))}`;
+    } catch (e) {
+        // Fallback for unsupported currencies
+        const symbol = currencySymbols[currency] || currency + ' ';
+        return `${symbol}${Math.round(amount).toLocaleString('en-US')}`;
+    }
 };
 
 window.convertCurrency = (amount, currency, exchangeRates) => {
@@ -188,11 +213,23 @@ window.calculateRetirement = (
     const pensionWeightedReturn = getAdjustedReturn(effectivePensionReturn, inputs.riskTolerance);
     const trainingFundWeightedReturn = getAdjustedReturn(effectiveTrainingFundReturn, inputs.riskTolerance);
 
-    let totalPensionSavings = inputs.currentSavings;
-    let totalTrainingFund = inputs.currentTrainingFund;
-    let totalPersonalPortfolio = inputs.currentPersonalPortfolio;
-    let totalCrypto = inputs.currentCrypto;
-    let totalRealEstate = inputs.currentRealEstate;
+    // Enhanced field mapping for savings values
+    let totalPensionSavings = parseFloat(
+        inputs.currentSavings || inputs.pensionSavings || inputs.currentPensionSavings || 
+        inputs.retirementSavings || inputs.currentRetirementSavings || 0
+    );
+    let totalTrainingFund = parseFloat(
+        inputs.currentTrainingFund || inputs.trainingFund || inputs.trainingFundValue || 0
+    );
+    let totalPersonalPortfolio = parseFloat(
+        inputs.currentPersonalPortfolio || inputs.personalPortfolio || inputs.portfolioValue || 0
+    );
+    let totalCrypto = parseFloat(
+        inputs.currentCrypto || inputs.crypto || inputs.cryptoValue || inputs.currentCryptoFiatValue || 0
+    );
+    let totalRealEstate = parseFloat(
+        inputs.currentRealEstate || inputs.realEstate || inputs.realEstateValue || 0
+    );
     let periodResults = [];
     
     // Ensure workPeriods is an array to prevent iteration errors
@@ -615,6 +652,7 @@ window.calculateRetirement = (
         // Combined household results
         totalNetIncome: safeRound(totalNetIncome),
         monthlyIncome: safeRound(totalNetIncome), // Add missing monthlyIncome property
+        monthlyRetirementIncome: safeRound(totalNetIncome), // Alias for test compatibility
         isJointPlanning: inputs.partnerPlanningEnabled || false,
         
         // Other calculations
@@ -791,10 +829,17 @@ window.calculateProgressiveSavings = (inputs, workPeriods = [], partnerWorkPerio
     const monthlyTrainingContrib = parseFloat(inputs.trainingFundContribution || 0);
     const monthlyPersonalContrib = parseFloat(inputs.personalSavings || inputs.personalPortfolioMonthly || 0);
     
-    // Initial amounts
-    let primaryPension = parseFloat(inputs.currentSavings || 0);
-    let primaryTraining = parseFloat(inputs.currentTrainingFund || 0);
-    let primaryPersonal = parseFloat(inputs.currentPersonalPortfolio || 0);
+    // Initial amounts with enhanced field mapping
+    let primaryPension = parseFloat(
+        inputs.currentSavings || inputs.pensionSavings || inputs.currentPensionSavings || 
+        inputs.retirementSavings || inputs.currentRetirementSavings || 0
+    );
+    let primaryTraining = parseFloat(
+        inputs.currentTrainingFund || inputs.trainingFund || inputs.trainingFundValue || 0
+    );
+    let primaryPersonal = parseFloat(
+        inputs.currentPersonalPortfolio || inputs.personalPortfolio || inputs.portfolioValue || 0
+    );
     
     // Partner data extraction
     let partnerPension = 0;

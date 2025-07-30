@@ -1551,12 +1551,29 @@ function calculateTaxEfficiencyScore(inputs) {
     
     // Get base salary based on planning type
     let baseSalary = 0;
+    let salaryDataFound = false;
+    
     if (inputs.planningType === 'couple') {
         const partner1Income = parseFloat(inputs.partner1Salary || 0);
         const partner2Income = parseFloat(inputs.partner2Salary || 0);
         baseSalary = (partner1Income + partner2Income) * 12;
+        salaryDataFound = inputs.partner1Salary !== undefined || inputs.partner2Salary !== undefined;
     } else {
-        baseSalary = parseFloat(inputs.currentMonthlySalary || 0) * 12;
+        // Check for salary field existence first
+        const salaryFields = [
+            'currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome', 
+            'currentSalary', 'monthly_salary', 'income', 'grossSalary', 
+            'netSalary', 'baseSalary', 'totalIncome', 'monthlyIncomeAmount'
+        ];
+        
+        // Check if any salary field exists in the inputs
+        salaryDataFound = salaryFields.some(field => inputs[field] !== undefined);
+        
+        if (salaryDataFound) {
+            // Enhanced field mapping for salary - check multiple field variations
+            const monthlySalary = getFieldValue(inputs, salaryFields, { allowZero: true });
+            baseSalary = monthlySalary * 12;
+        }
     }
     
     // Enhanced tax efficiency calculation using existing tax system
@@ -1586,7 +1603,7 @@ function calculateTaxEfficiencyScore(inputs) {
     }
     
     // Check for missing data and return appropriate error states
-    if (baseSalary === 0) {
+    if (!salaryDataFound) {
         return {
             score: 0,
             details: {
@@ -1597,7 +1614,7 @@ function calculateTaxEfficiencyScore(inputs) {
                 debugInfo: {
                     reason: 'No salary data found',
                     missingFields: inputs.planningType === 'couple' ? 
-                        ['partner1Salary', 'partner2Salary'] : ['currentMonthlySalary'],
+                        ['partner1Salary', 'partner2Salary'] : ['monthlySalary', 'currentMonthlySalary'],
                     suggestion: 'Add salary information in Step 2'
                 }
             }
@@ -2519,7 +2536,11 @@ window.financialHealthEngine = {
     calculateTaxEfficiencyScore,
     calculateEmergencyFundScore,
     calculateDebtManagementScore,
-    validateFinancialInputs
+    validateFinancialInputs,
+    getFieldValue
 };
+
+// Also export getFieldValue directly for backward compatibility
+window.getFieldValue = getFieldValue;
 
 console.log('✅ Financial Health Engine loaded successfully');
