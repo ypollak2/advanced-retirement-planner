@@ -69,6 +69,46 @@ const RetirementWizard = ({
     React.useEffect(() => {
         inputsRef.current = inputs;
     }, [inputs]);
+    
+    // Keyboard navigation support
+    React.useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (window.a11yUtils && window.a11yUtils.handleWizardKeyNavigation) {
+                window.a11yUtils.handleWizardKeyNavigation(
+                    event,
+                    currentStep,
+                    totalSteps,
+                    handleNext,
+                    handlePrevious,
+                    language
+                );
+            }
+        };
+        
+        // Listen for custom step change events
+        const handleStepChange = (event) => {
+            const { step } = event.detail;
+            if (step >= 1 && step <= totalSteps) {
+                setCurrentStep(step);
+                // Announce step change to screen readers
+                if (window.a11yUtils && window.a11yUtils.announceToScreenReader) {
+                    const stepInfo = t.steps[step];
+                    window.a11yUtils.announceToScreenReader(
+                        `${language === 'he' ? 'שלב' : 'Step'} ${step}: ${stepInfo.title}`,
+                        'polite'
+                    );
+                }
+            }
+        };
+        
+        document.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('wizardStepChange', handleStepChange);
+        
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('wizardStepChange', handleStepChange);
+        };
+    }, [currentStep, totalSteps, handleNext, handlePrevious, language, t.steps]);
 
     // Immediate save function for critical operations - now dependency-free
     const saveProgressImmediate = React.useCallback((criticalData = false) => {

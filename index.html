@@ -49,12 +49,17 @@
     </style>
 </head>
 <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#root" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50" onclick="event.preventDefault(); document.getElementById('root').focus(); document.getElementById('root').scrollIntoView({ behavior: 'smooth' });">
+        Skip to main content
+    </a>
+    
     <!-- Version indicator (populated from version.json) -->
     <div class="version-indicator" id="version-indicator">
         ✨ Loading...
     </div>
     
-    <div id="root" class="min-h-screen" role="main" aria-label="Retirement Planner Application"></div>
+    <div id="root" class="min-h-screen" role="main" aria-label="Retirement Planner Application" tabindex="-1"></div>
     
     <!-- Console Interceptor - Load Early for Complete Capture -->
     <script src="src/utils/consoleInterceptor.js?v=7.2.1"></script>
@@ -109,6 +114,7 @@
             // Define all scripts to load in parallel
             const scripts = [
                 'src/utils/logger.js?v=7.2.1',
+                'src/utils/accessibilityUtils.js?v=7.2.1',
                 'src/translations/multiLanguage.js?v=7.2.1',
                 'src/data/marketConstants.js?v=7.2.1',
                 'src/utils/retirementCalculations.js?v=7.2.1',
