@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser Test Status Check</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-4">Browser Test Status Check</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Dependency Loading Status</h2>
+            <div id="dependency-status" class="grid grid-cols-2 gap-4"></div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test Results</h2>
+            <div id="test-results"></div>
+        </div>
+    </div>
+
+    <!-- Load all dependencies -->
+    <script src="src/data/marketConstants.js"></script>
+    <script src="src/translations/multiLanguage.js"></script>
+    <script src="src/utils/retirementCalculations.js"></script>
+    <script src="src/utils/currencyAPI.js"></script>
+    <script src="src/utils/financialHealthEngine.js"></script>
+    <script src="src/utils/financialHealthValidation.js"></script>
+    <script src="src/utils/financialHealthMessages.js"></script>
+    <script src="src/utils/coupleValidation.js"></script>
+    <script src="src/utils/performanceOptimizer.js"></script>
+    <script src="src/utils/exportFunctions.js"></script>
+    <script src="src/utils/performanceMonitor.js"></script>
+    <script src="src/components/shared/EnhancedRSUCompanySelector.js"></script>
+    <script src="src/components/shared/PartnerRSUSelector.js"></script>
+    <script src="src/components/core/RetirementPlannerApp.js"></script>
+    
+    <script>
+        // Provide risk scenarios fallback
+        window.riskScenarios = window.riskScenarios || {
+            conservative: { returnRate: 5, name: 'Conservative' },
+            moderate: { returnRate: 7, name: 'Moderate' },
+            aggressive: { returnRate: 10, name: 'Aggressive' }
+        };
+    </script>
+    
+    <script src="tests/browser/test-framework.js"></script>
+    
+    <script>
+        async function checkDependencies() {
+            const deps = [
+                { name: 'React', check: () => window.React },
+                { name: 'ReactDOM', check: () => window.ReactDOM },
+                { name: 'multiLanguage', check: () => window.multiLanguage },
+                { name: 'marketConstants', check: () => window.MARKET_CONSTANTS },
+                { name: 'retirementCalculations', check: () => window.calculateRetirement },
+                { name: 'currencyAPI', check: () => window.currencyAPI },
+                { name: 'financialHealthEngine', check: () => window.calculateFinancialHealthScore },
+                { name: 'coupleValidation', check: () => window.coupleValidation },
+                { name: 'performanceOptimizer', check: () => window.performanceOptimizer },
+                { name: 'exportFunctions', check: () => window.exportFunctions },
+                { name: 'performanceMonitor', check: () => window.performanceMonitor },
+                { name: 'EnhancedRSUCompanySelector', check: () => window.EnhancedRSUCompanySelector },
+                { name: 'PartnerRSUSelector', check: () => window.PartnerRSUSelector },
+                { name: 'RetirementPlannerApp', check: () => window.RetirementPlannerApp },
+                { name: 'riskScenarios', check: () => window.riskScenarios },
+                { name: 'formatCurrency', check: () => window.formatCurrency }
+            ];
+            
+            const container = document.getElementById('dependency-status');
+            let allLoaded = true;
+            
+            deps.forEach(dep => {
+                const loaded = !!dep.check();
+                if (!loaded) allLoaded = false;
+                
+                const div = document.createElement('div');
+                div.className = `p-3 rounded ${loaded ? 'bg-green-100' : 'bg-red-100'}`;
+                div.innerHTML = `
+                    <span class="${loaded ? 'text-green-800' : 'text-red-800'}">
+                        ${loaded ? '✅' : '❌'} ${dep.name}
+                    </span>
+                `;
+                container.appendChild(div);
+            });
+            
+            return allLoaded;
+        }
+        
+        async function runQuickTests() {
+            const results = document.getElementById('test-results');
+            
+            // Check dependencies first
+            const allDepsLoaded = await checkDependencies();
+            
+            if (!allDepsLoaded) {
+                results.innerHTML = '<p class="text-red-600 font-semibold">Cannot run tests - missing dependencies!</p>';
+                return;
+            }
+            
+            // Simple test runner
+            const testRunner = new BrowserTestRunner({
+                resultsElement: results
+            });
+            
+            // Load test files
+            try {
+                await Promise.all([
+                    loadScript('tests/browser/component-tests.js'),
+                    loadScript('tests/browser/integration-tests.js'),
+                    loadScript('tests/browser/e2e-tests.js')
+                ]);
+                
+                results.innerHTML = `
+                    <div class="bg-green-100 p-4 rounded">
+                        <p class="font-semibold">✅ All test files loaded successfully!</p>
+                        <p>Total tests registered: ${testRunner.tests.length}</p>
+                        <p class="mt-2">To run the full test suite, open <a href="test-runner-browser.html" class="text-blue-600 underline">test-runner-browser.html</a></p>
+                    </div>
+                `;
+                
+                // Run a sample test
+                if (testRunner.tests.length > 0) {
+                    const sampleTest = testRunner.tests[0];
+                    try {
+                        await testRunner.runTest(sampleTest);
+                        results.innerHTML += `
+                            <div class="mt-4 bg-blue-100 p-4 rounded">
+                                <p class="font-semibold">Sample test result:</p>
+                                <p>${sampleTest.description}: ${sampleTest.status === 'passed' ? '✅ PASSED' : '❌ FAILED'}</p>
+                            </div>
+                        `;
+                    } catch (e) {
+                        console.error('Sample test error:', e);
+                    }
+                }
+                
+            } catch (error) {
+                results.innerHTML = `
+                    <div class="bg-red-100 p-4 rounded">
+                        <p class="font-semibold text-red-800">❌ Error loading test files:</p>
+                        <p class="text-red-600">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = () => reject(new Error(`Failed to load ${src}`));
+                document.body.appendChild(script);
+            });
+        }
+        
+        // Run checks on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(runQuickTests, 1000);
+        });
+    </script>
+</body>
+</html>

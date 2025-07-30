@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Field Mapping Validation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: #48bb78; font-weight: bold; }
+        .error { color: #f56565; font-weight: bold; }
+        .warning { color: #ed8936; font-weight: bold; }
+        .code-block {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .result-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            background: #f7fafc;
+            border-left: 4px solid #e2e8f0;
+        }
+        .result-item.success {
+            border-left-color: #48bb78;
+            background: #f0fff4;
+        }
+        .result-item.error {
+            border-left-color: #f56565;
+            background: #fff5f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 Field Mapping Validation Test</h1>
+        <p>Testing the new field mapping dictionary implementation</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="runBasicTests()">Run Basic Tests</button>
+        <button onclick="runFieldMappingTests()">Test Field Mappings</button>
+        <button onclick="runScenarioTest()">Test Sample Scenario</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="results" class="results"></div>
+    </div>
+
+    <!-- Load dependencies -->
+    <script src="src/utils/fieldMappingDictionary.js"></script>
+    <script src="src/utils/financialHealthEngine.js"></script>
+    <script src="src/data/marketConstants.js"></script>
+    <script src="src/utils/retirementCalculations.js"></script>
+    <script src="src/utils/multiLanguage.js"></script>
+
+    <script>
+        const resultsDiv = document.getElementById('results');
+        let fallbackCount = 0;
+        let originalWarn = console.warn;
+
+        // Intercept console.warn to count fallbacks
+        console.warn = function(...args) {
+            const message = args.join(' ');
+            if (message.includes('Fallback Activated')) {
+                fallbackCount++;
+            }
+            originalWarn.apply(console, args);
+        };
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result-item ${type}`;
+            div.innerHTML = message;
+            resultsDiv.appendChild(div);
+        }
+
+        function clearResults() {
+            resultsDiv.innerHTML = '';
+            fallbackCount = 0;
+        }
+
+        function runBasicTests() {
+            clearResults();
+            addResult('<h3>Basic Field Mapping Tests</h3>');
+
+            // Test 1: Check if field mapping dictionary is loaded
+            if (window.fieldMappingDictionary) {
+                addResult('✅ Field mapping dictionary loaded successfully', 'success');
+            } else {
+                addResult('❌ Field mapping dictionary not loaded', 'error');
+                return;
+            }
+
+            // Test 2: Test normalize function
+            const testName = 'current_Monthly-Salary';
+            const normalized = window.fieldMappingDictionary.normalizeFieldName(testName);
+            if (normalized === 'currentmonthlysalary') {
+                addResult(`✅ Normalization working: ${testName} → ${normalized}`, 'success');
+            } else {
+                addResult(`❌ Normalization failed: ${testName} → ${normalized}`, 'error');
+            }
+
+            // Test 3: Test canonical field finding
+            const canonical = window.fieldMappingDictionary.findCanonicalField('currentMonthlySalary');
+            if (canonical === 'salary') {
+                addResult(`✅ Canonical field found: currentMonthlySalary → ${canonical}`, 'success');
+            } else {
+                addResult(`❌ Canonical field not found: currentMonthlySalary → ${canonical}`, 'error');
+            }
+
+            // Test 4: Test field variations
+            const variations = window.fieldMappingDictionary.getFieldVariations('salary');
+            if (variations && variations.length > 10) {
+                addResult(`✅ Field variations found: ${variations.length} variations for 'salary'`, 'success');
+            } else {
+                addResult(`❌ Field variations insufficient: ${variations ? variations.length : 0} variations`, 'error');
+            }
+        }
+
+        function runFieldMappingTests() {
+            clearResults();
+            addResult('<h3>Field Mapping Resolution Tests</h3>');
+
+            const testCases = [
+                {
+                    description: 'Salary field mapping',
+                    inputs: { monthly_salary: 15000 },
+                    searchFields: ['currentMonthlySalary', 'monthlySalary', 'salary'],
+                    expected: 15000
+                },
+                {
+                    description: 'Training fund rate mapping',
+                    inputs: { trainingFundRateEmployee: 2.5 },
+                    searchFields: ['trainingFundContributionRate', 'trainingFundEmployeeRate'],
+                    expected: 2.5
+                },
+                {
+                    description: 'Partner salary mapping',
+                    inputs: { Partner1Salary: 20000, Partner2Salary: 18000 },
+                    searchFields: ['partner1Salary', 'partner2Salary'],
+                    expected: 20000
+                },
+                {
+                    description: 'Emergency fund mapping',
+                    inputs: { bankAccount: 50000 },
+                    searchFields: ['emergencyFund', 'currentBankAccount', 'savingsAccount'],
+                    expected: 50000
+                },
+                {
+                    description: 'Crypto mapping',
+                    inputs: { digitalAssets: 100000 },
+                    searchFields: ['currentCrypto', 'cryptoValue', 'cryptocurrency'],
+                    expected: 100000
+                }
+            ];
+
+            testCases.forEach((testCase, index) => {
+                fallbackCount = 0;
+                const result = getFieldValue(testCase.inputs, testCase.searchFields, { debugMode: false });
+                
+                if (result === testCase.expected && fallbackCount === 0) {
+                    addResult(`✅ Test ${index + 1}: ${testCase.description} - Found value ${result} with NO fallbacks`, 'success');
+                } else if (result === testCase.expected) {
+                    addResult(`⚠️ Test ${index + 1}: ${testCase.description} - Found value ${result} but had ${fallbackCount} fallback(s)`, 'warning');
+                } else {
+                    addResult(`❌ Test ${index + 1}: ${testCase.description} - Expected ${testCase.expected}, got ${result}`, 'error');
+                }
+            });
+        }
+
+        function runScenarioTest() {
+            clearResults();
+            addResult('<h3>Full Scenario Test</h3>');
+
+            // Young Professional scenario from our test suite
+            const scenario = {
+                planningType: "individual",
+                currentAge: 28,
+                retirementAge: 67,
+                country: "israel",
+                currentMonthlySalary: 15000,
+                currency: "ILS",
+                pensionEmployeeRate: 7,
+                pensionEmployerRate: 14.33,
+                trainingFundEmployeeRate: 2.5,
+                trainingFundEmployerRate: 7.5,
+                currentBankAccount: 30000,
+                currentPersonalPortfolio: 50000,
+                personalPortfolioReturn: 8,
+                currentMonthlyExpenses: 12000,
+                monthlyAdditionalSavings: 1000,
+                riskTolerance: "moderate"
+            };
+
+            fallbackCount = 0;
+            const startTime = Date.now();
+            
+            try {
+                const result = window.calculateFinancialHealthScore(scenario);
+                const endTime = Date.now();
+                
+                addResult(`<strong>Test completed in ${endTime - startTime}ms</strong>`);
+                addResult(`Score: ${result.totalScore}/100 (${result.category})`);
+                addResult(`Fallback warnings: ${fallbackCount}`);
+                
+                if (fallbackCount === 0) {
+                    addResult('✅ ZERO FALLBACKS! Field mapping working perfectly!', 'success');
+                } else {
+                    addResult(`⚠️ Still have ${fallbackCount} fallback warnings to fix`, 'warning');
+                }
+                
+                // Show factor scores
+                addResult('<br><strong>Factor Scores:</strong>');
+                Object.entries(result.factors).forEach(([key, factor]) => {
+                    addResult(`${factor.name}: ${factor.score}/${factor.maxScore} (${factor.rating})`);
+                });
+                
+            } catch (error) {
+                addResult(`❌ Error during calculation: ${error.message}`, 'error');
+            }
+        }
+
+        // Run basic tests on load
+        window.addEventListener('load', () => {
+            addResult('<h3>System Check</h3>');
+            if (window.fieldMappingDictionary) {
+                addResult('✅ Field mapping dictionary is available', 'success');
+                addResult(`Total field mappings: ${Object.keys(window.fieldMappingDictionary.FIELD_MAPPINGS).length}`);
+            } else {
+                addResult('❌ Field mapping dictionary not loaded!', 'error');
+            }
+            
+            if (window.calculateFinancialHealthScore) {
+                addResult('✅ Financial health engine is available', 'success');
+            } else {
+                addResult('❌ Financial health engine not loaded!', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,625 @@
+name: Production E2E Tests
+
+on:
+  schedule:
+    # Run daily at 6 AM UTC (2 AM EST)
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      test_category:
+        description: 'Test category to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - console
+          - flow
+          - api
+          - performance
+      notify_on_success:
+        description: 'Send notification on success'
+        required: false
+        default: false
+        type: boolean
+      create_issue_on_failure:
+        description: 'Create GitHub issue on failure'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  PRODUCTION_URL: 'https://ypollak2.github.io/advanced-retirement-planner/'
+  TEST_TIMEOUT: 300000  # 5 minutes
+  NODE_VERSION: '18.x'
+
+jobs:
+  production-e2e-tests:
+    name: Production E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    outputs:
+      test_results: ${{ steps.run_tests.outputs.results }}
+      success_rate: ${{ steps.run_tests.outputs.success_rate }}
+      total_errors: ${{ steps.run_tests.outputs.total_errors }}
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          npm ci --prefer-offline --no-audit
+          
+      - name: Install Playwright
+        run: |
+          npx playwright install chromium firefox
+          npx playwright install-deps
+          
+      - name: Wait for production deployment
+        run: |
+          echo "🔍 Checking production deployment availability..."
+          for i in {1..10}; do
+            if curl -sSf "${{ env.PRODUCTION_URL }}" > /dev/null; then
+              echo "✅ Production site is accessible"
+              break
+            elif [ $i -eq 10 ]; then
+              echo "❌ Production site is not accessible after 10 attempts"
+              exit 1
+            else
+              echo "⏳ Attempt $i: Production site not ready, waiting 30 seconds..."
+              sleep 30
+            fi
+          done
+          
+      - name: Run Production E2E Tests
+        id: run_tests
+        run: |
+          echo "🚀 Starting Production E2E Tests..."
+          
+          # Create test results directory
+          mkdir -p test-results/production
+          
+          # Run tests with Playwright
+          cat > test-runner-production.js << 'EOF'
+          const { chromium, firefox } = require('playwright');
+          const fs = require('fs');
+          const path = require('path');
+          
+          class ProductionE2ERunner {
+            constructor() {
+              this.results = {
+                passed: 0,
+                failed: 0,
+                total: 0,
+                errors: [],
+                warnings: [],
+                performance: {},
+                startTime: Date.now()
+              };
+              this.testCategory = process.env.TEST_CATEGORY || 'all';
+              this.browsers = ['chromium'];
+            }
+            
+            async runAllTests() {
+              console.log(`🔍 Running ${this.testCategory} tests...`);
+              
+              for (const browserName of this.browsers) {
+                await this.runBrowserTests(browserName);
+              }
+              
+              this.generateReport();
+              this.setGitHubOutputs();
+              
+              // Exit with error code if tests failed
+              process.exit(this.results.failed > 0 ? 1 : 0);
+            }
+            
+            async runBrowserTests(browserName) {
+              console.log(`🌐 Testing with ${browserName}...`);
+              
+              const browser = await (browserName === 'firefox' ? firefox : chromium).launch();
+              const context = await browser.newContext({
+                viewport: { width: 1280, height: 720 },
+                userAgent: 'Mozilla/5.0 (compatible; Production-E2E-Test/1.0)'
+              });
+              
+              try {
+                await this.runTestSuite(context, browserName);
+              } finally {
+                await browser.close();
+              }
+            }
+            
+            async runTestSuite(context, browserName) {
+              const page = await context.newPage();
+              
+              // Capture console logs and errors
+              const consoleLogs = [];
+              const errors = [];
+              
+              page.on('console', msg => {
+                consoleLogs.push({
+                  type: msg.type(),
+                  text: msg.text(),
+                  timestamp: new Date()
+                });
+                
+                if (msg.type() === 'error') {
+                  errors.push({
+                    type: 'console-error',
+                    message: msg.text(),
+                    timestamp: new Date()
+                  });
+                }
+              });
+              
+              page.on('pageerror', err => {
+                errors.push({
+                  type: 'page-error',
+                  message: err.message,
+                  stack: err.stack,
+                  timestamp: new Date()
+                });
+              });
+              
+              // Test categories
+              const tests = [
+                { category: 'console', name: 'Page loads without critical errors', fn: () => this.testPageLoad(page) },
+                { category: 'console', name: 'No unhandled JavaScript errors', fn: () => this.testNoJSErrors(errors) },
+                { category: 'flow', name: 'Main application components render', fn: () => this.testComponentsRender(page) },
+                { category: 'flow', name: 'Navigation elements are present', fn: () => this.testNavigation(page) },
+                { category: 'api', name: 'External APIs are accessible', fn: () => this.testAPIConnectivity(page) },
+                { category: 'performance', name: 'Page load time is acceptable', fn: () => this.testPerformance(page) }
+              ];
+              
+              const filteredTests = this.testCategory === 'all' 
+                ? tests 
+                : tests.filter(test => test.category === this.testCategory);
+              
+              for (const test of filteredTests) {
+                await this.runSingleTest(test, browserName);
+              }
+              
+              // Store console logs and errors
+              this.results.consoleLogs = consoleLogs.slice(-50); // Last 50 logs
+              this.results.errors.push(...errors);
+            }
+            
+            async runSingleTest(test, browserName) {
+              const startTime = Date.now();
+              
+              try {
+                console.log(`  ▶️ [${browserName}] ${test.name}`);
+                await test.fn();
+                
+                this.results.passed++;
+                console.log(`  ✅ [${browserName}] ${test.name} (${Date.now() - startTime}ms)`);
+              } catch (error) {
+                this.results.failed++;
+                this.results.errors.push({
+                  test: test.name,
+                  browser: browserName,
+                  category: test.category,
+                  error: error.message,
+                  timestamp: new Date(),
+                  duration: Date.now() - startTime
+                });
+                
+                console.log(`  ❌ [${browserName}] ${test.name}: ${error.message}`);
+              }
+              
+              this.results.total++;
+            }
+            
+            async testPageLoad(page) {
+              const response = await page.goto(process.env.PRODUCTION_URL, {
+                waitUntil: 'networkidle',
+                timeout: 30000
+              });
+              
+              if (!response.ok()) {
+                throw new Error(`Page failed to load with status: ${response.status()}`);
+              }
+              
+              // Wait for basic content to load
+              await page.waitForTimeout(3000);
+            }
+            
+            async testNoJSErrors(errors) {
+              const criticalErrors = errors.filter(err => 
+                err.message.includes('is not defined') ||
+                err.message.includes('Cannot read property') ||
+                err.message.includes('Script error')
+              );
+              
+              if (criticalErrors.length > 0) {
+                throw new Error(`${criticalErrors.length} critical JavaScript errors detected`);
+              }
+              
+              if (errors.length > 10) {
+                throw new Error(`Too many JavaScript errors: ${errors.length}`);
+              }
+            }
+            
+            async testComponentsRender(page) {
+              // Check for key application elements
+              const selectors = [
+                'body',
+                '[id*="app"], [class*="app"]',
+                '[id*="main"], [class*="main"]',
+                'h1, h2, .title',
+                'button, .btn'
+              ];
+              
+              let foundElements = 0;
+              for (const selector of selectors) {
+                try {
+                  const element = await page.waitForSelector(selector, { timeout: 5000 });
+                  if (element) foundElements++;
+                } catch (e) {
+                  // Element not found, continue
+                }
+              }
+              
+              if (foundElements < 3) {
+                throw new Error(`Insufficient main components rendered: ${foundElements}/5`);
+              }
+            }
+            
+            async testNavigation(page) {
+              // Look for navigation elements
+              const navSelectors = [
+                'nav, .nav, .navigation',
+                'button, .btn, .button',
+                'a[href], .link',
+                '[role="button"], [role="link"]'
+              ];
+              
+              let navElements = 0;
+              for (const selector of navSelectors) {
+                try {
+                  const elements = await page.$$(selector);
+                  navElements += elements.length;
+                } catch (e) {
+                  // Continue if selector fails
+                }
+              }
+              
+              if (navElements < 5) {
+                throw new Error(`Insufficient navigation elements: ${navElements}`);
+              }
+            }
+            
+            async testAPIConnectivity(page) {
+              // Test external API connectivity from within the page context
+              const apiTests = await page.evaluate(async () => {
+                const tests = [];
+                
+                // Test currency API
+                try {
+                  const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+                  tests.push({
+                    name: 'Currency API',
+                    success: response.ok,
+                    status: response.status
+                  });
+                } catch (error) {
+                  tests.push({
+                    name: 'Currency API',
+                    success: false,
+                    error: error.message
+                  });
+                }
+                
+                return tests;
+              });
+              
+              const failedTests = apiTests.filter(test => !test.success);
+              if (failedTests.length === apiTests.length) {
+                throw new Error(`All API connectivity tests failed`);
+              }
+            }
+            
+            async testPerformance(page) {
+              const metrics = await page.evaluate(() => {
+                const perfData = performance.getEntriesByType('navigation')[0];
+                return {
+                  loadTime: perfData ? perfData.loadEventEnd - perfData.navigationStart : null,
+                  domContentLoaded: perfData ? perfData.domContentLoadedEventEnd - perfData.navigationStart : null
+                };
+              });
+              
+              this.results.performance = metrics;
+              
+              if (metrics.loadTime && metrics.loadTime > 10000) {
+                throw new Error(`Page load time too slow: ${metrics.loadTime}ms`);
+              }
+            }
+            
+            generateReport() {
+              const successRate = this.results.total > 0 
+                ? ((this.results.passed / this.results.total) * 100).toFixed(1)
+                : 0;
+              
+              const report = {
+                timestamp: new Date().toISOString(),
+                productionUrl: process.env.PRODUCTION_URL,
+                testCategory: this.testCategory,
+                summary: {
+                  passed: this.results.passed,
+                  failed: this.results.failed,
+                  total: this.results.total,
+                  successRate: successRate + '%',
+                  duration: Date.now() - this.results.startTime
+                },
+                errors: this.results.errors,
+                performance: this.results.performance,
+                environment: {
+                  userAgent: 'Production E2E Test',
+                  timestamp: new Date().toISOString()
+                }
+              };
+              
+              // Save report
+              fs.writeFileSync('test-results/production/e2e-report.json', JSON.stringify(report, null, 2));
+              
+              console.log(`\n📊 Test Summary:`);
+              console.log(`✅ Passed: ${this.results.passed}`);
+              console.log(`❌ Failed: ${this.results.failed}`);
+              console.log(`📈 Success Rate: ${successRate}%`);
+              console.log(`⏱️ Duration: ${report.summary.duration}ms`);
+              
+              if (this.results.failed > 0) {
+                console.log(`\n❌ Failed Tests:`);
+                this.results.errors.forEach(error => {
+                  console.log(`  • [${error.browser}] ${error.test}: ${error.error}`);
+                });
+              }
+            }
+            
+            setGitHubOutputs() {
+              const successRate = this.results.total > 0 
+                ? ((this.results.passed / this.results.total) * 100).toFixed(1)
+                : 0;
+              
+              console.log(`::set-output name=results::${JSON.stringify({
+                passed: this.results.passed,
+                failed: this.results.failed,
+                total: this.results.total
+              })}`);
+              console.log(`::set-output name=success_rate::${successRate}`);
+              console.log(`::set-output name=total_errors::${this.results.errors.length}`);
+            }
+          }
+          
+          // Set test category from input
+          process.env.TEST_CATEGORY = '${{ github.event.inputs.test_category || 'all' }}';
+          process.env.PRODUCTION_URL = '${{ env.PRODUCTION_URL }}';
+          
+          // Run tests
+          const runner = new ProductionE2ERunner();
+          runner.runAllTests().catch(console.error);
+          EOF
+          
+          # Execute the test runner
+          node test-runner-production.js
+          
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: production-e2e-results
+          path: |
+            test-results/production/
+          retention-days: 30
+          
+      - name: Create GitHub Issue on Failure
+        if: failure() && (github.event.inputs.create_issue_on_failure == 'true' || github.event_name == 'schedule')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let reportData = { summary: { failed: 0, total: 0 }, errors: [] };
+            try {
+              const reportContent = fs.readFileSync('test-results/production/e2e-report.json', 'utf8');
+              reportData = JSON.parse(reportContent);
+            } catch (e) {
+              console.log('Could not read test report:', e.message);
+            }
+            
+            const title = `🚨 Production E2E Tests Failed - ${reportData.summary.failed}/${reportData.summary.total} tests failed`;
+            
+            const body = `
+            ## Production E2E Test Failure Report
+            
+            **Timestamp:** ${new Date().toISOString()}
+            **Production URL:** ${{ env.PRODUCTION_URL }}
+            **Test Category:** ${{ github.event.inputs.test_category || 'all' }}
+            **Workflow:** ${context.workflow} ([Run #${context.runNumber}](${context.payload.repository.html_url}/actions/runs/${context.runId}))
+            
+            ### Summary
+            - ✅ **Passed:** ${reportData.summary.passed}
+            - ❌ **Failed:** ${reportData.summary.failed}
+            - 📊 **Total:** ${reportData.summary.total}
+            - 📈 **Success Rate:** ${reportData.summary.successRate}
+            
+            ### Failed Tests
+            ${reportData.errors.map(error => 
+              `- **[${error.browser || 'Unknown'}] ${error.test}**\n  \`${error.error}\``
+            ).join('\n\n')}
+            
+            ### Next Steps
+            1. Check the [workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId}) for detailed logs
+            2. Review the production deployment at ${{ env.PRODUCTION_URL }}
+            3. Investigate console errors and network issues
+            4. Fix issues and re-run tests manually if needed
+            
+            ### Auto-generated
+            This issue was automatically created by the Production E2E Tests workflow.
+            
+            ---
+            
+            /label bug, production, e2e-tests
+            /assign @${{ github.actor }}
+            `;
+            
+            // Check if similar issue already exists
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'production,e2e-tests'
+            });
+            
+            const existingIssue = issues.data.find(issue => 
+              issue.title.includes('Production E2E Tests Failed')
+            );
+            
+            if (existingIssue) {
+              // Update existing issue
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: `## New Failure Report\n\n${body}`
+              });
+              
+              console.log(`Updated existing issue #${existingIssue.number}`);
+            } else {
+              // Create new issue
+              const issue = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['bug', 'production', 'e2e-tests', 'automated']
+              });
+              
+              console.log(`Created new issue #${issue.data.number}`);
+            }
+            
+      - name: Send Slack Notification on Failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+          custom_payload: |
+            {
+              "text": "🚨 Production E2E Tests Failed",
+              "attachments": [
+                {
+                  "color": "danger",
+                  "fields": [
+                    {
+                      "title": "Repository",
+                      "value": "${{ github.repository }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Test Category",
+                      "value": "${{ github.event.inputs.test_category || 'all' }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Failed Tests",
+                      "value": "${{ steps.run_tests.outputs.total_errors || 'Unknown' }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Success Rate",
+                      "value": "${{ steps.run_tests.outputs.success_rate || '0' }}%",
+                      "short": true
+                    },
+                    {
+                      "title": "Production URL",
+                      "value": "${{ env.PRODUCTION_URL }}",
+                      "short": false
+                    },
+                    {
+                      "title": "Workflow Run",
+                      "value": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>",
+                      "short": false
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          
+      - name: Send Success Notification
+        if: success() && github.event.inputs.notify_on_success == 'true'
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+          custom_payload: |
+            {
+              "text": "✅ Production E2E Tests Passed",
+              "attachments": [
+                {
+                  "color": "good",
+                  "fields": [
+                    {
+                      "title": "Repository",
+                      "value": "${{ github.repository }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Success Rate",
+                      "value": "${{ steps.run_tests.outputs.success_rate || '100' }}%",
+                      "short": true
+                    },
+                    {
+                      "title": "Production URL",
+                      "value": "${{ env.PRODUCTION_URL }}",
+                      "short": false
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+  cleanup:
+    name: Cleanup and Summary
+    runs-on: ubuntu-latest
+    needs: production-e2e-tests
+    if: always()
+    
+    steps:
+      - name: Test Summary
+        run: |
+          echo "## Production E2E Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Production URL:** ${{ env.PRODUCTION_URL }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Test Category:** ${{ github.event.inputs.test_category || 'all' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ needs.production-e2e-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ needs.production-e2e-tests.result }}" == "success" ]]; then
+            echo "✅ **All tests passed!**" >> $GITHUB_STEP_SUMMARY
+            echo "**Success Rate:** ${{ needs.production-e2e-tests.outputs.success_rate }}%" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Tests failed**" >> $GITHUB_STEP_SUMMARY
+            echo "**Errors:** ${{ needs.production-e2e-tests.outputs.total_errors || 'Unknown' }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Please check the workflow logs and generated issues for details." >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "*Generated by Production E2E Tests workflow*" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive E2E Test Runner</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <style>
+        .test-pass { background-color: #d4edda; border-left: 4px solid #28a745; }
+        .test-fail { background-color: #f8d7da; border-left: 4px solid #dc3545; }
+        .test-running { background-color: #d1ecf1; border-left: 4px solid #17a2b8; }
+        .scenario-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+        .scenario-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .metric-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        .metric-good { background-color: #d4edda; color: #155724; }
+        .metric-warning { background-color: #fff3cd; color: #856404; }
+        .metric-bad { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Comprehensive E2E Test Suite</h1>
+            <p class="text-gray-600">Testing various user personas and scenarios in the Advanced Retirement Planner</p>
+        </header>
+        
+        <!-- Control Panel -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Test Controls</h2>
+                <div class="space-x-2">
+                    <button id="run-all-scenarios" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Run All Scenarios
+                    </button>
+                    <button id="run-edge-cases" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                        Run Edge Cases
+                    </button>
+                    <button id="export-results" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        Export Results
+                    </button>
+                    <button id="clear-results" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                        Clear Results
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Summary Stats -->
+            <div class="grid grid-cols-4 gap-4 mb-4">
+                <div class="text-center p-4 bg-gray-50 rounded">
+                    <div class="text-3xl font-bold text-blue-600" id="total-scenarios">0</div>
+                    <div class="text-sm text-gray-600">Total Scenarios</div>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded">
+                    <div class="text-3xl font-bold text-green-600" id="passed-scenarios">0</div>
+                    <div class="text-sm text-gray-600">Passed</div>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded">
+                    <div class="text-3xl font-bold text-red-600" id="failed-scenarios">0</div>
+                    <div class="text-sm text-gray-600">Failed</div>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded">
+                    <div class="text-3xl font-bold text-gray-600" id="avg-score">0</div>
+                    <div class="text-sm text-gray-600">Avg Health Score</div>
+                </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-200 rounded-full h-4">
+                <div id="progress-bar" class="bg-blue-500 h-4 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <!-- Scenario Results -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+                <h2 class="text-xl font-semibold mb-4">Individual Scenarios</h2>
+                <div id="individual-scenarios">
+                    <!-- Individual scenario results will be inserted here -->
+                </div>
+            </div>
+            
+            <div>
+                <h2 class="text-xl font-semibold mb-4">Couple Scenarios</h2>
+                <div id="couple-scenarios">
+                    <!-- Couple scenario results will be inserted here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Edge Cases Section -->
+        <div class="mt-8">
+            <h2 class="text-xl font-semibold mb-4">Edge Cases & Special Scenarios</h2>
+            <div id="edge-case-scenarios" class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Edge case results will be inserted here -->
+            </div>
+        </div>
+        
+        <!-- Detailed Results Modal -->
+        <div id="results-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white">
+                <div class="mt-3">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" id="modal-title">Detailed Results</h3>
+                    <div id="modal-content" class="mt-2">
+                        <!-- Detailed results will be inserted here -->
+                    </div>
+                    <div class="mt-4">
+                        <button id="close-modal" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden iframe for app testing -->
+    <iframe id="test-iframe" style="display: none; width: 100%; height: 600px; border: 1px solid #ccc;"></iframe>
+    
+    <!-- Hidden root element for component tests -->
+    <div id="test-root" style="display: none;"></div>
+    
+    <!-- Load all required scripts in correct order -->
+    <!-- Core data and translations -->
+    <script src="src/data/marketConstants.js"></script>
+    <script src="src/translations/multiLanguage.js"></script>
+    
+    <!-- Core utilities -->
+    <script src="src/utils/retirementCalculations.js"></script>
+    <script src="src/utils/currencyAPI.js"></script>
+    <script src="src/utils/financialHealthEngine.js"></script>
+    <script src="src/utils/financialHealthValidation.js"></script>
+    <script src="src/utils/financialHealthMessages.js"></script>
+    <script src="src/utils/coupleValidation.js"></script>
+    <script src="src/utils/performanceOptimizer.js"></script>
+    <script src="src/utils/exportFunctions.js"></script>
+    <script src="src/utils/performanceMonitor.js"></script>
+    <script src="src/utils/inputValidation.js"></script>
+    
+    <!-- Components -->
+    <script src="src/components/shared/ErrorBoundary.js"></script>
+    <script src="src/components/forms/BasicInputs.js"></script>
+    <script src="src/components/forms/RetirementAdvancedForm.js"></script>
+    <script src="src/components/shared/EnhancedRSUCompanySelector.js"></script>
+    <script src="src/components/shared/PartnerRSUSelector.js"></script>
+    <script src="src/components/shared/ExportControls.js"></script>
+    
+    <!-- Test Framework and Scenarios -->
+    <script src="tests/browser/test-framework.js"></script>
+    <script src="tests/browser/comprehensive-e2e-scenarios.js"></script>
+    
+    <script>
+        // Initialize test runner for scenarios
+        const scenarioRunner = new BrowserTestRunner({
+            passedElement: document.getElementById('passed-scenarios'),
+            failedElement: document.getElementById('failed-scenarios'),
+            totalElement: document.getElementById('total-scenarios'),
+            progressElement: document.getElementById('progress-bar')
+        });
+        
+        // Test result storage
+        const testResults = {
+            individual: [],
+            couple: [],
+            edgeCases: [],
+            performance: [],
+            timestamp: new Date().toISOString()
+        };
+        
+        // Create scenario card
+        function createScenarioCard(name, profile, results, healthScore) {
+            const card = document.createElement('div');
+            card.className = 'scenario-card bg-white';
+            
+            const isGoodScore = healthScore.totalScore >= 70;
+            const isOkScore = healthScore.totalScore >= 50;
+            
+            card.innerHTML = `
+                <h3 class="font-semibold text-lg mb-2">${name}</h3>
+                <div class="mb-3">
+                    <span class="metric-badge ${isGoodScore ? 'metric-good' : isOkScore ? 'metric-warning' : 'metric-bad'}">
+                        Score: ${healthScore.totalScore}/100
+                    </span>
+                    <span class="metric-badge metric-good">
+                        ${profile.planningType === 'couple' ? 'Couple' : 'Individual'}
+                    </span>
+                    ${profile.currentAge ? `<span class="text-sm text-gray-600">Age: ${profile.currentAge}</span>` : ''}
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div>Monthly Income: ${window.formatCurrency(profile.monthlySalary || 0)}</div>
+                    <div>Retirement: ${window.formatCurrency(results.totalSavings || 0)}</div>
+                    <div>Emergency Fund: ${healthScore.factors.emergencyFund?.details.months?.toFixed(1) || 0} months</div>
+                    <div>Savings Rate: ${healthScore.factors.savingsRate?.details.rate?.toFixed(1) || 0}%</div>
+                </div>
+                <button class="mt-3 text-blue-600 hover:text-blue-800 text-sm font-medium" 
+                        onclick="showDetailedResults('${name}', ${JSON.stringify(profile).replace(/"/g, '&quot;')}, ${JSON.stringify(results).replace(/"/g, '&quot;')}, ${JSON.stringify(healthScore).replace(/"/g, '&quot;')})">
+                    View Details →
+                </button>
+            `;
+            
+            return card;
+        }
+        
+        // Show detailed results in modal
+        window.showDetailedResults = function(name, profile, results, healthScore) {
+            const modal = document.getElementById('results-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            
+            modalTitle.textContent = `${name} - Detailed Analysis`;
+            
+            modalContent.innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded">
+                        <h4 class="font-semibold mb-2">Profile Summary</h4>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div>Planning Type: ${profile.planningType}</div>
+                            <div>Current Age: ${profile.currentAge || profile.partner1CurrentAge || 'N/A'}</div>
+                            <div>Retirement Age: ${profile.retirementAge || profile.partner1RetirementAge || 'N/A'}</div>
+                            <div>Risk Tolerance: ${profile.riskTolerance || 'moderate'}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 rounded">
+                        <h4 class="font-semibold mb-2">Financial Health Breakdown</h4>
+                        <div class="space-y-2">
+                            ${Object.entries(healthScore.factors || {}).map(([factor, data]) => `
+                                <div class="flex justify-between">
+                                    <span>${factor.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                    <span class="font-medium">${data.score}/${data.weight || 0}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 rounded">
+                        <h4 class="font-semibold mb-2">Retirement Projections</h4>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div>Total Savings: ${window.formatCurrency(results.totalSavings || 0)}</div>
+                            <div>Monthly Income: ${window.formatCurrency(results.monthlyRetirementIncome || 0)}</div>
+                            <div>Years to Retire: ${results.yearsToRetirement || 'N/A'}</div>
+                            <div>Years in Retirement: ${results.yearsInRetirement || 'N/A'}</div>
+                        </div>
+                    </div>
+                    
+                    ${healthScore.suggestions && healthScore.suggestions.length > 0 ? `
+                        <div class="bg-yellow-50 p-4 rounded">
+                            <h4 class="font-semibold mb-2">Top Recommendations</h4>
+                            <ul class="list-disc list-inside space-y-1 text-sm">
+                                ${healthScore.suggestions.slice(0, 3).map(s => `
+                                    <li>${s.action}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+        };
+        
+        // Close modal
+        document.getElementById('close-modal').addEventListener('click', () => {
+            document.getElementById('results-modal').classList.add('hidden');
+        });
+        
+        // Export results
+        document.getElementById('export-results').addEventListener('click', () => {
+            const exportData = {
+                timestamp: new Date().toISOString(),
+                totalScenarios: scenarioRunner.tests.length,
+                results: testResults,
+                summary: {
+                    averageScore: parseInt(document.getElementById('avg-score').textContent),
+                    passedScenarios: parseInt(document.getElementById('passed-scenarios').textContent),
+                    failedScenarios: parseInt(document.getElementById('failed-scenarios').textContent)
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `e2e-test-results-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        });
+        
+        // Clear results
+        document.getElementById('clear-results').addEventListener('click', () => {
+            document.getElementById('individual-scenarios').innerHTML = '';
+            document.getElementById('couple-scenarios').innerHTML = '';
+            document.getElementById('edge-case-scenarios').innerHTML = '';
+            document.getElementById('passed-scenarios').textContent = '0';
+            document.getElementById('failed-scenarios').textContent = '0';
+            document.getElementById('total-scenarios').textContent = '0';
+            document.getElementById('avg-score').textContent = '0';
+            document.getElementById('progress-bar').style.width = '0%';
+        });
+        
+        // Run all scenarios
+        async function runAllScenarios() {
+            const profiles = createTestProfiles();
+            let totalScore = 0;
+            let scenarioCount = 0;
+            
+            // Clear previous results
+            document.getElementById('clear-results').click();
+            
+            // Update total count
+            document.getElementById('total-scenarios').textContent = Object.keys(profiles).length;
+            
+            for (const [name, profile] of Object.entries(profiles)) {
+                try {
+                    // Calculate retirement projections
+                    const results = window.calculateRetirement(profile);
+                    
+                    // Calculate financial health score
+                    const healthScore = window.calculateFinancialHealthScore(profile);
+                    
+                    // Create scenario card
+                    const card = createScenarioCard(name, profile, results, healthScore);
+                    
+                    // Add to appropriate section
+                    if (profile.planningType === 'couple') {
+                        document.getElementById('couple-scenarios').appendChild(card);
+                        testResults.couple.push({ name, profile, results, healthScore });
+                    } else {
+                        document.getElementById('individual-scenarios').appendChild(card);
+                        testResults.individual.push({ name, profile, results, healthScore });
+                    }
+                    
+                    // Update statistics
+                    totalScore += healthScore.totalScore;
+                    scenarioCount++;
+                    document.getElementById('passed-scenarios').textContent = scenarioCount;
+                    document.getElementById('avg-score').textContent = Math.round(totalScore / scenarioCount);
+                    
+                    // Update progress
+                    const progress = (scenarioCount / Object.keys(profiles).length) * 100;
+                    document.getElementById('progress-bar').style.width = `${progress}%`;
+                    
+                    // Small delay to show progress
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    
+                } catch (error) {
+                    console.error(`Error in scenario ${name}:`, error);
+                    document.getElementById('failed-scenarios').textContent = 
+                        parseInt(document.getElementById('failed-scenarios').textContent) + 1;
+                }
+            }
+        }
+        
+        // Run edge cases
+        async function runEdgeCases() {
+            const edgeCases = [
+                {
+                    name: 'Zero Values',
+                    profile: {
+                        planningType: 'individual',
+                        currentAge: 30,
+                        retirementAge: 65,
+                        monthlySalary: 0,
+                        monthlyExpenses: 0,
+                        currentSavings: 0
+                    }
+                },
+                {
+                    name: 'Very Young',
+                    profile: {
+                        planningType: 'individual',
+                        currentAge: 18,
+                        retirementAge: 70,
+                        monthlySalary: 5000,
+                        monthlyExpenses: 4000
+                    }
+                },
+                {
+                    name: 'Crypto Only',
+                    profile: {
+                        planningType: 'individual',
+                        currentAge: 35,
+                        retirementAge: 65,
+                        currency: 'BTC',
+                        monthlySalary: 0.5,
+                        monthlyExpenses: 0.3,
+                        crypto: 10
+                    }
+                }
+            ];
+            
+            document.getElementById('edge-case-scenarios').innerHTML = '';
+            
+            for (const testCase of edgeCases) {
+                try {
+                    const results = window.calculateRetirement(testCase.profile);
+                    const healthScore = window.calculateFinancialHealthScore(testCase.profile);
+                    
+                    const card = document.createElement('div');
+                    card.className = 'bg-white p-4 rounded-lg shadow';
+                    card.innerHTML = `
+                        <h4 class="font-semibold mb-2">${testCase.name}</h4>
+                        <div class="text-sm text-gray-600">
+                            <div>Score: ${healthScore.totalScore}/100</div>
+                            <div>Status: ${!isNaN(healthScore.totalScore) ? '✅ Handled' : '❌ Failed'}</div>
+                        </div>
+                    `;
+                    
+                    document.getElementById('edge-case-scenarios').appendChild(card);
+                    testResults.edgeCases.push({ ...testCase, results, healthScore });
+                    
+                } catch (error) {
+                    console.error(`Edge case ${testCase.name} failed:`, error);
+                }
+            }
+        }
+        
+        // Button handlers
+        document.getElementById('run-all-scenarios').addEventListener('click', runAllScenarios);
+        document.getElementById('run-edge-cases').addEventListener('click', runEdgeCases);
+        
+        // Auto-run if specified in URL
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('autorun') === 'true') {
+            setTimeout(() => {
+                document.getElementById('run-all-scenarios').click();
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

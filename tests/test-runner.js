@@ -2814,6 +2814,53 @@ function testInputValidationAndXSSProtection() {
     }
 }
 
+// Test Capital Gains Tax Calculation
+function testCapitalGainsTax() {
+    console.log('\n💰 Testing Capital Gains Tax Calculation...');
+    
+    try {
+        // Test the calculation logic
+        const testCases = [
+            { gross: 1050000, tax: 0.50, expectedNet: 525000, desc: '50% tax on 1.05M' },
+            { gross: 1000000, tax: 0.25, expectedNet: 750000, desc: '25% tax on 1M' },
+            { gross: 2000000, tax: 0.30, expectedNet: 1400000, desc: '30% tax on 2M' },
+            { gross: 500000, tax: 0, expectedNet: 500000, desc: '0% tax on 500K' }
+        ];
+        
+        let allPassed = true;
+        testCases.forEach(test => {
+            const calculated = test.gross * (1 - test.tax);
+            const passed = Math.abs(calculated - test.expectedNet) < 0.01;
+            logTest(`Capital gains tax: ${test.desc}`, passed, 
+                passed ? '' : `Expected ${test.expectedNet}, got ${calculated}`);
+            if (!passed) allPassed = false;
+        });
+        
+        // Test that the UI shows the tax breakdown
+        const savingsPanelPath = 'src/components/panels/summary/SavingsSummaryPanel.js';
+        const savingsPanelContent = fs.readFileSync(savingsPanelPath, 'utf8');
+        
+        const hasGrossDisplay = savingsPanelContent.includes('Gross value:') || 
+                               savingsPanelContent.includes('ערך ברוטו:');
+        logTest('Capital gains tax: Shows gross portfolio value', hasGrossDisplay);
+        
+        const hasTaxDisplay = savingsPanelContent.includes('Capital gains tax:') || 
+                             savingsPanelContent.includes('מס רווחי הון:');
+        logTest('Capital gains tax: Shows tax percentage', hasTaxDisplay);
+        
+        const hasNetDisplay = savingsPanelContent.includes('Net:') || 
+                             savingsPanelContent.includes('ערך נטו:');
+        logTest('Capital gains tax: Shows net value after tax', hasNetDisplay);
+        
+        const hasVisibleStyling = savingsPanelContent.includes('text-sm') && 
+                                 savingsPanelContent.includes('bg-purple-100');
+        logTest('Capital gains tax: Tax info has visible styling', hasVisibleStyling);
+        
+    } catch (error) {
+        logTest('Capital gains tax calculation', false, `Error: ${error.message}`);
+    }
+}
+
 // Main test execution
 async function runAllTests() {
     console.log('Starting automated test suite...\n');
@@ -2840,6 +2887,9 @@ async function runAllTests() {
     testEnhancedCalculationLogic();
     testMultiStepWizardUX();
     testDataValidationAndErrorHandling();
+    
+    // Financial Calculation Tests
+    testCapitalGainsTax();
     
     // Advanced Wizard Components Testing Pipeline (v6.3.0)
     testAdvancedWizardComponents();

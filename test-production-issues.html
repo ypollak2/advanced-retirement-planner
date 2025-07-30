@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Issues Scanner - Advanced Retirement Planner</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <style>
+        .issue-critical { background-color: #fee; border-left: 4px solid #dc3545; }
+        .issue-warning { background-color: #fff3cd; border-left: 4px solid #ffc107; }
+        .issue-info { background-color: #d1ecf1; border-left: 4px solid #17a2b8; }
+        .issue-success { background-color: #d4edda; border-left: 4px solid #28a745; }
+        .console-error { color: #ff6b6b; }
+        .console-warn { color: #ffd93d; }
+        .console-log { color: #51cf66; }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Production Issues Scanner</h1>
+            <p class="text-gray-600">Comprehensive scan for potential production issues in Advanced Retirement Planner</p>
+        </header>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Scan Controls</h2>
+                <div class="space-x-2">
+                    <button id="run-scan" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Run Full Scan
+                    </button>
+                    <button id="clear-results" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                        Clear Results
+                    </button>
+                </div>
+            </div>
+            
+            <div id="scan-progress" class="hidden">
+                <div class="flex items-center space-x-4">
+                    <div class="loading-spinner"></div>
+                    <span id="current-scan" class="text-gray-600">Initializing scan...</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-4 mt-4">
+                    <div id="progress-bar" class="bg-blue-500 h-4 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4">Issues Found</h2>
+                <div id="issues-list" class="space-y-2 max-h-96 overflow-y-auto">
+                    <p class="text-gray-500">No scan run yet</p>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4">Console Output</h2>
+                <div id="console-output" class="bg-gray-900 text-green-400 p-4 rounded max-h-96 overflow-y-auto font-mono text-sm">
+                    <p>Console output will appear here...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+            <h2 class="text-xl font-semibold mb-4">Scan Summary</h2>
+            <div id="scan-summary" class="grid grid-cols-4 gap-4">
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-red-600" id="critical-count">0</div>
+                    <div class="text-sm text-gray-600">Critical</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-yellow-600" id="warning-count">0</div>
+                    <div class="text-sm text-gray-600">Warnings</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-blue-600" id="info-count">0</div>
+                    <div class="text-sm text-gray-600">Info</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-green-600" id="success-count">0</div>
+                    <div class="text-sm text-gray-600">Passed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden iframe for testing -->
+    <iframe id="test-iframe" style="display: none; width: 100%; height: 600px; border: 1px solid #ccc;"></iframe>
+    
+    <script>
+        // Production Issues Scanner
+        class ProductionScanner {
+            constructor() {
+                this.issues = [];
+                this.consoleBuffer = [];
+                this.counts = { critical: 0, warning: 0, info: 0, success: 0 };
+                this.setupConsoleInterceptor();
+                this.setupEventHandlers();
+            }
+            
+            setupConsoleInterceptor() {
+                const originalLog = console.log;
+                const originalError = console.error;
+                const originalWarn = console.warn;
+                
+                console.log = (...args) => {
+                    originalLog.apply(console, args);
+                    this.logToConsole('log', args);
+                };
+                
+                console.error = (...args) => {
+                    originalError.apply(console, args);
+                    this.logToConsole('error', args);
+                    // Track errors as issues
+                    this.addIssue('critical', 'Console Error', args.join(' '));
+                };
+                
+                console.warn = (...args) => {
+                    originalWarn.apply(console, args);
+                    this.logToConsole('warn', args);
+                    // Track warnings as issues
+                    this.addIssue('warning', 'Console Warning', args.join(' '));
+                };
+                
+                // Global error handler
+                window.addEventListener('error', (event) => {
+                    this.addIssue('critical', 'Uncaught Error', `${event.message} at ${event.filename}:${event.lineno}`);
+                });
+                
+                // Promise rejection handler
+                window.addEventListener('unhandledrejection', (event) => {
+                    this.addIssue('critical', 'Unhandled Promise Rejection', event.reason);
+                });
+            }
+            
+            setupEventHandlers() {
+                document.getElementById('run-scan').addEventListener('click', () => this.runFullScan());
+                document.getElementById('clear-results').addEventListener('click', () => this.clearResults());
+            }
+            
+            logToConsole(type, args) {
+                const message = args.map(arg => 
+                    typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+                ).join(' ');
+                
+                const entry = document.createElement('div');
+                entry.className = `console-${type} mb-1`;
+                
+                const timestamp = new Date().toLocaleTimeString();
+                entry.innerHTML = `[${timestamp}] ${this.escapeHtml(message)}`;
+                
+                const consoleEl = document.getElementById('console-output');
+                consoleEl.appendChild(entry);
+                consoleEl.scrollTop = consoleEl.scrollHeight;
+            }
+            
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            addIssue(severity, title, description) {
+                this.issues.push({ severity, title, description, timestamp: new Date() });
+                this.counts[severity]++;
+                this.updateUI();
+            }
+            
+            clearResults() {
+                this.issues = [];
+                this.counts = { critical: 0, warning: 0, info: 0, success: 0 };
+                document.getElementById('issues-list').innerHTML = '<p class="text-gray-500">No scan run yet</p>';
+                document.getElementById('console-output').innerHTML = '<p>Console cleared</p>';
+                this.updateUI();
+            }
+            
+            updateUI() {
+                // Update counts
+                document.getElementById('critical-count').textContent = this.counts.critical;
+                document.getElementById('warning-count').textContent = this.counts.warning;
+                document.getElementById('info-count').textContent = this.counts.info;
+                document.getElementById('success-count').textContent = this.counts.success;
+                
+                // Update issues list
+                const issuesList = document.getElementById('issues-list');
+                if (this.issues.length === 0) return;
+                
+                const latestIssue = this.issues[this.issues.length - 1];
+                const issueDiv = document.createElement('div');
+                issueDiv.className = `p-3 mb-2 rounded issue-${latestIssue.severity}`;
+                
+                issueDiv.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="font-semibold">${latestIssue.title}</div>
+                            <div class="text-sm mt-1">${this.escapeHtml(latestIssue.description)}</div>
+                        </div>
+                        <div class="text-xs text-gray-500">${latestIssue.timestamp.toLocaleTimeString()}</div>
+                    </div>
+                `;
+                
+                if (issuesList.querySelector('.text-gray-500')) {
+                    issuesList.innerHTML = '';
+                }
+                issuesList.appendChild(issueDiv);
+            }
+            
+            async runFullScan() {
+                this.clearResults();
+                document.getElementById('scan-progress').classList.remove('hidden');
+                
+                const scanSteps = [
+                    { name: 'Loading Scripts', fn: () => this.scanScriptLoading() },
+                    { name: 'Component Loading', fn: () => this.scanComponentLoading() },
+                    { name: 'API Methods', fn: () => this.scanAPIMethods() },
+                    { name: 'React Components', fn: () => this.scanReactComponents() },
+                    { name: 'Financial Calculations', fn: () => this.scanFinancialCalculations() },
+                    { name: 'Currency Conversions', fn: () => this.scanCurrencyConversions() },
+                    { name: 'Data Validation', fn: () => this.scanDataValidation() },
+                    { name: 'Local Storage', fn: () => this.scanLocalStorage() },
+                    { name: 'Network Requests', fn: () => this.scanNetworkRequests() },
+                    { name: 'Performance', fn: () => this.scanPerformance() }
+                ];
+                
+                for (let i = 0; i < scanSteps.length; i++) {
+                    const step = scanSteps[i];
+                    document.getElementById('current-scan').textContent = `Scanning: ${step.name}...`;
+                    document.getElementById('progress-bar').style.width = `${((i + 1) / scanSteps.length) * 100}%`;
+                    
+                    try {
+                        await step.fn();
+                        await this.wait(500); // Visual delay
+                    } catch (error) {
+                        this.addIssue('critical', `Scan Failed: ${step.name}`, error.message);
+                    }
+                }
+                
+                document.getElementById('scan-progress').classList.add('hidden');
+                this.generateSummary();
+            }
+            
+            async scanScriptLoading() {
+                // Check if all critical scripts are loaded
+                const requiredScripts = [
+                    { name: 'React', check: () => window.React },
+                    { name: 'ReactDOM', check: () => window.ReactDOM },
+                    { name: 'RetirementPlannerApp', check: () => window.RetirementPlannerApp },
+                    { name: 'calculateRetirement', check: () => window.calculateRetirement },
+                    { name: 'CurrencyAPI', check: () => window.CurrencyAPI },
+                    { name: 'financialHealthEngine', check: () => window.financialHealthEngine }
+                ];
+                
+                for (const script of requiredScripts) {
+                    if (script.check()) {
+                        this.addIssue('success', `Script Loaded: ${script.name}`, 'Successfully loaded');
+                    } else {
+                        this.addIssue('critical', `Script Missing: ${script.name}`, 'Required script not loaded');
+                    }
+                }
+            }
+            
+            async scanComponentLoading() {
+                // Check React components
+                const components = [
+                    'EnhancedRSUCompanySelector',
+                    'PartnerRSUSelector',
+                    'WizardStepSalary',
+                    'WizardStepSavings',
+                    'FinancialHealthScoreEnhanced',
+                    'ExportControls',
+                    'MissingDataModal'
+                ];
+                
+                for (const comp of components) {
+                    if (window[comp]) {
+                        // Try to create the component
+                        try {
+                            const element = React.createElement(window[comp], {
+                                inputs: {},
+                                updateInputs: () => {},
+                                language: 'en'
+                            });
+                            this.addIssue('success', `Component OK: ${comp}`, 'Component can be created');
+                        } catch (error) {
+                            this.addIssue('warning', `Component Issue: ${comp}`, error.message);
+                        }
+                    } else {
+                        this.addIssue('warning', `Component Missing: ${comp}`, 'Component not found in window');
+                    }
+                }
+            }
+            
+            async scanAPIMethods() {
+                // Check CurrencyAPI methods
+                if (window.CurrencyAPI) {
+                    const api = new window.CurrencyAPI();
+                    
+                    // Check for the corrected method name
+                    if (typeof api.fetchExchangeRates === 'function') {
+                        this.addIssue('success', 'CurrencyAPI Method', 'fetchExchangeRates method exists');
+                    } else {
+                        this.addIssue('critical', 'CurrencyAPI Method Missing', 'fetchExchangeRates method not found');
+                    }
+                    
+                    // Check for the old incorrect method
+                    if (typeof api.getExchangeRates === 'function') {
+                        this.addIssue('critical', 'CurrencyAPI Old Method', 'getExchangeRates method should not exist');
+                    } else {
+                        this.addIssue('success', 'CurrencyAPI Clean', 'No legacy getExchangeRates method');
+                    }
+                    
+                    // Test actual API call
+                    try {
+                        const rates = await api.fetchExchangeRates();
+                        if (rates && rates.USD) {
+                            this.addIssue('success', 'Currency Rates', `Successfully fetched rates: USD=${rates.USD}`);
+                        } else {
+                            this.addIssue('warning', 'Currency Rates', 'Rates fetched but format unexpected');
+                        }
+                    } catch (error) {
+                        this.addIssue('warning', 'Currency API Error', error.message);
+                    }
+                }
+            }
+            
+            async scanReactComponents() {
+                // Test rendering critical components
+                const container = document.createElement('div');
+                container.style.display = 'none';
+                document.body.appendChild(container);
+                
+                try {
+                    // Test RSU component with currency
+                    if (window.EnhancedRSUCompanySelector) {
+                        const root = ReactDOM.createRoot(container);
+                        const component = React.createElement(window.EnhancedRSUCompanySelector, {
+                            inputs: { workingCurrency: 'ILS', hasRSU: true },
+                            updateInputs: () => {},
+                            language: 'en'
+                        });
+                        
+                        await new Promise((resolve, reject) => {
+                            try {
+                                root.render(component);
+                                setTimeout(() => {
+                                    this.addIssue('success', 'RSU Component Render', 'EnhancedRSUCompanySelector renders without errors');
+                                    resolve();
+                                }, 1000);
+                            } catch (error) {
+                                this.addIssue('critical', 'RSU Component Error', error.message);
+                                reject(error);
+                            }
+                        });
+                    }
+                } catch (error) {
+                    // Error already logged
+                } finally {
+                    document.body.removeChild(container);
+                }
+            }
+            
+            async scanFinancialCalculations() {
+                // Test calculations with various inputs
+                const testCases = [
+                    {
+                        name: 'Basic Individual',
+                        inputs: {
+                            currentAge: 30,
+                            retirementAge: 65,
+                            monthlySalary: 10000,
+                            currentSavings: 50000
+                        }
+                    },
+                    {
+                        name: 'Couple Mode',
+                        inputs: {
+                            planningType: 'couple',
+                            partner1CurrentAge: 35,
+                            partner2CurrentAge: 33,
+                            partner1Salary: 15000,
+                            partner2Salary: 12000
+                        }
+                    },
+                    {
+                        name: 'With RSU',
+                        inputs: {
+                            currentAge: 40,
+                            retirementAge: 60,
+                            monthlySalary: 30000,
+                            hasRSU: true,
+                            rsuAmount: 50000
+                        }
+                    }
+                ];
+                
+                for (const testCase of testCases) {
+                    try {
+                        const result = window.calculateRetirement(testCase.inputs);
+                        if (result && result.totalSavings > 0) {
+                            this.addIssue('success', `Calculation: ${testCase.name}`, `Total savings: ${result.totalSavings.toLocaleString()}`);
+                        } else {
+                            this.addIssue('warning', `Calculation: ${testCase.name}`, 'Result is zero or invalid');
+                        }
+                    } catch (error) {
+                        this.addIssue('critical', `Calculation Error: ${testCase.name}`, error.message);
+                    }
+                }
+            }
+            
+            async scanCurrencyConversions() {
+                if (!window.CurrencyAPI) return;
+                
+                const api = new window.CurrencyAPI();
+                const currencies = ['USD', 'EUR', 'GBP', 'BTC', 'ETH'];
+                
+                for (const currency of currencies) {
+                    try {
+                        const rate = await api.getRate(currency, 'ILS');
+                        if (rate > 0) {
+                            this.addIssue('success', `Currency Rate: ${currency}`, `1 ${currency} = ${rate.toFixed(2)} ILS`);
+                        } else {
+                            this.addIssue('warning', `Currency Rate: ${currency}`, 'Invalid rate returned');
+                        }
+                    } catch (error) {
+                        this.addIssue('warning', `Currency Error: ${currency}`, error.message);
+                    }
+                }
+            }
+            
+            async scanDataValidation() {
+                // Test validation functions
+                if (window.coupleValidation) {
+                    const validationTests = [
+                        { ages: [30, 65], expected: true, name: 'Valid ages' },
+                        { ages: [65, 65], expected: false, name: 'Same ages' },
+                        { ages: [70, 65], expected: false, name: 'Current > Retirement' },
+                        { ages: [15, 65], expected: false, name: 'Too young' }
+                    ];
+                    
+                    for (const test of validationTests) {
+                        const result = window.coupleValidation.validatePartnerAge(...test.ages);
+                        if (result === test.expected) {
+                            this.addIssue('success', `Validation: ${test.name}`, 'Validation working correctly');
+                        } else {
+                            this.addIssue('critical', `Validation: ${test.name}`, `Expected ${test.expected}, got ${result}`);
+                        }
+                    }
+                }
+            }
+            
+            async scanLocalStorage() {
+                try {
+                    // Test localStorage access
+                    localStorage.setItem('test-scanner', 'test-value');
+                    const value = localStorage.getItem('test-scanner');
+                    localStorage.removeItem('test-scanner');
+                    
+                    if (value === 'test-value') {
+                        this.addIssue('success', 'LocalStorage', 'Read/write working correctly');
+                    } else {
+                        this.addIssue('warning', 'LocalStorage', 'Unexpected behavior');
+                    }
+                    
+                    // Check for saved data
+                    const savedInputs = localStorage.getItem('retirementWizardInputs');
+                    if (savedInputs) {
+                        try {
+                            const data = JSON.parse(savedInputs);
+                            this.addIssue('info', 'Saved Data', `Found saved inputs with ${Object.keys(data).length} fields`);
+                        } catch (error) {
+                            this.addIssue('warning', 'Saved Data', 'Could not parse saved inputs');
+                        }
+                    }
+                } catch (error) {
+                    this.addIssue('critical', 'LocalStorage Error', error.message);
+                }
+            }
+            
+            async scanNetworkRequests() {
+                // Monitor network requests for a short period
+                const requests = [];
+                const originalFetch = window.fetch;
+                
+                window.fetch = function(...args) {
+                    requests.push({ url: args[0], timestamp: new Date() });
+                    return originalFetch.apply(this, args);
+                };
+                
+                // Wait a bit to catch any automatic requests
+                await this.wait(2000);
+                
+                window.fetch = originalFetch;
+                
+                if (requests.length > 0) {
+                    this.addIssue('info', 'Network Activity', `${requests.length} fetch requests detected`);
+                    requests.forEach(req => {
+                        this.addIssue('info', 'Network Request', req.url);
+                    });
+                } else {
+                    this.addIssue('success', 'Network', 'No unexpected network requests on load');
+                }
+            }
+            
+            async scanPerformance() {
+                // Check performance metrics
+                if (window.performanceMonitor) {
+                    const metrics = window.performanceMonitor.getMetrics();
+                    if (metrics) {
+                        this.addIssue('info', 'Performance Metrics', 'Performance monitoring active');
+                    }
+                }
+                
+                // Check for memory leaks indicators
+                if (window.performanceOptimizer) {
+                    this.addIssue('success', 'Performance Optimizer', 'Optimization system loaded');
+                }
+                
+                // Check script count
+                const scripts = document.querySelectorAll('script');
+                if (scripts.length > 100) {
+                    this.addIssue('warning', 'Script Count', `${scripts.length} scripts loaded - consider bundling`);
+                } else {
+                    this.addIssue('success', 'Script Count', `${scripts.length} scripts loaded`);
+                }
+            }
+            
+            generateSummary() {
+                const total = Object.values(this.counts).reduce((a, b) => a + b, 0);
+                const criticalRate = (this.counts.critical / total * 100).toFixed(1);
+                
+                const summaryDiv = document.createElement('div');
+                summaryDiv.className = 'mt-4 p-4 rounded bg-gray-100';
+                
+                let status, statusColor;
+                if (this.counts.critical === 0) {
+                    status = 'Production Ready';
+                    statusColor = 'text-green-600';
+                } else if (this.counts.critical <= 2) {
+                    status = 'Minor Issues';
+                    statusColor = 'text-yellow-600';
+                } else {
+                    status = 'Critical Issues Found';
+                    statusColor = 'text-red-600';
+                }
+                
+                summaryDiv.innerHTML = `
+                    <h3 class="font-bold text-lg mb-2">Scan Complete</h3>
+                    <p class="${statusColor} font-bold text-xl">${status}</p>
+                    <p class="mt-2">Total checks: ${total}</p>
+                    <p>Critical issues: ${this.counts.critical} (${criticalRate}%)</p>
+                    <p class="mt-2 text-sm text-gray-600">
+                        ${this.counts.critical === 0 ? 
+                            'No critical issues found. The application appears ready for production.' :
+                            'Please address the critical issues before deploying to production.'}
+                    </p>
+                `;
+                
+                document.getElementById('scan-summary').appendChild(summaryDiv);
+            }
+            
+            wait(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+        
+        // Initialize scanner
+        const scanner = new ProductionScanner();
+        
+        // Load the actual app in hidden iframe to trigger all scripts
+        window.addEventListener('DOMContentLoaded', () => {
+            const iframe = document.getElementById('test-iframe');
+            iframe.src = 'index.html';
+        });
+    </script>
+</body>
+</html>

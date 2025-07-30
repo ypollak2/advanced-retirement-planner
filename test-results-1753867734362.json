@@ -1,0 +1,212 @@
+{
+  "timestamp": "2025-07-30T09:28:54.362Z",
+  "summary": {
+    "total": 20,
+    "passed": 20,
+    "failed": 0,
+    "errors": 0
+  },
+  "results": [
+    {
+      "scenario": "1. Young Professional (Israel)",
+      "score": 80,
+      "executionTime": 19,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "2. Mid-Career (USA)",
+      "score": 65,
+      "executionTime": 4,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "3. Pre-Retiree (UK)",
+      "score": 54,
+      "executionTime": 3,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "4. High Earner with RSUs (Israel)",
+      "score": 71,
+      "executionTime": 2,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "5. Freelancer (Israel)",
+      "score": 89,
+      "executionTime": 1,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "6. Minimal Data",
+      "score": 28,
+      "executionTime": 3,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "7. Maximum Data",
+      "score": 93,
+      "executionTime": 1,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "8. Retired Individual",
+      "score": 44,
+      "executionTime": 3,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "9. International Worker",
+      "score": 59,
+      "executionTime": 3,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "10. Debt Situation",
+      "score": 39,
+      "executionTime": 3,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "11. Young Couple (Israel)",
+      "score": 69,
+      "executionTime": 1,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "12. Mid-Career Family",
+      "score": 76,
+      "executionTime": 1,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "13. Single Earner Couple",
+      "score": 68,
+      "executionTime": 1,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "14. Both Retired",
+      "score": 38,
+      "executionTime": 5,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "15. Mixed Employment",
+      "score": 72,
+      "executionTime": 1,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "16. International Couple",
+      "score": 72,
+      "executionTime": 2,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "17. High Net Worth Couple",
+      "score": 72,
+      "executionTime": 1,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "18. Debt-Heavy Couple",
+      "score": 66,
+      "executionTime": 1,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "19. Minimal Couple Data",
+      "score": 28,
+      "executionTime": 5,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    },
+    {
+      "scenario": "20. Complex Portfolio Couple",
+      "score": 88,
+      "executionTime": 0,
+      "fallbackCount": 0,
+      "warningCount": 0,
+      "errorCount": 0,
+      "fallbacks": [],
+      "status": "PASS"
+    }
+  ],
+  "missingFields": {}
+}

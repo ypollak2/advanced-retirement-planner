@@ -210,14 +210,14 @@ const SavingsSummaryPanel = ({
                     // Show taxation breakdown
                     React.createElement('div', {
                         key: 'portfolio-taxation',
-                        className: "text-xs text-purple-600 mt-1 space-y-1"
+                        className: "text-sm text-purple-600 mt-2 space-y-1 bg-purple-100 p-2 rounded"
                     }, [
                         React.createElement('div', { key: 'gross-value' }, 
                             `${language === 'he' ? 'ערך ברוטו:' : 'Gross value:'} ${formatCurrency(grossPersonalPortfolio, workingCurrency)}`),
                         React.createElement('div', { key: 'tax-rate' }, 
                             `${language === 'he' ? 'מס רווחי הון:' : 'Capital gains tax:'} ${(portfolioTaxRate * 100).toFixed(0)}%`),
-                        React.createElement('div', { key: 'net-value', className: "font-semibold" }, 
-                            `${language === 'he' ? 'ערך נטו:' : 'Net value:'} ${formatCurrency(netPersonalPortfolio, workingCurrency)}`)
+                        React.createElement('div', { key: 'net-value', className: "font-bold text-purple-800" }, 
+                            `${language === 'he' ? 'ערך נטו:' : 'Net:'} ${formatCurrency(netPersonalPortfolio, workingCurrency)}`)
                     ])
                 ]),
                 

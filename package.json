@@ -66,7 +66,9 @@
     "qa:full": "npm test && node tests/security-qa-analysis.js && npm run test:components && npm run test:accessibility && npm run test:ux && npm run test:language && npm run test:version && npm run test:currency",
     "qa:security": "node tests/security-qa-analysis.js",
     "security:check": "node scripts/security-check.js",
-    "security:scan": "node scripts/secret-scanner.js scan",
+    "security:scan": "node scripts/secret-scanner.js scan --config .credential-scanner.json",
+    "security:scan-production": "node scripts/secret-scanner.js scan --config .credential-scanner.json --exclude tests/**",
+    "security:scan-strict": "node scripts/secret-scanner.js scan --no-crypto-filter --no-ui-filter --no-testing-filter",
     "security:scan-json": "node scripts/secret-scanner.js scan --format json",
     "security:scan-report": "node scripts/secret-scanner.js scan --format markdown --output security-report.md",
     "qa:business-logic": "node tests/business-logic-validator.js",
@@ -129,5 +131,8 @@
     "last 2 versions",
     "not dead",
     "not ie 11"
-  ]
+  ],
+  "dependencies": {
+    "playwright": "^1.54.1"
+  }
 }

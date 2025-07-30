@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Health Score E2E Tests - AUDIT-001</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        .test-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+        .test-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .status-pass { background: #4CAF50; color: white; }
+        .status-fail { background: #f44336; color: white; }
+        .status-warning { background: #ff9800; color: white; }
+        .test-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .info-card {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+        }
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+        .info-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+        .score-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .score-item {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            border: 1px solid #bbdefb;
+        }
+        .score-name {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .score-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1976d2;
+        }
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border: 1px solid #ef5350;
+        }
+        .summary {
+            background: #2196F3;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .summary h2 {
+            margin-top: 0;
+        }
+        .logs {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Financial Health Score E2E Tests - AUDIT-001</h1>
+    <p>Testing comprehensive scenarios from the AUDIT-001 plan to validate Financial Health Score calculations.</p>
+    
+    <div id="test-results"></div>
+    
+    <div class="summary" id="summary" style="display:none;">
+        <h2>Test Summary</h2>
+        <div id="summary-content"></div>
+    </div>
+
+    <!-- Load dependencies -->
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/recharts@2.5.0/dist/Recharts.js"></script>
+    
+    <!-- Load financial health engine -->
+    <script src="src/utils/financialHealthEngine.js"></script>
+    
+    <script>
+        // Test scenarios from AUDIT-001
+        const testScenarios = [
+            {
+                name: "Young Professional (Individual, Israel) 🇮🇱",
+                description: "Tech worker starting retirement planning",
+                expectedMin: 65,
+                expectedMax: 75,
+                data: {
+                    planningType: "individual",
+                    currentAge: 28,
+                    retirementAge: 67,
+                    country: "israel",
+                    currentMonthlySalary: 15000,
+                    currency: "ILS",
+                    pensionEmployeeRate: 7,
+                    pensionEmployerRate: 14.33,
+                    trainingFundEmployeeRate: 2.5,
+                    trainingFundEmployerRate: 7.5,
+                    currentBankAccount: 30000,
+                    currentPersonalPortfolio: 50000,
+                    personalPortfolioReturn: 8,
+                    currentMonthlyExpenses: 12000,
+                    monthlyAdditionalSavings: 1000,
+                    riskTolerance: "moderate"
+                }
+            },
+            {
+                name: "Mid-Career Couple (Israel) 👫",
+                description: "Dual-income family with mortgage",
+                expectedMin: 75,
+                expectedMax: 85,
+                data: {
+                    planningType: "couple",
+                    currentAge: 42,
+                    partnerCurrentAge: 40,
+                    retirementAge: 67,
+                    partnerRetirementAge: 65,
+                    country: "israel",
+                    partner1Salary: 25000,
+                    partner2Salary: 20000,
+                    currency: "ILS",
+                    currentPensionSavings: 800000,
+                    partnerCurrentSavings: 600000,
+                    emergencyFund: 150000,
+                    currentPersonalPortfolio: 300000,
+                    expenses: {
+                        housing: 8000,
+                        transportation: 3000,
+                        food: 4000,
+                        insurance: 2000,
+                        other: 3000,
+                        mortgage: 8000,
+                        carLoan: 2000
+                    },
+                    pensionEmployeeRate: 7,
+                    pensionEmployerRate: 14.33
+                }
+            },
+            {
+                name: "Pre-Retirement (Individual, USA) 🇺🇸",
+                description: "American nearing retirement with substantial savings",
+                expectedMin: 80,
+                expectedMax: 90,
+                data: {
+                    planningType: "individual",
+                    currentAge: 58,
+                    retirementAge: 65,
+                    country: "usa",
+                    currentMonthlySalary: 8000,
+                    currency: "USD",
+                    current401k: 750000,
+                    currentIRA: 250000,
+                    currentBankAccount: 50000,
+                    currentPersonalPortfolio: 200000,
+                    currentMonthlyExpenses: 6000,
+                    riskTolerance: "conservative"
+                }
+            },
+            {
+                name: "High Earner with RSUs (Individual, Israel) 📈",
+                description: "Tech executive with stock compensation",
+                expectedMin: 85,
+                expectedMax: 95,
+                data: {
+                    planningType: "individual",
+                    currentAge: 35,
+                    retirementAge: 60,
+                    country: "israel",
+                    currentMonthlySalary: 40000,
+                    currency: "ILS",
+                    rsuCompany: "AAPL",
+                    rsuUnits: 100,
+                    rsuFrequency: "quarterly",
+                    rsuCurrentStockPrice: 190.75,
+                    annualBonus: 150000,
+                    currentPensionSavings: 300000,
+                    currentCrypto: 100000,
+                    currentPersonalPortfolio: 500000,
+                    emergencyFund: 200000,
+                    pensionEmployeeRate: 7,
+                    pensionEmployerRate: 14.33,
+                    riskTolerance: "aggressive"
+                }
+            },
+            {
+                name: "Debt-Heavy Young Family (Couple, Israel) ⚠️",
+                description: "Young couple struggling with debt",
+                expectedMin: 25,
+                expectedMax: 35,
+                data: {
+                    planningType: "couple",
+                    currentAge: 32,
+                    partnerCurrentAge: 30,
+                    retirementAge: 67,
+                    partnerRetirementAge: 67,
+                    country: "israel",
+                    partner1Salary: 12000,
+                    partner2Salary: 10000,
+                    currency: "ILS",
+                    currentPensionSavings: 50000,
+                    partnerCurrentSavings: 30000,
+                    emergencyFund: 10000,
+                    expenses: {
+                        housing: 3000,
+                        transportation: 2000,
+                        food: 3000,
+                        insurance: 1000,
+                        other: 2000,
+                        mortgage: 7000,
+                        carLoan: 2000,
+                        creditCard: 1500
+                    },
+                    pensionEmployeeRate: 7,
+                    pensionEmployerRate: 14.33
+                }
+            },
+            {
+                name: "Minimum Data Entry ⚠️",
+                description: "User with minimal data provided",
+                expectedMin: 15,
+                expectedMax: 25,
+                data: {
+                    planningType: "individual",
+                    currentAge: 40,
+                    retirementAge: 67,
+                    currentMonthlySalary: 10000,
+                    currency: "ILS"
+                }
+            }
+        ];
+
+        // Run all tests
+        async function runAllTests() {
+            const results = [];
+            const container = document.getElementById('test-results');
+            container.innerHTML = '';
+            
+            for (const scenario of testScenarios) {
+                const testResult = await runTest(scenario);
+                results.push(testResult);
+                displayTestResult(testResult, container);
+            }
+            
+            displaySummary(results);
+        }
+
+        // Run individual test
+        async function runTest(scenario) {
+            const startTime = Date.now();
+            const logs = [];
+            
+            // Capture console logs
+            const originalLog = console.log;
+            const originalWarn = console.warn;
+            const originalError = console.error;
+            
+            console.log = (...args) => {
+                logs.push({ type: 'log', message: args.join(' ') });
+                originalLog.apply(console, args);
+            };
+            console.warn = (...args) => {
+                logs.push({ type: 'warn', message: args.join(' ') });
+                originalWarn.apply(console, args);
+            };
+            console.error = (...args) => {
+                logs.push({ type: 'error', message: args.join(' ') });
+                originalError.apply(console, args);
+            };
+            
+            let result;
+            let error = null;
+            
+            try {
+                // Run the calculation
+                result = calculateFinancialHealthScore(scenario.data);
+            } catch (e) {
+                error = e;
+                result = null;
+            }
+            
+            // Restore console
+            console.log = originalLog;
+            console.warn = originalWarn;
+            console.error = originalError;
+            
+            const endTime = Date.now();
+            
+            return {
+                scenario,
+                result,
+                error,
+                logs,
+                duration: endTime - startTime,
+                passed: result && 
+                        result.totalScore >= scenario.expectedMin && 
+                        result.totalScore <= scenario.expectedMax &&
+                        !hasNaN(result),
+                hasNaN: result ? hasNaN(result) : true
+            };
+        }
+
+        // Check for NaN values in result
+        function hasNaN(obj) {
+            if (typeof obj === 'number') {
+                return isNaN(obj);
+            }
+            if (typeof obj === 'object' && obj !== null) {
+                for (const key in obj) {
+                    if (hasNaN(obj[key])) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        // Display individual test result
+        function displayTestResult(testResult, container) {
+            const { scenario, result, error, logs, duration, passed, hasNaN } = testResult;
+            
+            const testDiv = document.createElement('div');
+            testDiv.className = 'test-container';
+            
+            let statusClass = 'status-pass';
+            let statusText = 'PASS';
+            
+            if (error || !result) {
+                statusClass = 'status-fail';
+                statusText = 'ERROR';
+            } else if (!passed) {
+                statusClass = 'status-fail';
+                statusText = 'FAIL';
+            } else if (hasNaN) {
+                statusClass = 'status-warning';
+                statusText = 'NaN DETECTED';
+            }
+            
+            testDiv.innerHTML = `
+                <div class="test-header">
+                    <div class="test-title">${scenario.name}</div>
+                    <div class="test-status ${statusClass}">${statusText}</div>
+                </div>
+                <p style="color: #666; margin: 5px 0;">${scenario.description}</p>
+                
+                <div class="test-info">
+                    <div class="info-card">
+                        <div class="info-label">Expected Score</div>
+                        <div class="info-value">${scenario.expectedMin}-${scenario.expectedMax}/100</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Actual Score</div>
+                        <div class="info-value" style="color: ${passed ? '#4CAF50' : '#f44336'}">
+                            ${result ? result.totalScore + '/100' : 'ERROR'}
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Duration</div>
+                        <div class="info-value">${duration}ms</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">NaN Check</div>
+                        <div class="info-value" style="color: ${hasNaN ? '#f44336' : '#4CAF50'}">
+                            ${hasNaN ? 'FAILED' : 'PASSED'}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            if (error) {
+                testDiv.innerHTML += `
+                    <div class="error-message">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+            
+            if (result && result.factors) {
+                const breakdownDiv = document.createElement('div');
+                breakdownDiv.className = 'score-breakdown';
+                
+                Object.entries(result.factors).forEach(([factor, data]) => {
+                    const scoreItem = document.createElement('div');
+                    scoreItem.className = 'score-item';
+                    scoreItem.innerHTML = `
+                        <div class="score-name">${factor}</div>
+                        <div class="score-value">${data.score}/${data.maxScore}</div>
+                    `;
+                    breakdownDiv.appendChild(scoreItem);
+                });
+                
+                testDiv.appendChild(breakdownDiv);
+            }
+            
+            if (logs.length > 0) {
+                const logsDiv = document.createElement('div');
+                logsDiv.className = 'logs';
+                logsDiv.innerHTML = '<strong>Console Output:</strong><br>' + 
+                    logs.map(log => `[${log.type.toUpperCase()}] ${log.message}`).join('<br>');
+                testDiv.appendChild(logsDiv);
+            }
+            
+            container.appendChild(testDiv);
+        }
+
+        // Display summary
+        function displaySummary(results) {
+            const summary = document.getElementById('summary');
+            const content = document.getElementById('summary-content');
+            
+            const passed = results.filter(r => r.passed).length;
+            const failed = results.filter(r => !r.passed).length;
+            const withNaN = results.filter(r => r.hasNaN).length;
+            
+            content.innerHTML = `
+                <p><strong>Total Tests:</strong> ${results.length}</p>
+                <p><strong>Passed:</strong> ${passed} ✅</p>
+                <p><strong>Failed:</strong> ${failed} ❌</p>
+                <p><strong>NaN Issues:</strong> ${withNaN} ⚠️</p>
+                <p><strong>Success Rate:</strong> ${Math.round(passed / results.length * 100)}%</p>
+            `;
+            
+            summary.style.display = 'block';
+        }
+
+        // Run tests on page load
+        window.onload = runAllTests;
+    </script>
+</body>
+</html>

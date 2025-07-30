@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Health Score Test - AUDIT-001</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .scenario-info {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .details {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+        .expected {
+            margin-top: 10px;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Financial Health Score Test - AUDIT-001</h1>
+        
+        <div class="scenario-info">
+            <h2>Scenario: Young Professional (Individual, Israel)</h2>
+            <p>Testing with specific data to verify score calculation and crash prevention</p>
+            <p class="expected">Expected score: 65-75/100</p>
+        </div>
+        
+        <div id="test-result"></div>
+    </div>
+
+    <!-- Load the financial health engine -->
+    <script src="src/utils/financialHealthEngine.js"></script>
+    
+    <script>
+        // Test data from AUDIT-001
+        const testData = {
+            planningType: "individual",
+            currentAge: 28,
+            retirementAge: 67,
+            country: "israel",
+            currentMonthlySalary: 15000,
+            currency: "ILS",
+            pensionEmployeeRate: 7,
+            pensionEmployerRate: 14.33,
+            trainingFundEmployeeRate: 2.5,
+            trainingFundEmployerRate: 7.5,
+            currentBankAccount: 30000,
+            currentPersonalPortfolio: 50000,
+            personalPortfolioReturn: 8,
+            currentMonthlyExpenses: 12000,
+            monthlyAdditionalSavings: 1000,
+            riskTolerance: "moderate"
+        };
+
+        // Run the test
+        function runTest() {
+            const resultDiv = document.getElementById('test-result');
+            
+            try {
+                console.log('Starting Financial Health Score test...');
+                console.log('Test data:', JSON.stringify(testData, null, 2));
+                
+                // Check if the function exists
+                if (typeof window.calculateFinancialHealthScore !== 'function') {
+                    throw new Error('calculateFinancialHealthScore function not found');
+                }
+                
+                // Calculate the score
+                const startTime = performance.now();
+                const result = window.calculateFinancialHealthScore(testData);
+                const endTime = performance.now();
+                
+                console.log('Calculation completed in', (endTime - startTime).toFixed(2), 'ms');
+                console.log('Result:', result);
+                
+                // Display results
+                let html = '<div class="result success">';
+                html += '<h3>Test Completed Successfully</h3>';
+                html += `<p><strong>Total Score:</strong> ${result.totalScore}/100</p>`;
+                html += `<p><strong>Status:</strong> ${result.totalScore >= 65 && result.totalScore <= 75 ? 'PASS - Within expected range (65-75)' : 'FAIL - Outside expected range (65-75)'}</p>`;
+                html += '<div class="details">';
+                html += '<strong>Score Breakdown:</strong>\n';
+                html += `Savings Rate: ${result.categories.savingsRate.score}/${result.categories.savingsRate.weight}\n`;
+                html += `Emergency Fund: ${result.categories.emergencyFund.score}/${result.categories.emergencyFund.weight}\n`;
+                html += `Retirement Readiness: ${result.categories.retirementReadiness.score}/${result.categories.retirementReadiness.weight}\n`;
+                html += `Debt Management: ${result.categories.debtManagement.score}/${result.categories.debtManagement.weight}\n`;
+                html += `Investment Allocation: ${result.categories.investmentAllocation.score}/${result.categories.investmentAllocation.weight}\n`;
+                html += '\n<strong>Full Result Object:</strong>\n';
+                html += JSON.stringify(result, null, 2);
+                html += '</div>';
+                html += '</div>';
+                
+                resultDiv.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Test failed:', error);
+                
+                let html = '<div class="result error">';
+                html += '<h3>Test Failed</h3>';
+                html += `<p><strong>Error:</strong> ${error.message}</p>`;
+                html += '<div class="details">';
+                html += '<strong>Stack Trace:</strong>\n';
+                html += error.stack || 'No stack trace available';
+                html += '</div>';
+                html += '</div>';
+                
+                resultDiv.innerHTML = html;
+            }
+        }
+
+        // Run test when page loads
+        window.addEventListener('load', function() {
+            setTimeout(runTest, 100); // Small delay to ensure everything is loaded
+        });
+    </script>
+</body>
+</html>

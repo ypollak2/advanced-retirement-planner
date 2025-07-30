@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Run All E2E Tests</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-4">Running All E2E Tests...</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-4">
+            <h2 class="text-xl font-semibold mb-2">Test Progress</h2>
+            <div id="status" class="text-lg text-blue-600">Initializing tests...</div>
+            <div class="mt-4">
+                <div class="w-full bg-gray-200 rounded-full h-4">
+                    <div id="progress-bar" class="bg-blue-500 h-4 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4">Test Results Summary</h2>
+                <div id="summary" class="space-y-2">
+                    <div>Total Tests: <span id="total-tests">0</span></div>
+                    <div>Passed: <span id="passed-tests" class="text-green-600">0</span></div>
+                    <div>Failed: <span id="failed-tests" class="text-red-600">0</span></div>
+                    <div>Pass Rate: <span id="pass-rate">0%</span></div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4">Test Categories</h2>
+                <div id="categories" class="space-y-2">
+                    <div>Component Tests: <span id="component-status">Pending</span></div>
+                    <div>Integration Tests: <span id="integration-status">Pending</span></div>
+                    <div>E2E Tests: <span id="e2e-status">Pending</span></div>
+                    <div>Comprehensive Scenarios: <span id="scenario-status">Pending</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+            <h2 class="text-xl font-semibold mb-4">Failed Tests</h2>
+            <div id="failed-tests-list" class="space-y-2 max-h-96 overflow-y-auto">
+                <p class="text-gray-500">No failures yet...</p>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+            <h2 class="text-xl font-semibold mb-4">Console Output</h2>
+            <div id="console-output" class="bg-gray-900 text-green-400 p-4 rounded font-mono text-sm max-h-96 overflow-y-auto">
+                <p>Console output will appear here...</p>
+            </div>
+        </div>
+        
+        <div class="mt-6 flex gap-4">
+            <button onclick="runAllTests()" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">
+                Run All Tests
+            </button>
+            <button onclick="exportResults()" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
+                Export Results
+            </button>
+        </div>
+    </div>
+    
+    <!-- Test iframe -->
+    <iframe id="test-frame" style="display: none;"></iframe>
+    
+    <script>
+        let testResults = {
+            total: 0,
+            passed: 0,
+            failed: 0,
+            failures: [],
+            timestamp: new Date().toISOString()
+        };
+        
+        let consoleOutput = [];
+        
+        // Capture console output
+        const originalConsole = {
+            log: console.log,
+            error: console.error,
+            warn: console.warn
+        };
+        
+        function captureConsole() {
+            console.log = (...args) => {
+                originalConsole.log(...args);
+                const message = args.map(arg => 
+                    typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+                ).join(' ');
+                consoleOutput.push({ type: 'log', message, time: new Date().toISOString() });
+                updateConsoleDisplay();
+            };
+            
+            console.error = (...args) => {
+                originalConsole.error(...args);
+                const message = args.map(arg => 
+                    typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+                ).join(' ');
+                consoleOutput.push({ type: 'error', message, time: new Date().toISOString() });
+                updateConsoleDisplay();
+            };
+            
+            console.warn = (...args) => {
+                originalConsole.warn(...args);
+                const message = args.map(arg => 
+                    typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+                ).join(' ');
+                consoleOutput.push({ type: 'warn', message, time: new Date().toISOString() });
+                updateConsoleDisplay();
+            };
+        }
+        
+        function updateConsoleDisplay() {
+            const consoleDiv = document.getElementById('console-output');
+            const lastMessages = consoleOutput.slice(-50); // Show last 50 messages
+            
+            consoleDiv.innerHTML = lastMessages.map(entry => {
+                const color = entry.type === 'error' ? 'text-red-400' : 
+                             entry.type === 'warn' ? 'text-yellow-400' : 'text-green-400';
+                return `<div class="${color}">[${entry.type.toUpperCase()}] ${entry.message}</div>`;
+            }).join('');
+            
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        async function runAllTests() {
+            captureConsole();
+            
+            document.getElementById('status').textContent = 'Running all E2E tests...';
+            testResults = { total: 0, passed: 0, failed: 0, failures: [], timestamp: new Date().toISOString() };
+            document.getElementById('failed-tests-list').innerHTML = '<p class="text-gray-500">No failures yet...</p>';
+            
+            const testFiles = [
+                { file: 'test-runner-browser.html', name: 'All Browser Tests', category: 'all' },
+                { file: 'run-comprehensive-e2e-tests.html?autorun=true', name: 'Comprehensive E2E Scenarios', category: 'scenario' }
+            ];
+            
+            for (let i = 0; i < testFiles.length; i++) {
+                const test = testFiles[i];
+                document.getElementById('status').textContent = `Running ${test.name}...`;
+                document.getElementById('progress-bar').style.width = `${((i + 1) / testFiles.length) * 100}%`;
+                
+                try {
+                    await runTestFile(test.file, test.name, test.category);
+                } catch (error) {
+                    console.error(`Error running ${test.name}:`, error);
+                }
+                
+                updateSummary();
+            }
+            
+            document.getElementById('status').textContent = 'All tests completed!';
+            console.log('Test run complete:', testResults);
+        }
+        
+        async function runTestFile(file, name, category) {
+            return new Promise((resolve) => {
+                const iframe = document.getElementById('test-frame');
+                
+                iframe.onload = async () => {
+                    // Wait for tests to complete
+                    await new Promise(r => setTimeout(r, 5000)); // Give tests time to run
+                    
+                    try {
+                        // Try to extract test results from iframe
+                        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                        const passedEl = iframeDoc.getElementById('passed-count') || iframeDoc.getElementById('passed-scenarios');
+                        const failedEl = iframeDoc.getElementById('failed-count') || iframeDoc.getElementById('failed-scenarios');
+                        const totalEl = iframeDoc.getElementById('total-count') || iframeDoc.getElementById('total-scenarios');
+                        
+                        if (passedEl && failedEl) {
+                            const passed = parseInt(passedEl.textContent) || 0;
+                            const failed = parseInt(failedEl.textContent) || 0;
+                            const total = parseInt(totalEl?.textContent) || (passed + failed);
+                            
+                            testResults.total += total;
+                            testResults.passed += passed;
+                            testResults.failed += failed;
+                            
+                            console.log(`${name}: ${passed}/${total} passed (${failed} failed)`);
+                            
+                            // Update category status
+                            const statusEl = document.getElementById(`${category}-status`);
+                            if (statusEl) {
+                                statusEl.textContent = failed === 0 ? '✓ Passed' : `✗ ${failed} Failed`;
+                                statusEl.className = failed === 0 ? 'text-green-600' : 'text-red-600';
+                            }
+                            
+                            // Extract failed test details
+                            const failedTests = iframeDoc.querySelectorAll('.test-fail');
+                            failedTests.forEach(test => {
+                                const testName = test.querySelector('.test-name')?.textContent || 'Unknown test';
+                                const error = test.querySelector('.test-error')?.textContent || 'No error message';
+                                testResults.failures.push({
+                                    category: name,
+                                    test: testName,
+                                    error: error
+                                });
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error extracting test results:', error);
+                    }
+                    
+                    resolve();
+                };
+                
+                iframe.src = file;
+            });
+        }
+        
+        function updateSummary() {
+            document.getElementById('total-tests').textContent = testResults.total;
+            document.getElementById('passed-tests').textContent = testResults.passed;
+            document.getElementById('failed-tests').textContent = testResults.failed;
+            
+            const passRate = testResults.total > 0 ? 
+                ((testResults.passed / testResults.total) * 100).toFixed(1) : 0;
+            document.getElementById('pass-rate').textContent = `${passRate}%`;
+            
+            // Update failed tests list
+            if (testResults.failures.length > 0) {
+                const failedList = document.getElementById('failed-tests-list');
+                failedList.innerHTML = testResults.failures.map((failure, i) => `
+                    <div class="border-l-4 border-red-500 pl-4 py-2">
+                        <div class="font-semibold">${i + 1}. ${failure.test}</div>
+                        <div class="text-sm text-gray-600">Category: ${failure.category}</div>
+                        <div class="text-sm text-red-600">${failure.error}</div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function exportResults() {
+            const exportData = {
+                ...testResults,
+                consoleOutput: consoleOutput,
+                userAgent: navigator.userAgent,
+                timestamp: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `e2e-test-results-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+        
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            setTimeout(runAllTests, 1000);
+        });
+    </script>
+</body>
+</html>

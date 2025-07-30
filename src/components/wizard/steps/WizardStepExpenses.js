@@ -229,7 +229,7 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
             transportation: 20000, // Maximum ₪20,000 transportation
             food: 15000,         // Maximum ₪15,000 food
             insurance: 10000,    // Maximum ₪10,000 insurance
-            other: 25000,        // Maximum ₪25,000 other expenses
+            other: 75000,        // Maximum ₪75,000 other expenses
             mortgage: 40000,     // Maximum ₪40,000 mortgage
             carLoan: 15000,      // Maximum ₪15,000 car loan
             creditCard: 10000,   // Maximum ₪10,000 credit card

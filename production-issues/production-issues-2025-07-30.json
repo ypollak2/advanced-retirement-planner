@@ -1,0 +1,137 @@
+{
+  "metadata": {
+    "generatedAt": "2025-07-30T13:55:38.214Z",
+    "generatedBy": "ProductionIssueExporter v1.0.0",
+    "productionUrl": "https://ypollak2.github.io/advanced-retirement-planner/",
+    "reportFormat": "claude-code-optimized",
+    "exportTool": "CLI",
+    "dataCollectionMethod": "playwright-automation"
+  },
+  "summary": {
+    "totalIssues": 1,
+    "issueCounts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 1
+    },
+    "overallHealthScore": 90,
+    "urgentActionRequired": false,
+    "dataPoints": {
+      "consoleLogs": 128,
+      "networkRequests": 103,
+      "performanceMetrics": 5,
+      "testDuration": "automated-collection"
+    }
+  },
+  "systemMetrics": {
+    "timestamp": "2025-07-30T13:55:38.215Z",
+    "productionUrl": "https://ypollak2.github.io/advanced-retirement-planner/",
+    "performance": {
+      "loadTime": null,
+      "domContentLoaded": null,
+      "firstContentfulPaint": null,
+      "memory": {
+        "used": 11,
+        "total": 14,
+        "limit": 3586
+      },
+      "timestamp": "2025-07-30T13:55:38.205Z"
+    },
+    "networkSummary": {
+      "totalRequests": 103,
+      "failedRequests": 2,
+      "successRate": "98.1%"
+    },
+    "consoleSummary": {
+      "totalLogs": 128,
+      "errorLogs": 0,
+      "warningLogs": 0
+    }
+  },
+  "issues": [
+    {
+      "id": "prod-1753883738215-1binoi",
+      "title": "Missing Component: Currency Elements",
+      "severity": "low",
+      "category": "currency-api",
+      "description": "Key UI component \"Currency Elements\" not found on page",
+      "technicalDetails": {
+        "type": "component-missing",
+        "source": "component-test",
+        "timestamp": "2025-07-30T13:55:38.211Z"
+      },
+      "impact": {
+        "user": "low",
+        "functionality": [
+          "currency-conversion",
+          "ui-rendering"
+        ],
+        "business": "low"
+      },
+      "context": {
+        "reproducible": true,
+        "automated": true,
+        "environment": "production"
+      },
+      "recommendations": [
+        "Verify component loading order",
+        "Check for JavaScript errors preventing rendering",
+        "Validate HTML structure"
+      ],
+      "claudeCodeMetadata": {
+        "analysisComplexity": "low",
+        "debuggingHints": [],
+        "relatedFiles": [
+          "index.html",
+          "src/main.js"
+        ],
+        "testingStrategy": [
+          "Include in next testing cycle",
+          "Monitor for recurrence"
+        ]
+      }
+    }
+  ],
+  "insights": {
+    "patterns": [
+      {
+        "category": "currency-api",
+        "count": 1
+      }
+    ],
+    "recommendations": [],
+    "prioritizedActions": []
+  },
+  "claudeCodeInstructions": {
+    "analysisGuidance": [
+      "Review summary section first for critical issues requiring immediate attention",
+      "Focus on issues with 'critical' or 'high' severity levels",
+      "Look for patterns in issue categories that might indicate systemic problems",
+      "Use the recommendations section for actionable next steps",
+      "Review system metrics to understand overall production health"
+    ],
+    "suggestedWorkflow": [
+      "1. Address any critical issues immediately (system stability risk)",
+      "2. Investigate high-severity issues (significant functionality impact)",
+      "3. Group related issues by category for efficient resolution",
+      "4. Implement monitoring for recurring issue patterns",
+      "5. Use debugging hints and testing strategies for systematic fixes"
+    ],
+    "contextualInfo": {
+      "deploymentPlatform": "GitHub Pages",
+      "applicationFramework": "Vanilla JavaScript with React createElement",
+      "externalDependencies": [
+        "Currency APIs",
+        "Yahoo Finance",
+        "Service Worker"
+      ],
+      "criticalFunctionality": [
+        "Financial calculations",
+        "Currency conversion",
+        "Data persistence"
+      ],
+      "userBase": "Financial planning application users"
+    }
+  }
+}

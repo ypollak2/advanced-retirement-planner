@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E2E Test Launcher</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">E2E Test Suite Launcher</h1>
+            <p class="text-gray-600">Choose which E2E tests to run</p>
+        </header>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Comprehensive Scenario Tests -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4">Comprehensive Scenario Tests</h2>
+                <p class="text-gray-600 mb-4">
+                    Test 10+ different user personas including young professionals, 
+                    families, retirees, and edge cases.
+                </p>
+                <div class="space-y-2">
+                    <button onclick="window.open('run-comprehensive-e2e-tests.html', '_blank')" 
+                            class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Run Scenario Tests
+                    </button>
+                    <button onclick="window.open('run-comprehensive-e2e-tests.html?autorun=true', '_blank')" 
+                            class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        Auto-Run All Scenarios
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Full Test Suite -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4">Full Browser Test Suite</h2>
+                <p class="text-gray-600 mb-4">
+                    Run all component, integration, and E2E tests including the 
+                    comprehensive scenarios.
+                </p>
+                <div class="space-y-2">
+                    <button onclick="window.open('test-runner-browser.html', '_blank')" 
+                            class="w-full bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                        Open Test Runner
+                    </button>
+                    <button onclick="window.open('test-runner-browser.html?autorun=true', '_blank')" 
+                            class="w-full bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">
+                        Auto-Run All Tests
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Quick Tests -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4">Quick Validation Tests</h2>
+                <p class="text-gray-600 mb-4">
+                    Run specific validation tests for critical features.
+                </p>
+                <div class="space-y-2">
+                    <button onclick="runQuickTest('individual')" 
+                            class="w-full bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+                        Test Individual Planning
+                    </button>
+                    <button onclick="runQuickTest('couple')" 
+                            class="w-full bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                        Test Couple Planning
+                    </button>
+                    <button onclick="runQuickTest('rsu')" 
+                            class="w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                        Test RSU Features
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Performance Tests -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold mb-4">Performance & Stress Tests</h2>
+                <p class="text-gray-600 mb-4">
+                    Test application performance with rapid updates and complex calculations.
+                </p>
+                <div class="space-y-2">
+                    <button onclick="window.open('tests/performance/performance-benchmarks.js', '_blank')" 
+                            class="w-full bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                        View Performance Tests
+                    </button>
+                    <button onclick="runStressTest()" 
+                            class="w-full bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600">
+                        Run Stress Test
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Results Preview -->
+        <div class="mt-8 bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Quick Test Results</h2>
+            <div id="quick-results" class="text-gray-600">
+                <p>Run a quick test to see results here...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden test container -->
+    <div id="test-container" style="display: none;"></div>
+    
+    <!-- Load required scripts -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="src/data/marketConstants.js"></script>
+    <script src="src/translations/multiLanguage.js"></script>
+    <script src="src/utils/retirementCalculations.js"></script>
+    <script src="src/utils/currencyAPI.js"></script>
+    <script src="src/utils/financialHealthEngine.js"></script>
+    <script src="src/utils/coupleValidation.js"></script>
+    <script src="src/components/shared/EnhancedRSUCompanySelector.js"></script>
+    
+    <script>
+        // Quick test functions
+        async function runQuickTest(type) {
+            const resultsDiv = document.getElementById('quick-results');
+            resultsDiv.innerHTML = '<p class="text-blue-600">Running test...</p>';
+            
+            try {
+                let testProfile;
+                let testName;
+                
+                switch(type) {
+                    case 'individual':
+                        testProfile = {
+                            planningType: 'individual',
+                            currentAge: 35,
+                            retirementAge: 65,
+                            monthlySalary: 15000,
+                            monthlyExpenses: 10000,
+                            currentSavings: 200000,
+                            emergencyFund: 50000,
+                            pensionSavings: 150000
+                        };
+                        testName = 'Individual Planning';
+                        break;
+                        
+                    case 'couple':
+                        testProfile = {
+                            planningType: 'couple',
+                            partner1Name: 'Test1',
+                            partner2Name: 'Test2',
+                            partner1CurrentAge: 35,
+                            partner2CurrentAge: 33,
+                            partner1RetirementAge: 65,
+                            partner2RetirementAge: 65,
+                            partner1Salary: 20000,
+                            partner2Salary: 15000,
+                            jointMonthlyExpenses: 25000,
+                            jointEmergencyFund: 100000
+                        };
+                        testName = 'Couple Planning';
+                        break;
+                        
+                    case 'rsu':
+                        testProfile = {
+                            planningType: 'individual',
+                            currentAge: 35,
+                            retirementAge: 65,
+                            monthlySalary: 25000,
+                            hasRSU: true,
+                            rsuCompany: 'AAPL',
+                            rsuUnits: 500,
+                            rsuFrequency: 'annually'
+                        };
+                        testName = 'RSU Feature';
+                        break;
+                }
+                
+                // Run calculations
+                const results = window.calculateRetirement(testProfile);
+                const healthScore = window.calculateFinancialHealthScore(testProfile);
+                
+                // Display results
+                resultsDiv.innerHTML = `
+                    <div class="space-y-2">
+                        <h3 class="font-semibold text-green-600">✓ ${testName} Test Passed</h3>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="font-medium">Health Score:</span> ${healthScore.totalScore}/100
+                            </div>
+                            <div>
+                                <span class="font-medium">Total Savings:</span> ${window.formatCurrency(results.totalSavings)}
+                            </div>
+                            <div>
+                                <span class="font-medium">Monthly Retirement:</span> ${window.formatCurrency(results.monthlyRetirementIncome)}
+                            </div>
+                            <div>
+                                <span class="font-medium">Years to Retire:</span> ${results.yearsToRetirement || 'N/A'}
+                            </div>
+                        </div>
+                        ${healthScore.suggestions && healthScore.suggestions.length > 0 ? `
+                            <div class="mt-2">
+                                <span class="font-medium">Top Suggestion:</span>
+                                <p class="text-sm text-gray-600">${healthScore.suggestions[0].action}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="text-red-600">
+                        <h3 class="font-semibold">✗ ${type} Test Failed</h3>
+                        <p class="text-sm">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Stress test function
+        async function runStressTest() {
+            const resultsDiv = document.getElementById('quick-results');
+            resultsDiv.innerHTML = '<p class="text-blue-600">Running stress test...</p>';
+            
+            const startTime = performance.now();
+            let successCount = 0;
+            const iterations = 100;
+            
+            try {
+                for (let i = 0; i < iterations; i++) {
+                    const testProfile = {
+                        planningType: 'individual',
+                        currentAge: 20 + Math.floor(Math.random() * 40),
+                        retirementAge: 60 + Math.floor(Math.random() * 10),
+                        monthlySalary: 5000 + Math.floor(Math.random() * 45000),
+                        monthlyExpenses: 3000 + Math.floor(Math.random() * 20000),
+                        currentSavings: Math.floor(Math.random() * 1000000)
+                    };
+                    
+                    const results = window.calculateRetirement(testProfile);
+                    const healthScore = window.calculateFinancialHealthScore(testProfile);
+                    
+                    if (results && healthScore && !isNaN(healthScore.totalScore)) {
+                        successCount++;
+                    }
+                }
+                
+                const endTime = performance.now();
+                const totalTime = endTime - startTime;
+                const avgTime = totalTime / iterations;
+                
+                resultsDiv.innerHTML = `
+                    <div class="space-y-2">
+                        <h3 class="font-semibold text-green-600">✓ Stress Test Complete</h3>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="font-medium">Total Iterations:</span> ${iterations}
+                            </div>
+                            <div>
+                                <span class="font-medium">Success Rate:</span> ${(successCount/iterations*100).toFixed(1)}%
+                            </div>
+                            <div>
+                                <span class="font-medium">Total Time:</span> ${totalTime.toFixed(0)}ms
+                            </div>
+                            <div>
+                                <span class="font-medium">Avg Time/Calc:</span> ${avgTime.toFixed(2)}ms
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600">
+                            ${avgTime < 10 ? 'Excellent' : avgTime < 50 ? 'Good' : 'Needs optimization'} performance
+                        </p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="text-red-600">
+                        <h3 class="font-semibold">✗ Stress Test Failed</h3>
+                        <p class="text-sm">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
