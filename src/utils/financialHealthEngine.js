@@ -6,6 +6,18 @@
  * Provides detailed breakdowns, actionable insights, and peer comparisons
  */
 
+// Import field mapping dictionary if available
+let fieldMappingDictionary = null;
+if (typeof window !== 'undefined' && window.fieldMappingDictionary) {
+    fieldMappingDictionary = window.fieldMappingDictionary;
+} else if (typeof require !== 'undefined') {
+    try {
+        fieldMappingDictionary = require('./fieldMappingDictionary.js');
+    } catch (e) {
+        // Field mapping not available - fallback to legacy behavior
+    }
+}
+
 // Safe calculation wrappers to prevent NaN/Infinity values
 function safeParseFloat(value, defaultValue = 0) {
     const parsed = parseFloat(value);
@@ -135,6 +147,44 @@ function getFieldValue(inputs, fieldNames, options = {}) {
     
     logger.fieldSearch(`Searching for fields: ${fieldNames.join(', ')}`);
     logger.debug(`Planning type: ${inputs.planningType}, Combine partners: ${combinePartners}`);
+    
+    // PHASE 0: Use field mapping dictionary if available
+    if (fieldMappingDictionary && fieldMappingDictionary.FIELD_MAPPINGS) {
+        logger.debug('Using field mapping dictionary for enhanced field detection');
+        
+        // Try to find fields using the mapping dictionary
+        for (const fieldName of fieldNames) {
+            // Check all possible variations from the dictionary
+            const canonicalField = fieldMappingDictionary.findCanonicalField(fieldName);
+            if (canonicalField) {
+                const variations = fieldMappingDictionary.getFieldVariations(canonicalField);
+                
+                for (const variation of variations) {
+                    const value = inputs[variation];
+                    if (value !== undefined && value !== null && value !== '') {
+                        const parsed = parseFloat(value);
+                        if (!isNaN(parsed) && (allowZero || parsed > 0)) {
+                            logger.fieldFound(`Found field "${variation}" (mapped from "${fieldName}"): ${parsed}`);
+                            return parsed;
+                        }
+                    }
+                }
+            }
+            
+            // Also try to find a suggested field based on available fields
+            const suggestion = fieldMappingDictionary.suggestFieldName(fieldName, Object.keys(inputs));
+            if (suggestion) {
+                const value = inputs[suggestion];
+                if (value !== undefined && value !== null && value !== '') {
+                    const parsed = parseFloat(value);
+                    if (!isNaN(parsed) && (allowZero || parsed > 0)) {
+                        logger.fieldFound(`Found suggested field "${suggestion}" for "${fieldName}": ${parsed}`);
+                        return parsed;
+                    }
+                }
+            }
+        }
+    }
     
     // Helper function to detect and convert annual salary to monthly
     const detectSalaryType = (fieldName, value) => {
@@ -415,16 +465,40 @@ function getFieldValue(inputs, fieldNames, options = {}) {
     }
     
     // Enhanced fallback logging for better debugging
-    console.warn(`⚠️ Fallback Activated: No value found for fields: [${fieldNames.join(', ')}]. Defaulting to 0.`);
-    console.log(`🕵️‍♂️ Debug Info: Available input keys: [${Object.keys(inputs).join(', ')}]`);
+    // Only warn if field mapping dictionary is not available or didn't help
+    if (!fieldMappingDictionary || !fieldMappingDictionary.FIELD_MAPPINGS) {
+        console.warn(`⚠️ Fallback Activated: No value found for fields: [${fieldNames.join(', ')}]. Defaulting to 0.`);
+        console.log(`🕵️‍♂️ Debug Info: Available input keys: [${Object.keys(inputs).join(', ')}]`);
+    } else {
+        // With field mapping dictionary, this is a genuine missing field
+        if (debugMode) {
+            console.log(`📊 Field not found in inputs: [${fieldNames.join(', ')}]`);
+            console.log(`📋 Available fields: [${Object.keys(inputs).slice(0, 10).join(', ')}${Object.keys(inputs).length > 10 ? '...' : ''}]`);
+            
+            // Suggest possible fields from the dictionary
+            const suggestions = [];
+            fieldNames.forEach(field => {
+                const suggestion = fieldMappingDictionary.suggestFieldName(field, Object.keys(inputs));
+                if (suggestion) {
+                    suggestions.push(`${field} → ${suggestion}`);
+                }
+            });
+            
+            if (suggestions.length > 0) {
+                console.log(`💡 Suggestions: ${suggestions.join(', ')}`);
+            }
+        }
+    }
 
     // Log a more detailed warning if critical fields are missing
     const criticalFields = ['salary', 'income', 'pension', 'savings', 'emergency', 'portfolio'];
     if (fieldNames.some(f => criticalFields.some(c => f.toLowerCase().includes(c)))) {
-        console.warn(`CRITICAL: A key financial field was not found. This will significantly impact score accuracy.`);
+        if (!fieldMappingDictionary) {
+            console.warn(`CRITICAL: A key financial field was not found. This will significantly impact score accuracy.`);
+        }
     }
     
-    return 0;
+    return allowZero ? 0 : null;
 }
 
 // Score factor definitions with weights and benchmarks
@@ -1753,7 +1827,7 @@ function calculateEmergencyFundScore(inputs) {
     }
     
     // Calculate months covered, handling edge cases
-    const monthsCovered = safeDivide(emergencyFund, monthlyExpenses, 0);
+    const monthsCovered = safeDivideCompat(emergencyFund, monthlyExpenses, 0);
     
     // Calculate debt-to-income ratio to adjust emergency fund recommendations
     const monthlyIncome = getFieldValue(inputs, [
@@ -1777,7 +1851,7 @@ function calculateEmergencyFundScore(inputs) {
         }, 0);
     }
     
-    const debtToIncomeRatio = safeDivide(monthlyDebtPayments, totalMonthlyIncome, 0);
+    const debtToIncomeRatio = safeDivideCompat(monthlyDebtPayments, totalMonthlyIncome, 0);
     
     // Adjust target months based on debt load
     let targetMonths = SCORE_FACTORS.emergencyFund.benchmarks.good; // Default 6 months
@@ -1901,7 +1975,7 @@ function calculateDebtManagementScore(inputs) {
         };
     }
     
-    const debtToIncomeRatio = safeDivide(monthlyDebtPayments, totalMonthlyIncome, 0);
+    const debtToIncomeRatio = safeDivideCompat(monthlyDebtPayments, totalMonthlyIncome, 0);
     const maxScore = SCORE_FACTORS.debtManagement.weight;
     
     let score = maxScore;
