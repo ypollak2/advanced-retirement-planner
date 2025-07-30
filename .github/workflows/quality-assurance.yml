@@ -213,10 +213,27 @@ jobs:
           TEST_OUTPUT=$(npm test 2>&1)
           echo "$TEST_OUTPUT"
           
-          # Extract results
-          PASSED=$(echo "$TEST_OUTPUT" | grep -oE 'Tests Passed: [0-9]+' | grep -oE '[0-9]+' || echo "0")
-          TOTAL=$(echo "$TEST_OUTPUT" | grep -oE 'Success Rate:.*Tests Passed: ([0-9]+)' | grep -oE '[0-9]+' | head -1 || echo "381")
-          SUCCESS_RATE=$(echo "$TEST_OUTPUT" | grep -oE 'Success Rate: [0-9.]+%' | grep -oE '[0-9.]+' || echo "0")
+          # Extract results with improved parsing
+          # Look for "Tests Passed: X/Y" pattern or similar
+          if echo "$TEST_OUTPUT" | grep -q "Tests Passed:"; then
+            PASSED=$(echo "$TEST_OUTPUT" | grep -oE 'Tests Passed: [0-9]+' | grep -oE '[0-9]+' | tail -1 || echo "0")
+            TOTAL=$(echo "$TEST_OUTPUT" | grep -oE 'Tests Passed: [0-9]+/[0-9]+' | grep -oE '/[0-9]+' | grep -oE '[0-9]+' | tail -1 || echo "374")
+          else
+            # Alternative parsing for different output formats
+            PASSED=$(echo "$TEST_OUTPUT" | grep -oE '[0-9]+/[0-9]+ tests? pass' | grep -oE '^[0-9]+' | tail -1 || echo "0")
+            TOTAL=$(echo "$TEST_OUTPUT" | grep -oE '[0-9]+/[0-9]+ tests? pass' | grep -oE '[0-9]+$' | tail -1 || echo "374")
+          fi
+          
+          # Ensure we have valid numbers
+          PASSED=${PASSED:-0}
+          TOTAL=${TOTAL:-374}
+          
+          # Calculate success rate
+          if [ "$TOTAL" -gt 0 ]; then
+            SUCCESS_RATE=$(awk "BEGIN {printf \"%.1f\", ($PASSED/$TOTAL)*100}")
+          else
+            SUCCESS_RATE="0"
+          fi
           
           echo "results={\"passed\": $PASSED, \"total\": $TOTAL, \"rate\": \"$SUCCESS_RATE\"}" >> $GITHUB_OUTPUT
           
