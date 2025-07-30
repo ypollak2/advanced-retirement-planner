@@ -1,6 +1,6 @@
 {
-  "version": "7.3.2",
+  "version": "7.3.3",
   "build": "2025-07-30",
-  "commit": "v7.3.2-critical-wizard-fix",
-  "description": "Critical fix for RetirementWizard initialization errors, improved deployment testing framework"
+  "commit": "v7.3.3-keyboard-ux-fix",
+  "description": "Removed number key navigation that interfered with form inputs, improved keyboard UX"
 }
