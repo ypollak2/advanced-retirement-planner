@@ -1,6 +1,6 @@
-// Internal Design Evaluator for Advanced Retirement Planner v7.3.1
+// Internal Design Evaluator for Advanced Retirement Planner v7.3.2
 // Analyzes current implementation and suggests improvements for a cool, trendy, and awesome pension tool
-// Created by Yali Pollak (יהלי פולק) - v7.3.1
+// Created by Yali Pollak (יהלי פולק) - v7.3.2
 
 // Design evaluation framework
 const DESIGN_CATEGORIES = {
