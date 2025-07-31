@@ -221,9 +221,14 @@ window.calculateRetirement = (
     let totalTrainingFund = parseFloat(
         inputs.currentTrainingFund || inputs.trainingFund || inputs.trainingFundValue || 0
     );
-    let totalPersonalPortfolio = parseFloat(
+    
+    // Apply capital gains tax to personal portfolio upfront
+    const grossPersonalPortfolio = parseFloat(
         inputs.currentPersonalPortfolio || inputs.personalPortfolio || inputs.portfolioValue || 0
     );
+    const portfolioTaxRate = (inputs.portfolioTaxRate || 25) / 100; // Default 25% capital gains tax
+    let totalPersonalPortfolio = grossPersonalPortfolio * (1 - portfolioTaxRate);
+    
     let totalCrypto = parseFloat(
         inputs.currentCrypto || inputs.crypto || inputs.cryptoValue || inputs.currentCryptoFiatValue || 0
     );
@@ -369,8 +374,10 @@ window.calculateRetirement = (
             const partnerTrainingContributions = partnerWorkPeriods.reduce((sum, period) => sum + period.monthlyTrainingFund, 0) * (Math.pow(1 + partnerTrainingMonthlyReturn, partnerTrainingMonths) - 1) / partnerTrainingMonthlyReturn;
             totalPartnerTrainingFund = partnerTrainingGrowth + partnerTrainingContributions;
             
-            // Calculate partner personal portfolio
-            let totalPartnerPersonalPortfolio = inputs.partnerCurrentPersonalPortfolio;
+            // Calculate partner personal portfolio with capital gains tax applied
+            const grossPartnerPortfolio = inputs.partnerCurrentPersonalPortfolio || 0;
+            const partnerPortfolioTaxRate = (inputs.partnerPersonalPortfolioTaxRate || 25) / 100;
+            let totalPartnerPersonalPortfolio = grossPartnerPortfolio * (1 - partnerPortfolioTaxRate);
             const adjustedPartnerPersonalReturn = getAdjustedReturn(inputs.partnerPersonalPortfolioReturn, inputs.riskTolerance);
             const partnerPersonalMonthlyReturn = adjustedPartnerPersonalReturn / 100 / 12;
             const partnerPersonalMonths = partnerYearsToRetirement * 12;
@@ -837,9 +844,14 @@ window.calculateProgressiveSavings = (inputs, workPeriods = [], partnerWorkPerio
     let primaryTraining = parseFloat(
         inputs.currentTrainingFund || inputs.trainingFund || inputs.trainingFundValue || 0
     );
-    let primaryPersonal = parseFloat(
+    // Apply capital gains tax to primary personal portfolio
+    const grossPrimaryPortfolio = parseFloat(
         inputs.currentPersonalPortfolio || inputs.personalPortfolio || inputs.portfolioValue || 0
     );
+    const primaryTaxRate = inputs.planningType === 'couple' ? 
+        (inputs.partner1PortfolioTaxRate || 25) / 100 :
+        (inputs.portfolioTaxRate || 25) / 100;
+    let primaryPersonal = grossPrimaryPortfolio * (1 - primaryTaxRate);
     
     // Partner data extraction
     let partnerPension = 0;
@@ -852,7 +864,11 @@ window.calculateProgressiveSavings = (inputs, workPeriods = [], partnerWorkPerio
     if (inputs.planningType === 'couple') {
         partnerPension = parseFloat(inputs.partner2CurrentSavings || inputs.partnerCurrentSavings || 0);
         partnerTraining = parseFloat(inputs.partner2CurrentTrainingFund || inputs.partnerCurrentTrainingFund || 0);
-        partnerPersonal = parseFloat(inputs.partner2CurrentPersonalPortfolio || inputs.partnerCurrentPersonalPortfolio || 0);
+        
+        // Apply capital gains tax to partner personal portfolio
+        const grossPartner2Portfolio = parseFloat(inputs.partner2CurrentPersonalPortfolio || inputs.partnerCurrentPersonalPortfolio || 0);
+        const partner2TaxRate = (inputs.partner2PortfolioTaxRate || 25) / 100;
+        partnerPersonal = grossPartner2Portfolio * (1 - partner2TaxRate);
         
         // Extract partner contributions
         const partner2Salary = parseFloat(inputs.partner2Salary || 0);

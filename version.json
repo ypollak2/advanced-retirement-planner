@@ -1,6 +1,6 @@
 {
-  "version": "7.3.5",
-  "build": "2025-07-30",
-  "commit": "v7.3.3-keyboard-ux-fix",
-  "description": "Removed number key navigation that interfered with form inputs, improved keyboard UX"
+  "version": "7.3.6",
+  "build": "2025-07-31",
+  "commit": "v7.3.6-portfolio-tax-fix",
+  "description": "Fixed critical bug: capital gains tax now correctly applied to personal portfolio principal"
 }
