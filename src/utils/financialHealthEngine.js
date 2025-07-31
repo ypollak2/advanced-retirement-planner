@@ -176,7 +176,7 @@ function enhancedSafeCalculation(calculationName, calculationFn) {
 
 // ENHANCED: Comprehensive field mapping utility with wizard compatibility and debugging
 function getFieldValue(inputs, fieldNames, options = {}) {
-    const { combinePartners = false, allowZero = false, debugMode = true, expectString = false } = options;
+    const { combinePartners = false, allowZero = false, debugMode = true, expectString = false, combineMethod = 'sum' } = options;
     const logger = window.logger || { fieldSearch: () => {}, fieldFound: () => {}, debug: () => {} };
     
     logger.fieldSearch(`Searching for fields: ${fieldNames.join(', ')}`);
@@ -376,12 +376,30 @@ function getFieldValue(inputs, fieldNames, options = {}) {
         // Determine which field types we're looking for based on input field names
         const isLookingForBank = fieldNames.some(f => f.toLowerCase().includes('bank') || f.toLowerCase().includes('emergency'));
         const isLookingForSalary = fieldNames.some(f => f.toLowerCase().includes('salary') || f.toLowerCase().includes('income'));
+        const isLookingForPensionRate = fieldNames.some(f => f.toLowerCase().includes('pension') && (f.toLowerCase().includes('rate') || f.toLowerCase().includes('contribution')));
+        const isLookingForTrainingRate = fieldNames.some(f => f.toLowerCase().includes('training') && (f.toLowerCase().includes('rate') || f.toLowerCase().includes('contribution')));
         
         if (isLookingForBank) {
             partnerFieldMappings.push(
                 { partner1: 'partner1BankAccount', partner2: 'partner2BankAccount' },
                 { partner1: 'partner1Bank', partner2: 'partner2Bank' },
                 { partner1: 'partner1Emergency', partner2: 'partner2Emergency' }
+            );
+        }
+        
+        if (isLookingForPensionRate) {
+            partnerFieldMappings.push(
+                { partner1: 'partner1PensionEmployeeRate', partner2: 'partner2PensionEmployeeRate' },
+                { partner1: 'partner1PensionContributionRate', partner2: 'partner2PensionContributionRate' },
+                { partner1: 'partner1PensionRate', partner2: 'partner2PensionRate' }
+            );
+        }
+        
+        if (isLookingForTrainingRate) {
+            partnerFieldMappings.push(
+                { partner1: 'partner1TrainingFundEmployeeRate', partner2: 'partner2TrainingFundEmployeeRate' },
+                { partner1: 'partner1TrainingFundContributionRate', partner2: 'partner2TrainingFundContributionRate' },
+                { partner1: 'partner1TrainingFundRate', partner2: 'partner2TrainingFundRate' }
             );
         }
         
@@ -453,7 +471,13 @@ function getFieldValue(inputs, fieldNames, options = {}) {
         }
         
         if (combinedValue > 0) {
-            logger.fieldFound(`Combined ${partnersFound} partner fields: ${combinedValue}`);
+            // For rates (percentages), average the values instead of summing
+            if (combineMethod === 'average' && partnersFound > 1) {
+                combinedValue = combinedValue / partnersFound;
+                logger.fieldFound(`Averaged ${partnersFound} partner fields: ${combinedValue}`);
+            } else {
+                logger.fieldFound(`Combined ${partnersFound} partner fields: ${combinedValue}`);
+            }
             return combinedValue;
         } else {
             logger.debug(`  No valid partner field data found in any structure`);
@@ -932,8 +956,10 @@ function calculateSavingsRateScore(inputs) {
         'employeePensionRate', 'pension_contribution_rate', 'pension_rate',
         'pensionRateEmployee', 'employee_pension_rate', 'employeePension',
         // Partner-specific fields for couple mode
-        'partner1PensionContributionRate', 'partner2PensionContributionRate'
-    ], { debugMode: true });
+        'partner1PensionContributionRate', 'partner2PensionContributionRate',
+        'partner1PensionEmployeeRate', 'partner2PensionEmployeeRate',
+        'partner1PensionRate', 'partner2PensionRate'
+    ], { debugMode: true, combinePartners: inputs.planningType === 'couple', combineMethod: 'average' });
     
     const trainingFundRate = getFieldValue(inputs, [
         // Primary field names used by wizard components
@@ -943,8 +969,9 @@ function calculateSavingsRateScore(inputs) {
         'trainingRateEmployee', 'employee_training_fund_rate', 'employeeTrainingFund',
         // Partner-specific fields for couple mode
         'partner1TrainingFundContributionRate', 'partner2TrainingFundContributionRate',
-        'partner1TrainingFundEmployeeRate', 'partner2TrainingFundEmployeeRate'
-    ], { debugMode: true });
+        'partner1TrainingFundEmployeeRate', 'partner2TrainingFundEmployeeRate',
+        'partner1TrainingFundRate', 'partner2TrainingFundRate'
+    ], { debugMode: true, combinePartners: inputs.planningType === 'couple', combineMethod: 'average' });
     
     // Use default rates if not found (standard Israeli rates)
     const DEFAULT_PENSION_RATE = 17.5;  // Standard employee + employer pension contribution
