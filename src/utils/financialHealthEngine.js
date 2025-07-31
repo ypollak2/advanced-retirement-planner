@@ -174,11 +174,33 @@ function enhancedSafeCalculation(calculationName, calculationFn) {
     }
 }
 
-// ENHANCED: Comprehensive field mapping utility with wizard compatibility and debugging
+// SIMPLIFIED: Field mapping utility using the field mapping bridge
 function getFieldValue(inputs, fieldNames, options = {}) {
     const { combinePartners = false, allowZero = false, debugMode = true, expectString = false, combineMethod = 'sum' } = options;
     const logger = window.logger || { fieldSearch: () => {}, fieldFound: () => {}, debug: () => {} };
     
+    // Use the field mapping bridge if available
+    if (window.fieldMappingBridge) {
+        logger.debug('Using field mapping bridge for enhanced field detection');
+        
+        // Try each field name using the bridge
+        for (const fieldName of fieldNames) {
+            const value = window.fieldMappingBridge.getFieldValue(inputs, fieldName, {
+                ...options,
+                combinePartners: combinePartners && inputs.planningType === 'couple'
+            });
+            
+            if (value !== null && (allowZero || value !== 0)) {
+                logger.fieldFound(`Found field "${fieldName}" via bridge: ${value}`);
+                return value;
+            }
+        }
+        
+        // If no value found and we need to return something
+        return allowZero ? 0 : null;
+    }
+    
+    // Fallback to original implementation if bridge not available
     logger.fieldSearch(`Searching for fields: ${fieldNames.join(', ')}`);
     logger.debug(`Planning type: ${inputs.planningType}, Combine partners: ${combinePartners}, Expect string: ${expectString}`);
     
@@ -819,35 +841,41 @@ function calculateSavingsRateScore(inputs) {
     console.log('📋 Input planning type:', inputs.planningType);
     console.log('📋 Available fields:', Object.keys(inputs).length);
     
-    // PHASE 1: Get monthly income using enhanced field mapping
+    // PHASE 1: Get monthly income using simplified field mapping
     let monthlyIncome = 0;
     
     if (inputs.planningType === 'couple') {
         console.log('👫 Couple mode: Looking for partner salary fields...');
         
-        // Use enhanced field mapping for couple income with expanded field list
-        monthlyIncome = getFieldValue(inputs, [
-            // Net salary fields (check these first)
-            'partner1NetSalary', 'partner2NetSalary', 'partner1NetIncome', 'partner2NetIncome',
-            // Gross salary fields
-            'partner1GrossSalary', 'partner2GrossSalary',
-            'partner1Salary', 'partner2Salary', 'Partner1Salary', 'Partner2Salary',
-            'partner1Income', 'partner2Income', 'partner1MonthlySalary', 'partner2MonthlySalary',
-            'partner_1_salary', 'partner_2_salary', 'partnerOneSalary', 'partnerTwoSalary',
-            'currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome'
-        ], { combinePartners: true, debugMode: true });
+        // Use field mapping bridge for couple income
+        if (window.fieldMappingBridge) {
+            monthlyIncome = window.fieldMappingBridge.getCombinedPartnerValue(inputs, 'Salary', { allowZero: true });
+        }
+        
+        // Fallback to legacy method if no income found
+        if (!monthlyIncome) {
+            monthlyIncome = getFieldValue(inputs, [
+                'partner1Salary', 'partner2Salary', 'Partner1Salary', 'Partner2Salary',
+                'partner1Income', 'partner2Income', 'partner1MonthlySalary', 'partner2MonthlySalary'
+            ], { combinePartners: true, debugMode: true });
+        }
         
         console.log('👫 Combined partner income:', monthlyIncome);
         
     } else {
         console.log('👤 Individual mode: Looking for salary fields...');
         
-        // Use enhanced field mapping for individual income with expanded field list
-        monthlyIncome = getFieldValue(inputs, [
-            'currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome',
-            'currentSalary', 'monthly_salary', 'income', 'grossSalary',
-            'netSalary', 'baseSalary', 'totalIncome', 'monthlyIncomeAmount'
-        ], { debugMode: true });
+        // Use field mapping bridge for individual income
+        if (window.fieldMappingBridge) {
+            monthlyIncome = window.fieldMappingBridge.findFieldValue(inputs, 'monthlySalary', { allowZero: true }) || 0;
+        }
+        
+        // Fallback to legacy method if no income found
+        if (!monthlyIncome) {
+            monthlyIncome = getFieldValue(inputs, [
+                'currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome'
+            ], { debugMode: true });
+        }
         
         console.log('👤 Individual income:', monthlyIncome);
     }
@@ -949,29 +977,49 @@ function calculateSavingsRateScore(inputs) {
     console.log('💰 Looking for contribution rates...');
     console.log('💰 Current monthly income for savings rate calculation:', monthlyIncome);
     
-    const pensionRate = getFieldValue(inputs, [
-        // Primary field names used by wizard components
-        'pensionContributionRate', 'pensionEmployeeRate', 'pensionEmployee',
-        // Legacy field names for backward compatibility
-        'employeePensionRate', 'pension_contribution_rate', 'pension_rate',
-        'pensionRateEmployee', 'employee_pension_rate', 'employeePension',
-        // Partner-specific fields for couple mode
-        'partner1PensionContributionRate', 'partner2PensionContributionRate',
-        'partner1PensionEmployeeRate', 'partner2PensionEmployeeRate',
-        'partner1PensionRate', 'partner2PensionRate'
-    ], { debugMode: true, combinePartners: inputs.planningType === 'couple', combineMethod: 'average' });
+    let pensionRate = 0;
+    let trainingFundRate = 0;
     
-    const trainingFundRate = getFieldValue(inputs, [
-        // Primary field names used by wizard components
-        'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee',
-        // Legacy field names for backward compatibility
-        'employeeTrainingFundRate', 'training_fund_rate', 'trainingFund_rate',
-        'trainingRateEmployee', 'employee_training_fund_rate', 'employeeTrainingFund',
-        // Partner-specific fields for couple mode
-        'partner1TrainingFundContributionRate', 'partner2TrainingFundContributionRate',
-        'partner1TrainingFundEmployeeRate', 'partner2TrainingFundEmployeeRate',
-        'partner1TrainingFundRate', 'partner2TrainingFundRate'
-    ], { debugMode: true, combinePartners: inputs.planningType === 'couple', combineMethod: 'average' });
+    if (window.fieldMappingBridge) {
+        if (inputs.planningType === 'couple') {
+            // Get combined partner rates using average
+            pensionRate = window.fieldMappingBridge.getCombinedPartnerValue(inputs, 'PensionRate', { 
+                allowZero: true, 
+                combineMethod: 'average' 
+            });
+        } else {
+            // Get individual rates
+            pensionRate = window.fieldMappingBridge.findFieldValue(inputs, 'pensionEmployeeRate', { allowZero: true }) || 0;
+        }
+    }
+    
+    // Fallback to legacy method if rates not found
+    if (!pensionRate) {
+        pensionRate = getFieldValue(inputs, [
+            'pensionContributionRate', 'pensionEmployeeRate', 'pensionEmployee',
+            'employeePensionRate', 'pension_contribution_rate', 'pension_rate'
+        ], { debugMode: true, combinePartners: inputs.planningType === 'couple', combineMethod: 'average' });
+    }
+    
+    // Get training fund rate
+    if (window.fieldMappingBridge) {
+        if (inputs.planningType === 'couple') {
+            trainingFundRate = window.fieldMappingBridge.getCombinedPartnerValue(inputs, 'TrainingRate', { 
+                allowZero: true, 
+                combineMethod: 'average' 
+            });
+        } else {
+            trainingFundRate = window.fieldMappingBridge.findFieldValue(inputs, 'trainingFundEmployeeRate', { allowZero: true }) || 0;
+        }
+    }
+    
+    // Fallback to legacy method if rates not found
+    if (!trainingFundRate) {
+        trainingFundRate = getFieldValue(inputs, [
+            'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee',
+            'employeeTrainingFundRate', 'training_fund_rate', 'trainingFund_rate'
+        ], { debugMode: true, combinePartners: inputs.planningType === 'couple', combineMethod: 'average' });
+    }
     
     // Use default rates if not found (standard Israeli rates)
     const DEFAULT_PENSION_RATE = 17.5;  // Standard employee + employer pension contribution
@@ -1227,7 +1275,7 @@ function calculateRetirementReadinessScore(inputs) {
     
     const currentAge = parseFloat(inputs.currentAge || 30);
     
-    // Enhanced income calculation that properly handles couple mode
+    // Enhanced income calculation using field mapping bridge
     let monthlyIncome = 0;
     
     // Check if person is already retired (has pension income)
@@ -1239,22 +1287,28 @@ function calculateRetirementReadinessScore(inputs) {
         // Person is retired, use pension income
         monthlyIncome = pensionIncome;
         console.log('👴 Retiree pension income:', monthlyIncome);
-    } else if (inputs.planningType === 'couple') {
-        // For couples, combine both partner salaries using getFieldValue with combinePartners
-        monthlyIncome = getFieldValue(inputs, [
-            'partner1Salary', 'partner2Salary', 'Partner1Salary', 'Partner2Salary',
-            'partner1Income', 'partner2Income', 'partner1MonthlySalary', 'partner2MonthlySalary',
-            'currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome'
-        ], { combinePartners: true, debugMode: true });
-        
-        console.log('👫 Couple income found:', monthlyIncome);
-    } else {
-        // For individuals, use main salary
-        monthlyIncome = getFieldValue(inputs, [
-            'currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome'
-        ], { debugMode: true });
-        
-        console.log('👤 Individual income found:', monthlyIncome);
+    } else if (window.fieldMappingBridge) {
+        // Use field mapping bridge for better field detection
+        if (inputs.planningType === 'couple') {
+            monthlyIncome = window.fieldMappingBridge.getCombinedPartnerValue(inputs, 'Salary', { allowZero: true });
+            console.log('👫 Couple income found via bridge:', monthlyIncome);
+        } else {
+            monthlyIncome = window.fieldMappingBridge.findFieldValue(inputs, 'monthlySalary', { allowZero: true }) || 0;
+            console.log('👤 Individual income found via bridge:', monthlyIncome);
+        }
+    }
+    
+    // Fallback to legacy method if no income found
+    if (!monthlyIncome) {
+        if (inputs.planningType === 'couple') {
+            monthlyIncome = getFieldValue(inputs, [
+                'partner1Salary', 'partner2Salary', 'Partner1Salary', 'Partner2Salary'
+            ], { combinePartners: true, debugMode: true });
+        } else {
+            monthlyIncome = getFieldValue(inputs, [
+                'currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome'
+            ], { debugMode: true });
+        }
     }
     
     // Add RSU income if available (similar to savings rate calculation)
@@ -1289,17 +1343,38 @@ function calculateRetirementReadinessScore(inputs) {
     
     const annualIncome = monthlyIncome * 12;
     
-    // Enhanced calculation for total current savings using getFieldValue
+    // Enhanced calculation for total current savings using field mapping bridge
     console.log('💰 Calculating total current savings...');
     let currentSavings = 0;
     
-    // Get pension/retirement savings - matching wizard component field names
-    const pensionSavings = getFieldValue(inputs, [
-        'currentPensionSavings', 'currentSavings', 'pensionSavings', 
-        'retirementSavings', 'currentRetirementSavings', 'currentPension'
-    ], { allowZero: true, debugMode: true });
-    currentSavings += pensionSavings;
-    console.log('  Pension savings:', pensionSavings);
+    // Use field mapping bridge for better field detection
+    if (window.fieldMappingBridge) {
+        // Get individual asset values
+        const pensionSavings = window.fieldMappingBridge.findFieldValue(inputs, 'currentPensionSavings', { allowZero: true }) || 0;
+        const trainingFund = window.fieldMappingBridge.findFieldValue(inputs, 'currentTrainingFund', { allowZero: true }) || 0;
+        const portfolio = window.fieldMappingBridge.findFieldValue(inputs, 'currentPortfolio', { allowZero: true }) || 0;
+        const realEstate = window.fieldMappingBridge.findFieldValue(inputs, 'currentRealEstate', { allowZero: true }) || 0;
+        const crypto = window.fieldMappingBridge.findFieldValue(inputs, 'currentCrypto', { allowZero: true }) || 0;
+        const bankAccount = window.fieldMappingBridge.findFieldValue(inputs, 'currentBankAccount', { allowZero: true }) || 0;
+        
+        currentSavings = pensionSavings + trainingFund + portfolio + realEstate + crypto + bankAccount;
+        
+        console.log('  Asset breakdown via bridge:');
+        console.log('  - Pension:', pensionSavings);
+        console.log('  - Training Fund:', trainingFund);
+        console.log('  - Portfolio:', portfolio);
+        console.log('  - Real Estate:', realEstate);
+        console.log('  - Crypto:', crypto);
+        console.log('  - Bank/Emergency:', bankAccount);
+    } else {
+        // Fallback to legacy method
+        const pensionSavings = getFieldValue(inputs, [
+            'currentPensionSavings', 'currentSavings', 'pensionSavings', 
+            'retirementSavings', 'currentRetirementSavings', 'currentPension'
+        ], { allowZero: true, debugMode: true });
+        currentSavings += pensionSavings;
+        console.log('  Pension savings (legacy):', pensionSavings);
+    }
     
     // Get US retirement accounts (401k, IRA)
     const retirement401k = getFieldValue(inputs, [
@@ -1514,7 +1589,14 @@ function calculateRiskAlignmentScore(inputs) {
         }
         
         const currentAge = parseFloat(inputs.currentAge || 30);
-        const riskTolerance = inputs.riskTolerance || 'moderate';
+        
+        // Get risk tolerance using field mapping bridge
+        let riskTolerance = 'moderate';
+        if (window.fieldMappingBridge) {
+            riskTolerance = window.fieldMappingBridge.findFieldValue(inputs, 'riskTolerance', { expectString: true }) || 'moderate';
+        } else {
+            riskTolerance = inputs.riskTolerance || inputs.riskProfile || 'moderate';
+        }
         
         // Check if portfolio allocations exist for better stock percentage calculation
         let stockPercentage = 0;
@@ -1527,6 +1609,13 @@ function calculateRiskAlignmentScore(inputs) {
         } else {
             // Fallback to direct field
             stockPercentage = parseFloat(inputs.stockPercentage || 60);
+        }
+        
+        // If still no stock percentage, use age-based default
+        if (stockPercentage === 0 && !inputs.portfolioAllocations && !inputs.stockPercentage) {
+            // Use age-based default: 100 - age
+            stockPercentage = Math.max(20, 100 - currentAge);
+            console.log(`📊 Using age-based default stock allocation: ${stockPercentage}%`);
         }
         
         // If no allocation data available, return minimal score
@@ -1770,16 +1859,40 @@ function calculateDiversificationScore(inputs) {
 function calculateTaxEfficiencyScore(inputs) {
     console.log('🔍 Calculating Tax Efficiency Score...');
     
-    // Enhanced field detection for contribution rates
-    const pensionRate = getFieldValue(inputs, [
-        'pensionContributionRate', 'pensionEmployeeRate', 'pensionEmployee',
-        'employeePensionRate', 'pension_contribution_rate', 'pension_rate'
-    ]);
+    // Enhanced field detection for contribution rates using field mapping bridge
+    let pensionRate = 0;
+    let trainingFundRate = 0;
     
-    const trainingFundRate = getFieldValue(inputs, [
-        'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee',
-        'employeeTrainingFundRate', 'training_fund_rate', 'trainingFund_rate'
-    ]);
+    if (window.fieldMappingBridge) {
+        if (inputs.planningType === 'couple') {
+            // Get combined partner rates using average
+            pensionRate = window.fieldMappingBridge.getCombinedPartnerValue(inputs, 'PensionRate', { 
+                allowZero: true, 
+                combineMethod: 'average' 
+            });
+            trainingFundRate = window.fieldMappingBridge.getCombinedPartnerValue(inputs, 'TrainingRate', { 
+                allowZero: true, 
+                combineMethod: 'average' 
+            });
+        } else {
+            // Get individual rates
+            pensionRate = window.fieldMappingBridge.findFieldValue(inputs, 'pensionEmployeeRate', { allowZero: true }) || 0;
+            trainingFundRate = window.fieldMappingBridge.findFieldValue(inputs, 'trainingFundEmployeeRate', { allowZero: true }) || 0;
+        }
+    }
+    
+    // Fallback to legacy method if rates not found
+    if (!pensionRate) {
+        pensionRate = getFieldValue(inputs, [
+            'pensionContributionRate', 'pensionEmployeeRate', 'pensionEmployee'
+        ]) || 0;
+    }
+    
+    if (!trainingFundRate) {
+        trainingFundRate = getFieldValue(inputs, [
+            'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee'
+        ]) || 0;
+    }
     
     // Country normalization with proper handling
     const country = (inputs.country || inputs.taxCountry || inputs.inheritanceCountry || 'ISR')
@@ -2460,6 +2573,17 @@ function calculateFinancialHealthScore(inputs) {
             country: inputs.country || inputs.taxCountry || 'unknown'
         });
         
+        // Run field availability diagnostics if bridge is available
+        let fieldDiagnostics = null;
+        if (window.fieldMappingBridge && window.fieldMappingBridge.diagnoseFieldAvailability) {
+            fieldDiagnostics = window.fieldMappingBridge.diagnoseFieldAvailability(inputs);
+            console.log('🔧 Field Diagnostics:', fieldDiagnostics);
+            
+            if (fieldDiagnostics.criticalIssues.length > 0) {
+                console.warn('⚠️ Critical field issues detected:', fieldDiagnostics.criticalIssues);
+            }
+        }
+        
         // Calculate each factor with error handling
         const factors = {};
         
@@ -2539,7 +2663,13 @@ function calculateFinancialHealthScore(inputs) {
                 calculationMethod: 'enhanced_field_mapping',
                 zeroScoreFactors: Object.entries(factors)
                     .filter(([_, factor]) => factor.score === 0)
-                    .map(([name, factor]) => ({ name, reason: factor.details?.calculationMethod || 'unknown' }))
+                    .map(([name, factor]) => ({ name, reason: factor.details?.calculationMethod || 'unknown' })),
+                fieldDiagnostics: fieldDiagnostics ? {
+                    foundFields: Object.keys(fieldDiagnostics.foundFields),
+                    missingFields: Object.keys(fieldDiagnostics.missingFields),
+                    criticalIssues: fieldDiagnostics.criticalIssues
+                } : null,
+                usingFieldMappingBridge: !!window.fieldMappingBridge
             }
         };
         
