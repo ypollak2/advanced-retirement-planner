@@ -176,11 +176,47 @@ function enhancedSafeCalculation(calculationName, calculationFn) {
 
 // ENHANCED: Comprehensive field mapping utility with wizard compatibility and debugging
 function getFieldValue(inputs, fieldNames, options = {}) {
-    const { combinePartners = false, allowZero = false, debugMode = true } = options;
+    const { combinePartners = false, allowZero = false, debugMode = true, expectString = false } = options;
     const logger = window.logger || { fieldSearch: () => {}, fieldFound: () => {}, debug: () => {} };
     
     logger.fieldSearch(`Searching for fields: ${fieldNames.join(', ')}`);
-    logger.debug(`Planning type: ${inputs.planningType}, Combine partners: ${combinePartners}`);
+    logger.debug(`Planning type: ${inputs.planningType}, Combine partners: ${combinePartners}, Expect string: ${expectString}`);
+    
+    // TICKET-009 FIX: Define string fields that should not be parsed as numbers
+    const STRING_FIELDS = [
+        'riskTolerance', 'riskProfile', 'investmentRisk', 'riskLevel',
+        'taxCountry', 'country', 'taxLocation', 'location', 'countryCode',
+        'planningType', 'rsuFrequency', 'currency', 'baseCurrency',
+        'pensionFundProvider', 'bankName', 'insuranceProvider'
+    ];
+    
+    // Helper function to process field value based on expected type
+    const processFieldValue = (rawValue, fieldName) => {
+        if (rawValue === undefined || rawValue === null || rawValue === '') {
+            return null;
+        }
+        
+        // Check if this is a string field or if we explicitly expect a string
+        const isStringField = expectString || STRING_FIELDS.some(sf => 
+            fieldName.toLowerCase().includes(sf.toLowerCase()) || 
+            sf.toLowerCase().includes(fieldName.toLowerCase())
+        );
+        
+        if (isStringField) {
+            // For string fields, return the string value
+            const stringValue = String(rawValue).toLowerCase().trim();
+            logger.fieldFound(`Found string field ${fieldName}: "${stringValue}"`);
+            return stringValue;
+        } else {
+            // For numeric fields, parse as number
+            const numericValue = parseFloat(rawValue);
+            if (!isNaN(numericValue) && (allowZero || numericValue > 0)) {
+                logger.fieldFound(`Found numeric field ${fieldName}: ${numericValue}`);
+                return numericValue;
+            }
+            return null;
+        }
+    };
     
     // PHASE 0.5: Direct E2E Test field mapping
     // Map common E2E test field names to standard patterns before normal lookup
@@ -201,10 +237,9 @@ function getFieldValue(inputs, fieldNames, options = {}) {
         if (e2eFieldMappings[fieldName]) {
             for (const e2eField of e2eFieldMappings[fieldName]) {
                 if (inputs[e2eField] !== undefined) {
-                    const value = parseFloat(inputs[e2eField]);
-                    if (!isNaN(value) && (allowZero || value > 0)) {
-                        logger.fieldFound(`Found E2E field ${e2eField}: ${value}`);
-                        return value;
+                    const processedValue = processFieldValue(inputs[e2eField], e2eField);
+                    if (processedValue !== null) {
+                        return processedValue;
                     }
                 }
             }
@@ -214,10 +249,9 @@ function getFieldValue(inputs, fieldNames, options = {}) {
     // Also check if inputs contain E2E field names that match our target patterns
     for (const [e2eField, mappings] of Object.entries(e2eFieldMappings)) {
         if (inputs[e2eField] !== undefined && fieldNames.some(f => mappings.includes(f))) {
-            const value = parseFloat(inputs[e2eField]);
-            if (!isNaN(value) && (allowZero || value > 0)) {
-                logger.fieldFound(`Found E2E mapping ${e2eField}: ${value}`);
-                return value;
+            const processedValue = processFieldValue(inputs[e2eField], e2eField);
+            if (processedValue !== null) {
+                return processedValue;
             }
         }
     }
