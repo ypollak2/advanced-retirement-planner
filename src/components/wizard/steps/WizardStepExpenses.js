@@ -756,7 +756,7 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
                     type: 'range',
                     min: '-5',
                     max: '10',
-                    step: '0.5',
+                    step: '0.1',
                     value: inputs.expenses?.yearlyAdjustment || 2.5,
                     onChange: (e) => handleAdjustmentChange(e.target.value),
                     className: 'flex-1'
@@ -768,7 +768,7 @@ const WizardStepExpenses = ({ inputs, setInputs, language, workingCurrency, form
                     React.createElement('span', {
                         key: 'percentage',
                         className: `text-lg font-bold ${(inputs.expenses?.yearlyAdjustment || 2.5) < 0 ? 'text-green-600' : 'text-red-600'}`
-                    }, `${(inputs.expenses?.yearlyAdjustment || 2.5) > 0 ? '+' : ''}${inputs.expenses?.yearlyAdjustment || 2.5}%`)
+                    }, `${(inputs.expenses?.yearlyAdjustment || 2.5) > 0 ? '+' : ''}${(inputs.expenses?.yearlyAdjustment || 2.5).toFixed(1)}%`)
                 ])
             ])
         ]),
