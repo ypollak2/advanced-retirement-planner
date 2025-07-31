@@ -1,6 +1,6 @@
 {
-  "version": "7.3.6",
+  "version": "7.3.7",
   "build": "2025-07-31",
-  "commit": "v7.3.6-portfolio-tax-fix",
-  "description": "Fixed critical bug: capital gains tax now correctly applied to personal portfolio principal"
+  "commit": "v7.3.7-portfolio-tax-ui-enhancement",
+  "description": "Enhanced UI to clearly show portfolio tax breakdown: gross value, tax amount, and net value displayed in summary panel"
 }
