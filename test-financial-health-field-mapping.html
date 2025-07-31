@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TICKET-009: Financial Health Field Mapping Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #e3f2fd;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+        
+        .test-section.success {
+            border-color: #4caf50;
+            background: #f1f8e9;
+        }
+        
+        .test-section.error {
+            border-color: #f44336;
+            background: #ffebee;
+        }
+        
+        .test-input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .results {
+            background: #263238;
+            color: #00e676;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+        
+        .score-display {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .score-excellent { background: #4caf50; color: white; }
+        .score-good { background: #8bc34a; color: white; }
+        .score-fair { background: #ffeb3b; color: #333; }
+        .score-poor { background: #f44336; color: white; }
+        
+        .factor-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .factor-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .factor-score {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .console-output {
+            background: #1e1e1e;
+            color: #dcdcdc;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 TICKET-009: Financial Health Field Mapping Test</h1>
+            <p>Browser-based testing tool for Financial Health Score field mapping issues</p>
+            <p><strong>Issue:</strong> User getting 31/100 instead of expected 70-80 with Savings Rate 0/25</p>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Test Scenario Configuration</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h4>Basic Information</h4>
+                    <input type="text" id="planningType" class="test-input" placeholder="Planning Type" value="individual">
+                    <input type="number" id="currentAge" class="test-input" placeholder="Current Age" value="35">
+                    <input type="number" id="retirementAge" class="test-input" placeholder="Retirement Age" value="65">
+                    
+                    <h4>Income & Contributions</h4>
+                    <input type="number" id="currentMonthlySalary" class="test-input" placeholder="Monthly Salary" value="15000">
+                    <input type="number" id="pensionContributionRate" class="test-input" placeholder="Pension Rate %" value="6.5">
+                    <input type="number" id="trainingFundContributionRate" class="test-input" placeholder="Training Fund Rate %" value="2.5">
+                </div>
+                <div>
+                    <h4>Current Savings</h4>
+                    <input type="number" id="currentPensionSavings" class="test-input" placeholder="Pension Savings" value="150000">
+                    <input type="number" id="currentTrainingFund" class="test-input" placeholder="Training Fund" value="50000">
+                    <input type="number" id="currentPersonalPortfolio" class="test-input" placeholder="Personal Portfolio" value="100000">
+                    
+                    <h4>Risk & Location</h4>
+                    <select id="riskTolerance" class="test-input">
+                        <option value="conservative">Conservative</option>
+                        <option value="moderate" selected>Moderate</option>
+                        <option value="aggressive">Aggressive</option>
+                    </select>
+                    <select id="taxCountry" class="test-input">
+                        <option value="israel" selected>Israel</option>
+                        <option value="usa">USA</option>
+                        <option value="uk">UK</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <button class="test-button" onclick="runFieldMappingTest()">🧪 Test Field Mapping</button>
+                <button class="test-button" onclick="calculateFinancialHealthScore()">💯 Calculate Score</button>
+                <button class="test-button" onclick="runBothTests()">🚀 Run Complete Test</button>
+                <button class="test-button" onclick="clearResults()">🗑️ Clear Results</button>
+            </div>
+        </div>
+
+        <div class="test-section" id="scoreSection" style="display: none;">
+            <h3>📊 Financial Health Score Results</h3>
+            <div id="scoreDisplay" class="score-display"></div>
+            <div id="factorBreakdown" class="factor-breakdown"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 Test Results & Logs</h3>
+            <div id="testResults" class="results">
+Ready to test Financial Health Score field mapping...
+
+Instructions:
+1. Modify the input values above to match your test scenario
+2. Click "Test Field Mapping" to see if fields are detected correctly  
+3. Click "Calculate Score" to run the actual financial health calculation
+4. Check the console output below for detailed logging
+
+Expected Fix: String fields (riskTolerance, taxCountry) should now be detected correctly.
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>💻 Console Output</h3>
+            <div id="consoleOutput" class="console-output">
+Console logs will appear here...
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Required Scripts -->
+    <script>
+        // Capture console logs
+        const originalConsole = {
+            log: console.log,
+            warn: console.warn,
+            error: console.error
+        };
+        
+        const consoleOutput = document.getElementById('consoleOutput');
+        
+        function addToConsole(type, ...args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            consoleOutput.innerHTML += `<span style="color: #888">[${timestamp}]</span> <span style="color: ${
+                type === 'error' ? '#ff6b6b' : 
+                type === 'warn' ? '#ffd93d' : '#6bcf7f'
+            }">${type.toUpperCase()}:</span> ${message}\n`;
+            
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            originalConsole[type](...args);
+        }
+        
+        console.log = (...args) => addToConsole('log', ...args);
+        console.warn = (...args) => addToConsole('warn', ...args);
+        console.error = (...args) => addToConsole('error', ...args);
+        
+        // Mock logger for field search
+        window.logger = {
+            fieldSearch: (msg) => console.log('🔍 FIELD_SEARCH:', msg),
+            fieldFound: (msg) => console.log('✅ FIELD_FOUND:', msg),
+            debug: (msg) => console.log('🐛 DEBUG:', msg)
+        };
+    </script>
+
+    <!-- Load Financial Health Engine -->
+    <script src="src/utils/fieldMappingDictionary.js"></script>
+    <script src="src/utils/financialHealthEngine.js"></script>
+
+    <script>
+        let testInputs = {};
+        
+        function getTestInputs() {
+            return {
+                planningType: document.getElementById('planningType').value,
+                currentAge: parseInt(document.getElementById('currentAge').value),
+                retirementAge: parseInt(document.getElementById('retirementAge').value),
+                currentMonthlySalary: parseFloat(document.getElementById('currentMonthlySalary').value),
+                pensionContributionRate: parseFloat(document.getElementById('pensionContributionRate').value),
+                trainingFundContributionRate: parseFloat(document.getElementById('trainingFundContributionRate').value),
+                currentPensionSavings: parseFloat(document.getElementById('currentPensionSavings').value),
+                currentTrainingFund: parseFloat(document.getElementById('currentTrainingFund').value),
+                currentPersonalPortfolio: parseFloat(document.getElementById('currentPersonalPortfolio').value),
+                riskTolerance: document.getElementById('riskTolerance').value,
+                taxCountry: document.getElementById('taxCountry').value
+            };
+        }
+        
+        function logToResults(message) {
+            const results = document.getElementById('testResults');
+            results.textContent += message + '\n';
+        }
+        
+        function clearResults() {
+            document.getElementById('testResults').textContent = 'Results cleared. Ready for new test...\n';
+            document.getElementById('consoleOutput').innerHTML = 'Console cleared...\n';
+            document.getElementById('scoreSection').style.display = 'none';
+        }
+        
+        function runFieldMappingTest() {
+            logToResults('\n🧪 === RUNNING FIELD MAPPING TEST ===');
+            testInputs = getTestInputs();
+            
+            logToResults('📋 Test Input Data:');
+            logToResults(JSON.stringify(testInputs, null, 2));
+            
+            // Test field mapping using the getFieldValue function
+            logToResults('\n🔍 Testing Field Detection:');
+            
+            try {
+                // Test numeric fields
+                const monthlyIncome = window.getFieldValue(testInputs, ['currentMonthlySalary', 'monthlySalary', 'salary']);
+                logToResults(`💰 Monthly Income: ${monthlyIncome} (${monthlyIncome > 0 ? '✅ Found' : '❌ Missing'})`);
+                
+                const pensionRate = window.getFieldValue(testInputs, ['pensionContributionRate', 'pensionEmployeeRate'], { allowZero: true });
+                logToResults(`📈 Pension Rate: ${pensionRate}% (${pensionRate > 0 ? '✅ Found' : '❌ Missing'})`);
+                
+                // Test string fields with new expectString option
+                const riskTolerance = window.getFieldValue(testInputs, ['riskTolerance', 'riskProfile'], { expectString: true });
+                logToResults(`⚖️  Risk Tolerance: "${riskTolerance}" (${riskTolerance ? '✅ Found' : '❌ Missing'})`);
+                
+                const taxCountry = window.getFieldValue(testInputs, ['taxCountry', 'country'], { expectString: true });
+                logToResults(`🌍 Tax Country: "${taxCountry}" (${taxCountry ? '✅ Found' : '❌ Missing'})`);
+                
+                logToResults('\n✅ Field mapping test completed successfully!');
+                
+            } catch (error) {
+                logToResults(`❌ Field mapping test failed: ${error.message}`);
+                console.error('Field mapping error:', error);
+            }
+        }
+        
+        function calculateFinancialHealthScore() {
+            logToResults('\n💯 === CALCULATING FINANCIAL HEALTH SCORE ===');
+            testInputs = getTestInputs();
+            
+            try {
+                if (!window.calculateFinancialHealthScore) {
+                    throw new Error('Financial Health Engine not loaded');
+                }
+                
+                logToResults('🚀 Running financial health calculation...');
+                
+                const result = window.calculateFinancialHealthScore(testInputs);
+                
+                logToResults('\n📊 CALCULATION RESULTS:');
+                logToResults(`Total Score: ${result.totalScore}/100`);
+                
+                // Display score
+                displayScore(result);
+                
+                if (result.factors) {
+                    logToResults('\n📈 Factor Breakdown:');
+                    Object.entries(result.factors).forEach(([name, factor]) => {
+                        const weight = window.SCORE_FACTORS[name]?.weight || 'unknown';
+                        logToResults(`  ${name}: ${factor.score}/${weight} (${factor.details?.status || 'no status'})`);
+                    });
+                }
+                
+                // Check if this matches user's issue
+                if (result.totalScore < 50) {
+                    logToResults('\n🚨 LOW SCORE DETECTED - This matches the reported issue!');
+                    
+                    if (result.factors.savingsRate && result.factors.savingsRate.score === 0) {
+                        logToResults('❌ CONFIRMED: Savings Rate = 0 (matches user report)');
+                    }
+                    if (result.factors.riskAlignment && result.factors.riskAlignment.score === 0) {
+                        logToResults('❌ CONFIRMED: Risk Alignment = 0 (matches user report)');
+                    }
+                    if (result.factors.taxEfficiency && result.factors.taxEfficiency.score === 0) {
+                        logToResults('❌ CONFIRMED: Tax Efficiency = 0 (matches user report)');
+                    }
+                } else {
+                    logToResults('✅ GOOD SCORE - Field mapping fix appears to be working!');
+                }
+                
+            } catch (error) {
+                logToResults(`❌ Financial health calculation failed: ${error.message}`);
+                console.error('Calculation error:', error);
+            }
+        }
+        
+        function displayScore(result) {
+            const scoreSection = document.getElementById('scoreSection');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const factorBreakdown = document.getElementById('factorBreakdown');
+            
+            scoreSection.style.display = 'block';
+            
+            // Display main score
+            const score = result.totalScore || 0;
+            scoreDisplay.textContent = `${score}/100`;
+            
+            if (score >= 85) {
+                scoreDisplay.className = 'score-display score-excellent';
+            } else if (score >= 70) {
+                scoreDisplay.className = 'score-display score-good';
+            } else if (score >= 50) {
+                scoreDisplay.className = 'score-display score-fair';
+            } else {
+                scoreDisplay.className = 'score-display score-poor';
+            }
+            
+            // Display factor breakdown
+            factorBreakdown.innerHTML = '';
+            if (result.factors) {
+                Object.entries(result.factors).forEach(([name, factor]) => {
+                    const weight = window.SCORE_FACTORS[name]?.weight || 0;
+                    const card = document.createElement('div');
+                    card.className = 'factor-card';
+                    card.innerHTML = `
+                        <div class="factor-score" style="color: ${factor.score > 0 ? '#4caf50' : '#f44336'}">
+                            ${factor.score}/${weight}
+                        </div>
+                        <h4>${window.SCORE_FACTORS[name]?.name || name}</h4>
+                        <p>Status: ${factor.details?.status || 'unknown'}</p>
+                    `;
+                    factorBreakdown.appendChild(card);
+                });
+            }
+        }
+        
+        function runBothTests() {
+            clearResults();
+            logToResults('🚀 === RUNNING COMPLETE FIELD MAPPING & SCORE TEST ===\n');
+            runFieldMappingTest();
+            setTimeout(() => {
+                calculateFinancialHealthScore();
+            }, 1000);
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 TICKET-009 Financial Health Field Mapping Test Tool loaded');
+            console.log('📋 Testing fix for string field detection (riskTolerance, taxCountry)');
+            
+            if (window.calculateFinancialHealthScore) {
+                console.log('✅ Financial Health Engine loaded successfully');
+            } else {
+                console.error('❌ Failed to load Financial Health Engine');
+            }
+        });
+    </script>
+</body>
+</html>
