@@ -212,10 +212,10 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             const convertedValue = await convertCurrency(netValueILS, 'ILS', workingCurrency);
             const formattedValue = formatCurrency(convertedValue, workingCurrency);
             
-            // Update state with converted value
+            // Update state with converted value and the net value for comparison
             setConversionStates(prev => ({ 
                 ...prev, 
-                [stateKey]: { loading: false, value: formattedValue, error: null } 
+                [stateKey]: { loading: false, value: formattedValue, error: null, netValue: netValueILS } 
             }));
             
             return formattedValue;
@@ -223,10 +223,10 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             console.warn('Currency conversion failed:', error);
             const fallbackValue = formatCurrency(netValueILS, 'ILS');
             
-            // Update state with error
+            // Update state with error and the net value for comparison
             setConversionStates(prev => ({ 
                 ...prev, 
-                [stateKey]: { loading: false, value: fallbackValue, error: true } 
+                [stateKey]: { loading: false, value: fallbackValue, error: true, netValue: netValueILS } 
             }));
             
             return fallbackValue;
@@ -242,8 +242,13 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             return formatCurrency(0);
         }
         
-        // If we have a cached converted value, use it
-        if (conversionState && !conversionState.loading && conversionState.value) {
+        // Check if we have a cached value AND if it's still valid (tax rate hasn't changed)
+        // We need to recalculate if the tax rate has changed
+        const currentNetValue = portfolioValue * (1 - (taxRate || 25) / 100);
+        const needsRecalculation = conversionState && conversionState.netValue !== currentNetValue;
+        
+        // If we have a cached converted value and tax rate hasn't changed, use it
+        if (conversionState && !conversionState.loading && conversionState.value && !needsRecalculation) {
             const display = displayText ? `${displayText}: ${conversionState.value}` : conversionState.value;
             return conversionState.error ? 
                 createElement('span', { className: 'flex items-center' }, [
