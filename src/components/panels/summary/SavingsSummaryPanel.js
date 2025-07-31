@@ -63,7 +63,7 @@ const SavingsSummaryPanel = ({
         const currentRealEstate = parseFloat(inputs.currentRealEstate) || 0;
         // Fixed: Use correct field name and add portfolio taxation
         const grossPersonalPortfolio = parseFloat(inputs.currentPersonalPortfolio) || parseFloat(inputs.currentInvestments) || 0;
-        const portfolioTaxRate = parseFloat(inputs.portfolioTaxRate) || 0.25; // Default 25% capital gains tax
+        const portfolioTaxRate = (parseFloat(inputs.portfolioTaxRate) || 25) / 100; // Default 25% capital gains tax
         const netPersonalPortfolio = grossPersonalPortfolio * (1 - portfolioTaxRate);
         
         // Include partner crypto assets if in couple mode

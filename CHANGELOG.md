@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [7.3.6] - 2025-07-31 - CRITICAL FIX: Personal Portfolio Tax Calculation 💰
+
+### 🐛 **Fixed**
+- **Personal Portfolio Tax Calculation**:
+  - Fixed critical bug where capital gains tax was not applied to personal portfolio principal
+  - Portfolio value now correctly reduced by tax rate BEFORE retirement calculations
+  - Example: 1,000,000 with 25% tax now correctly shows 750,000 net value
+  - Applied fix to both individual and couple planning modes
+  - Partner portfolios now also have tax applied correctly
+
+### 🔧 **Technical Details**
+- Updated `retirementCalculations.js` to apply tax upfront to portfolio values
+- Fixed `SavingsSummaryPanel.js` to treat tax rate as percentage (not decimal)
+- Ensured consistency between display and calculation logic
+
+---
+
 ## [7.3.0] - 2025-07-30 - COMPREHENSIVE TEST SUITE & PRODUCTION DEPLOYMENT 🧪🚀
 
 ### 🚀 **Major Features**

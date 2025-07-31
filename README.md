@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v7.3.5 ✨
+# 🚀 Advanced Retirement Planner v7.3.6 ✨
 
-[![Version](https://img.shields.io/badge/version-7.3.5-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-7.3.6-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-374%2F374-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -27,7 +27,15 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki) | **📊 Repository Statistics:** [View Stats](REPOSITORY-STATISTICS.md)
 
-## 🎨 What's New in v7.3.1 - PARTNER 1 INCOME ATTRIBUTION FIX 💰👫
+## 🎨 What's New in v7.3.6 - CRITICAL FIX: Personal Portfolio Tax Calculation 💰
+
+### Critical Bug Fix: Capital Gains Tax Application
+- **🐛 Fixed Portfolio Tax Calculation**: Capital gains tax is now correctly applied to the portfolio principal amount BEFORE retirement calculations
+- **💰 Correct Net Value**: With 1,000,000 portfolio and 25% tax, the net value correctly shows as 750,000 (not 1,000,000)
+- **👫 Couple Mode Support**: Tax is properly applied to both Partner 1 and Partner 2 portfolios
+- **✅ Full Test Coverage**: All 374 tests passing including new portfolio tax validation
+
+### Previous: v7.3.1 - PARTNER 1 INCOME ATTRIBUTION FIX 💰👫
 
 ### Major Fix: Partner 1 Income Attribution
 - **🐛 Fixed Partner 1 Income Display**: Partner 1's additional income (bonuses, rental, dividends) now properly shows as part of their total income instead of being displayed separately
