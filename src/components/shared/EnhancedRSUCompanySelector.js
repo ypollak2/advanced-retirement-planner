@@ -113,17 +113,29 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language, workingCurren
         setSearchQuery('');
         
         if (symbol && symbol !== 'OTHER' && symbol !== '') {
-            // Wait for currency rate if needed before fetching stock price
+            // Fetch currency rate directly if needed for non-USD currencies
+            let effectiveRate = currencyRate;
             if (workingCurrency !== 'USD' && (currencyRate === null || currencyRate <= 0)) {
-                console.log('⏳ Waiting for currency rate to load...');
-                // Try to wait up to 3 seconds for currency rate
-                let waitTime = 0;
-                while ((currencyRate === null || currencyRate <= 0) && waitTime < 3000) {
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    waitTime += 100;
+                console.log('💱 Fetching currency rate for RSU conversion...');
+                try {
+                    const api = new window.CurrencyAPI();
+                    const rates = await api.getExchangeRates();
+                    if (rates && rates[workingCurrency]) {
+                        effectiveRate = rates[workingCurrency];
+                        setCurrencyRate(effectiveRate);
+                        console.log(`✅ Currency rate fetched: 1 USD = ${effectiveRate} ${workingCurrency}`);
+                    } else {
+                        // Use fallback rate if API fails
+                        effectiveRate = workingCurrency === 'ILS' ? 3.70 : 1;
+                        console.warn(`⚠️ Using fallback rate: 1 USD = ${effectiveRate} ${workingCurrency}`);
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch currency rate:', error);
+                    // Use fallback rate
+                    effectiveRate = workingCurrency === 'ILS' ? 3.70 : 1;
                 }
             }
-            await fetchStockPriceForSymbol(symbol);
+            await fetchStockPriceForSymbol(symbol, effectiveRate);
         } else {
             // Reset price data for OTHER or empty selection
             setStockPrice(null);
@@ -134,7 +146,7 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language, workingCurren
     };
     
     // Function to fetch stock price using the API
-    const fetchStockPriceForSymbol = async (symbol) => {
+    const fetchStockPriceForSymbol = async (symbol, providedRate = null) => {
         if (!symbol || !window.fetchStockPrice) {
             console.warn('⚠️ fetchStockPrice function not available');
             setManualPriceMode(true);
@@ -152,12 +164,14 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language, workingCurren
                 // Convert to working currency with validation
                 let convertedPrice = priceUSD;
                 if (workingCurrency !== 'USD') {
-                    if (!currencyRate || currencyRate <= 0 || !isFinite(currencyRate)) {
-                        console.warn(`⚠️ Invalid currency rate for ${workingCurrency}: ${currencyRate}`);
+                    // Use provided rate or state rate
+                    const effectiveRate = providedRate || currencyRate;
+                    if (!effectiveRate || effectiveRate <= 0 || !isFinite(effectiveRate)) {
+                        console.warn(`⚠️ Invalid currency rate for ${workingCurrency}: ${effectiveRate}`);
                         throw new Error('Currency rate not available');
                     }
-                    convertedPrice = Math.round(priceUSD * currencyRate * 100) / 100; // Avoid floating point issues
-                    console.log(`💱 Converting ${symbol}: $${priceUSD} USD → ${currencySymbol}${convertedPrice.toFixed(2)} ${workingCurrency} (rate: ${currencyRate})`);
+                    convertedPrice = Math.round(priceUSD * effectiveRate * 100) / 100; // Avoid floating point issues
+                    console.log(`💱 Converting ${symbol}: $${priceUSD} USD → ${currencySymbol}${convertedPrice.toFixed(2)} ${workingCurrency} (rate: ${effectiveRate})`);
                 }
                 
                 setStockPrice(convertedPrice);
@@ -224,7 +238,7 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language, workingCurren
     // Refresh stock price
     const refreshStockPrice = () => {
         if (inputs.rsuCompany && inputs.rsuCompany !== 'OTHER') {
-            fetchStockPriceForSymbol(inputs.rsuCompany);
+            fetchStockPriceForSymbol(inputs.rsuCompany, currencyRate);
         }
     };
     
