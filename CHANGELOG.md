@@ -6,6 +6,54 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [7.3.8] - 2025-07-31 - FUNDAMENTAL REDESIGN: Financial Health Scoring System 🚀
+
+### 🏗️ **Major System Redesign**
+- **Financial Health Scoring System - Complete Overhaul**:
+  - Created `fieldMappingBridge.js` - centralized field name translation layer
+  - Simplified complex 700+ line field detection logic to cleaner implementation
+  - Added comprehensive field diagnostics and error reporting
+  - Implemented graceful degradation instead of zero scores
+  
+### 🔧 **Enhanced**
+- **Improved Field Detection** across all scoring factors:
+  - Savings Rate: Better income detection for both individual and couple modes
+  - Retirement Readiness: Enhanced asset field discovery
+  - Tax Efficiency: Improved contribution rate finding
+  - Risk Alignment: Added intelligent defaults when data is missing
+  
+### 📊 **Added**
+- **Better Debugging & Diagnostics**:
+  - Field availability reports in scoring results
+  - Critical issue detection and warnings
+  - Clear identification of missing required fields
+  - Detailed debug information for troubleshooting
+
+### 🔧 **Technical Details**
+- Created new `fieldMappingBridge.js` with explicit field translations
+- Refactored `getFieldValue` function to use the bridge
+- Updated all calculator functions to handle missing data gracefully
+- Added `diagnoseFieldAvailability` function for field analysis
+- All 374 tests passing with no regressions
+
+---
+
+## [7.3.7] - 2025-07-31 - Financial Health Score Accuracy Fixes 🎯
+
+### 🐛 **Fixed**
+- **Financial Health Score Accuracy**:
+  - Fixed critical calculation issues in couple mode
+  - Resolved partner contribution rate detection
+  - Fixed field mapping for partner-specific data
+  - Ensured proper score combination logic
+- **Portfolio Tax Net Value**:
+  - Fixed net value not updating when tax rate changes
+  - Added proper cache invalidation
+- **Yearly Adjustment Slider**:
+  - Enhanced precision with 0.1% steps for better control
+
+---
+
 ## [7.3.6] - 2025-07-31 - CRITICAL FIX: Personal Portfolio Tax Calculation 💰
 
 ### 🐛 **Fixed**
