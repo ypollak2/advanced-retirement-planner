@@ -545,17 +545,44 @@ const SummaryPanel = ({
                     }, `${portfolioBreakdown.training.toFixed(1)}%`)
                 ]),
                 portfolioBreakdown.personal > 0 && React.createElement('div', {
-                    key: 'personal',
-                    className: 'flex justify-between items-center p-2 bg-purple-50 rounded'
+                    key: 'personal-section',
+                    className: 'space-y-2'
                 }, [
-                    React.createElement('span', {
-                        key: 'personal-label',
-                        className: 'text-sm text-purple-700'
-                    }, t.personalPortfolio),
-                    React.createElement('span', {
-                        key: 'personal-value',
-                        className: 'text-sm font-semibold text-purple-800'
-                    }, `${portfolioBreakdown.personal.toFixed(1)}%`)
+                    React.createElement('div', {
+                        key: 'personal',
+                        className: 'flex justify-between items-center p-2 bg-purple-50 rounded'
+                    }, [
+                        React.createElement('span', {
+                            key: 'personal-label',
+                            className: 'text-sm text-purple-700'
+                        }, t.personalPortfolio),
+                        React.createElement('span', {
+                            key: 'personal-value',
+                            className: 'text-sm font-semibold text-purple-800'
+                        }, `${portfolioBreakdown.personal.toFixed(1)}%`)
+                    ]),
+                    // Show tax breakdown if user has personal portfolio
+                    (inputs.currentPersonalPortfolio > 0) && React.createElement('div', {
+                        key: 'personal-tax-breakdown',
+                        className: 'ml-4 p-2 bg-purple-25 border-l-2 border-purple-200 text-xs space-y-1'
+                    }, [
+                        React.createElement('div', {
+                            key: 'tax-note',
+                            className: 'text-purple-600 font-medium'
+                        }, language === 'he' ? '💰 מוצג ערך נטו לאחר מס רווחי הון' : '💰 Shown as net value after capital gains tax'),
+                        React.createElement('div', {
+                            key: 'gross-value',
+                            className: 'text-purple-600'
+                        }, `${language === 'he' ? 'ערך ברוטו:' : 'Gross value:'} ${formatCurrency(inputs.currentPersonalPortfolio)}`),
+                        React.createElement('div', {
+                            key: 'tax-rate',
+                            className: 'text-purple-600'
+                        }, `${language === 'he' ? 'מס רווחי הון:' : 'Capital gains tax:'} ${inputs.portfolioTaxRate || 25}%`),
+                        React.createElement('div', {
+                            key: 'net-value',
+                            className: 'text-purple-700 font-semibold'
+                        }, `${language === 'he' ? 'ערך נטו:' : 'Net value:'} ${formatCurrency(inputs.currentPersonalPortfolio * (1 - (inputs.portfolioTaxRate || 25) / 100))}`)
+                    ])
                 ]),
                 portfolioBreakdown.realEstate > 0 && React.createElement('div', {
                     key: 'real-estate',

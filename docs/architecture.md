@@ -1,8 +1,8 @@
-# 🏗️ Advanced Retirement Planner v6.6.3 - System Architecture
+# 🏗️ Advanced Retirement Planner v7.3.6 - System Architecture
 
 ## Overview
 
-The Advanced Retirement Planner v6.0.0 represents a major architectural evolution, introducing a sophisticated partner planning system with multi-step wizard interface, country-specific pension rules, and enhanced calculation engine. This document outlines the comprehensive technical architecture supporting these advanced features.
+The Advanced Retirement Planner v7.3.6 represents a mature, production-ready retirement planning application with comprehensive testing infrastructure, component runtime validation, and hotfix prevention mechanisms. This document outlines the robust technical architecture supporting 374 comprehensive tests, component render validation, and enterprise-grade reliability.
 
 ## 🎯 Core Architecture Principles
 
@@ -29,13 +29,17 @@ The Advanced Retirement Planner v6.0.0 represents a major architectural evolutio
 - **Input Validation**: Comprehensive type checking and sanitization
 - **XSS Prevention**: Safe DOM manipulation through React.createElement
 - **Privacy First**: All calculations performed client-side
+- **Component Runtime Validation**: Prevents initialization errors before deployment
 - **Semantic Secret Scanner**: AST-based secret detection with context awareness
 
-### **5. DevSecOps Integration**
+### **5. DevSecOps Integration & Testing Excellence**
 - **Automated Secret Detection**: CI/CD integrated scanning with exit code strategy
+- **Component Render Validation**: Prevents runtime initialization errors
+- **374 Comprehensive Tests**: 100% pass rate required for deployment
 - **Context-Aware Analysis**: Cryptocurrency and UI component filtering
 - **Multi-Format Reporting**: Console, JSON, Markdown, and SARIF outputs
 - **Performance Optimized**: Concurrent processing with timeout protection
+- **Hotfix Prevention**: Runtime error detection before production deployment
 
 ## 📁 Project Structure
 
@@ -72,8 +76,10 @@ advanced-retirement-planner/
 │   │   └── marketConstants.js        # Country-specific pension data
 │   └── 📁 translations/              # Internationalization
 │       └── multiLanguage.js          # Hebrew/English translations
-├── 📁 tests/                         # Comprehensive test suite
-│   ├── test-runner.js                # Enhanced test runner (116 tests)
+├── 📁 tests/                         # Comprehensive test suite (374 tests)
+│   ├── test-runner.js                # Enhanced test runner (374 tests)
+│   ├── rendering/                    # Component render validation
+│   │   └── component-render.test.js  # Runtime error prevention
 │   ├── partner-planning-test.js      # Partner feature validation
 │   ├── wizard-interface-test.js      # Multi-step wizard testing
 │   ├── calculation-logic-test.js     # Enhanced calculation validation
@@ -92,9 +98,64 @@ advanced-retirement-planner/
 │   └── 📁 reports/                   # Multi-format report generators
 └── 📁 scripts/                       # Build and deployment
     ├── secret-scanner.js             # Semantic secret scanner CLI
+    ├── validate-components.js        # Component render validation
     ├── pre-commit-qa.sh              # Quality assurance automation
     └── update-version.js             # Version management
 ```
+
+## 🛡️ Component Runtime Validation Architecture
+
+### **Component Validation System (v7.3.6)**
+
+A critical safety system introduced to prevent runtime initialization errors that could crash the production application.
+
+#### **Problem Solved**
+- **Runtime Initialization Errors**: Functions referenced in `useEffect` before declaration
+- **"Cannot access before initialization"**: JavaScript hoisting issues in React components
+- **Production Crashes**: Components failing to render due to improper function ordering
+
+#### **Solution Architecture**
+
+```javascript
+// CORRECT: Functions defined BEFORE useEffect that uses them
+const handleNext = React.useCallback(() => {
+  // Function implementation
+}, [dependencies]);
+
+const handlePrevious = React.useCallback(() => {
+  // Function implementation  
+}, [dependencies]);
+
+// useEffect can safely reference the functions above
+React.useEffect(() => {
+  // Use handleNext and handlePrevious safely
+}, [handleNext, handlePrevious]);
+```
+
+#### **Validation Tools**
+
+1. **Component Render Validation Script** (`scripts/validate-components.js`)
+   - Validates all components can initialize without errors
+   - Checks for common initialization patterns
+   - Detects function hoisting issues
+   - Runs in CI/CD pipeline before deployment
+
+2. **NPM Scripts Integration**
+   ```bash
+   npm run validate:components  # Full component validation
+   npm run validate:render     # React render testing
+   ```
+
+3. **CI/CD Pipeline Integration**
+   - Automated component validation in GitHub Actions
+   - Prevents deployment if components fail to render
+   - Integrated into both stage and production deployment workflows
+
+#### **Prevention Rules**
+- Define all functions BEFORE `useEffect` hooks that reference them
+- Use `React.useCallback` for functions used in dependencies
+- Never reference a function in `useEffect` before it's declared
+- Test components can mount/unmount without errors
 
 ## 🧩 Component Architecture
 
