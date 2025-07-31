@@ -1,9 +1,10 @@
 // Financial Health Engine - Unified scoring system with detailed breakdowns
-// Created by Yali Pollak (יהלי פולק) - v6.6.3
+// Created by Yali Pollak (יהלי פולק) - v7.3.8
 
 /**
  * Comprehensive Financial Health Scoring Engine
  * Provides detailed breakdowns, actionable insights, and peer comparisons
+ * Enhanced with GitHub Gist session storage for debugging
  */
 
 // Import field mapping dictionary if available
@@ -2559,6 +2560,15 @@ function getPeerComparison(inputs, totalScore) {
  */
 function calculateFinancialHealthScore(inputs) {
     try {
+        // Log to session storage for debugging
+        if (window.sessionStorageGist) {
+            window.sessionStorageGist.logDebugInfo('Financial Health Score Calculation Started', {
+                planningType: inputs.planningType,
+                totalFields: Object.keys(inputs).length,
+                inputKeys: Object.keys(inputs)
+            });
+        }
+        
         // Enhanced debug logging for input validation
         console.log('🔍 Financial Health Score Calculation Started');
         console.log('📋 Input Summary:', {
@@ -2579,8 +2589,21 @@ function calculateFinancialHealthScore(inputs) {
             fieldDiagnostics = window.fieldMappingBridge.diagnoseFieldAvailability(inputs);
             console.log('🔧 Field Diagnostics:', fieldDiagnostics);
             
+            // Log field mapping diagnosis to session storage
+            if (window.sessionStorageGist) {
+                window.sessionStorageGist.logFieldMappingDiagnosis(inputs, fieldDiagnostics);
+            }
+            
             if (fieldDiagnostics.criticalIssues.length > 0) {
                 console.warn('⚠️ Critical field issues detected:', fieldDiagnostics.criticalIssues);
+                
+                // Log critical issues to session storage
+                if (window.sessionStorageGist) {
+                    window.sessionStorageGist.logError({
+                        message: 'Critical field mapping issues detected',
+                        details: fieldDiagnostics.criticalIssues
+                    }, { context: 'financial-health-calculation' });
+                }
             }
         }
         
@@ -2675,10 +2698,45 @@ function calculateFinancialHealthScore(inputs) {
         
         console.log('✅ Financial health score calculated:', scoreBreakdown.totalScore, scoreBreakdown.status);
         console.log('⚠️ Zero score factors:', scoreBreakdown.debugInfo.zeroScoreFactors);
+        
+        // Log final score to session storage
+        if (window.sessionStorageGist) {
+            window.sessionStorageGist.logFinancialHealthScore({
+                totalScore: scoreBreakdown.totalScore,
+                status: scoreBreakdown.status,
+                factors: Object.keys(scoreBreakdown.factors).reduce((acc, key) => {
+                    acc[key] = {
+                        score: scoreBreakdown.factors[key].score,
+                        status: scoreBreakdown.factors[key].details?.status || 'calculated'
+                    };
+                    return acc;
+                }, {}),
+                criticalFactors: scoreBreakdown.debugInfo?.zeroScoreFactors || [],
+                calculationSuccessful: true
+            });
+        }
+        
         return scoreBreakdown;
         
     } catch (error) {
         console.error('❌ Error calculating financial health score:', error);
+        
+        // Log error to session storage
+        if (window.sessionStorageGist) {
+            window.sessionStorageGist.logError(error, { 
+                context: 'financial-health-calculation',
+                inputs: inputs ? Object.keys(inputs) : []
+            });
+            
+            window.sessionStorageGist.logFinancialHealthScore({
+                totalScore: 0,
+                status: 'error',
+                factors: {},
+                error: error.message,
+                calculationSuccessful: false
+            });
+        }
+        
         return {
             totalScore: 0,
             factors: {},

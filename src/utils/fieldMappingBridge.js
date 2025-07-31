@@ -1,136 +1,6 @@
 // Field Mapping Bridge - Translates wizard field names to financial health engine expectations
 // This provides a clean, maintainable mapping between different field naming conventions
-
-/**
- * Field mapping configuration
- * Maps canonical field names to all possible variations found in wizard components
- */
-const FIELD_MAPPINGS = {
-    // Income fields
-    monthlySalary: [
-        'currentMonthlySalary', 'monthlySalary', 'salary', 'monthlyIncome',
-        'currentSalary', 'monthly_salary', 'income', 'grossSalary',
-        'netSalary', 'baseSalary', 'totalIncome', 'monthlyIncomeAmount'
-    ],
-    
-    // Partner income fields (couple mode)
-    partner1Salary: [
-        'partner1Salary', 'Partner1Salary', 'partner1Income', 'partner1MonthlySalary',
-        'partner1NetSalary', 'partner1GrossSalary', 'partner1NetIncome',
-        'partner_1_salary', 'partnerOneSalary'
-    ],
-    
-    partner2Salary: [
-        'partner2Salary', 'Partner2Salary', 'partner2Income', 'partner2MonthlySalary',
-        'partner2NetSalary', 'partner2GrossSalary', 'partner2NetIncome',
-        'partner_2_salary', 'partnerTwoSalary'
-    ],
-    
-    // Pension contribution rates
-    pensionEmployeeRate: [
-        'pensionContributionRate', 'pensionEmployeeRate', 'pensionEmployee',
-        'employeePensionRate', 'pension_contribution_rate', 'pension_rate',
-        'pensionRate', 'employeePension'
-    ],
-    
-    partner1PensionRate: [
-        'partner1PensionEmployeeRate', 'partner1PensionContributionRate', 
-        'partner1PensionRate', 'partner1PensionEmployee'
-    ],
-    
-    partner2PensionRate: [
-        'partner2PensionEmployeeRate', 'partner2PensionContributionRate',
-        'partner2PensionRate', 'partner2PensionEmployee'
-    ],
-    
-    // Training fund contribution rates
-    trainingFundEmployeeRate: [
-        'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee',
-        'employeeTrainingFundRate', 'training_fund_rate', 'trainingFund_rate',
-        'trainingFundRate', 'employeeTrainingFund'
-    ],
-    
-    partner1TrainingRate: [
-        'partner1TrainingFundEmployeeRate', 'partner1TrainingFundContributionRate',
-        'partner1TrainingFundRate', 'partner1TrainingFundEmployee'
-    ],
-    
-    partner2TrainingRate: [
-        'partner2TrainingFundEmployeeRate', 'partner2TrainingFundContributionRate',
-        'partner2TrainingFundRate', 'partner2TrainingFundEmployee'
-    ],
-    
-    // Current savings - Pension
-    currentPensionSavings: [
-        'currentPensionSavings', 'currentSavings', 'pensionSavings',
-        'retirementSavings', 'currentRetirementSavings', 'currentPension',
-        'pensionBalance', 'pensionValue'
-    ],
-    
-    // Current savings - Training Fund
-    currentTrainingFund: [
-        'currentTrainingFund', 'trainingFund', 'trainingFundValue',
-        'trainingFundBalance', 'kerenHishtalmut', 'kerenHishtalmutBalance'
-    ],
-    
-    // Current savings - Portfolio
-    currentPortfolio: [
-        'currentPersonalPortfolio', 'personalPortfolio', 'currentPortfolio',
-        'portfolio', 'stockPortfolio', 'investmentPortfolio', 
-        'currentStockPortfolio', 'portfolioValue'
-    ],
-    
-    // Current savings - Real Estate
-    currentRealEstate: [
-        'currentRealEstate', 'realEstate', 'realEstateValue',
-        'currentRealEstateValue', 'propertyValue', 'properties'
-    ],
-    
-    // Current savings - Crypto
-    currentCrypto: [
-        'currentCrypto', 'currentCryptoFiatValue', 'cryptoValue',
-        'currentCryptocurrency', 'cryptoPortfolio', 'cryptocurrency'
-    ],
-    
-    // Current savings - Bank/Emergency
-    currentBankAccount: [
-        'currentBankAccount', 'currentSavingsAccount', 'emergencyFund',
-        'emergencyFundAmount', 'bankAccount', 'savingsAccount',
-        'cashReserves', 'liquidSavings', 'cashSavings'
-    ],
-    
-    // Risk tolerance
-    riskTolerance: [
-        'riskTolerance', 'riskProfile', 'investmentRisk', 'riskLevel',
-        'risk_tolerance', 'riskToleranceLevel', 'investmentRiskLevel'
-    ],
-    
-    // Country/Tax location
-    taxCountry: [
-        'taxCountry', 'country', 'taxLocation', 'location', 'countryCode',
-        'tax_country', 'residenceCountry'
-    ],
-    
-    // Age
-    currentAge: [
-        'currentAge', 'age', 'userAge', 'myAge', 'current_age'
-    ],
-    
-    // Monthly expenses
-    monthlyExpenses: [
-        'currentMonthlyExpenses', 'monthlyExpenses', 'expenses',
-        'monthly_expenses', 'totalMonthlyExpenses'
-    ],
-    
-    // RSU fields
-    rsuUnits: [
-        'rsuUnits', 'rsu_units', 'stockUnits', 'restrictedStockUnits'
-    ],
-    
-    rsuStockPrice: [
-        'rsuCurrentStockPrice', 'rsuStockPrice', 'stockPrice', 'currentStockPrice'
-    ]
-};
+// Uses the comprehensive FIELD_MAPPINGS from fieldMappingDictionary.js
 
 /**
  * Find the value for a canonical field name in the input data
@@ -142,8 +12,19 @@ const FIELD_MAPPINGS = {
 function findFieldValue(inputs, canonicalName, options = {}) {
     const { expectString = false, allowZero = false } = options;
     
+    // Use the comprehensive field mapping dictionary
+    const mappingDict = window.fieldMappingDictionary;
+    if (!mappingDict) {
+        console.warn('Field mapping dictionary not available, falling back to direct field access');
+        const value = inputs[canonicalName];
+        if (value !== undefined && value !== null && value !== '') {
+            return expectString ? String(value).toLowerCase().trim() : parseFloat(value);
+        }
+        return null;
+    }
+    
     // Get all possible field names for this canonical name
-    const fieldVariations = FIELD_MAPPINGS[canonicalName] || [canonicalName];
+    const fieldVariations = mappingDict.FIELD_MAPPINGS[canonicalName] || [canonicalName];
     
     // Search through all variations
     for (const fieldName of fieldVariations) {
@@ -225,8 +106,15 @@ function diagnoseFieldAvailability(inputs) {
         criticalIssues: []
     };
     
+    // Use the comprehensive field mapping dictionary
+    const mappingDict = window.fieldMappingDictionary;
+    if (!mappingDict) {
+        report.criticalIssues.push('Field mapping dictionary not available');
+        return report;
+    }
+    
     // Check each canonical field
-    for (const [canonical, variations] of Object.entries(FIELD_MAPPINGS)) {
+    for (const [canonical, variations] of Object.entries(mappingDict.FIELD_MAPPINGS)) {
         const value = findFieldValue(inputs, canonical, { allowZero: true });
         
         if (value !== null) {
@@ -242,12 +130,12 @@ function diagnoseFieldAvailability(inputs) {
         }
     }
     
-    // Check for critical missing fields
-    if (!report.foundFields.monthlySalary && inputs.planningType === 'individual') {
+    // Check for critical missing fields based on canonical names from dictionary
+    if (!report.foundFields.salary && inputs.planningType === 'individual') {
         report.criticalIssues.push('No monthly salary found for individual mode');
     }
     
-    if (!report.foundFields.partner1Salary && !report.foundFields.partner2Salary && inputs.planningType === 'couple') {
+    if (!report.foundFields.partnerSalary && inputs.planningType === 'couple') {
         report.criticalIssues.push('No partner salaries found for couple mode');
     }
     
@@ -263,8 +151,7 @@ window.fieldMappingBridge = {
     getFieldValue: getFieldValueWithMapping,
     findFieldValue,
     getCombinedPartnerValue,
-    diagnoseFieldAvailability,
-    FIELD_MAPPINGS
+    diagnoseFieldAvailability
 };
 
 console.log('✅ Field Mapping Bridge loaded successfully');
