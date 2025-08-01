@@ -222,12 +222,10 @@ window.calculateRetirement = (
         inputs.currentTrainingFund || inputs.trainingFund || inputs.trainingFundValue || 0
     );
     
-    // Apply capital gains tax to personal portfolio upfront
-    const grossPersonalPortfolio = parseFloat(
+    // Personal portfolio - don't apply tax here, apply it on withdrawal income
+    let totalPersonalPortfolio = parseFloat(
         inputs.currentPersonalPortfolio || inputs.personalPortfolio || inputs.portfolioValue || 0
     );
-    const portfolioTaxRate = (inputs.portfolioTaxRate || 25) / 100; // Default 25% capital gains tax
-    let totalPersonalPortfolio = grossPersonalPortfolio * (1 - portfolioTaxRate);
     
     let totalCrypto = parseFloat(
         inputs.currentCrypto || inputs.crypto || inputs.cryptoValue || inputs.currentCryptoFiatValue || 0

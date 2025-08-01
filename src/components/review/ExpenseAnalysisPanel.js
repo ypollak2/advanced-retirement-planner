@@ -117,11 +117,39 @@ const ExpenseAnalysisPanel = ({ inputs, language = 'en', workingCurrency = 'ILS'
     }
     
     // Calculate monthly income
+    // Calculate net (after-tax) income for expense analysis
     const monthlyIncome = React.useMemo(() => {
+        let grossIncome = 0;
+        let netIncome = 0;
+        
         if (inputs.planningType === 'couple') {
-            return (parseFloat(inputs.partner1Salary) || 0) + (parseFloat(inputs.partner2Salary) || 0);
+            // For couple mode, calculate net income for each partner
+            const partner1Gross = parseFloat(inputs.partner1Salary) || 0;
+            const partner2Gross = parseFloat(inputs.partner2Salary) || 0;
+            grossIncome = partner1Gross + partner2Gross;
+            
+            if (window.TaxCalculators && window.TaxCalculators.calculateIsraeliTax) {
+                const partner1Tax = window.TaxCalculators.calculateIsraeliTax(partner1Gross);
+                const partner2Tax = window.TaxCalculators.calculateIsraeliTax(partner2Gross);
+                netIncome = (partner1Tax?.netSalary || partner1Gross) + (partner2Tax?.netSalary || partner2Gross);
+            } else {
+                // Fallback: estimate 25% tax rate
+                netIncome = grossIncome * 0.75;
+            }
+        } else {
+            // Individual mode
+            grossIncome = parseFloat(inputs.currentMonthlySalary) || 0;
+            
+            if (window.TaxCalculators && window.TaxCalculators.calculateIsraeliTax) {
+                const taxResult = window.TaxCalculators.calculateIsraeliTax(grossIncome);
+                netIncome = taxResult?.netSalary || grossIncome;
+            } else {
+                // Fallback: estimate 25% tax rate
+                netIncome = grossIncome * 0.75;
+            }
         }
-        return parseFloat(inputs.currentMonthlySalary) || 0;
+        
+        return netIncome;
     }, [inputs.planningType, inputs.partner1Salary, inputs.partner2Salary, inputs.currentMonthlySalary]);
     
     // Check if expense analysis function is available
@@ -159,7 +187,7 @@ const ExpenseAnalysisPanel = ({ inputs, language = 'en', workingCurrency = 'ILS'
                 createElement('div', {
                     key: 'ratio',
                     className: "text-lg text-green-600"
-                }, `${expenseToIncomeRatio.toFixed(1)}% of income`)
+                }, `${expenseToIncomeRatio.toFixed(1)}% of net income`)
             ])
         ]);
     }
@@ -310,6 +338,14 @@ const ExpenseAnalysisPanel = ({ inputs, language = 'en', workingCurrency = 'ILS'
         ]),
         
         // Recommendations
+        // Add note about net income calculation
+        createElement('div', {
+            key: 'net-income-note',
+            className: 'text-sm text-gray-600 italic mb-4'
+        }, language === 'he' ? 
+            '* הניתוח מבוסס על הכנסה נטו (אחרי מס)' : 
+            '* Analysis based on net (after-tax) income'),
+        
         expenseAnalysis.recommendations && expenseAnalysis.recommendations.length > 0 && createElement('div', {
             key: 'recommendations',
             className: "p-4 bg-yellow-50 rounded-lg border border-yellow-200"

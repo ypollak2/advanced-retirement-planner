@@ -40,23 +40,60 @@ function calculateTaxEfficiencyScore(inputs, selectedCountry = 'israel') {
     const trainingFundRate = parseFloat(inputs.trainingFundContributionRate || 0);
     
     // Validate inputs to prevent NaN
-    if (isNaN(pensionRate)) return 0;
+    if (isNaN(pensionRate)) {
+        return {
+            score: 0,
+            details: {
+                status: 'invalid_data',
+                reason: 'Invalid pension rate',
+                pensionRate: 0,
+                trainingFundRate: 0
+            }
+        };
+    }
+    
+    let score = 0;
+    let status = 'needs_improvement';
+    let pensionEfficiency = 0;
+    let trainingFundEfficiency = 0;
     
     // Israel-specific optimization
     if (selectedCountry === 'israel') {
         const optimalPensionRate = 7; // 7% is deductible
         const optimalTrainingFundRate = 10; // Up to threshold
         
-        const pensionEfficiency = optimalPensionRate > 0 ? Math.min(100, (pensionRate / optimalPensionRate) * 100) : 0;
-        const trainingFundEfficiency = optimalTrainingFundRate > 0 ? Math.min(100, (trainingFundRate / optimalTrainingFundRate) * 100) : 0;
+        pensionEfficiency = optimalPensionRate > 0 ? Math.min(100, (pensionRate / optimalPensionRate) * 100) : 0;
+        trainingFundEfficiency = optimalTrainingFundRate > 0 ? Math.min(100, (trainingFundRate / optimalTrainingFundRate) * 100) : 0;
         
-        const score = (pensionEfficiency + trainingFundEfficiency) / 2;
-        return isNaN(score) ? 0 : Math.round(score);
+        score = (pensionEfficiency + trainingFundEfficiency) / 2;
+        score = isNaN(score) ? 0 : Math.round(score);
+        
+        if (score >= 80) status = 'excellent';
+        else if (score >= 60) status = 'good';
+        else if (score >= 40) status = 'fair';
+        else status = 'poor';
+    } else {
+        // General tax efficiency for other countries
+        score = pensionRate > 0 ? Math.min(100, (pensionRate / 12) * 100) : 0;
+        score = isNaN(score) ? 0 : Math.round(score);
+        status = score >= 70 ? 'good' : 'needs_improvement';
     }
     
-    // General tax efficiency for other countries
-    const score = pensionRate > 0 ? Math.min(100, (pensionRate / 12) * 100) : 0;
-    return isNaN(score) ? 0 : Math.round(score);
+    // Return weighted score (0-15 for 15% weight) instead of 0-100
+    const weightedScore = (score / 100) * 15; // Tax efficiency has 15% weight
+    
+    return {
+        score: weightedScore,
+        details: {
+            status: status,
+            pensionRate: pensionRate,
+            trainingFundRate: trainingFundRate,
+            country: selectedCountry,
+            pensionEfficiency: pensionEfficiency,
+            trainingFundEfficiency: trainingFundEfficiency,
+            recommendation: score < 70 ? 'Consider increasing contribution rates for better tax efficiency' : 'Good tax optimization'
+        }
+    };
 }
 
 /**
@@ -67,18 +104,58 @@ function calculateSavingsRateScore(inputs) {
     const pensionRate = parseFloat(inputs.pensionContributionRate || inputs.employeePensionRate || 0);
     const trainingFundRate = parseFloat(inputs.trainingFundContributionRate || inputs.employeeTrainingFundRate || 0);
     
-    if (monthlyIncome === 0) return 0;
+    if (monthlyIncome === 0) {
+        return {
+            score: 0,
+            details: {
+                status: 'missing_income_data',
+                monthlyIncome: 0,
+                monthlyContributions: 0,
+                savingsRate: 0,
+                reason: 'No monthly income found'
+            }
+        };
+    }
     
     const monthlyContributions = monthlyIncome * (pensionRate + trainingFundRate) / 100;
     const savingsRate = (monthlyContributions / monthlyIncome) * 100;
     
-    // Score based on savings rate benchmarks
-    if (savingsRate >= 20) return 100;      // Excellent: 20%+
-    if (savingsRate >= 15) return 85;       // Good: 15%+
-    if (savingsRate >= 10) return 70;       // Fair: 10%+
-    if (savingsRate >= 5) return 50;        // Poor: 5%+
+    let score = 0;
+    let status = 'critical';
     
-    return Math.max(0, (savingsRate / 5) * 50); // Critical: <5%
+    // Score based on savings rate benchmarks
+    if (savingsRate >= 20) {
+        score = 100;
+        status = 'excellent';
+    } else if (savingsRate >= 15) {
+        score = 85;
+        status = 'good';
+    } else if (savingsRate >= 10) {
+        score = 70;
+        status = 'fair';
+    } else if (savingsRate >= 5) {
+        score = 50;
+        status = 'poor';
+    } else {
+        score = Math.max(0, (savingsRate / 5) * 50);
+        status = 'critical';
+    }
+    
+    // Return weighted score (0-20 for 20% weight) instead of 0-100
+    const weightedScore = (score / 100) * 20; // Savings rate has 20% weight
+    
+    return {
+        score: weightedScore,
+        details: {
+            status: status,
+            monthlyIncome: monthlyIncome,
+            monthlyContributions: monthlyContributions,
+            savingsRate: savingsRate,
+            pensionRate: pensionRate,
+            trainingFundRate: trainingFundRate,
+            recommendation: savingsRate < 15 ? 'Aim to save at least 15% of income for retirement' : 'Maintaining good savings rate'
+        }
+    };
 }
 
 /**
@@ -89,22 +166,69 @@ function calculateRetirementReadinessScore(inputs) {
     const currentSavings = calculateTotalCurrentSavings(inputs);
     const annualIncome = parseFloat(inputs.currentMonthlySalary || 0) * 12;
     
-    if (annualIncome === 0) return 0;
+    if (annualIncome === 0) {
+        return {
+            score: 0,
+            details: {
+                status: 'missing_income_data',
+                currentAge: currentAge,
+                currentSavings: currentSavings,
+                annualIncome: 0,
+                targetSavings: 0,
+                reason: 'No annual income found'
+            }
+        };
+    }
     
     // Age-based savings targets (rule of thumb)
     const targetMultiplier = Math.max(0, (currentAge - 25) / 5); // 1x by 30, 2x by 35, etc.
     const targetSavings = annualIncome * targetMultiplier;
     
-    if (targetSavings === 0) return 100; // Young age, no target yet
+    let score = 0;
+    let status = 'on_track';
+    let ratio = 0;
     
-    const ratio = currentSavings / targetSavings;
+    if (targetSavings === 0) {
+        // Young age, no target yet
+        score = 100;
+        status = 'on_track';
+    } else {
+        ratio = currentSavings / targetSavings;
+        
+        if (ratio >= 1.5) {
+            score = 100;
+            status = 'excellent';
+        } else if (ratio >= 1.0) {
+            score = 85;
+            status = 'good';
+        } else if (ratio >= 0.7) {
+            score = 70;
+            status = 'fair';
+        } else if (ratio >= 0.4) {
+            score = 50;
+            status = 'poor';
+        } else {
+            score = Math.max(0, ratio * 50);
+            status = 'critical';
+        }
+    }
     
-    if (ratio >= 1.5) return 100;        // Excellent: 150% of target
-    if (ratio >= 1.0) return 85;         // Good: 100% of target
-    if (ratio >= 0.7) return 70;         // Fair: 70% of target
-    if (ratio >= 0.4) return 50;         // Poor: 40% of target
+    // Return weighted score (0-20 for 20% weight) instead of 0-100
+    const weightedScore = (score / 100) * 20; // Retirement readiness has 20% weight
     
-    return Math.max(0, ratio * 50);      // Critical: <40%
+    return {
+        score: weightedScore,
+        details: {
+            status: status,
+            currentAge: currentAge,
+            currentSavings: currentSavings,
+            annualIncome: annualIncome,
+            targetSavings: targetSavings,
+            savingsRatio: ratio,
+            targetMultiplier: targetMultiplier,
+            recommendation: ratio < 1.0 ? 'Consider increasing savings to meet age-based targets' : 'On track with age-based savings targets'
+        }
+    };
 }
 
 /**
@@ -178,12 +302,17 @@ function calculateOverallFinancialHealthScore(inputs) {
 function generateImprovementSuggestions(inputs, language = 'en') {
     const suggestions = [];
     
-    const savingsRate = calculateSavingsRateScore(inputs);
-    const readiness = calculateRetirementReadinessScore(inputs);
+    const savingsRateResult = calculateSavingsRateScore(inputs);
+    const readinessResult = calculateRetirementReadinessScore(inputs);
     const diversification = calculateSimpleDiversificationScore(inputs);
-    const taxEfficiency = calculateTaxEfficiencyScore(inputs);
+    const taxEfficiencyResult = calculateTaxEfficiencyScore(inputs);
     
-    if (savingsRate < 70) {
+    // Extract scores from objects or use directly for simple scores
+    const savingsRateScore = typeof savingsRateResult === 'object' ? savingsRateResult.score : savingsRateResult;
+    const readinessScore = typeof readinessResult === 'object' ? readinessResult.score : readinessResult;
+    const taxEfficiencyScore = typeof taxEfficiencyResult === 'object' ? taxEfficiencyResult.score : taxEfficiencyResult;
+    
+    if (savingsRateScore < 70) {
         suggestions.push({
             priority: 'high',
             category: language === 'he' ? 'שיעור חיסכון' : 'Savings Rate',
@@ -192,7 +321,7 @@ function generateImprovementSuggestions(inputs, language = 'en') {
         });
     }
     
-    if (readiness < 70) {
+    if (readinessScore < 70) {
         suggestions.push({
             priority: 'high',
             category: language === 'he' ? 'מוכנות לפרישה' : 'Retirement Readiness',
@@ -210,7 +339,7 @@ function generateImprovementSuggestions(inputs, language = 'en') {
         });
     }
     
-    if (taxEfficiency < 70) {
+    if (taxEfficiencyScore < 70) {
         suggestions.push({
             priority: 'medium',
             category: language === 'he' ? 'יעילות מס' : 'Tax Efficiency',
