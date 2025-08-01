@@ -6,6 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [7.5.9] - 2025-08-01 - Test Release with Pre-filled Data
+### 🧪 **Testing Features**
+- **Test Data Initializer**:
+  - Pre-fills wizard with realistic couple data for testing
+  - Accessible via `?testdata=true` parameter in production
+  - Automatically loads in local development
+  - Includes protection against overwriting real user data
+
+- **Test Data Contents**:
+  - Couple aged 39, retiring at 67
+  - Combined income: ₪86,500/month
+  - Total current savings: ₪4,154,000
+  - Standard Israeli contribution rates
+  - Zero expenses for testing edge cases
+
+- **Testing Functions**:
+  - `window.initializeTestData()` - Load test data
+  - `window.clearTestData()` - Clear only test data (protects user data)
+
+### 📝 **Note**
+This is a temporary testing release. The test data feature will be removed in the next version after confirming all functionality works correctly with pre-filled data.
+
+---
+
 ## [7.5.8] - 2025-08-01 - Comprehensive Review Step Improvements
 ### 🚀 **Major Enhancements**
 - **Fixed Total Accumulation Display**:
