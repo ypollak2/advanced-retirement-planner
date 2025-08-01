@@ -115,6 +115,9 @@ window.patchFinancialHealthEngine = function() {
         }
         
         // Get contribution rates with enhanced field detection
+        console.log('🔍 Checking for employeePensionRate:', inputs.employeePensionRate);
+        console.log('🔍 Checking for trainingFundEmployeeRate:', inputs.trainingFundEmployeeRate);
+        
         const pensionRate = window.enhancedGetFieldValue(inputs, [
             'employeePensionRate', 'pensionEmployeeRate',
             'pensionContributionRate', 'pensionRate',
@@ -127,15 +130,23 @@ window.patchFinancialHealthEngine = function() {
             'trainingFundEmployeeContribution', 'employeeTrainingFundContribution'
         ], { allowZero: true, debugMode: true });
         
-        // If no rates found, check if we should use defaults
-        const finalPensionRate = pensionRate || (inputs.taxCountry === 'israel' || inputs.country === 'israel' ? 6.5 : 5.0);
-        const finalTrainingRate = trainingRate || (inputs.taxCountry === 'israel' || inputs.country === 'israel' ? 2.5 : 0);
+        // If no rates found, check if we should use defaults based on country
+        const isIsraeli = inputs.taxCountry === 'israel' || inputs.country === 'israel' || !inputs.taxCountry;
+        const finalPensionRate = pensionRate !== 0 ? pensionRate : (isIsraeli ? 6.5 : 5.0);
+        const finalTrainingRate = trainingRate !== 0 ? trainingRate : (isIsraeli ? 2.5 : 0);
         
-        if (!pensionRate && !trainingRate) {
+        if (pensionRate === 0 && trainingRate === 0) {
             console.warn('⚠️ No contribution rates found, using defaults:', {
                 pension: finalPensionRate,
                 trainingFund: finalTrainingRate,
-                country: inputs.taxCountry || inputs.country || 'unknown'
+                country: inputs.taxCountry || inputs.country || 'israel (default)'
+            });
+        } else {
+            console.log('✅ Found contribution rates:', {
+                pension: finalPensionRate,
+                trainingFund: finalTrainingRate,
+                foundPension: pensionRate !== 0,
+                foundTraining: trainingRate !== 0
             });
         }
         

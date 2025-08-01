@@ -209,6 +209,17 @@ function analyzeExpenseRatios(expenses, monthlyIncome, language = 'en') {
  * @returns {Object} Potential savings by category
  */
 function calculateSavingsPotential(expenses, monthlyIncome) {
+    // Add validation to prevent NaN issues
+    if (!monthlyIncome || monthlyIncome === 0 || isNaN(monthlyIncome)) {
+        console.warn('calculateSavingsPotential: Invalid monthly income:', monthlyIncome);
+        return {
+            total: 0,
+            additionalSavingsRate: 0,
+            amount: 0,
+            description: 'No savings potential calculated - invalid income data'
+        };
+    }
+    
     const potential = {};
     let totalPotentialSavings = 0;
     
@@ -216,28 +227,46 @@ function calculateSavingsPotential(expenses, monthlyIncome) {
         if (category === 'yearlyAdjustment') return;
         
         const amount = parseFloat(expenses[category]) || 0;
+        if (amount <= 0) return; // Skip categories with no expenses
+        
         const ratio = (amount / monthlyIncome) * 100;
         const recommended = RECOMMENDED_EXPENSE_RATIOS[category];
+        
+        // Add safety check for recommended ratios
+        if (!recommended || typeof recommended.ideal !== 'number') {
+            console.warn(`calculateSavingsPotential: No recommended ratios found for category: ${category}`);
+            return;
+        }
         
         if (ratio > recommended.ideal) {
             const idealAmount = (recommended.ideal / 100) * monthlyIncome;
             const potentialSaving = amount - idealAmount;
             
-            potential[category] = {
-                currentAmount: amount,
-                idealAmount: idealAmount,
-                potentialSaving: potentialSaving,
-                percentReduction: ((potentialSaving / amount) * 100).toFixed(1)
-            };
-            
-            totalPotentialSavings += potentialSaving;
+            // Ensure potentialSaving is valid
+            if (potentialSaving > 0 && !isNaN(potentialSaving)) {
+                potential[category] = {
+                    currentAmount: amount,
+                    idealAmount: idealAmount,
+                    potentialSaving: potentialSaving,
+                    percentReduction: ((potentialSaving / amount) * 100).toFixed(1)
+                };
+                
+                totalPotentialSavings += potentialSaving;
+            }
         }
     });
     
-    potential.total = totalPotentialSavings;
-    potential.additionalSavingsRate = (totalPotentialSavings / monthlyIncome) * 100;
+    // Ensure values are valid numbers
+    totalPotentialSavings = isNaN(totalPotentialSavings) ? 0 : totalPotentialSavings;
+    const additionalSavingsRate = monthlyIncome > 0 ? (totalPotentialSavings / monthlyIncome) * 100 : 0;
     
-    return potential;
+    return {
+        ...potential,
+        total: totalPotentialSavings,
+        additionalSavingsRate: isNaN(additionalSavingsRate) ? 0 : additionalSavingsRate,
+        amount: totalPotentialSavings, // Add amount property for compatibility
+        description: totalPotentialSavings > 0 ? 'Potential monthly savings from optimization' : 'No optimization opportunities found'
+    };
 }
 
 /**

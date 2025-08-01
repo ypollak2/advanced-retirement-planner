@@ -457,8 +457,9 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     }, [inputs.currentAge, inputs.retirementAge, inputs.currentSavings, 
         inputs.monthlyContribution, inputs.inflationRate]);
     
-    const totalAccumulation = retirementProjections.totalAccumulation || 0;
-    const projectedIncome = retirementProjections.projectedIncome || 0;
+    // Fix field mapping - retirement calculation returns totalSavings, not totalAccumulation
+    const totalAccumulation = retirementProjections.totalSavings || retirementProjections.totalAccumulation || 0;
+    const projectedIncome = retirementProjections.totalNetIncome || retirementProjections.projectedIncome || 0;
     const monthlyRetirementIncome = retirementProjections.monthlyIncome || 0;
     
     // Retirement readiness assessment with memoization (test pattern: readinessScore)
