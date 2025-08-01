@@ -529,7 +529,29 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         inputs.monthlyContribution, inputs.inflationRate]);
     
     // Fix field mapping - retirement calculation returns totalSavings, not totalAccumulation
-    const totalAccumulation = retirementProjections.totalSavings || retirementProjections.totalAccumulation || 0;
+    // If retirement projections are 0, calculate from current savings
+    let totalAccumulation = retirementProjections.totalSavings || retirementProjections.totalAccumulation || 0;
+    
+    // If still 0, try to calculate from current savings
+    if (totalAccumulation === 0) {
+        if (inputs.planningType === 'couple') {
+            totalAccumulation = parseFloat(inputs.partner1CurrentPension || 0) +
+                               parseFloat(inputs.partner1CurrentTrainingFund || 0) +
+                               parseFloat(inputs.partner1PersonalPortfolio || 0) +
+                               parseFloat(inputs.partner1CurrentSavings || 0) +
+                               parseFloat(inputs.partner2CurrentPension || 0) +
+                               parseFloat(inputs.partner2CurrentTrainingFund || 0) +
+                               parseFloat(inputs.partner2PersonalPortfolio || 0) +
+                               parseFloat(inputs.partner2CurrentSavings || 0);
+        } else {
+            totalAccumulation = parseFloat(inputs.currentSavings || inputs.currentPension || 0) +
+                               parseFloat(inputs.currentTrainingFund || 0) +
+                               parseFloat(inputs.currentPersonalPortfolio || 0) +
+                               parseFloat(inputs.currentRealEstate || 0) +
+                               parseFloat(inputs.currentCrypto || 0);
+        }
+    }
+    
     const projectedIncome = retirementProjections.totalNetIncome || retirementProjections.projectedIncome || 0;
     const monthlyRetirementIncome = retirementProjections.monthlyIncome || 0;
     
@@ -540,13 +562,16 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     
     console.log('📊 Component Scores Data Mapping:', {
         totalAccumulation: totalAccumulation,
+        safeTotalAccumulation: safeTotalAccumulation,
         projectedIncome: projectedIncome,
         monthlyRetirementIncome: monthlyRetirementIncome,
+        dataSource: totalAccumulation === 0 ? 'No retirement projections - showing current savings' : 'From retirement projections',
         mappingSource: {
             totalSavings: retirementProjections.totalSavings,
             totalAccumulation: retirementProjections.totalAccumulation,
             totalNetIncome: retirementProjections.totalNetIncome,
-            monthlyIncome: retirementProjections.monthlyIncome
+            monthlyIncome: retirementProjections.monthlyIncome,
+            currentSavingsUsed: totalAccumulation > 0 && !retirementProjections.totalSavings
         }
     });
     
@@ -596,13 +621,14 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
             total: partner2Salary + partner2Bonus + partner2RSU + partner2Freelance + partner2Rental + partner2Dividend
         });
     } else {
-        // Individual mode
-        const salary = parseFloat(inputs.currentMonthlySalary || inputs.monthlySalary || inputs.currentSalary || 0);
-        const bonus = parseFloat(inputs.annualBonus || 0) / 12;
-        const rsu = parseFloat(inputs.quarterlyRSU || 0) / 3; // Quarterly to monthly
-        const freelance = parseFloat(inputs.freelanceIncome || 0);
-        const rental = parseFloat(inputs.rentalIncome || 0);
-        const dividend = parseFloat(inputs.dividendIncome || 0);
+        // Individual mode - enhanced field mapping
+        const salary = parseFloat(inputs.currentMonthlySalary || inputs.monthlySalary || inputs.currentSalary || 
+                                 inputs.salary || inputs.monthlyIncome || inputs.grossSalary || 0);
+        const bonus = parseFloat(inputs.annualBonus || inputs.yearlyBonus || inputs.bonus || 0) / 12;
+        const rsu = parseFloat(inputs.quarterlyRSU || inputs.rsu || inputs.RSU || inputs.stockOptions || 0) / 3; // Quarterly to monthly
+        const freelance = parseFloat(inputs.freelanceIncome || inputs.additionalIncome || 0);
+        const rental = parseFloat(inputs.rentalIncome || inputs.rentIncome || 0);
+        const dividend = parseFloat(inputs.dividendIncome || inputs.dividends || 0);
         
         currentMonthlyIncome = salary + bonus + rsu + freelance + rental + dividend;
         
