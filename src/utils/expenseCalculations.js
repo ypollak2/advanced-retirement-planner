@@ -172,7 +172,27 @@ function analyzeExpenseRatios(expenses, monthlyIncome, language = 'en') {
         }
     }
     
-    return { analysis, recommendations, savingsRate, totalExpenses };
+    const totalExpenseRatio = totalExpenses > 0 ? (totalExpenses / monthlyIncome) * 100 : 0;
+    
+    // Find highest expense category
+    let highestCategory = null;
+    let highestAmount = 0;
+    Object.entries(analysis).forEach(([category, data]) => {
+        if (category !== 'savings' && data.amount > highestAmount) {
+            highestCategory = category;
+            highestAmount = data.amount;
+        }
+    });
+    
+    return { 
+        analysis, 
+        recommendations, 
+        savingsRate, 
+        totalExpenses, 
+        totalExpenseRatio,
+        categoryBreakdown: analysis,
+        highestCategory: highestCategory
+    };
 }
 
 /**

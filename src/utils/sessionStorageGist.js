@@ -13,7 +13,7 @@ class SessionStorageGist {
         
         // Configuration
         this.config = {
-            enableGist: true, // Can be disabled for users who don't want GitHub storage
+            enableGist: false, // Disabled by default (requires GitHub token)
             fallbackToLocal: true, // Fallback to localStorage if GitHub fails
             autoCleanup: true, // Auto-cleanup after 24 hours
             debugMode: window.location.search.includes('debug=true')
@@ -53,7 +53,21 @@ class SessionStorageGist {
     
     async initializeGist() {
         try {
-            // Create a new anonymous gist for this session
+            // Check if gist feature is explicitly enabled
+            if (!this.config.enableGist) {
+                console.log('📊 GitHub Gist storage is disabled (requires authentication)');
+                return false;
+            }
+            
+            // Check for GitHub token
+            const githubToken = localStorage.getItem('githubToken');
+            if (!githubToken) {
+                console.log('🔑 GitHub token not found. Gist storage requires authentication.');
+                this.config.enableGist = false;
+                return false;
+            }
+            
+            // Create a new gist for this session
             const gistData = {
                 description: `Advanced Retirement Planner - Session ${this.sessionId}`,
                 public: false, // Private by default
@@ -71,7 +85,8 @@ class SessionStorageGist {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `token ${githubToken}`
                 },
                 body: JSON.stringify(gistData)
             });
@@ -94,11 +109,15 @@ class SessionStorageGist {
                 }));
                 
                 return true;
+            } else if (response.status === 401) {
+                console.warn('⚠️ GitHub authentication failed. Check your token.');
+                this.config.enableGist = false;
+                return false;
             } else {
                 throw new Error(`Failed to create gist: ${response.status} ${response.statusText}`);
             }
         } catch (error) {
-            console.warn('🔄 Failed to create GitHub Gist, falling back to localStorage:', error.message);
+            console.warn('🔄 Failed to create GitHub Gist:', error.message);
             this.config.enableGist = false;
             return false;
         }

@@ -1887,15 +1887,17 @@ function calculateTaxEfficiencyScore(inputs) {
     // Fallback to legacy method if rates not found
     if (!pensionRate) {
         pensionRate = getFieldValue(inputs, [
-            'pensionContributionRate', 'pensionEmployeeRate', 'pensionEmployee',
-            'pensionEmployeeContribution', 'employeePensionContribution', 'pensionRate'
+            'employeePensionRate', 'pensionContributionRate', 'pensionEmployeeRate', 
+            'pensionEmployee', 'pensionEmployeeContribution', 'employeePensionContribution', 
+            'pensionRate'
         ]) || 0;
     }
     
     if (!trainingFundRate) {
         trainingFundRate = getFieldValue(inputs, [
-            'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee',
-            'trainingFundEmployeeContribution', 'employeeTrainingFundContribution', 'trainingFundRate'
+            'trainingFundEmployeeRate', 'trainingFundContributionRate', 
+            'trainingFundEmployee', 'trainingFundEmployeeContribution', 
+            'employeeTrainingFundContribution', 'trainingFundRate'
         ]) || 0;
     }
     

@@ -61,6 +61,12 @@ window.enhancedGetFieldValue = function(inputs, fieldNames, options = {}) {
 window.patchFinancialHealthEngine = function() {
     console.log('🔧 Applying Financial Health Field Mapping Patch v7.4.8...');
     
+    // Check if functions exist before storing
+    if (!window.calculateSavingsRateScore || !window.calculateRiskAlignmentScore || !window.calculateTaxEfficiencyScore) {
+        console.warn('⚠️ Financial health scoring functions not found, deferring patch...');
+        return false;
+    }
+    
     // Store original functions
     const originalCalculateSavingsRateScore = window.calculateSavingsRateScore;
     const originalCalculateRiskAlignmentScore = window.calculateRiskAlignmentScore;
@@ -105,19 +111,33 @@ window.patchFinancialHealthEngine = function() {
             };
         }
         
-        // Get contribution rates
+        // Get contribution rates with enhanced field detection
         const pensionRate = window.enhancedGetFieldValue(inputs, [
             'employeePensionRate', 'pensionEmployeeRate',
-            'pensionContributionRate', 'pensionRate'
-        ], { allowZero: true, debugMode: true }) || 6.5; // Default Israeli rate
+            'pensionContributionRate', 'pensionRate',
+            'pensionEmployeeContribution', 'employeePensionContribution'
+        ], { allowZero: true, debugMode: true });
         
         const trainingRate = window.enhancedGetFieldValue(inputs, [
-            'trainingFundContributionRate', 'trainingFundEmployeeRate',
-            'trainingFundRate', 'employeeTrainingFundRate'
-        ], { allowZero: true, debugMode: true }) || 2.5; // Default Israeli rate
+            'trainingFundEmployeeRate', 'trainingFundContributionRate',
+            'trainingFundRate', 'employeeTrainingFundRate',
+            'trainingFundEmployeeContribution', 'employeeTrainingFundContribution'
+        ], { allowZero: true, debugMode: true });
+        
+        // If no rates found, check if we should use defaults
+        const finalPensionRate = pensionRate || (inputs.taxCountry === 'israel' || inputs.country === 'israel' ? 6.5 : 5.0);
+        const finalTrainingRate = trainingRate || (inputs.taxCountry === 'israel' || inputs.country === 'israel' ? 2.5 : 0);
+        
+        if (!pensionRate && !trainingRate) {
+            console.warn('⚠️ No contribution rates found, using defaults:', {
+                pension: finalPensionRate,
+                trainingFund: finalTrainingRate,
+                country: inputs.taxCountry || inputs.country || 'unknown'
+            });
+        }
         
         // Calculate savings rate
-        const totalContributionRate = pensionRate + trainingRate;
+        const totalContributionRate = finalPensionRate + finalTrainingRate;
         const savingsRate = (monthlyIncome * totalContributionRate / 100) / monthlyIncome * 100;
         
         // Calculate score (0-25 scale)
@@ -138,8 +158,8 @@ window.patchFinancialHealthEngine = function() {
                 savingsRate: savingsRate,
                 monthlyIncome: monthlyIncome,
                 contributionRates: {
-                    pension: pensionRate,
-                    trainingFund: trainingRate,
+                    pension: finalPensionRate,
+                    trainingFund: finalTrainingRate,
                     total: totalContributionRate
                 }
             }
@@ -244,20 +264,34 @@ window.patchFinancialHealthEngine = function() {
     };
     
     console.log('✅ Financial Health Field Mapping Patch Applied Successfully');
+    return true;
 };
 
-// Auto-apply patch on load
-if (window.financialHealthEngine) {
-    window.patchFinancialHealthEngine();
-} else {
-    // Wait for engine to load
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            if (window.calculateSavingsRateScore) {
-                window.patchFinancialHealthEngine();
-            }
-        }, 1000);
-    });
+// Auto-apply patch on load with retry logic
+let patchAttempts = 0;
+const maxAttempts = 5;
+
+function tryApplyPatch() {
+    if (window.calculateSavingsRateScore && window.calculateRiskAlignmentScore && window.calculateTaxEfficiencyScore) {
+        if (window.patchFinancialHealthEngine()) {
+            console.log('✅ Patch applied successfully on attempt', patchAttempts + 1);
+            return true;
+        }
+    }
+    
+    patchAttempts++;
+    if (patchAttempts < maxAttempts) {
+        console.log(`⏳ Waiting for financial health engine... attempt ${patchAttempts}/${maxAttempts}`);
+        setTimeout(tryApplyPatch, 1000);
+    } else {
+        console.warn('⚠️ Could not apply financial health patch after', maxAttempts, 'attempts');
+    }
+    return false;
 }
+
+// Start trying to apply patch
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(tryApplyPatch, 500);
+});
 
 console.log('✅ Financial Health Field Patch loaded');
