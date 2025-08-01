@@ -1,5 +1,5 @@
 // Export Functions for Advanced Retirement Planner
-// Created by Yali Pollak (יהלי פולק) - v7.4.7
+// Created by Yali Pollak (יהלי פולק) - v7.4.8
 
 // Export retirement plan as image (PNG/PDF)
 async function exportAsImage(format = 'png', includeCharts = true) {
@@ -104,7 +104,7 @@ function exportForLLMAnalysis(inputs, results, partnerResults = null) {
         const analysisData = {
             metadata: {
                 exportDate: new Date().toISOString(),
-                version: 'v7.4.7',
+                version: 'v7.4.8',
                 tool: 'Advanced Retirement Planner by Yali Pollak',
                 purpose: 'LLM Analysis and Recommendations'
             },
@@ -276,8 +276,26 @@ async function loadHtml2Canvas() {
         
         const script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-        script.onload = () => resolve();
-        script.onerror = () => reject(new Error('Failed to load html2canvas'));
+        script.crossOrigin = 'anonymous';
+        script.onload = () => {
+            console.log('✅ html2canvas loaded successfully');
+            resolve();
+        };
+        script.onerror = (error) => {
+            console.error('❌ Failed to load html2canvas from CDN:', error);
+            // Try fallback URL
+            const fallbackScript = document.createElement('script');
+            fallbackScript.src = 'https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js';
+            fallbackScript.crossOrigin = 'anonymous';
+            fallbackScript.onload = () => {
+                console.log('✅ html2canvas loaded from fallback CDN');
+                resolve();
+            };
+            fallbackScript.onerror = () => {
+                reject(new Error('Failed to load html2canvas from both primary and fallback CDNs'));
+            };
+            document.head.appendChild(fallbackScript);
+        };
         document.head.appendChild(script);
     });
 }
@@ -292,8 +310,26 @@ async function loadJsPDF() {
         
         const script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-        script.onload = () => resolve();
-        script.onerror = () => reject(new Error('Failed to load jsPDF'));
+        script.crossOrigin = 'anonymous';
+        script.onload = () => {
+            console.log('✅ jsPDF loaded successfully');
+            resolve();
+        };
+        script.onerror = (error) => {
+            console.error('❌ Failed to load jsPDF from CDN:', error);
+            // Try fallback URL
+            const fallbackScript = document.createElement('script');
+            fallbackScript.src = 'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js';
+            fallbackScript.crossOrigin = 'anonymous';
+            fallbackScript.onload = () => {
+                console.log('✅ jsPDF loaded from fallback CDN');
+                resolve();
+            };
+            fallbackScript.onerror = () => {
+                reject(new Error('Failed to load jsPDF from both primary and fallback CDNs'));
+            };
+            document.head.appendChild(fallbackScript);
+        };
         document.head.appendChild(script);
     });
 }

@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v7.4.7 ✨
+# 🚀 Advanced Retirement Planner v7.4.8 ✨
 
-[![Version](https://img.shields.io/badge/version-7.4.7-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-7.4.8-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-374%2F374-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -26,6 +26,33 @@
 > **📋 Deployment Status**: GitHub Pages is the primary deployment and is fully operational with the reorganized component structure. Netlify is currently rebuilding after the repository reorganization and should be available shortly.
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki) | **📊 Repository Statistics:** [View Stats](REPOSITORY-STATISTICS.md)
+
+## 🚀 What's New in v7.4.8 - Financial Health Scoring & Export Fixes 🎯
+
+### 🔧 Critical Fixes
+- **Financial Health Scoring Field Detection** - Resolved 0% scores for critical factors
+  - Fixed **Savings Rate** calculation (was 0/25) - Now properly detects partner salaries and contribution rates
+  - Fixed **Risk Alignment** calculation (was 0/12) - Enhanced risk tolerance and stock percentage detection
+  - Fixed **Tax Efficiency** calculation (was 0/8) - Improved country and age field detection
+  - Added comprehensive field mapping patch to handle wizard field name variations
+- **Export Functionality** - Fixed CDN loading errors for html2canvas and jsPDF
+  - Added fallback CDNs for both PNG and PDF export libraries
+  - Improved error handling with retry logic
+  - Added CORS headers for cross-origin resource loading
+
+### 📊 Improvements
+- Enhanced field detection with patched scoring functions
+- Better debugging output for field mapping issues
+- More resilient export functionality with multiple CDN sources
+- Clearer error messages when exports fail
+
+### ✅ Quality Assurance
+- All 374 tests passing
+- Financial health scores now calculate correctly for all 8 factors
+- Export functionality tested with both primary and fallback CDNs
+- No breaking changes to existing functionality
+
+---
 
 ## 🚀 What's New in v7.4.7 - Contribution Rate Field Mapping & Portfolio Tax Fixes 📊
 
