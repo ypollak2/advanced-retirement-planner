@@ -453,7 +453,39 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     
     // Memoize retirement projections to prevent recalculation loops
     const retirementProjections = React.useMemo(() => {
-        return window.calculateRetirement ? window.calculateRetirement(inputs) : {};
+        console.log('🔄 === CALCULATING RETIREMENT PROJECTIONS ===');
+        
+        if (!window.calculateRetirement) {
+            console.error('❌ calculateRetirement function not available!');
+            return {};
+        }
+        
+        try {
+            const results = window.calculateRetirement(inputs);
+            
+            console.log('✅ Retirement calculation results:', {
+                totalSavings: results.totalSavings || 0,
+                totalNetIncome: results.totalNetIncome || 0,
+                monthlyIncome: results.monthlyIncome || 0,
+                monthlyRetirementIncome: results.monthlyRetirementIncome || 0,
+                pensionSavings: results.pensionSavings || 0,
+                trainingFundValue: results.trainingFundValue || 0,
+                personalPortfolioValue: results.personalPortfolioValue || 0,
+                hasData: (results.totalSavings || 0) > 0
+            });
+            
+            if (results.totalSavings === 0) {
+                console.warn('⚠️ Total savings is 0 - checking components:');
+                console.log('  - Input currentSavings:', inputs.currentSavings);
+                console.log('  - Input partner1CurrentPension:', inputs.partner1CurrentPension);
+                console.log('  - Input partner2CurrentPension:', inputs.partner2CurrentPension);
+            }
+            
+            return results;
+        } catch (error) {
+            console.error('❌ Retirement calculation error:', error);
+            return {};
+        }
     }, [inputs.currentAge, inputs.retirementAge, inputs.currentSavings, 
         inputs.monthlyContribution, inputs.inflationRate]);
     
@@ -462,10 +494,25 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     const projectedIncome = retirementProjections.totalNetIncome || retirementProjections.projectedIncome || 0;
     const monthlyRetirementIncome = retirementProjections.monthlyIncome || 0;
     
+    console.log('📊 Component Scores Data Mapping:', {
+        totalAccumulation: totalAccumulation,
+        projectedIncome: projectedIncome,
+        monthlyRetirementIncome: monthlyRetirementIncome,
+        mappingSource: {
+            totalSavings: retirementProjections.totalSavings,
+            totalAccumulation: retirementProjections.totalAccumulation,
+            totalNetIncome: retirementProjections.totalNetIncome,
+            monthlyIncome: retirementProjections.monthlyIncome
+        }
+    });
+    
     // Calculate current monthly income including all sources (salary + bonuses + RSUs + other)
     let currentMonthlyIncome = 0;
     
+    console.log('💰 === CALCULATING CURRENT MONTHLY INCOME ===');
+    
     if (inputs.planningType === 'couple') {
+        console.log('Couple mode income calculation:');
         // Partner 1 income
         const partner1Salary = parseFloat(inputs.partner1Salary || 0);
         const partner1Bonus = parseFloat(inputs.partner1Bonus || inputs.partner1AnnualBonus || 0) / 12;
@@ -484,6 +531,26 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         
         currentMonthlyIncome = partner1Salary + partner1Bonus + partner1RSU + partner1Freelance + partner1Rental + partner1Dividend +
                               partner2Salary + partner2Bonus + partner2RSU + partner2Freelance + partner2Rental + partner2Dividend;
+        
+        console.log('Partner 1 income breakdown:', {
+            salary: partner1Salary,
+            bonusMonthly: partner1Bonus,
+            rsuMonthly: partner1RSU,
+            freelance: partner1Freelance,
+            rental: partner1Rental,
+            dividend: partner1Dividend,
+            total: partner1Salary + partner1Bonus + partner1RSU + partner1Freelance + partner1Rental + partner1Dividend
+        });
+        
+        console.log('Partner 2 income breakdown:', {
+            salary: partner2Salary,
+            bonusMonthly: partner2Bonus,
+            rsuMonthly: partner2RSU,
+            freelance: partner2Freelance,
+            rental: partner2Rental,
+            dividend: partner2Dividend,
+            total: partner2Salary + partner2Bonus + partner2RSU + partner2Freelance + partner2Rental + partner2Dividend
+        });
     } else {
         // Individual mode
         const salary = parseFloat(inputs.currentMonthlySalary || inputs.monthlySalary || inputs.currentSalary || 0);
@@ -494,7 +561,19 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         const dividend = parseFloat(inputs.dividendIncome || 0);
         
         currentMonthlyIncome = salary + bonus + rsu + freelance + rental + dividend;
+        
+        console.log('Individual income breakdown:', {
+            salary: salary,
+            bonusMonthly: bonus,
+            rsuMonthly: rsu,
+            freelance: freelance,
+            rental: rental,
+            dividend: dividend,
+            total: currentMonthlyIncome
+        });
     }
+    
+    console.log('✅ Total current monthly income:', currentMonthlyIncome);
     
     // Retirement readiness assessment with memoization (test pattern: readinessScore)
     const readinessScore = React.useMemo(() => {
@@ -686,12 +765,29 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         }),
         
         // Retirement Projection Charts
-        window.RetirementProjectionPanel && createElement(window.RetirementProjectionPanel, {
+        (() => {
+            console.log('📈 === RETIREMENT PROJECTION PANEL ===');
+            console.log('Panel available:', !!window.RetirementProjectionPanel);
+            console.log('generateRetirementProjectionChart available:', !!window.generateRetirementProjectionChart);
+            
+            if (window.RetirementProjectionPanel) {
+                console.log('Rendering RetirementProjectionPanel with inputs:', {
+                    hasInputs: !!inputs,
+                    currentAge: inputs.currentAge,
+                    retirementAge: inputs.retirementAge,
+                    planningType: inputs.planningType,
+                    hasSalaryData: !!(inputs.currentMonthlySalary || inputs.partner1Salary),
+                    hasSavingsData: !!(inputs.currentSavings || inputs.partner1CurrentPension)
+                });
+            }
+            
+            return window.RetirementProjectionPanel && createElement(window.RetirementProjectionPanel, {
             key: 'retirement-projection',
             inputs: inputs,
             language: language,
             workingCurrency: workingCurrency
-        }),
+        });
+        })(),
         
         // Expense Analysis
         window.ExpenseAnalysisPanel && createElement(window.ExpenseAnalysisPanel, {
