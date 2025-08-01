@@ -4,6 +4,39 @@
 const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency = 'ILS' }) => {
     const createElement = React.createElement;
     
+    // Ensure getAllInputs is available (fallback for production)
+    if (!window.getAllInputs) {
+        window.getAllInputs = function() {
+            // Try localStorage first
+            try {
+                const savedInputs = localStorage.getItem('retirementWizardInputs');
+                if (savedInputs) {
+                    const parsedInputs = JSON.parse(savedInputs);
+                    console.log('📋 Review Step: Retrieved', Object.keys(parsedInputs).length, 'fields from localStorage');
+                    return parsedInputs;
+                }
+            } catch (e) {
+                console.error('Review Step: Failed to get inputs from localStorage:', e);
+            }
+            
+            // Fallback to current inputs prop
+            if (inputs && Object.keys(inputs).length > 0) {
+                console.log('📋 Review Step: Using current inputs prop');
+                return inputs;
+            }
+            
+            // Try window.wizardInputs
+            if (window.wizardInputs) {
+                console.log('📋 Review Step: Using window.wizardInputs');
+                return window.wizardInputs;
+            }
+            
+            console.warn('⚠️ Review Step: No inputs found - returning empty object');
+            return {};
+        };
+        console.log('✅ Review Step: Added fallback getAllInputs function');
+    }
+    
     // Multi-language content
     const content = {
         he: {
