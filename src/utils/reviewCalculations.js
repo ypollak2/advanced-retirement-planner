@@ -261,9 +261,10 @@ function validateReviewInputs(inputs) {
 
 // Export functions to window for global access
 window.calculateTotalCurrentSavings = calculateTotalCurrentSavings;
-window.calculateTaxEfficiencyScore = calculateTaxEfficiencyScore;
-window.calculateSavingsRateScore = calculateSavingsRateScore;
-window.calculateRetirementReadinessScore = calculateRetirementReadinessScore;
+// Don't export these as they conflict with financialHealthEngine.js versions
+// window.calculateTaxEfficiencyScore = calculateTaxEfficiencyScore;
+// window.calculateSavingsRateScore = calculateSavingsRateScore;
+// window.calculateRetirementReadinessScore = calculateRetirementReadinessScore;
 // Export renamed functions to avoid conflicts with financialHealthEngine.js
 window.calculateSimpleDiversificationScore = calculateSimpleDiversificationScore;
 window.calculateSimpleRiskAlignmentScore = calculateSimpleRiskAlignmentScore;
