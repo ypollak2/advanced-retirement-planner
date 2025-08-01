@@ -123,26 +123,28 @@ window.patchFinancialHealthEngine = function() {
         let trainingRate = 0;
         
         if (inputs.planningType === 'couple') {
-            // Partner 1 rates
+            // Partner 1 rates - using correct field names from WizardStepContributions
             const partner1PensionRate = window.enhancedGetFieldValue(inputs, [
-                'partner1PensionEmployeeRate', 'partner1EmployeePensionRate',
-                'partner1PensionContributionRate', 'partner1PensionRate'
+                'partner1EmployeeRate', 'partner1PensionEmployeeRate', 
+                'partner1EmployeePensionRate', 'partner1PensionContributionRate', 
+                'partner1PensionRate'
             ], { allowZero: true, debugMode: true });
             
             const partner1TrainingRate = window.enhancedGetFieldValue(inputs, [
-                'partner1TrainingFundEmployeeRate', 'partner1TrainingFundContributionRate',
-                'partner1TrainingFundRate', 'partner1EmployeeTrainingFundRate'
+                'partner1TrainingFundRate', 'partner1TrainingFundEmployeeRate', 
+                'partner1TrainingFundContributionRate', 'partner1EmployeeTrainingFundRate'
             ], { allowZero: true, debugMode: true });
             
-            // Partner 2 rates
+            // Partner 2 rates - using correct field names
             const partner2PensionRate = window.enhancedGetFieldValue(inputs, [
-                'partner2PensionEmployeeRate', 'partner2EmployeePensionRate',
-                'partner2PensionContributionRate', 'partner2PensionRate'
+                'partner2EmployeeRate', 'partner2PensionEmployeeRate', 
+                'partner2EmployeePensionRate', 'partner2PensionContributionRate', 
+                'partner2PensionRate'
             ], { allowZero: true, debugMode: true });
             
             const partner2TrainingRate = window.enhancedGetFieldValue(inputs, [
-                'partner2TrainingFundEmployeeRate', 'partner2TrainingFundContributionRate',
-                'partner2TrainingFundRate', 'partner2EmployeeTrainingFundRate'
+                'partner2TrainingFundRate', 'partner2TrainingFundEmployeeRate', 
+                'partner2TrainingFundContributionRate', 'partner2EmployeeTrainingFundRate'
             ], { allowZero: true, debugMode: true });
             
             // Average the rates (or could sum if needed)
@@ -286,15 +288,17 @@ window.patchFinancialHealthEngine = function() {
         let pensionRate = 0;
         
         if (inputs.planningType === 'couple') {
-            // In couple mode, average partner pension rates
+            // In couple mode, average partner pension rates - using correct field names
             const partner1PensionRate = window.enhancedGetFieldValue(inputs, [
-                'partner1PensionEmployeeRate', 'partner1EmployeePensionRate',
-                'partner1PensionContributionRate', 'partner1PensionRate'
+                'partner1EmployeeRate', 'partner1PensionEmployeeRate', 
+                'partner1EmployeePensionRate', 'partner1PensionContributionRate', 
+                'partner1PensionRate'
             ], { allowZero: true, debugMode: true });
             
             const partner2PensionRate = window.enhancedGetFieldValue(inputs, [
-                'partner2PensionEmployeeRate', 'partner2EmployeePensionRate',
-                'partner2PensionContributionRate', 'partner2PensionRate'
+                'partner2EmployeeRate', 'partner2PensionEmployeeRate', 
+                'partner2EmployeePensionRate', 'partner2PensionContributionRate', 
+                'partner2PensionRate'
             ], { allowZero: true, debugMode: true });
             
             pensionRate = (partner1PensionRate + partner2PensionRate) / 2;
