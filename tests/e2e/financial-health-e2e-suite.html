@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Health E2E Test Suite - 80 Scenarios</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <style>
+        .test-passed { @apply bg-green-50 border-green-500 text-green-800; }
+        .test-failed { @apply bg-red-50 border-red-500 text-red-800; }
+        .test-running { @apply bg-yellow-50 border-yellow-500 text-yellow-800; }
+        .test-pending { @apply bg-gray-50 border-gray-300 text-gray-600; }
+        .test-skipped { @apply bg-blue-50 border-blue-300 text-blue-600; }
+        
+        .scenario-card {
+            @apply border-2 rounded-lg p-4 mb-4 transition-all duration-300;
+        }
+        
+        .score-badge {
+            @apply inline-block px-3 py-1 rounded-full text-sm font-semibold;
+        }
+        
+        .score-excellent { @apply bg-green-100 text-green-800; }
+        .score-good { @apply bg-blue-100 text-blue-800; }
+        .score-fair { @apply bg-yellow-100 text-yellow-800; }
+        .score-poor { @apply bg-orange-100 text-orange-800; }
+        .score-critical { @apply bg-red-100 text-red-800; }
+        
+        .factor-score {
+            @apply flex justify-between items-center py-1 text-sm;
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        
+        .test-log-entry {
+            @apply font-mono text-xs py-1 border-b border-gray-200;
+        }
+        
+        .field-mapping-table {
+            @apply w-full text-sm;
+        }
+        
+        .field-mapping-table td {
+            @apply border px-2 py-1;
+        }
+        
+        pre {
+            @apply bg-gray-900 text-green-400 p-4 rounded-lg overflow-x-auto text-xs;
+        }
+        
+        .wizard-step-indicator {
+            @apply flex items-center justify-center w-8 h-8 rounded-full text-white font-bold;
+        }
+        
+        .step-complete { @apply bg-green-500; }
+        .step-current { @apply bg-blue-500; }
+        .step-pending { @apply bg-gray-400; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">🧪 Financial Health E2E Test Suite</h1>
+            <p class="text-gray-600 mb-4">Comprehensive testing of financial health scoring across 80 scenarios</p>
+            
+            <!-- Test Controls -->
+            <div class="flex flex-wrap gap-4 mb-6">
+                <button id="runAllTests" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                    🚀 Run All 80 Tests
+                </button>
+                <button id="runCategoryTests" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    📂 Run by Category
+                </button>
+                <button id="runFailedTests" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    🔄 Retry Failed
+                </button>
+                <button id="pauseTests" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    ⏸️ Pause
+                </button>
+                <button id="exportResults" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    📊 Export Results
+                </button>
+                <button id="clearResults" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    🗑️ Clear
+                </button>
+            </div>
+            
+            <!-- Test Configuration -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Environment</label>
+                    <select id="testEnvironment" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <option value="production">Production</option>
+                        <option value="local">Local (localhost:8080)</option>
+                        <option value="custom">Custom URL</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Test Speed</label>
+                    <select id="testSpeed" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <option value="fast">Fast (2s per test)</option>
+                        <option value="normal" selected>Normal (5s per test)</option>
+                        <option value="thorough">Thorough (10s per test)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Log Level</label>
+                    <select id="logLevel" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <option value="error">Errors Only</option>
+                        <option value="info" selected>Info</option>
+                        <option value="debug">Debug</option>
+                        <option value="verbose">Verbose</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="mb-4">
+                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                    <span>Progress: <span id="progressText">0/80 tests</span></span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="bg-gray-200 rounded-full h-4">
+                    <div id="progressBar" class="bg-blue-600 h-4 rounded-full progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <!-- Test Summary -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+                <div class="bg-gray-50 p-3 rounded-lg">
+                    <div id="totalCount" class="text-2xl font-bold text-gray-700">80</div>
+                    <div class="text-sm text-gray-600">Total</div>
+                </div>
+                <div class="bg-green-50 p-3 rounded-lg">
+                    <div id="passedCount" class="text-2xl font-bold text-green-600">0</div>
+                    <div class="text-sm text-green-800">Passed</div>
+                </div>
+                <div class="bg-red-50 p-3 rounded-lg">
+                    <div id="failedCount" class="text-2xl font-bold text-red-600">0</div>
+                    <div class="text-sm text-red-800">Failed</div>
+                </div>
+                <div class="bg-yellow-50 p-3 rounded-lg">
+                    <div id="runningCount" class="text-2xl font-bold text-yellow-600">0</div>
+                    <div class="text-sm text-yellow-800">Running</div>
+                </div>
+                <div class="bg-blue-50 p-3 rounded-lg">
+                    <div id="skippedCount" class="text-2xl font-bold text-blue-600">0</div>
+                    <div class="text-sm text-blue-800">Skipped</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Category Filter Tabs -->
+        <div class="bg-white rounded-lg shadow-lg p-4 mb-6">
+            <div class="flex flex-wrap gap-2">
+                <button class="category-tab px-4 py-2 rounded-lg font-medium bg-blue-100 text-blue-800" data-category="all">
+                    All (80)
+                </button>
+                <button class="category-tab px-4 py-2 rounded-lg font-medium bg-gray-100 text-gray-700" data-category="individual">
+                    Individual (20)
+                </button>
+                <button class="category-tab px-4 py-2 rounded-lg font-medium bg-gray-100 text-gray-700" data-category="couple">
+                    Couple (20)
+                </button>
+                <button class="category-tab px-4 py-2 rounded-lg font-medium bg-gray-100 text-gray-700" data-category="persistence">
+                    Persistence (15)
+                </button>
+                <button class="category-tab px-4 py-2 rounded-lg font-medium bg-gray-100 text-gray-700" data-category="edge">
+                    Edge Cases (15)
+                </button>
+                <button class="category-tab px-4 py-2 rounded-lg font-medium bg-gray-100 text-gray-700" data-category="scoring">
+                    Scoring (10)
+                </button>
+            </div>
+        </div>
+        
+        <!-- Test Results Container -->
+        <div id="testResults" class="space-y-4">
+            <!-- Test result cards will be dynamically inserted here -->
+        </div>
+        
+        <!-- Test Frame (Hidden) -->
+        <iframe id="testFrame" class="hidden" style="width: 100%; height: 600px;"></iframe>
+        
+        <!-- Detailed Log Modal -->
+        <div id="logModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-hidden flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">📋 Detailed Test Log</h3>
+                    <button id="closeLogModal" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="logContent" class="flex-1 overflow-y-auto">
+                    <pre id="logPre" class="text-xs"></pre>
+                </div>
+                <div class="mt-4 flex gap-2">
+                    <button id="copyLog" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                        📋 Copy Log
+                    </button>
+                    <button id="downloadLog" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+                        💾 Download Log
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Export Modal -->
+        <div id="exportModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                <h3 class="text-xl font-bold mb-4">📊 Export Test Results</h3>
+                <p class="text-gray-600 mb-4">Choose export format for the test results and logs:</p>
+                <div class="space-y-3">
+                    <button id="exportJSON" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
+                        📄 Export as JSON (Complete Data)
+                    </button>
+                    <button id="exportCSV" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded">
+                        📊 Export as CSV (Summary)
+                    </button>
+                    <button id="exportMarkdown" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded">
+                        📝 Export as Markdown (Report)
+                    </button>
+                    <button id="exportDebugLog" class="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 px-4 rounded">
+                        🐛 Export Debug Log
+                    </button>
+                    <button id="closeExportModal" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Components -->
+    <script src="test-data-generator.js"></script>
+    <script src="field-mapping-validator.js"></script>
+    <script src="score-validation-engine.js"></script>
+    <script src="test-logger.js"></script>
+    <script src="automated-test-runner.js"></script>
+    
+    <script>
+        // Test Suite Implementation
+        class FinancialHealthE2ETestSuite {
+            constructor() {
+                this.testDataGenerator = new TestDataGenerator();
+                this.scenarios = this.testDataGenerator.getAllScenarios();
+                this.results = {};
+                this.logger = new TestLogger();
+                this.fieldValidator = new FieldMappingValidator();
+                this.scoreValidator = new ScoreValidationEngine();
+                this.automatedRunner = null;
+                this.sessionId = this.generateSessionId();
+                this.startTime = null;
+                this.isPaused = false;
+                this.currentTest = null;
+                this.testFrame = document.getElementById('testFrame');
+                this.testSpeed = 5000; // Default 5s per test
+                this.logLevel = 'info';
+                this.environment = 'production';
+                
+                this.initializeUI();
+                this.initializeLogging();
+            }
+            
+            generateSessionId() {
+                return `fh-e2e-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            }
+            
+            initializeUI() {
+                // Control buttons
+                document.getElementById('runAllTests').onclick = () => this.runAllTests();
+                document.getElementById('runCategoryTests').onclick = () => this.showCategoryMenu();
+                document.getElementById('runFailedTests').onclick = () => this.runFailedTests();
+                document.getElementById('pauseTests').onclick = () => this.togglePause();
+                document.getElementById('exportResults').onclick = () => this.showExportModal();
+                document.getElementById('clearResults').onclick = () => this.clearResults();
+                
+                // Configuration
+                document.getElementById('testEnvironment').onchange = (e) => {
+                    this.environment = e.target.value;
+                    this.log('info', `Environment changed to: ${this.environment}`);
+                };
+                
+                document.getElementById('testSpeed').onchange = (e) => {
+                    const speeds = { fast: 2000, normal: 5000, thorough: 10000 };
+                    this.testSpeed = speeds[e.target.value];
+                    this.log('info', `Test speed changed to: ${e.target.value}`);
+                };
+                
+                document.getElementById('logLevel').onchange = (e) => {
+                    this.logLevel = e.target.value;
+                    this.log('info', `Log level changed to: ${this.logLevel}`);
+                };
+                
+                // Category tabs
+                document.querySelectorAll('.category-tab').forEach(tab => {
+                    tab.onclick = (e) => this.filterByCategory(e.target.dataset.category);
+                });
+                
+                // Modal controls
+                document.getElementById('closeLogModal').onclick = () => this.hideLogModal();
+                document.getElementById('copyLog').onclick = () => this.copyLog();
+                document.getElementById('downloadLog').onclick = () => this.downloadLog();
+                
+                document.getElementById('closeExportModal').onclick = () => this.hideExportModal();
+                document.getElementById('exportJSON').onclick = () => this.exportResults('json');
+                document.getElementById('exportCSV').onclick = () => this.exportResults('csv');
+                document.getElementById('exportMarkdown').onclick = () => this.exportResults('markdown');
+                document.getElementById('exportDebugLog').onclick = () => this.exportResults('debug');
+                
+                // Initialize test cards
+                this.renderTestCards();
+            }
+            
+            initializeLogging() {
+                this.logger.log('INFO', '🧪 Financial Health E2E Test Suite Initialized', {
+                    sessionId: this.sessionId,
+                    totalScenarios: this.scenarios.length,
+                    environment: this.environment,
+                    timestamp: new Date().toISOString()
+                });
+            }
+            
+            processAutomatedReport(report) {
+                // Update UI with results from automated runner
+                report.detailedResults.forEach(result => {
+                    this.processTestResult(result.scenario, result.result);
+                });
+                
+                // Show summary
+                this.showAutomatedSummary(report);
+            }
+            
+            showAutomatedSummary(report) {
+                alert(`Test Execution Complete!\n\nTotal: ${report.summary.totalTests}\nPassed: ${report.summary.passed}\nFailed: ${report.summary.failed}\nSuccess Rate: ${report.summary.successRate}\n\nCheck console for detailed report.`);
+                console.log('Automated Test Report:', report);
+            }
+            
+            renderTestCards() {
+                const container = document.getElementById('testResults');
+                container.innerHTML = '';
+                
+                // Group scenarios by category
+                const categories = {};
+                this.scenarios.forEach(scenario => {
+                    const cat = scenario.category.split('_')[0];
+                    if (!categories[cat]) categories[cat] = [];
+                    categories[cat].push(scenario);
+                });
+                
+                // Render each category
+                Object.entries(categories).forEach(([category, scenarios]) => {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'category-section mb-8';
+                    categoryDiv.dataset.category = category;
+                    
+                    categoryDiv.innerHTML = `
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">
+                            ${this.getCategoryTitle(category)} (${scenarios.length} tests)
+                        </h2>
+                        <div class="space-y-3">
+                            ${scenarios.map(scenario => this.createTestCard(scenario)).join('')}
+                        </div>
+                    `;
+                    
+                    container.appendChild(categoryDiv);
+                });
+            }
+            
+            getCategoryTitle(category) {
+                const titles = {
+                    individual: '👤 Individual Planning',
+                    couple: '👫 Couple Planning',
+                    persistence: '💾 Data Persistence',
+                    edge: '⚠️ Edge Cases',
+                    scoring: '📊 Scoring Factors'
+                };
+                return titles[category] || category;
+            }
+            
+            createTestCard(scenario) {
+                return `
+                    <div id="test-${scenario.id}" class="scenario-card test-pending" data-scenario-id="${scenario.id}">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="font-semibold text-lg">${scenario.name}</h3>
+                                <p class="text-sm text-gray-600">${scenario.description}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="test-status text-sm font-medium">Pending</span>
+                                <div class="expected-score text-xs text-gray-500 mt-1">
+                                    Expected: ${scenario.expectedScoreRange.min}-${scenario.expectedScoreRange.max}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-details hidden mt-4">
+                            <!-- Test details will be populated during execution -->
+                        </div>
+                        <div class="test-actions mt-3 flex gap-2">
+                            <button class="run-single-test text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" 
+                                    onclick="testSuite.runSingleTest('${scenario.id}')">
+                                Run Test
+                            </button>
+                            <button class="view-details text-sm bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600"
+                                    onclick="testSuite.viewTestDetails('${scenario.id}')">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            async runAllTests() {
+                this.logger.log('INFO', '🚀 Starting all tests', { count: this.scenarios.length });
+                this.startTime = Date.now();
+                this.resetCounters();
+                
+                // Use automated runner if parallel execution is desired
+                if (window.location.search.includes('parallel=true')) {
+                    this.automatedRunner = new AutomatedTestRunner({
+                        parallel: true,
+                        maxConcurrent: 5,
+                        exportFormat: 'markdown',
+                        verbose: true
+                    });
+                    const report = await this.automatedRunner.runAllTests();
+                    this.processAutomatedReport(report);
+                    return;
+                }
+                
+                // Sequential execution
+                for (let i = 0; i < this.scenarios.length; i++) {
+                    if (this.isPaused) {
+                        await this.waitForResume();
+                    }
+                    
+                    await this.runTest(this.scenarios[i]);
+                    this.updateProgress(i + 1);
+                }
+                
+                this.completeTestRun();
+            }
+            
+            async runTest(scenario) {
+                this.currentTest = scenario;
+                const testCard = document.getElementById(`test-${scenario.id}`);
+                
+                // Update UI to running state
+                testCard.className = 'scenario-card test-running';
+                testCard.querySelector('.test-status').textContent = 'Running...';
+                
+                this.logger.startScenario(scenario);
+                
+                try {
+                    // Load the application with test data
+                    const appUrl = this.getApplicationUrl();
+                    const result = await this.executeScenario(scenario, appUrl);
+                    
+                    // Validate with new validators
+                    const fieldValidation = this.fieldValidator.validateScenario(scenario, result.wizardData || {}, result);
+                    const scoreValidation = this.scoreValidator.validateScore(scenario, result);
+                    
+                    // Combine validations
+                    result.fieldValidation = fieldValidation;
+                    result.scoreValidation = scoreValidation;
+                    result.passed = fieldValidation.passed && scoreValidation.passed;
+                    
+                    // Process results
+                    this.processTestResult(scenario, result);
+                    
+                    // End scenario logging
+                    this.logger.endScenario(scenario.id, result);
+                    
+                } catch (error) {
+                    this.handleTestError(scenario, error);
+                    this.logger.logError(error, { scenario: scenario.id });
+                }
+            }
+            
+            async executeScenario(scenario, appUrl) {
+                return new Promise((resolve) => {
+                    const startTime = Date.now();
+                    
+                    // Create a timeout
+                    const timeout = setTimeout(() => {
+                        resolve({
+                            success: false,
+                            error: 'Test timeout',
+                            duration: Date.now() - startTime
+                        });
+                    }, this.testSpeed + 5000); // Extra 5s buffer
+                    
+                    // Load application in iframe
+                    this.testFrame.onload = async () => {
+                        try {
+                            // Wait for app initialization
+                            await this.waitForAppReady();
+                            
+                            // Execute test scenario
+                            const result = await this.runScenarioInApp(scenario);
+                            
+                            clearTimeout(timeout);
+                            resolve({
+                                success: true,
+                                ...result,
+                                duration: Date.now() - startTime
+                            });
+                            
+                        } catch (error) {
+                            clearTimeout(timeout);
+                            resolve({
+                                success: false,
+                                error: error.message,
+                                duration: Date.now() - startTime
+                            });
+                        }
+                    };
+                    
+                    this.testFrame.src = appUrl;
+                });
+            }
+            
+            async waitForAppReady() {
+                return new Promise((resolve, reject) => {
+                    let attempts = 0;
+                    const maxAttempts = 50; // 5 seconds with 100ms intervals
+                    
+                    const checkReady = setInterval(() => {
+                        attempts++;
+                        
+                        const doc = this.testFrame.contentDocument;
+                        const win = this.testFrame.contentWindow;
+                        
+                        // Check if app is loaded
+                        if (win && win.calculateFinancialHealthScore && doc.getElementById('root')) {
+                            clearInterval(checkReady);
+                            resolve();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(checkReady);
+                            reject(new Error('Application failed to load'));
+                        }
+                    }, 100);
+                });
+            }
+            
+            async runScenarioInApp(scenario) {
+                const win = this.testFrame.contentWindow;
+                const doc = this.testFrame.contentDocument;
+                
+                // Log input data
+                this.log('debug', 'Injecting test data', { inputs: scenario.inputs });
+                
+                // For persistence tests, handle differently
+                if (scenario.testType === 'save_resume') {
+                    return await this.runPersistenceTest(scenario, win, doc);
+                }
+                
+                // For field mapping tests
+                if (scenario.testType === 'field_mapping') {
+                    return await this.runFieldMappingTest(scenario, win, doc);
+                }
+                
+                // Standard scoring test
+                return await this.runScoringTest(scenario, win, doc);
+            }
+            
+            async runScoringTest(scenario, win, doc) {
+                // Calculate score directly
+                const scoreResult = win.calculateFinancialHealthScore(scenario.inputs);
+                
+                // Validate field mappings
+                const fieldMappingResults = this.validateFieldMappings(scenario.inputs, win);
+                
+                // Analyze results
+                const analysis = this.analyzeScoreResult(scoreResult, scenario.expectedScoreRange);
+                
+                return {
+                    actualScore: scoreResult.totalScore,
+                    expectedRange: scenario.expectedScoreRange,
+                    scoreDetails: scoreResult.factorScores,
+                    fieldMappings: fieldMappingResults,
+                    analysis: analysis,
+                    passed: analysis.inRange,
+                    wizardData: this.captureWizardState(doc)
+                };
+            }
+            
+            async runPersistenceTest(scenario, win, doc) {
+                // Simulate wizard progression
+                const wizardResults = await this.simulateWizardProgression(scenario.wizardState, win, doc);
+                
+                // Test save functionality
+                const saveResult = await this.testSaveFunction(win);
+                
+                // Clear and reload
+                win.location.reload();
+                await this.waitForAppReady();
+                
+                // Test restore functionality
+                const restoreResult = await this.testRestoreFunction(win);
+                
+                return {
+                    wizardProgression: wizardResults,
+                    saveSuccess: saveResult.success,
+                    restoreSuccess: restoreResult.success,
+                    dataIntegrity: this.validateDataIntegrity(scenario.wizardState.inputs, restoreResult.data),
+                    passed: saveResult.success && restoreResult.success
+                };
+            }
+            
+            async runFieldMappingTest(scenario, win, doc) {
+                const results = {};
+                
+                // Test each field mapping
+                for (const test of scenario.fieldMappingTests) {
+                    const mappingResult = this.testFieldMapping(test, win);
+                    results[test.canonicalName] = mappingResult;
+                }
+                
+                return {
+                    fieldMappings: results,
+                    passed: Object.values(results).every(r => r.success),
+                    details: results
+                };
+            }
+            
+            validateFieldMappings(inputs, win) {
+                const results = {};
+                
+                if (win.fieldMappingBridge) {
+                    const criticalFields = [
+                        'currentMonthlySalary',
+                        'currentMonthlyExpenses',
+                        'currentPension',
+                        'emergencyFund'
+                    ];
+                    
+                    criticalFields.forEach(field => {
+                        const value = win.fieldMappingBridge.findFieldValue(inputs, field);
+                        results[field] = {
+                            found: value !== undefined && value !== null,
+                            value: value,
+                            inputValue: inputs[field]
+                        };
+                    });
+                }
+                
+                return results;
+            }
+            
+            analyzeScoreResult(scoreResult, expectedRange) {
+                const totalScore = scoreResult.totalScore;
+                const inRange = totalScore >= expectedRange.min && totalScore <= expectedRange.max;
+                
+                let status = 'unknown';
+                if (totalScore >= 80) status = 'excellent';
+                else if (totalScore >= 65) status = 'good';
+                else if (totalScore >= 50) status = 'fair';
+                else if (totalScore >= 35) status = 'poor';
+                else status = 'critical';
+                
+                const issues = [];
+                
+                // Check for critical low score issue (27-29)
+                if (totalScore >= 27 && totalScore <= 29) {
+                    issues.push('CRITICAL_LOW_SCORE_BUG: Score in problematic range 27-29');
+                }
+                
+                // Analyze factor scores
+                if (scoreResult.factorScores) {
+                    Object.entries(scoreResult.factorScores).forEach(([factor, data]) => {
+                        if (data.score === 0) {
+                            issues.push(`ZERO_SCORE: ${factor} returned 0`);
+                        }
+                        if (data.details?.error) {
+                            issues.push(`CALCULATION_ERROR: ${factor} - ${data.details.error}`);
+                        }
+                    });
+                }
+                
+                return {
+                    totalScore,
+                    inRange,
+                    status,
+                    issues,
+                    deviation: inRange ? 0 : 
+                        totalScore < expectedRange.min ? expectedRange.min - totalScore :
+                        totalScore - expectedRange.max
+                };
+            }
+            
+            processTestResult(scenario, result) {
+                const testCard = document.getElementById(`test-${scenario.id}`);
+                
+                // Store result
+                this.results[scenario.id] = {
+                    scenario,
+                    result,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Update UI
+                if (result.success && result.passed) {
+                    testCard.className = 'scenario-card test-passed';
+                    testCard.querySelector('.test-status').textContent = '✅ Passed';
+                    this.updateCounter('passed', 1);
+                } else {
+                    testCard.className = 'scenario-card test-failed';
+                    testCard.querySelector('.test-status').textContent = '❌ Failed';
+                    this.updateCounter('failed', 1);
+                }
+                
+                // Add result details
+                const detailsDiv = testCard.querySelector('.test-details');
+                detailsDiv.innerHTML = this.renderTestDetails(scenario, result);
+                detailsDiv.classList.remove('hidden');
+                
+                // Log result
+                this.log(result.success && result.passed ? 'info' : 'error', 
+                    `Test ${scenario.id} ${result.passed ? 'passed' : 'failed'}`, result);
+            }
+            
+            renderTestDetails(scenario, result) {
+                if (!result.success) {
+                    return `<div class="text-red-600">Error: ${result.error}</div>`;
+                }
+                
+                let html = '<div class="space-y-2">';
+                
+                // Score comparison
+                if (result.actualScore !== undefined) {
+                    const scoreClass = result.analysis.inRange ? 'text-green-600' : 'text-red-600';
+                    html += `
+                        <div class="flex justify-between">
+                            <span>Actual Score:</span>
+                            <span class="${scoreClass} font-bold">${result.actualScore}/100</span>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-600">
+                            <span>Expected Range:</span>
+                            <span>${scenario.expectedScoreRange.min}-${scenario.expectedScoreRange.max}</span>
+                        </div>
+                    `;
+                    
+                    // Issues
+                    if (result.analysis.issues.length > 0) {
+                        html += '<div class="mt-2 p-2 bg-red-50 rounded text-sm">';
+                        html += '<div class="font-semibold text-red-700">Issues Detected:</div>';
+                        html += '<ul class="list-disc list-inside text-red-600">';
+                        result.analysis.issues.forEach(issue => {
+                            html += `<li>${issue}</li>`;
+                        });
+                        html += '</ul></div>';
+                    }
+                    
+                    // Factor scores
+                    if (result.scoreDetails) {
+                        html += '<div class="mt-3"><div class="font-semibold mb-1">Factor Scores:</div>';
+                        html += '<div class="grid grid-cols-2 gap-2 text-sm">';
+                        Object.entries(result.scoreDetails).forEach(([factor, data]) => {
+                            const factorClass = data.score > 0 ? 'text-gray-700' : 'text-red-600';
+                            html += `
+                                <div class="flex justify-between ${factorClass}">
+                                    <span>${factor}:</span>
+                                    <span>${data.score}/${data.maxScore || '?'}</span>
+                                </div>
+                            `;
+                        });
+                        html += '</div></div>';
+                    }
+                }
+                
+                // Duration
+                html += `<div class="text-xs text-gray-500 mt-2">Duration: ${result.duration}ms</div>`;
+                
+                html += '</div>';
+                return html;
+            }
+            
+            updateCounter(type, delta) {
+                const element = document.getElementById(`${type}Count`);
+                const current = parseInt(element.textContent);
+                element.textContent = current + delta;
+            }
+            
+            updateProgress(completed) {
+                const total = this.scenarios.length;
+                const percent = Math.round((completed / total) * 100);
+                
+                document.getElementById('progressText').textContent = `${completed}/${total} tests`;
+                document.getElementById('progressPercent').textContent = `${percent}%`;
+                document.getElementById('progressBar').style.width = `${percent}%`;
+            }
+            
+            resetCounters() {
+                ['passed', 'failed', 'running', 'skipped'].forEach(type => {
+                    document.getElementById(`${type}Count`).textContent = '0';
+                });
+            }
+            
+            completeTestRun() {
+                const duration = Date.now() - this.startTime;
+                const totalTests = Object.keys(this.results).length;
+                const passed = Object.values(this.results).filter(r => r.result.passed).length;
+                const failed = totalTests - passed;
+                
+                this.log('info', '✅ Test run completed', {
+                    duration: `${(duration / 1000).toFixed(2)}s`,
+                    totalTests,
+                    passed,
+                    failed,
+                    successRate: `${((passed / totalTests) * 100).toFixed(2)}%`
+                });
+                
+                // Show summary
+                this.showTestSummary();
+            }
+            
+            showTestSummary() {
+                // Analyze results for patterns
+                const criticalLowScores = Object.values(this.results).filter(r => 
+                    r.result.actualScore >= 27 && r.result.actualScore <= 29
+                ).length;
+                
+                const fieldMappingErrors = Object.values(this.results).filter(r =>
+                    r.result.analysis?.issues.some(i => i.includes('FIELD_MAPPING'))
+                ).length;
+                
+                const zeroScores = Object.values(this.results).filter(r =>
+                    r.result.analysis?.issues.some(i => i.includes('ZERO_SCORE'))
+                ).length;
+                
+                // Create summary message
+                let summary = '📊 Test Summary:\n';
+                summary += `- Critical Low Scores (27-29): ${criticalLowScores}\n`;
+                summary += `- Field Mapping Errors: ${fieldMappingErrors}\n`;
+                summary += `- Zero Score Issues: ${zeroScores}\n`;
+                
+                if (criticalLowScores > 0) {
+                    summary += '\n⚠️ CRITICAL: The 27-29 score bug is still present!';
+                }
+                
+                alert(summary);
+            }
+            
+            getApplicationUrl() {
+                const urls = {
+                    production: 'https://ypollak2.github.io/advanced-retirement-planner/',
+                    local: 'http://localhost:8080/',
+                    custom: prompt('Enter custom URL:')
+                };
+                return urls[this.environment];
+            }
+            
+            async exportResults(format) {
+                // Use the new test logger's export functionality
+                try {
+                    this.logger.downloadReport(format);
+                    this.hideExportModal();
+                } catch (error) {
+                    console.error('Export failed:', error);
+                    alert('Export failed: ' + error.message);
+                }
+            }
+            
+            generateSummary() {
+                const results = Object.values(this.results);
+                const categories = {};
+                
+                results.forEach(r => {
+                    const cat = r.scenario.category;
+                    if (!categories[cat]) {
+                        categories[cat] = { total: 0, passed: 0, failed: 0, issues: [] };
+                    }
+                    categories[cat].total++;
+                    if (r.result.passed) {
+                        categories[cat].passed++;
+                    } else {
+                        categories[cat].failed++;
+                        if (r.result.analysis?.issues) {
+                            categories[cat].issues.push(...r.result.analysis.issues);
+                        }
+                    }
+                });
+                
+                return {
+                    categories,
+                    commonIssues: this.findCommonIssues(results),
+                    scoreDistribution: this.calculateScoreDistribution(results)
+                };
+            }
+            
+            findCommonIssues(results) {
+                const issueCounts = {};
+                
+                results.forEach(r => {
+                    if (r.result.analysis?.issues) {
+                        r.result.analysis.issues.forEach(issue => {
+                            issueCounts[issue] = (issueCounts[issue] || 0) + 1;
+                        });
+                    }
+                });
+                
+                return Object.entries(issueCounts)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([issue, count]) => ({ issue, count }));
+            }
+            
+            calculateScoreDistribution(results) {
+                const distribution = {
+                    '0-20': 0,
+                    '21-40': 0,
+                    '41-60': 0,
+                    '61-80': 0,
+                    '81-100': 0
+                };
+                
+                results.forEach(r => {
+                    const score = r.result.actualScore;
+                    if (score !== undefined) {
+                        if (score <= 20) distribution['0-20']++;
+                        else if (score <= 40) distribution['21-40']++;
+                        else if (score <= 60) distribution['41-60']++;
+                        else if (score <= 80) distribution['61-80']++;
+                        else distribution['81-100']++;
+                    }
+                });
+                
+                return distribution;
+            }
+            
+            generateCSV(exportData) {
+                const rows = [['Test ID', 'Name', 'Category', 'Expected Min', 'Expected Max', 'Actual Score', 'Passed', 'Issues']];
+                
+                Object.values(exportData.results).forEach(r => {
+                    rows.push([
+                        r.scenario.id,
+                        r.scenario.name,
+                        r.scenario.category,
+                        r.scenario.expectedScoreRange.min,
+                        r.scenario.expectedScoreRange.max,
+                        r.result.actualScore || 'N/A',
+                        r.result.passed ? 'Yes' : 'No',
+                        r.result.analysis?.issues.join('; ') || ''
+                    ]);
+                });
+                
+                return rows.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+            }
+            
+            generateMarkdown(exportData) {
+                let md = `# Financial Health E2E Test Results\n\n`;
+                md += `**Session ID:** ${exportData.metadata.sessionId}\n`;
+                md += `**Date:** ${exportData.metadata.timestamp}\n`;
+                md += `**Environment:** ${exportData.metadata.environment}\n`;
+                md += `**Duration:** ${(exportData.metadata.duration / 1000).toFixed(2)}s\n\n`;
+                
+                md += `## Summary\n\n`;
+                md += `- **Total Tests:** ${exportData.metadata.totalTests}\n`;
+                md += `- **Executed:** ${exportData.metadata.executed}\n`;
+                md += `- **Passed:** ${exportData.metadata.passed}\n`;
+                md += `- **Failed:** ${exportData.metadata.failed}\n`;
+                md += `- **Success Rate:** ${((exportData.metadata.passed / exportData.metadata.executed) * 100).toFixed(2)}%\n\n`;
+                
+                md += `## Results by Category\n\n`;
+                Object.entries(exportData.summary.categories).forEach(([cat, data]) => {
+                    md += `### ${cat}\n`;
+                    md += `- Total: ${data.total}\n`;
+                    md += `- Passed: ${data.passed}\n`;
+                    md += `- Failed: ${data.failed}\n`;
+                    if (data.issues.length > 0) {
+                        md += `- Common Issues: ${[...new Set(data.issues)].join(', ')}\n`;
+                    }
+                    md += '\n';
+                });
+                
+                md += `## Common Issues\n\n`;
+                exportData.summary.commonIssues.forEach(({ issue, count }) => {
+                    md += `- ${issue}: ${count} occurrences\n`;
+                });
+                
+                md += `\n## Score Distribution\n\n`;
+                Object.entries(exportData.summary.scoreDistribution).forEach(([range, count]) => {
+                    md += `- ${range}: ${count} tests\n`;
+                });
+                
+                return md;
+            }
+            
+            generateDebugLog(exportData) {
+                let log = `Financial Health E2E Debug Log\n`;
+                log += `Session: ${exportData.metadata.sessionId}\n`;
+                log += `${'='.repeat(80)}\n\n`;
+                
+                exportData.logs.forEach(entry => {
+                    log += `[${entry.timestamp}] [${entry.level.toUpperCase()}] ${entry.message}\n`;
+                    if (Object.keys(entry.data).length > 0) {
+                        log += JSON.stringify(entry.data, null, 2) + '\n';
+                    }
+                    log += '\n';
+                });
+                
+                return log;
+            }
+            
+            // UI Helper Methods
+            showExportModal() {
+                document.getElementById('exportModal').classList.remove('hidden');
+                document.getElementById('exportModal').classList.add('flex');
+            }
+            
+            hideExportModal() {
+                document.getElementById('exportModal').classList.remove('flex');
+                document.getElementById('exportModal').classList.add('hidden');
+            }
+            
+            showLogModal() {
+                document.getElementById('logModal').classList.remove('hidden');
+                document.getElementById('logModal').classList.add('flex');
+            }
+            
+            hideLogModal() {
+                document.getElementById('logModal').classList.remove('flex');
+                document.getElementById('logModal').classList.add('hidden');
+            }
+            
+            viewTestDetails(testId) {
+                const result = this.results[testId];
+                if (result) {
+                    const logContent = JSON.stringify(result, null, 2);
+                    document.getElementById('logPre').textContent = logContent;
+                    this.showLogModal();
+                }
+            }
+            
+            async runSingleTest(testId) {
+                const scenario = this.scenarios.find(s => s.id === testId);
+                if (scenario) {
+                    this.startTime = Date.now();
+                    await this.runTest(scenario);
+                }
+            }
+            
+            filterByCategory(category) {
+                // Update tab styling
+                document.querySelectorAll('.category-tab').forEach(tab => {
+                    if (tab.dataset.category === category) {
+                        tab.className = 'category-tab px-4 py-2 rounded-lg font-medium bg-blue-100 text-blue-800';
+                    } else {
+                        tab.className = 'category-tab px-4 py-2 rounded-lg font-medium bg-gray-100 text-gray-700';
+                    }
+                });
+                
+                // Show/hide sections
+                document.querySelectorAll('.category-section').forEach(section => {
+                    if (category === 'all' || section.dataset.category === category) {
+                        section.classList.remove('hidden');
+                    } else {
+                        section.classList.add('hidden');
+                    }
+                });
+            }
+            
+            clearResults() {
+                if (confirm('Clear all test results?')) {
+                    this.results = {};
+                    this.logger = new TestLogger(); // Reset logger
+                    this.fieldValidator = new FieldMappingValidator(); // Reset validators
+                    this.scoreValidator = new ScoreValidationEngine();
+                    this.resetCounters();
+                    this.renderTestCards();
+                    document.getElementById('progressBar').style.width = '0%';
+                    document.getElementById('progressText').textContent = '0/80 tests';
+                    document.getElementById('progressPercent').textContent = '0%';
+                }
+            }
+            
+            handleTestError(scenario, error) {
+                const testCard = document.getElementById(`test-${scenario.id}`);
+                testCard.className = 'scenario-card test-failed';
+                testCard.querySelector('.test-status').textContent = '❌ Error';
+                
+                this.results[scenario.id] = {
+                    scenario,
+                    result: {
+                        success: false,
+                        passed: false,
+                        error: error.message
+                    },
+                    timestamp: new Date().toISOString()
+                };
+                
+                this.updateCounter('failed', 1);
+            }
+            
+            waitForResume() {
+                return new Promise(resolve => {
+                    const checkInterval = setInterval(() => {
+                        if (!this.isPaused) {
+                            clearInterval(checkInterval);
+                            resolve();
+                        }
+                    }, 100);
+                });
+            }
+            
+            togglePause() {
+                this.isPaused = !this.isPaused;
+                const button = document.getElementById('pauseTests');
+                button.textContent = this.isPaused ? '▶️ Resume' : '⏸️ Pause';
+            }
+        }
+        
+        // Initialize test suite
+        const testSuite = new FinancialHealthE2ETestSuite();
+        
+        // Make available globally for debugging
+        window.testSuite = testSuite;
+        
+        // Auto-start if URL parameter present
+        if (window.location.search.includes('autorun=true')) {
+            setTimeout(() => testSuite.runAllTests(), 1000);
+        }
+    </script>
+</body>
+</html>
