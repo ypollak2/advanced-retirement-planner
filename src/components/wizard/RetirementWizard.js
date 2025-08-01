@@ -396,9 +396,9 @@ const RetirementWizard = ({
                        inflationRate >= 0 && inflationRate <= 15;
             
             case 8: 
-                // Goals validation - positive values from current or saved data
-                return (mergedInputs.retirementGoal || 0) > 0 && 
-                       (mergedInputs.currentMonthlyExpenses || 0) > 0;
+                // Goals validation - always allow progression, goals are optional
+                // User can proceed with default retirement goal calculations
+                return true;
             
             case 9: 
                 // Final review step - check if we have minimum required data from current or saved
