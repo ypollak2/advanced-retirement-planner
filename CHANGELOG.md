@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [7.5.7] - 2025-08-01 - NaN Display Fix in Component Scores
+### 🐛 **Fixed**
+- **Component Scores NaN Display**:
+  - Fixed formatCurrency function to handle invalid values (NaN, undefined, null, Infinity)
+  - Component Scores now display ₪0 instead of NaN when values are missing
+  - Ensures all currency formatting is consistent and error-free
+  - Prevents NaN propagation in financial displays
+
+---
+
 ## [7.3.8] - 2025-07-31 - FUNDAMENTAL REDESIGN: Financial Health Scoring System 🚀
 
 ### 🏗️ **Major System Redesign**

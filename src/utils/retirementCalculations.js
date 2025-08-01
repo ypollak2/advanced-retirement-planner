@@ -2,6 +2,14 @@
 // Dependencies: countryData, riskScenarios from marketConstants.js
 
 window.formatCurrency = (amount, currency = 'ILS') => {
+    // Handle invalid amounts (NaN, undefined, null, etc.)
+    if (amount === undefined || amount === null || isNaN(amount) || !isFinite(amount)) {
+        amount = 0;
+    }
+    
+    // Ensure amount is a number
+    amount = parseFloat(amount) || 0;
+    
     // Handle different currencies
     const currencySymbols = {
         ILS: '₪',
