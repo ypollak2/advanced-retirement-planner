@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Production Test - Advanced Retirement Planner</title>
+    <style>
+        body { 
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-passed { border-left: 4px solid #10b981; background: #f0fdf4; }
+        .test-failed { border-left: 4px solid #ef4444; background: #fef2f2; }
+        .test-running { border-left: 4px solid #f59e0b; background: #fffbeb; }
+        .test-pending { border-left: 4px solid #6b7280; background: #f9fafb; }
+        
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 5px;
+        }
+        button:hover { background: #2563eb; }
+        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .summary-item {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        
+        .iframe-container {
+            width: 100%;
+            height: 500px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .console-output {
+            background: #1f2937;
+            color: #10b981;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🚀 Quick Production Test</h1>
+        <p>Rapid validation of critical Advanced Retirement Planner functionality</p>
+        
+        <div class="controls">
+            <button onclick="runQuickTest()">▶️ Run Quick Test</button>
+            <button onclick="runFullTest()">🧪 Run Full Test</button>
+            <button onclick="testSpecificIssue()">🔧 Test v7.3.8 Fixes</button>
+            <button onclick="clearResults()">🗑️ Clear</button>
+        </div>
+        
+        <div class="summary">
+            <div class="summary-item" style="background: #dcfce7;">
+                <div id="passedCount">0</div>
+                <div>Passed</div>
+            </div>
+            <div class="summary-item" style="background: #fee2e2;">
+                <div id="failedCount">0</div>
+                <div>Failed</div>
+            </div>
+            <div class="summary-item" style="background: #fef3c7;">
+                <div id="runningCount">0</div>
+                <div>Running</div>
+            </div>
+            <div class="summary-item" style="background: #f3f4f6;">
+                <div id="totalCount">8</div>
+                <div>Total</div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="testResults"></div>
+    
+    <div class="test-container">
+        <h3>🖥️ Test Environment</h3>
+        <iframe id="testFrame" class="iframe-container" src="about:blank"></iframe>
+    </div>
+    
+    <div class="test-container">
+        <h3>📋 Console Output</h3>
+        <div id="consoleOutput" class="console-output">Ready to run tests...</div>
+    </div>
+
+    <script>
+        const PRODUCTION_URL = 'https://ypollak2.github.io/advanced-retirement-planner/';
+        const MIRROR_URL = 'https://advanced-retirement-planner.netlify.app/';
+        
+        let testResults = [];
+        let passedCount = 0;
+        let failedCount = 0;
+        let runningCount = 0;
+        
+        function log(message) {
+            const output = document.getElementById('consoleOutput');
+            const time = new Date().toLocaleTimeString();
+            output.innerHTML += `\n[${time}] ${message}`;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        function updateCounters() {
+            document.getElementById('passedCount').textContent = passedCount;
+            document.getElementById('failedCount').textContent = failedCount;
+            document.getElementById('runningCount').textContent = runningCount;
+        }
+        
+        function createTestElement(testName, status = 'pending') {
+            const div = document.createElement('div');
+            div.className = `test-container test-${status}`;
+            div.id = `test-${testName.replace(/\s+/g, '-')}`;
+            div.innerHTML = `
+                <h4>${testName}</h4>
+                <div class="status">Status: <span id="status-${testName.replace(/\s+/g, '-')}">${status}</span></div>
+                <div class="message" id="message-${testName.replace(/\s+/g, '-')}">Waiting to run...</div>
+                <div class="duration" id="duration-${testName.replace(/\s+/g, '-')}" style="font-size: 12px; color: #666;"></div>
+            `;
+            document.getElementById('testResults').appendChild(div);
+            return div;
+        }
+        
+        function updateTestResult(testName, passed, message, duration) {
+            const testId = testName.replace(/\s+/g, '-');
+            const element = document.getElementById(`test-${testId}`);
+            const statusElement = document.getElementById(`status-${testId}`);
+            const messageElement = document.getElementById(`message-${testId}`);
+            const durationElement = document.getElementById(`duration-${testId}`);
+            
+            if (passed) {
+                element.className = 'test-container test-passed';
+                statusElement.textContent = '✅ Passed';
+                passedCount++;
+            } else {
+                element.className = 'test-container test-failed';
+                statusElement.textContent = '❌ Failed';
+                failedCount++;
+            }
+            
+            messageElement.textContent = message;
+            durationElement.textContent = `Duration: ${duration}ms`;
+            runningCount--;
+            updateCounters();
+            
+            log(`${passed ? '✅' : '❌'} ${testName}: ${message} (${duration}ms)`);
+        }
+        
+        async function runTest(testName, testFn, timeout = 10000) {
+            const testElement = createTestElement(testName, 'running');
+            runningCount++;
+            updateCounters();
+            
+            const startTime = Date.now();
+            
+            try {
+                const result = await Promise.race([
+                    testFn(),
+                    new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Test timeout')), timeout)
+                    )
+                ]);
+                
+                const duration = Date.now() - startTime;
+                updateTestResult(testName, result.passed, result.message, duration);
+                return result.passed;
+                
+            } catch (error) {
+                const duration = Date.now() - startTime;
+                updateTestResult(testName, false, error.message, duration);
+                return false;
+            }
+        }
+        
+        async function waitForFrameLoad(iframe, url) {
+            return new Promise((resolve) => {
+                iframe.onload = resolve;
+                iframe.src = url;
+            });
+        }
+        
+        async function runQuickTest() {
+            log('🚀 Starting quick production test...');
+            clearResults();
+            
+            const iframe = document.getElementById('testFrame');
+            
+            // Test 1: Page loads
+            await runTest('Page Load', async () => {
+                await waitForFrameLoad(iframe, PRODUCTION_URL);
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                const doc = iframe.contentDocument;
+                const title = doc?.title;
+                const root = doc?.getElementById('root');
+                
+                return {
+                    passed: title?.includes('Advanced Retirement Planner') && root !== null,
+                    message: title ? `Loaded: ${title}` : 'Failed to load'
+                };
+            });
+            
+            // Test 2: Version check
+            await runTest('Version v7.3.8', async () => {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                const doc = iframe.contentDocument;
+                const versionElement = doc?.querySelector('.version-indicator');
+                const hasCorrectVersion = versionElement?.textContent?.includes('v7.3.8');
+                
+                return {
+                    passed: hasCorrectVersion,
+                    message: hasCorrectVersion ? 'v7.3.8 confirmed' : `Wrong version: ${versionElement?.textContent}`
+                };
+            });
+            
+            // Test 3: No JavaScript errors
+            await runTest('No JS Errors', async () => {
+                let errorCount = 0;
+                
+                if (iframe.contentWindow) {
+                    const originalError = iframe.contentWindow.console.error;
+                    iframe.contentWindow.console.error = function(...args) {
+                        errorCount++;
+                        originalError.apply(this, args);
+                    };
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                return {
+                    passed: errorCount === 0,
+                    message: errorCount === 0 ? 'No errors detected' : `${errorCount} errors found`
+                };
+            });
+            
+            // Test 4: Session storage
+            await runTest('Session Storage', async () => {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                const sessionStorage = iframe.contentWindow?.sessionStorageGist;
+                const consoleLogs = iframe.contentWindow?.__consoleLogs;
+                
+                return {
+                    passed: sessionStorage !== undefined && Array.isArray(consoleLogs),
+                    message: sessionStorage ? 'SessionStorageGist active' : 'SessionStorageGist missing'
+                };
+            });
+            
+            log('✅ Quick test completed');
+        }
+        
+        async function runFullTest() {
+            log('🧪 Starting full production test...');
+            clearResults();
+            
+            const iframe = document.getElementById('testFrame');
+            
+            // All quick tests plus additional ones
+            await runQuickTest();
+            
+            // Test 5: Field mapping
+            await runTest('Field Mapping', async () => {
+                const bridge = iframe.contentWindow?.fieldMappingBridge;
+                const dictionary = iframe.contentWindow?.fieldMappingDictionary;
+                
+                return {
+                    passed: bridge && dictionary,
+                    message: bridge && dictionary ? 'Field mapping loaded' : 'Field mapping missing'
+                };
+            });
+            
+            // Test 6: Financial health scoring
+            await runTest('Financial Health Score', async () => {
+                const testInputs = {
+                    currentAge: 30,
+                    retirementAge: 67,
+                    currentMonthlySalary: 20000,
+                    planningType: 'individual'
+                };
+                
+                const scoreFunction = iframe.contentWindow?.calculateFinancialHealthScore;
+                if (!scoreFunction) {
+                    return { passed: false, message: 'Score function not found' };
+                }
+                
+                const result = scoreFunction(testInputs);
+                const hasValidScore = result && typeof result.totalScore === 'number' && result.totalScore >= 0;
+                
+                return {
+                    passed: hasValidScore,
+                    message: hasValidScore ? `Score: ${result.totalScore}/100` : 'Score calculation failed'
+                };
+            });
+            
+            // Test 7: Currency API
+            await runTest('Currency API', async () => {
+                const currencyAPI = iframe.contentWindow?.currencyAPI;
+                const rates = currencyAPI?.getCachedRates?.();
+                
+                return {
+                    passed: currencyAPI !== undefined,
+                    message: currencyAPI ? 'Currency API loaded' : 'Currency API missing'
+                };
+            });
+            
+            // Test 8: Export functions
+            await runTest('Export Functions', async () => {
+                const exportImage = iframe.contentWindow?.exportAsImage;
+                const exportLLM = iframe.contentWindow?.exportForLLMAnalysis;
+                
+                return {
+                    passed: exportImage && exportLLM,
+                    message: (exportImage && exportLLM) ? 'Export functions available' : 'Export functions missing'
+                };
+            });
+            
+            log('✅ Full test completed');
+        }
+        
+        async function testSpecificIssue() {
+            log('🔧 Testing v7.3.8 specific fixes...');
+            clearResults();
+            
+            const iframe = document.getElementById('testFrame');
+            await waitForFrameLoad(iframe, PRODUCTION_URL + '?debug=true');
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            
+            // Test 1: No FIELD_MAPPINGS conflict
+            await runTest('No FIELD_MAPPINGS Conflict', async () => {
+                let hasConflict = false;
+                
+                // Check console for specific error
+                const consoleLogs = iframe.contentWindow?.__consoleLogs || [];
+                hasConflict = consoleLogs.some(log => 
+                    log.messages.some(msg => 
+                        msg.includes('FIELD_MAPPINGS') && msg.includes('already been declared')
+                    )
+                );
+                
+                return {
+                    passed: !hasConflict,
+                    message: hasConflict ? 'FIELD_MAPPINGS conflict detected' : 'No conflicts found'
+                };
+            });
+            
+            // Test 2: Financial health scores > 0
+            await runTest('Financial Health > 0', async () => {
+                const testInputs = {
+                    currentAge: 35,
+                    retirementAge: 67,
+                    currentMonthlySalary: 25000,
+                    currentMonthlyExpenses: 15000,
+                    planningType: 'individual',
+                    emergencyFund: 50000
+                };
+                
+                const scoreFunction = iframe.contentWindow?.calculateFinancialHealthScore;
+                if (!scoreFunction) {
+                    return { passed: false, message: 'Score function not available' };
+                }
+                
+                const result = scoreFunction(testInputs);
+                const scoreAboveZero = result && result.totalScore > 27; // Should be much higher than the broken 27-29
+                
+                return {
+                    passed: scoreAboveZero,
+                    message: scoreAboveZero ? `Score: ${result.totalScore}/100 (fixed!)` : `Low score: ${result?.totalScore || 'N/A'}`
+                };
+            });
+            
+            // Test 3: GitHub Gist session creation
+            await runTest('GitHub Gist Session', async () => {
+                const sessionStorage = iframe.contentWindow?.sessionStorageGist;
+                const sessionInfo = sessionStorage?.getSessionInfo?.();
+                
+                return {
+                    passed: sessionInfo && sessionInfo.sessionId,
+                    message: sessionInfo?.gistUrl ? `Gist created: ${sessionInfo.gistUrl}` : 'No Gist session'
+                };
+            });
+            
+            // Test 4: Couple mode field mapping
+            await runTest('Couple Mode Fields', async () => {
+                const testInputs = {
+                    planningType: 'couple',
+                    partner1Salary: 30000,
+                    partner2Salary: 25000,
+                    currentAge: 30,
+                    retirementAge: 67
+                };
+                
+                const scoreFunction = iframe.contentWindow?.calculateFinancialHealthScore;
+                if (!scoreFunction) {
+                    return { passed: false, message: 'Score function not available' };
+                }
+                
+                const result = scoreFunction(testInputs);
+                const coupleScoreWorks = result && result.totalScore > 0;
+                
+                return {
+                    passed: coupleScoreWorks,
+                    message: coupleScoreWorks ? `Couple score: ${result.totalScore}/100` : 'Couple mode failed'
+                };
+            });
+            
+            log('✅ v7.3.8 fixes tested');
+        }
+        
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '';
+            passedCount = 0;
+            failedCount = 0;
+            runningCount = 0;
+            updateCounters();
+            document.getElementById('consoleOutput').innerHTML = 'Console cleared...';
+        }
+        
+        // Auto-run quick test on load
+        window.addEventListener('load', () => {
+            log('🧪 Quick Production Test ready');
+            log(`📍 Testing: ${PRODUCTION_URL}`);
+        });
+    </script>
+</body>
+</html>
