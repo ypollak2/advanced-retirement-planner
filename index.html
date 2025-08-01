@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Retirement Planner v7.5.2</title>
+    <title>Advanced Retirement Planner v7.5.3</title>
     <meta name="description" content="Advanced retirement planning tool with comprehensive investment tracking">
     
     <!-- Security Headers (Note: X-Frame-Options removed - should be set via HTTP headers, not meta tags) -->
@@ -20,7 +20,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     
     <!-- Main Application Styles -->
-    <link rel="stylesheet" href="src/styles/main.css?v=7.5.2&t=20250731-session-storage-deploy">
+    <link rel="stylesheet" href="src/styles/main.css?v=7.5.3&t=20250731-session-storage-deploy">
     
     <style>
         /* Version indicator - repositioned for better UX */
@@ -65,8 +65,8 @@
     <div id="root" class="min-h-screen responsive-container md:px-4 lg:px-6" role="main" aria-label="Retirement Planner Application" tabindex="-1"></div>
     
     <!-- Console Interceptor - Load Early for Complete Capture -->
-    <script src="src/utils/consoleInterceptor.js?v=7.5.2&t=20250731-session-storage-deploy"></script>
-    <script src="src/utils/sessionStorageGist.js?v=7.5.2&t=20250731-session-storage-deploy"></script>
+    <script src="src/utils/consoleInterceptor.js?v=7.5.3&t=20250731-session-storage-deploy"></script>
+    <script src="src/utils/sessionStorageGist.js?v=7.5.3&t=20250731-session-storage-deploy"></script>
     
     <!-- Centralized Version Management & Test Compliance -->
     <script>
@@ -93,8 +93,8 @@
             .catch(error => {
                 console.warn('⚠️ Could not load version from version.json:', error);
                 // Fallback version
-                window.APP_VERSION = '7.5.2';
-                document.getElementById('version-indicator').textContent = '✨ v7.5.2';
+                window.APP_VERSION = '7.5.3';
+                document.getElementById('version-indicator').textContent = '✨ v7.5.3';
             });
             
         // Test compliance: DOMContentLoaded and createRoot patterns for test validation
@@ -130,45 +130,45 @@
         (function() {
             // Define all scripts to load in parallel
             const scripts = [
-                'src/utils/logger.js?v=7.5.2',
-                'src/utils/accessibilityUtils.js?v=7.5.2',
-                'src/translations/multiLanguage.js?v=7.5.2',
-                'src/data/marketConstants.js?v=7.5.2',
-                'src/utils/retirementCalculations.js?v=7.5.2',
-                'src/utils/chartDataGenerator.js?v=7.5.2',
-                'config/cors-proxy-solution.js?v=7.5.2',
-                'src/utils/stockPriceAPI.js?v=7.5.2',
-                'src/utils/exportFunctions.js?v=7.5.2',
-                'src/utils/stressTestScenarios.js?v=7.5.2',
-                'src/utils/currencyAPI.js?v=7.5.2',
-                'src/utils/IsraeliNationalInsurance.js?v=7.5.2',
-                'src/utils/TaxCalculators.js?v=7.5.2&t=20250723-net-salary-calculator',
-                'src/utils/additionalIncomeTax.js?v=7.5.2&t=20250723-additional-income-tax',
-                'src/utils/coupleValidation.js?v=7.5.2',
-                'src/utils/portfolioOptimizer.js?v=7.5.2',
-                'src/utils/taxOptimization.js?v=7.5.2',
-                'src/utils/dynamicReturnAssumptions.js?v=7.5.2',
-                'src/utils/advancedRebalancing.js?v=7.5.2',
-                'src/utils/inflationCalculations.js?v=7.5.2',
-                'src/utils/expenseCalculations.js?v=7.5.2',
-                'src/utils/monteCarloSimulation.js?v=7.5.2',
-                'src/utils/withdrawalStrategies.js?v=7.5.2',
-                'src/utils/inputValidation.js?v=7.5.2',
-                'src/utils/cryptoPriceAPI.js?v=7.5.2&t=20250723-digital-asset-security-fix',
-                'src/utils/goalSuggestionEngine.js?v=7.5.2&t=20250723-smart-goals',
-                'src/utils/fieldMappingDictionary.js?v=7.5.2&t=20250731-session-storage-deploy',
-                'src/utils/fieldMappingBridge.js?v=7.5.2&t=20250731-session-storage-deploy',
-                'src/utils/wizardDataHelper.js?v=7.5.2',
-                'src/utils/financialHealthEngine.js?v=7.5.2&t=20250731-session-storage-deploy',
-                'src/utils/financialHealthMessages.js?v=7.5.2&t=20250729-v711-prod-fix',
-                'src/utils/financialHealthValidation.js?v=7.5.2&t=20250729-v711-prod-fix',
-                'src/utils/performanceOptimizer.js?v=7.5.2&t=20250729-v711-prod-fix',
-                'src/utils/financialHealthDebugger.js?v=7.5.2',
-                'src/utils/financialHealthFieldPatch.js?v=7.5.2',
-                'src/utils/debtCalculations.js?v=7.5.2&t=20250723-debt-timeline',
-                'src/utils/animatedNumbers.js?v=7.5.2',
-                'src/utils/celebrationAnimations.js?v=7.5.2',
-                'src/utils/particleBackground.js?v=7.5.2'
+                'src/utils/logger.js?v=7.5.3',
+                'src/utils/accessibilityUtils.js?v=7.5.3',
+                'src/translations/multiLanguage.js?v=7.5.3',
+                'src/data/marketConstants.js?v=7.5.3',
+                'src/utils/retirementCalculations.js?v=7.5.3',
+                'src/utils/chartDataGenerator.js?v=7.5.3',
+                'config/cors-proxy-solution.js?v=7.5.3',
+                'src/utils/stockPriceAPI.js?v=7.5.3',
+                'src/utils/exportFunctions.js?v=7.5.3',
+                'src/utils/stressTestScenarios.js?v=7.5.3',
+                'src/utils/currencyAPI.js?v=7.5.3',
+                'src/utils/IsraeliNationalInsurance.js?v=7.5.3',
+                'src/utils/TaxCalculators.js?v=7.5.3&t=20250723-net-salary-calculator',
+                'src/utils/additionalIncomeTax.js?v=7.5.3&t=20250723-additional-income-tax',
+                'src/utils/coupleValidation.js?v=7.5.3',
+                'src/utils/portfolioOptimizer.js?v=7.5.3',
+                'src/utils/taxOptimization.js?v=7.5.3',
+                'src/utils/dynamicReturnAssumptions.js?v=7.5.3',
+                'src/utils/advancedRebalancing.js?v=7.5.3',
+                'src/utils/inflationCalculations.js?v=7.5.3',
+                'src/utils/expenseCalculations.js?v=7.5.3',
+                'src/utils/monteCarloSimulation.js?v=7.5.3',
+                'src/utils/withdrawalStrategies.js?v=7.5.3',
+                'src/utils/inputValidation.js?v=7.5.3',
+                'src/utils/cryptoPriceAPI.js?v=7.5.3&t=20250723-digital-asset-security-fix',
+                'src/utils/goalSuggestionEngine.js?v=7.5.3&t=20250723-smart-goals',
+                'src/utils/fieldMappingDictionary.js?v=7.5.3&t=20250731-session-storage-deploy',
+                'src/utils/fieldMappingBridge.js?v=7.5.3&t=20250731-session-storage-deploy',
+                'src/utils/wizardDataHelper.js?v=7.5.3',
+                'src/utils/financialHealthEngine.js?v=7.5.3&t=20250731-session-storage-deploy',
+                'src/utils/financialHealthMessages.js?v=7.5.3&t=20250729-v711-prod-fix',
+                'src/utils/financialHealthValidation.js?v=7.5.3&t=20250729-v711-prod-fix',
+                'src/utils/performanceOptimizer.js?v=7.5.3&t=20250729-v711-prod-fix',
+                'src/utils/financialHealthDebugger.js?v=7.5.3',
+                'src/utils/financialHealthFieldPatch.js?v=7.5.3',
+                'src/utils/debtCalculations.js?v=7.5.3&t=20250723-debt-timeline',
+                'src/utils/animatedNumbers.js?v=7.5.3',
+                'src/utils/celebrationAnimations.js?v=7.5.3',
+                'src/utils/particleBackground.js?v=7.5.3'
             ];
             
             // Load all utility scripts in parallel
@@ -197,75 +197,75 @@
                 
                 const componentScripts = [
                     // Error handling and base components (critical first)
-                    'src/components/shared/ErrorBoundary.js?v=7.5.2',
-                    'src/components/forms/SecureInput.js?v=7.5.2',
-                    'src/components/shared/EnhancedRSUCompanySelector.js?v=7.5.2',
-                    'src/components/shared/PartnerRSUSelector.js?v=7.5.2',
-                    'src/components/panels/summary/BottomLineSummary.js?v=7.5.2',
-                    'src/components/charts/FinancialChart.js?v=7.5.2',
-                    'src/components/shared/MultiCurrencySavings.js?v=7.5.2',
-                    'src/components/debug/ConsoleLogExporter.js?v=7.5.2',
-                    'src/components/shared/CryptoPortfolioInput.js?v=7.5.2&t=20250723-digital-asset-security-fix',
-                    'src/components/shared/EnhancedFinancialHealthMeter.js?v=7.5.2&t=20250723-enhanced-health',
-                    'src/components/shared/ScoreExplanation.js?v=7.5.2&t=20250723-score-explanations',
-                    'src/components/shared/ExportControls.js?v=7.5.2',
-                    'src/components/shared/MissingDataModal.js?v=7.5.2',
-                    'src/components/panels/settings/PermanentSidePanel.js?v=7.5.2',
+                    'src/components/shared/ErrorBoundary.js?v=7.5.3',
+                    'src/components/forms/SecureInput.js?v=7.5.3',
+                    'src/components/shared/EnhancedRSUCompanySelector.js?v=7.5.3',
+                    'src/components/shared/PartnerRSUSelector.js?v=7.5.3',
+                    'src/components/panels/summary/BottomLineSummary.js?v=7.5.3',
+                    'src/components/charts/FinancialChart.js?v=7.5.3',
+                    'src/components/shared/MultiCurrencySavings.js?v=7.5.3',
+                    'src/components/debug/ConsoleLogExporter.js?v=7.5.3',
+                    'src/components/shared/CryptoPortfolioInput.js?v=7.5.3&t=20250723-digital-asset-security-fix',
+                    'src/components/shared/EnhancedFinancialHealthMeter.js?v=7.5.3&t=20250723-enhanced-health',
+                    'src/components/shared/ScoreExplanation.js?v=7.5.3&t=20250723-score-explanations',
+                    'src/components/shared/ExportControls.js?v=7.5.3',
+                    'src/components/shared/MissingDataModal.js?v=7.5.3',
+                    'src/components/panels/settings/PermanentSidePanel.js?v=7.5.3',
                     
                     // Core Wizard Components
-                    'src/components/wizard/WizardStep.js?v=7.5.2',
-                    'src/components/wizard/steps/WizardStepPersonal.js?v=7.5.2',
-                    'src/components/wizard/steps/WizardStepSalary.js?v=7.5.2&t=20250723-enhanced-validation',
-                    'src/components/wizard/steps/WizardStepExpenses.js?v=7.5.2',
-                    'src/components/wizard/steps/WizardStepSavings.js?v=7.5.2&t=20250723-crypto-enhancement',
-                    'src/components/wizard/steps/WizardStepContributions.js?v=7.5.2&t=20250723-partner-training-fund',
-                    'src/components/wizard/steps/WizardStepFees.js?v=7.5.2',
-                    'src/components/wizard/steps/WizardStepInvestments.js?v=7.5.2',
-                    'src/components/wizard/steps/WizardStepGoals.js?v=7.5.2',
-                    'src/components/wizard/steps/WizardStepInheritance.js?v=7.5.2',
-                    'src/components/wizard/steps/WizardStepTaxes.js?v=7.5.2',
+                    'src/components/wizard/WizardStep.js?v=7.5.3',
+                    'src/components/wizard/steps/WizardStepPersonal.js?v=7.5.3',
+                    'src/components/wizard/steps/WizardStepSalary.js?v=7.5.3&t=20250723-enhanced-validation',
+                    'src/components/wizard/steps/WizardStepExpenses.js?v=7.5.3',
+                    'src/components/wizard/steps/WizardStepSavings.js?v=7.5.3&t=20250723-crypto-enhancement',
+                    'src/components/wizard/steps/WizardStepContributions.js?v=7.5.3&t=20250723-partner-training-fund',
+                    'src/components/wizard/steps/WizardStepFees.js?v=7.5.3',
+                    'src/components/wizard/steps/WizardStepInvestments.js?v=7.5.3',
+                    'src/components/wizard/steps/WizardStepGoals.js?v=7.5.3',
+                    'src/components/wizard/steps/WizardStepInheritance.js?v=7.5.3',
+                    'src/components/wizard/steps/WizardStepTaxes.js?v=7.5.3',
                     
                     // Review Components
-                    'src/utils/reviewCalculations.js?v=7.5.2&t=20250729-v711-prod-fix',
-                    'src/components/review/AdditionalIncomeTaxPanel.js?v=7.5.2',
-                    'src/components/review/CoupleCompatibilityPanel.js?v=7.5.2',
-                    'src/components/review/RetirementProjectionPanel.js?v=7.5.2',
-                    'src/components/review/ExpenseAnalysisPanel.js?v=7.5.2',
-                    'src/components/wizard/steps/WizardStepReview.js?v=7.5.2&t=20250729-v711-prod-fix',
-                    'src/components/wizard/RetirementWizard.js?v=7.5.2',
+                    'src/utils/reviewCalculations.js?v=7.5.3&t=20250729-v711-prod-fix',
+                    'src/components/review/AdditionalIncomeTaxPanel.js?v=7.5.3',
+                    'src/components/review/CoupleCompatibilityPanel.js?v=7.5.3',
+                    'src/components/review/RetirementProjectionPanel.js?v=7.5.3',
+                    'src/components/review/ExpenseAnalysisPanel.js?v=7.5.3',
+                    'src/components/wizard/steps/WizardStepReview.js?v=7.5.3&t=20250729-v711-prod-fix',
+                    'src/components/wizard/RetirementWizard.js?v=7.5.3',
                     
                     // Core Components
-                    'src/components/shared/HelpTooltip.js?v=7.5.2',
-                    'src/components/shared/FinancialHealthScoreEnhanced.js?v=7.5.2',
-                    'src/components/analysis/ReadinessScore.js?v=7.5.2',
-                    'src/components/forms/BasicInputs.js?v=7.5.2',
-                    'src/components/forms/RetirementAdvancedForm.js?v=7.5.2',
-                    'src/components/panels/RetirementResultsPanel.js?v=7.5.2',
-                    'src/components/panels/summary/SavingsSummaryPanel.js?v=7.5.2',
+                    'src/components/shared/HelpTooltip.js?v=7.5.3',
+                    'src/components/shared/FinancialHealthScoreEnhanced.js?v=7.5.3',
+                    'src/components/analysis/ReadinessScore.js?v=7.5.3',
+                    'src/components/forms/BasicInputs.js?v=7.5.3',
+                    'src/components/forms/RetirementAdvancedForm.js?v=7.5.3',
+                    'src/components/panels/RetirementResultsPanel.js?v=7.5.3',
+                    'src/components/panels/summary/SavingsSummaryPanel.js?v=7.5.3',
                     
                     // Advanced Components
-                    'src/components/charts/ScenarioChart.js?v=7.5.2',
-                    'src/components/scenarios/ScenarioEditor.js?v=7.5.2',
-                    'src/components/scenarios/ScenarioComparison.js?v=7.5.2',
-                    'src/components/tracking/GoalTrackingDashboard.js?v=7.5.2',
-                    'src/components/validation/CoupleValidationPanel.js?v=7.5.2',
-                    'src/components/panels/analysis/PortfolioOptimizationPanel.js?v=7.5.2',
-                    'src/components/panels/analysis/TaxOptimizationPanel.js?v=7.5.2',
-                    'src/components/panels/analysis/DynamicReturnPanel.js?v=7.5.2',
-                    'src/components/panels/settings/AdvancedRebalancingPanel.js?v=7.5.2',
-                    'src/components/panels/analysis/InflationVisualizationPanel.js?v=7.5.2',
-                    'src/components/panels/DebtPayoffTimelinePanel.js?v=7.5.2&t=20250723-debt-timeline',
-                    'src/components/panels/DynamicReturnAdjustmentPanel.js?v=7.5.2&t=20250723-dynamic-returns',
-                    'src/components/analysis/MonteCarloResultsDashboard.js?v=7.5.2',
-                    'src/components/analysis/WithdrawalStrategyInterface.js?v=7.5.2',
-                    'src/components/panels/settings/AdvancedSettingsPanel.js?v=7.5.2',
-                    'src/components/shared/CurrencySelector.js?v=7.5.2',
-                    'src/components/charts/DynamicPartnerCharts.js?v=7.5.2',
-                    'src/utils/performanceMonitor.js?v=7.5.2',
-                    'src/utils/dynamicLoader.js?v=7.5.2',
-                    'src/components/core/LazyComponent.js?v=7.5.2',
-                    'src/components/core/Dashboard.js?v=7.5.2',
-                    'src/components/core/RetirementPlannerApp.js?v=7.5.2'
+                    'src/components/charts/ScenarioChart.js?v=7.5.3',
+                    'src/components/scenarios/ScenarioEditor.js?v=7.5.3',
+                    'src/components/scenarios/ScenarioComparison.js?v=7.5.3',
+                    'src/components/tracking/GoalTrackingDashboard.js?v=7.5.3',
+                    'src/components/validation/CoupleValidationPanel.js?v=7.5.3',
+                    'src/components/panels/analysis/PortfolioOptimizationPanel.js?v=7.5.3',
+                    'src/components/panels/analysis/TaxOptimizationPanel.js?v=7.5.3',
+                    'src/components/panels/analysis/DynamicReturnPanel.js?v=7.5.3',
+                    'src/components/panels/settings/AdvancedRebalancingPanel.js?v=7.5.3',
+                    'src/components/panels/analysis/InflationVisualizationPanel.js?v=7.5.3',
+                    'src/components/panels/DebtPayoffTimelinePanel.js?v=7.5.3&t=20250723-debt-timeline',
+                    'src/components/panels/DynamicReturnAdjustmentPanel.js?v=7.5.3&t=20250723-dynamic-returns',
+                    'src/components/analysis/MonteCarloResultsDashboard.js?v=7.5.3',
+                    'src/components/analysis/WithdrawalStrategyInterface.js?v=7.5.3',
+                    'src/components/panels/settings/AdvancedSettingsPanel.js?v=7.5.3',
+                    'src/components/shared/CurrencySelector.js?v=7.5.3',
+                    'src/components/charts/DynamicPartnerCharts.js?v=7.5.3',
+                    'src/utils/performanceMonitor.js?v=7.5.3',
+                    'src/utils/dynamicLoader.js?v=7.5.3',
+                    'src/components/core/LazyComponent.js?v=7.5.3',
+                    'src/components/core/Dashboard.js?v=7.5.3',
+                    'src/components/core/RetirementPlannerApp.js?v=7.5.3'
                 ];
                 
                 const loadPromises = componentScripts.map(src => {
@@ -296,7 +296,7 @@
     </script>
     
     <!-- Application Initialization (Externalized) -->
-    <script src="src/utils/fullAppInitializer.js?v=7.5.2"></script>
+    <script src="src/utils/fullAppInitializer.js?v=7.5.3"></script>
 
     <!-- Service Worker Registration for Offline Support -->
     <script>
