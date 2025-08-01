@@ -68,6 +68,12 @@ const RetirementWizard = ({
     
     React.useEffect(() => {
         inputsRef.current = inputs;
+        // Also update window.wizardInputs for global access
+        if (window.setAllInputs) {
+            window.setAllInputs(inputs);
+        } else {
+            window.wizardInputs = inputs;
+        }
     }, [inputs]);
     
     // Immediate save function for critical operations - now dependency-free
