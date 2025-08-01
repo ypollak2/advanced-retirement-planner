@@ -2978,6 +2978,16 @@ window.financialHealthEngine = {
     getFieldValue
 };
 
+// Also export individual calculator functions directly to window for backward compatibility
+window.calculateSavingsRateScore = calculateSavingsRateScore;
+window.calculateRetirementReadinessScore = calculateRetirementReadinessScore;
+window.calculateTimeHorizonScore = calculateTimeHorizonScore;
+window.calculateRiskAlignmentScore = calculateRiskAlignmentScore;
+window.calculateDiversificationScore = calculateDiversificationScore;
+window.calculateTaxEfficiencyScore = calculateTaxEfficiencyScore;
+window.calculateEmergencyFundScore = calculateEmergencyFundScore;
+window.calculateDebtManagementScore = calculateDebtManagementScore;
+
 // Also export getFieldValue directly for backward compatibility
 window.getFieldValue = getFieldValue;
 

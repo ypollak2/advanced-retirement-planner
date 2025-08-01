@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Factor Errors</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        .command-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            position: relative;
+            overflow-x: auto;
+            cursor: pointer;
+        }
+        .copy-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .issue {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .good-news {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        h1 { color: #333; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 10px 10px 0;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug Factor Calculation Errors</h1>
+        <p>The good news: The 27-29 bug is NOT present! Score is 45.</p>
+        <p>The issue: Three factors are returning 0 due to calculation errors.</p>
+        
+        <button onclick="window.open('https://ypollak2.github.io/advanced-retirement-planner/', '_blank')">
+            Open Production App
+        </button>
+    </div>
+
+    <div class="container">
+        <div class="good-news">
+            <h3>✅ Good News</h3>
+            <ul>
+                <li>The critical 27-29 bug is NOT happening</li>
+                <li>5 out of 8 factors are calculating correctly</li>
+                <li>The scoring engine itself is working</li>
+            </ul>
+        </div>
+        
+        <div class="issue">
+            <h3>❌ Issue Found</h3>
+            <p>Three factor calculators are returning numbers instead of objects, causing them to score 0:</p>
+            <ul>
+                <li><strong>savingsRate:</strong> 0/25 points</li>
+                <li><strong>retirementReadiness:</strong> 0/20 points</li>
+                <li><strong>taxEfficiency:</strong> 0/8 points</li>
+            </ul>
+            <p>Total missing points: 53/100</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Debug Commands</h2>
+        
+        <h3>1. Test Individual Factor Calculators</h3>
+        <div class="command-block" onclick="copyToClipboard(this)">
+// Test each factor calculator individually
+const testData = {
+    planningType: 'individual',
+    currentAge: 35,
+    retirementAge: 67,
+    currentMonthlySalary: 50000,
+    currentMonthlyExpenses: 25000,
+    currentPension: 500000,
+    currentTrainingFund: 300000,
+    pensionContributionRate: 18.5,
+    trainingFundContributionRate: 10
+};
+
+console.log('🔍 Testing individual factor calculators...\n');
+
+// Test savings rate
+if (window.calculateSavingsRateScore) {
+    try {
+        const savingsResult = window.calculateSavingsRateScore(testData);
+        console.log('Savings Rate Result:', savingsResult);
+        console.log('Type:', typeof savingsResult);
+        console.log('Expected: object with {score, details}');
+        console.log('---');
+    } catch (e) {
+        console.error('Savings Rate Error:', e);
+    }
+}
+
+// Test retirement readiness
+if (window.calculateRetirementReadinessScore) {
+    try {
+        const readinessResult = window.calculateRetirementReadinessScore(testData);
+        console.log('Retirement Readiness Result:', readinessResult);
+        console.log('Type:', typeof readinessResult);
+        console.log('Expected: object with {score, details}');
+        console.log('---');
+    } catch (e) {
+        console.error('Retirement Readiness Error:', e);
+    }
+}
+
+// Test tax efficiency
+if (window.calculateTaxEfficiencyScore) {
+    try {
+        const taxResult = window.calculateTaxEfficiencyScore(testData);
+        console.log('Tax Efficiency Result:', taxResult);
+        console.log('Type:', typeof taxResult);
+        console.log('Expected: object with {score, details}');
+    } catch (e) {
+        console.error('Tax Efficiency Error:', e);
+    }
+}
+                <button class="copy-btn">Copy</button>
+            </div>
+        
+        <h3>2. Check Expected Return Format</h3>
+        <div class="command-block" onclick="copyToClipboard(this)">
+// Check what the working factors return
+console.log('🔍 Checking working factor return format...\n');
+
+// These are working correctly
+const workingFactors = [
+    'calculateTimeHorizonScore',
+    'calculateRiskAlignmentScore', 
+    'calculateDiversificationScore',
+    'calculateEmergencyFundScore',
+    'calculateDebtManagementScore'
+];
+
+workingFactors.forEach(factorName => {
+    if (window[factorName]) {
+        try {
+            const result = window[factorName](testData);
+            console.log(`${factorName}:`);
+            console.log('- Type:', typeof result);
+            console.log('- Structure:', result);
+            console.log('---');
+        } catch (e) {
+            console.error(`${factorName} error:`, e);
+        }
+    }
+});
+                <button class="copy-btn">Copy</button>
+            </div>
+
+        <h3>3. Quick Fix Test</h3>
+        <div class="command-block" onclick="copyToClipboard(this)">
+// Test if we can wrap the broken calculators
+console.log('🔧 Testing wrapper fix...\n');
+
+// Save original functions
+const origSavingsRate = window.calculateSavingsRateScore;
+const origRetirement = window.calculateRetirementReadinessScore;
+const origTax = window.calculateTaxEfficiencyScore;
+
+// Create wrappers that return proper format
+window.calculateSavingsRateScore = function(inputs) {
+    const result = origSavingsRate(inputs);
+    if (typeof result === 'number') {
+        return { score: result, details: { wrapped: true } };
+    }
+    return result;
+};
+
+window.calculateRetirementReadinessScore = function(inputs) {
+    const result = origRetirement(inputs);
+    if (typeof result === 'number') {
+        return { score: result, details: { wrapped: true } };
+    }
+    return result;
+};
+
+window.calculateTaxEfficiencyScore = function(inputs) {
+    const result = origTax(inputs);
+    if (typeof result === 'number') {
+        return { score: result, details: { wrapped: true } };
+    }
+    return result;
+};
+
+// Now recalculate
+const newResult = window.calculateFinancialHealthScore(testData, {
+    combinePartners: false,
+    debugMode: true
+});
+
+console.log('🎯 NEW SCORE:', newResult.totalScore);
+console.log('Expected: 70-90');
+
+// Restore originals
+window.calculateSavingsRateScore = origSavingsRate;
+window.calculateRetirementReadinessScore = origRetirement;
+window.calculateTaxEfficiencyScore = origTax;
+                <button class="copy-btn">Copy</button>
+            </div>
+    </div>
+
+    <div class="container">
+        <h2>Summary</h2>
+        <p>The issue is NOT the 27-29 bug. Instead, three factor calculators are returning numbers instead of objects, causing the scoring engine to default them to 0.</p>
+        <p>This is a different bug - likely these calculators were updated to return objects but the deployed version still returns numbers.</p>
+        <p><strong>Current Score:</strong> 45/100 (missing 53 points from the broken factors)</p>
+        <p><strong>Expected Score:</strong> 70-90/100</p>
+    </div>
+
+    <script>
+        function copyToClipboard(element) {
+            const codeBlock = element.cloneNode(true);
+            const button = codeBlock.querySelector('.copy-btn');
+            if (button) button.remove();
+            
+            const text = codeBlock.textContent.trim();
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = element.querySelector('.copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#28a745';
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy. Please select and copy manually.');
+            });
+        }
+    </script>
+</body>
+</html>

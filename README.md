@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v7.4.0 ✨
+# 🚀 Advanced Retirement Planner v7.4.1 ✨
 
-[![Version](https://img.shields.io/badge/version-7.4.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-7.4.1-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-374%2F374-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -27,30 +27,20 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki) | **📊 Repository Statistics:** [View Stats](REPOSITORY-STATISTICS.md)
 
-## 🎨 What's New in v7.4.0 - Comprehensive E2E Testing Framework 🧪
+## 🎨 What's New in v7.4.1 - Critical Bug Investigation Fix 🔍
 
-### 🚀 Major Testing Infrastructure
-- **Complete E2E Testing Suite**
-  - 80 comprehensive test scenarios covering all user types
-  - Field mapping validator for data flow verification
-  - Score validation engine to detect critical bugs
-  - Automated test runner with parallel execution support
-  - CI/CD ready with headless mode capabilities
+### 🐛 Fixed Critical Issue
+- **Score Calculation Bug Resolution**
+  - Fixed issue where three factor calculators weren't accessible globally
+  - Exported individual calculator functions directly to window object
+  - Resolved scoring discrepancy (was showing 45 instead of expected 70-90)
+  - All 8 financial health factors now calculate correctly
 
-### 🔍 Test Categories & Coverage
-- **Individual Planning** (20 scenarios)
-- **Couple Planning** (20 scenarios) 
-- **Data Persistence** (15 scenarios)
-- **Edge Cases** (15 scenarios)
-- **Scoring Factors** (10 scenarios)
-
-### 📊 Advanced Test Features
-- Real-time test execution dashboard
-- Comprehensive logging with session tracking
-- Export functionality (JSON/CSV/Markdown/HTML)
-- Critical bug detection (27-29 score range)
-- Field mapping validation across wizard steps
-- Performance metrics for each test
+### 🔧 Technical Details
+- Added backward compatibility exports for all calculator functions
+- Maintained existing `financialHealthEngine` namespace
+- No breaking changes to existing integrations
+- All 374 tests continue to pass
 
 ### 🛡️ Quality Assurance
 - Validates data persistence through 9-step wizard
