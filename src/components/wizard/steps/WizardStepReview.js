@@ -533,7 +533,7 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         }
         
         try {
-            const results = window.calculateRetirement(inputs);
+            const results = window.calculateRetirement(processedInputs);
             
             console.log('✅ Retirement calculation results:', {
                 totalSavings: results.totalSavings || 0,
@@ -558,16 +558,18 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
             console.error('❌ Retirement calculation error:', error);
             return {};
         }
-    }, [inputs.currentAge, inputs.retirementAge, inputs.currentSavings, 
-        inputs.monthlyContribution, inputs.inflationRate]);
+    }, [processedInputs.currentAge, processedInputs.retirementAge, processedInputs.currentSavings, 
+        processedInputs.currentTrainingFund, processedInputs.currentPersonalPortfolio,
+        processedInputs.currentMonthlySalary, processedInputs.monthlyContribution, 
+        processedInputs.inflationRate]);
     
     // Fix field mapping - retirement calculation returns totalSavings, not totalAccumulation
     // If retirement projections are 0, calculate from current savings
     let totalAccumulation = retirementProjections.totalSavings || retirementProjections.totalAccumulation || 0;
     
-    // If still 0, try to calculate from current savings
+    // If still 0, try to calculate from current savings using processedInputs
     if (totalAccumulation === 0) {
-        if (inputs.planningType === 'couple') {
+        if (processedInputs.planningType === 'couple') {
             totalAccumulation = parseFloat(inputs.partner1CurrentPension || 0) +
                                parseFloat(inputs.partner1CurrentTrainingFund || 0) +
                                parseFloat(inputs.partner1PersonalPortfolio || 0) +
@@ -577,11 +579,11 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                                parseFloat(inputs.partner2PersonalPortfolio || 0) +
                                parseFloat(inputs.partner2CurrentSavings || 0);
         } else {
-            totalAccumulation = parseFloat(inputs.currentSavings || inputs.currentPension || 0) +
-                               parseFloat(inputs.currentTrainingFund || 0) +
-                               parseFloat(inputs.currentPersonalPortfolio || 0) +
-                               parseFloat(inputs.currentRealEstate || 0) +
-                               parseFloat(inputs.currentCrypto || 0);
+            totalAccumulation = parseFloat(processedInputs.currentSavings || 0) +
+                               parseFloat(processedInputs.currentTrainingFund || 0) +
+                               parseFloat(processedInputs.currentPersonalPortfolio || 0) +
+                               parseFloat(processedInputs.currentRealEstate || 0) +
+                               parseFloat(processedInputs.currentCrypto || 0);
         }
     }
     
@@ -848,7 +850,7 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                     className: "p-3 bg-orange-50 rounded-lg text-center"
                 }, [
                     createElement('div', { key: 'income-value', className: "text-lg font-bold text-orange-600" }, 
-                        window.formatCurrency ? window.formatCurrency(safeCurrentMonthlyIncome, workingCurrency) : `${workingCurrency}${safeCurrentMonthlyIncome.toLocaleString()}`),
+                        window.formatCurrency ? window.formatCurrency(processedInputs.currentMonthlySalary || 0, workingCurrency) : `${workingCurrency}${(processedInputs.currentMonthlySalary || 0).toLocaleString()}`),
                     createElement('div', { key: 'income-label', className: "text-sm text-orange-700" }, 
                         language === 'he' ? 'הכנסה חודשית נוכחית' : 'Current Monthly Income')
                 ])
