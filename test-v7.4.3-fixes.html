@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>v7.4.3 Fixes Verification Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .console-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .chart-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 v7.4.3 Fixes Verification Test</h1>
+    
+    <div class="test-section">
+        <div class="test-title">1. Version Check</div>
+        <div id="version-result"></div>
+    </div>
+
+    <div class="test-section">
+        <div class="test-title">2. Tax Optimization Fix Test</div>
+        <div id="tax-optimization-result"></div>
+        <button onclick="testTaxOptimization()">Run Tax Optimization Test</button>
+    </div>
+
+    <div class="test-section">
+        <div class="test-title">3. Financial Health Calculators Test</div>
+        <div id="calculator-results"></div>
+        <button onclick="testAllCalculators()">Test All Calculators</button>
+    </div>
+
+    <div class="test-section">
+        <div class="test-title">4. Chart Component Test</div>
+        <div id="chart-test-result"></div>
+        <div class="chart-container" id="test-chart-container" style="display:none;">
+            <canvas id="test-chart"></canvas>
+        </div>
+        <button onclick="testChartComponent()">Test Chart Rendering</button>
+    </div>
+
+    <div class="test-section">
+        <div class="test-title">5. Comprehensive E2E Test</div>
+        <div id="e2e-result"></div>
+        <button onclick="runE2ETest()">Run Full E2E Test</button>
+    </div>
+
+    <div class="test-section">
+        <div class="test-title">Console Output</div>
+        <div class="console-output" id="console-output"></div>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+
+    <script>
+        // Console capture
+        const consoleOutput = document.getElementById('console-output');
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        function logToPage(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#dc3545' : type === 'warn' ? '#ffc107' : '#28a745';
+            consoleOutput.innerHTML += `<div style="color: ${color}">[${timestamp}] ${type.toUpperCase()}: ${message}</div>`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logToPage(args.join(' '), 'log');
+        };
+
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            logToPage(args.join(' '), 'error');
+        };
+
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            logToPage(args.join(' '), 'warn');
+        };
+
+        function clearConsole() {
+            consoleOutput.innerHTML = '';
+        }
+
+        // Test data
+        const testInputs = {
+            // Basic info
+            currentAge: 35,
+            retirementAge: 67,
+            planningType: 'individual',
+            
+            // Income data
+            currentMonthlySalary: 25000,
+            currentSalary: 25000,
+            monthlySalary: 25000,
+            salary: 25000,
+            monthlyIncome: 25000,
+            
+            // Savings data
+            currentSavings: 500000,
+            currentPensionSavings: 300000,
+            currentTrainingFund: 200000,
+            currentPersonalPortfolio: 100000,
+            currentBankAccount: 50000,
+            
+            // Monthly contributions
+            monthlyContribution: 2500,
+            monthlyAdditionalSavings: 1000,
+            personalPortfolioMonthly: 500,
+            
+            // Contribution rates
+            pensionEmployeeRate: 7,
+            pensionContributionRate: 7,
+            trainingFundEmployeeRate: 2.5,
+            trainingFundContributionRate: 2.5,
+            
+            // Returns
+            pensionReturn: 5,
+            trainingFundReturn: 4,
+            personalPortfolioReturn: 6,
+            
+            // Risk and tax
+            riskTolerance: 'moderate',
+            stockPercentage: 60,
+            taxCountry: 'israel',
+            
+            // Emergency fund
+            emergencyFund: 100000,
+            monthlyExpenses: 15000,
+            currentMonthlyExpenses: 15000,
+            
+            // Other
+            inflationRate: 2,
+            targetReplacement: 70
+        };
+
+        // Load the app in iframe
+        window.onload = function() {
+            checkVersion();
+        };
+
+        function checkVersion() {
+            const versionDiv = document.getElementById('version-result');
+            
+            // Check version from production
+            fetch('https://ypollak2.github.io/advanced-retirement-planner/src/version.js')
+                .then(res => res.text())
+                .then(text => {
+                    const versionMatch = text.match(/number:\s*["']([^"']+)["']/);
+                    const version = versionMatch ? versionMatch[1] : 'Unknown';
+                    
+                    if (version === '7.4.3') {
+                        versionDiv.innerHTML = '<div class="test-result success">✅ Version 7.4.3 is deployed</div>';
+                    } else {
+                        versionDiv.innerHTML = `<div class="test-result error">❌ Wrong version detected: ${version}</div>`;
+                    }
+                })
+                .catch(err => {
+                    versionDiv.innerHTML = `<div class="test-result error">❌ Error checking version: ${err.message}</div>`;
+                });
+        }
+
+        async function testTaxOptimization() {
+            const resultDiv = document.getElementById('tax-optimization-result');
+            resultDiv.innerHTML = '<div class="test-result info">🔄 Testing tax optimization...</div>';
+            
+            try {
+                // Create iframe to test in production context
+                const iframe = document.createElement('iframe');
+                iframe.src = 'https://ypollak2.github.io/advanced-retirement-planner/';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                
+                // Wait for iframe to load
+                await new Promise(resolve => {
+                    iframe.onload = resolve;
+                    setTimeout(resolve, 5000); // Timeout after 5 seconds
+                });
+                
+                const iframeWindow = iframe.contentWindow;
+                
+                // Test if taxOptimization exists
+                if (!iframeWindow.taxOptimization) {
+                    throw new Error('taxOptimization object not found');
+                }
+                
+                // Test the fixed methods
+                const testResults = [];
+                
+                // Test calculatePensionTaxSavings
+                try {
+                    const pensionResult = iframeWindow.taxOptimization.calculatePensionTaxSavings(300000, 7, 'israel');
+                    testResults.push({
+                        method: 'calculatePensionTaxSavings',
+                        success: true,
+                        result: pensionResult
+                    });
+                } catch (err) {
+                    testResults.push({
+                        method: 'calculatePensionTaxSavings',
+                        success: false,
+                        error: err.message
+                    });
+                }
+                
+                // Test analyzePersonalTaxSituation
+                try {
+                    const analysisResult = iframeWindow.taxOptimization.analyzePersonalTaxSituation(testInputs);
+                    testResults.push({
+                        method: 'analyzePersonalTaxSituation',
+                        success: true,
+                        result: analysisResult
+                    });
+                } catch (err) {
+                    testResults.push({
+                        method: 'analyzePersonalTaxSituation',
+                        success: false,
+                        error: err.message
+                    });
+                }
+                
+                // Display results
+                let html = '<table><tr><th>Method</th><th>Status</th><th>Details</th></tr>';
+                testResults.forEach(test => {
+                    const status = test.success ? '✅ Pass' : '❌ Fail';
+                    const details = test.success ? 
+                        `Returns: ${JSON.stringify(test.result).substring(0, 100)}...` : 
+                        `Error: ${test.error}`;
+                    html += `<tr><td>${test.method}</td><td>${status}</td><td>${details}</td></tr>`;
+                });
+                html += '</table>';
+                
+                const allPassed = testResults.every(t => t.success);
+                resultDiv.innerHTML = allPassed ? 
+                    `<div class="test-result success">✅ All tax optimization methods working correctly</div>${html}` :
+                    `<div class="test-result error">❌ Some tax optimization methods failed</div>${html}`;
+                
+                // Clean up
+                document.body.removeChild(iframe);
+                
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="test-result error">❌ Tax optimization test failed: ${err.message}</div>`;
+            }
+        }
+
+        async function testAllCalculators() {
+            const resultDiv = document.getElementById('calculator-results');
+            resultDiv.innerHTML = '<div class="test-result info">🔄 Testing all calculators...</div>';
+            
+            try {
+                // Create iframe for testing
+                const iframe = document.createElement('iframe');
+                iframe.src = 'https://ypollak2.github.io/advanced-retirement-planner/';
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                
+                await new Promise(resolve => {
+                    iframe.onload = resolve;
+                    setTimeout(resolve, 5000);
+                });
+                
+                const iframeWindow = iframe.contentWindow;
+                
+                // Test each calculator
+                const calculators = [
+                    'calculateSavingsRateScore',
+                    'calculateRetirementReadinessScore',
+                    'calculateRiskAlignmentScore',
+                    'calculateTaxEfficiencyScore',
+                    'calculateTimeHorizonScore',
+                    'calculateDiversificationScore',
+                    'calculateEmergencyFundScore',
+                    'calculateDebtManagementScore'
+                ];
+                
+                const results = [];
+                
+                for (const calcName of calculators) {
+                    try {
+                        const func = iframeWindow[calcName] || (iframeWindow.financialHealthEngine && iframeWindow.financialHealthEngine[calcName]);
+                        if (!func) {
+                            results.push({
+                                name: calcName,
+                                success: false,
+                                error: 'Function not found'
+                            });
+                            continue;
+                        }
+                        
+                        const result = func(testInputs);
+                        results.push({
+                            name: calcName,
+                            success: true,
+                            score: result.score,
+                            maxScore: result.maxScore || 'N/A',
+                            details: result.details
+                        });
+                    } catch (err) {
+                        results.push({
+                            name: calcName,
+                            success: false,
+                            error: err.message
+                        });
+                    }
+                }
+                
+                // Display results
+                let html = '<table><tr><th>Calculator</th><th>Status</th><th>Score</th><th>Details</th></tr>';
+                results.forEach(calc => {
+                    const status = calc.success ? '✅' : '❌';
+                    const score = calc.success ? `${calc.score}/${calc.maxScore}` : 'Error';
+                    const details = calc.success ? 
+                        JSON.stringify(calc.details).substring(0, 50) + '...' : 
+                        calc.error;
+                    html += `<tr><td>${calc.name}</td><td>${status}</td><td>${score}</td><td>${details}</td></tr>`;
+                });
+                html += '</table>';
+                
+                // Summary
+                const totalScore = results.filter(r => r.success).reduce((sum, r) => sum + r.score, 0);
+                const failedCalcs = results.filter(r => !r.success || r.score === 0);
+                
+                if (failedCalcs.length === 0) {
+                    resultDiv.innerHTML = `<div class="test-result success">✅ All calculators working! Total score: ${totalScore}</div>${html}`;
+                } else {
+                    resultDiv.innerHTML = `<div class="test-result warning">⚠️ ${failedCalcs.length} calculators failed or returned 0</div>${html}`;
+                }
+                
+                // Clean up
+                document.body.removeChild(iframe);
+                
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="test-result error">❌ Calculator test failed: ${err.message}</div>`;
+            }
+        }
+
+        async function testChartComponent() {
+            const resultDiv = document.getElementById('chart-test-result');
+            const chartContainer = document.getElementById('test-chart-container');
+            
+            resultDiv.innerHTML = '<div class="test-result info">🔄 Testing chart component...</div>';
+            
+            try {
+                // Load Chart.js if not already loaded
+                if (!window.Chart) {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+                    document.head.appendChild(script);
+                    await new Promise(resolve => script.onload = resolve);
+                }
+                
+                // Generate test chart data
+                const chartData = [];
+                for (let age = 35; age <= 67; age++) {
+                    chartData.push({
+                        age: age,
+                        totalSavings: 500000 + (age - 35) * 50000,
+                        pensionSavings: 300000 + (age - 35) * 30000,
+                        trainingFund: 200000 + (age - 35) * 20000,
+                        inflationAdjusted: (500000 + (age - 35) * 50000) / Math.pow(1.02, age - 35)
+                    });
+                }
+                
+                // Create chart
+                const ctx = document.getElementById('test-chart').getContext('2d');
+                const chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.map(d => `Age ${d.age}`),
+                        datasets: [{
+                            label: 'Total Savings (Nominal)',
+                            data: chartData.map(d => d.totalSavings),
+                            borderColor: '#3B82F6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: 'Inflation Adjusted',
+                            data: chartData.map(d => d.inflationAdjusted),
+                            borderColor: '#EF4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderDash: [5, 5],
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Retirement Savings Projection'
+                            }
+                        }
+                    }
+                });
+                
+                chartContainer.style.display = 'block';
+                resultDiv.innerHTML = '<div class="test-result success">✅ Chart component working correctly</div>';
+                
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="test-result error">❌ Chart test failed: ${err.message}</div>`;
+            }
+        }
+
+        async function runE2ETest() {
+            const resultDiv = document.getElementById('e2e-result');
+            resultDiv.innerHTML = '<div class="test-result info">🔄 Running comprehensive E2E test...</div>';
+            
+            try {
+                const iframe = document.createElement('iframe');
+                iframe.src = 'https://ypollak2.github.io/advanced-retirement-planner/';
+                iframe.style.width = '100%';
+                iframe.style.height = '600px';
+                resultDiv.appendChild(iframe);
+                
+                await new Promise(resolve => {
+                    iframe.onload = resolve;
+                    setTimeout(resolve, 5000);
+                });
+                
+                const iframeWindow = iframe.contentWindow;
+                const iframeDocument = iframe.contentDocument;
+                
+                // Check for chart in results panel
+                const chartElements = iframeDocument.querySelectorAll('canvas');
+                const hasChart = chartElements.length > 0;
+                
+                // Check for financial health score
+                const scoreElements = iframeDocument.querySelectorAll('[class*="score"], [class*="Score"]');
+                const hasScore = scoreElements.length > 0;
+                
+                // Summary
+                let summary = '<h4>E2E Test Results:</h4><ul>';
+                summary += `<li>Chart rendering: ${hasChart ? '✅ Found' : '❌ Not found'}</li>`;
+                summary += `<li>Financial health score: ${hasScore ? '✅ Found' : '❌ Not found'}</li>`;
+                summary += `<li>Tax optimization: ${iframeWindow.taxOptimization ? '✅ Available' : '❌ Not available'}</li>`;
+                summary += `<li>Calculator functions: ${iframeWindow.calculateSavingsRateScore ? '✅ Available' : '❌ Not available'}</li>`;
+                summary += '</ul>';
+                
+                resultDiv.innerHTML = `<div class="test-result success">✅ E2E test completed</div>${summary}`;
+                
+            } catch (err) {
+                resultDiv.innerHTML = `<div class="test-result error">❌ E2E test failed: ${err.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

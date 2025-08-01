@@ -14,8 +14,8 @@ window.taxOptimization = {
         const taxableIncomeWithoutPension = grossAnnualSalary;
         const taxableIncomeWithPension = grossAnnualSalary - pensionContribution;
         
-        const taxWithoutPension = this.calculateIsraeliIncomeTax(taxableIncomeWithoutPension);
-        const taxWithPension = this.calculateIsraeliIncomeTax(taxableIncomeWithPension);
+        const taxWithoutPension = window.taxOptimization.calculateIsraeliIncomeTax(taxableIncomeWithoutPension);
+        const taxWithPension = window.taxOptimization.calculateIsraeliIncomeTax(taxableIncomeWithPension);
         
         const annualTaxSavings = taxWithoutPension.totalTax - taxWithPension.totalTax;
         const monthlyTaxSavings = annualTaxSavings / 12;
@@ -150,14 +150,14 @@ window.taxOptimization = {
     
     // Get marginal tax rate for income level
     getMarginalTaxRate: (annualIncome) => {
-        const taxResult = this.calculateIsraeliIncomeTax(annualIncome);
+        const taxResult = window.taxOptimization.calculateIsraeliIncomeTax(annualIncome);
         return taxResult.marginalRate;
     },
     
     // Calculate tax savings from any deduction
     calculateTaxSavingsFromDeduction: (annualIncome, deductionAmount) => {
-        const taxWithoutDeduction = this.calculateIsraeliIncomeTax(annualIncome);
-        const taxWithDeduction = this.calculateIsraeliIncomeTax(annualIncome - deductionAmount);
+        const taxWithoutDeduction = window.taxOptimization.calculateIsraeliIncomeTax(annualIncome);
+        const taxWithDeduction = window.taxOptimization.calculateIsraeliIncomeTax(annualIncome - deductionAmount);
         
         return {
             savings: taxWithoutDeduction.totalTax - taxWithDeduction.totalTax,
