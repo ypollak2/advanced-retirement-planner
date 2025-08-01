@@ -1041,4 +1041,11 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
 // Export to window for global access
 window.WizardStepReview = WizardStepReview;
 
+// Initialize particle background on first render of review step
+if (window.ParticleBackground && !window.particleBackgroundInitialized) {
+    window.ParticleBackground.init();
+    window.addParticleToggle && window.addParticleToggle();
+    window.particleBackgroundInitialized = true;
+}
+
 console.log('✅ WizardStepReview (refactored) component loaded successfully');
