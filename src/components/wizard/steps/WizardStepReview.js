@@ -160,7 +160,8 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                 }
                 
                 // Fall back to individual salary fields
-                let salary = inputs.currentMonthlySalary || 
+                let salary = baseInputs.currentMonthlySalary ||  // Include the mapped value from baseInputs
+                           inputs.currentMonthlySalary || 
                            inputs.monthlySalary || 
                            inputs.salary ||
                            inputs.monthlyIncome ||
@@ -328,7 +329,39 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                 
                 // Fall back to individual expense fields
                 return inputs.currentMonthlyExpenses || 0;
-            })()
+            })(),
+            
+            // Add savings field mappings for retirement calculations
+            currentSavings: inputs.currentSavings || 
+                           inputs.pensionSavings || 
+                           inputs.currentPensionSavings ||
+                           inputs.currentPension ||
+                           inputs.retirementSavings || 
+                           inputs.currentRetirementSavings || 
+                           0,
+                           
+            currentTrainingFund: inputs.currentTrainingFund || 
+                                inputs.trainingFund || 
+                                inputs.trainingFundValue ||
+                                inputs.currentTrainingFundValue ||
+                                0,
+                                
+            currentPersonalPortfolio: inputs.currentPersonalPortfolio || 
+                                    inputs.personalPortfolio || 
+                                    inputs.portfolioValue ||
+                                    inputs.currentPortfolioValue ||
+                                    0,
+                                    
+            currentCrypto: inputs.currentCrypto || 
+                          inputs.crypto || 
+                          inputs.cryptoValue || 
+                          inputs.currentCryptoFiatValue ||
+                          0,
+                          
+            currentRealEstate: inputs.currentRealEstate || 
+                             inputs.realEstate || 
+                             inputs.realEstateValue ||
+                             0
         };
         
         // Enhanced validation and logging for couple mode
