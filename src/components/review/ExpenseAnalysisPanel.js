@@ -252,7 +252,11 @@ const ExpenseAnalysisPanel = ({ inputs, language = 'en', workingCurrency = 'ILS'
                 createElement('div', {
                     key: 'ratio-status',
                     className: `text-sm text-${statusColor}-600 mt-1`
-                }, statusLabel)
+                }, statusLabel),
+                createElement('div', {
+                    key: 'based-on-net',
+                    className: "text-xs text-gray-500 mt-2 italic"
+                }, language === 'he' ? '* מבוסס על הכנסה נטו (אחרי מס)' : '* Based on net (after-tax) income')
             ])
         ]),
         

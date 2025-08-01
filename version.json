@@ -1,6 +1,6 @@
 {
-  "version": "7.4.8",
+  "version": "7.4.9",
   "build": "2025-08-01",
-  "commit": "fix-financial-health-scoring-and-exports",
-  "description": "Fixed financial health scoring field detection for savingsRate, riskAlignment, and taxEfficiency. Added export CDN fallbacks"
+  "commit": "fix-scoring-tooltips-expense-analysis",
+  "description": "Fixed savings rate and tax efficiency scoring (0% issue), enhanced tooltip hover functionality, fixed expense analysis ratio calculation"
 }
