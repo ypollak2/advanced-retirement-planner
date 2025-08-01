@@ -1,6 +1,6 @@
 {
   "name": "advanced-retirement-planner",
-  "version": "7.4.12",
+  "version": "7.5.0",
   "description": "Professional retirement planning tool with enhanced UI/UX, proper partner data visualization, salary tracking, family planning, comprehensive investment tracking, FIRE calculator, stress testing, and dedicated data management",
   "main": "index.html",
   "homepage": "https://ypollak2.github.io/advanced-retirement-planner",

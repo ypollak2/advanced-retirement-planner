@@ -115,6 +115,42 @@ const EnhancedFinancialHealthMeter = ({
         return symbols[workingCurrency] || '₪';
     };
     
+    // Animate score when it changes
+    React.useEffect(() => {
+        if (scoreData && scoreElementRef.current && window.AnimatedNumbers) {
+            // Animate the main score
+            if (scoreData.totalScore !== prevScore.current) {
+                window.animateNumber(scoreElementRef.current, {
+                    start: prevScore.current,
+                    end: scoreData.totalScore,
+                    duration: 1500,
+                    format: 'number',
+                    onComplete: (value) => {
+                        prevScore.current = value;
+                        // Check for celebration milestone
+                        if (window.CelebrationAnimations) {
+                            window.CelebrationAnimations.celebrateMilestone('readiness', value);
+                        }
+                    }
+                });
+            }
+            
+            // Animate factor scores
+            scoreData.factors.forEach((factor, index) => {
+                const factorElement = document.getElementById(`factor-score-${index}`);
+                if (factorElement) {
+                    window.animateNumber(factorElement, {
+                        start: 0,
+                        end: factor.score,
+                        duration: 1000 + (index * 100),
+                        format: 'number',
+                        suffix: '%'
+                    });
+                }
+            });
+        }
+    }, [scoreData]);
+    
     // Calculate score when inputs change
     React.useEffect(() => {
         if (window.calculateFinancialHealthScore && inputs) {
