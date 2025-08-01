@@ -226,10 +226,10 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             const convertedValue = await convertCurrency(netValueILS, 'ILS', workingCurrency);
             const formattedValue = formatCurrency(convertedValue, workingCurrency);
             
-            // Update state with converted value and the net value for comparison
+            // Update state with converted value, the net value, and tax rate for comparison
             setConversionStates(prev => ({ 
                 ...prev, 
-                [stateKey]: { loading: false, value: formattedValue, error: null, netValue: netValueILS } 
+                [stateKey]: { loading: false, value: formattedValue, error: null, netValue: netValueILS, taxRate: taxRate || 25 } 
             }));
             
             return formattedValue;
@@ -237,10 +237,10 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             console.warn('Currency conversion failed:', error);
             const fallbackValue = formatCurrency(netValueILS, 'ILS');
             
-            // Update state with error and the net value for comparison
+            // Update state with error, the net value, and tax rate for comparison
             setConversionStates(prev => ({ 
                 ...prev, 
-                [stateKey]: { loading: false, value: fallbackValue, error: true, netValue: netValueILS } 
+                [stateKey]: { loading: false, value: fallbackValue, error: true, netValue: netValueILS, taxRate: taxRate || 25 } 
             }));
             
             return fallbackValue;
@@ -258,8 +258,9 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
         
         // Check if we have a cached value AND if it's still valid (tax rate hasn't changed)
         // We need to recalculate if the tax rate has changed
-        const currentNetValue = portfolioValue * (1 - (taxRate || 25) / 100);
-        const needsRecalculation = conversionState && conversionState.netValue !== currentNetValue;
+        const currentTaxRate = taxRate || 25;
+        const currentNetValue = portfolioValue * (1 - currentTaxRate / 100);
+        const needsRecalculation = conversionState && (conversionState.netValue !== currentNetValue || conversionState.taxRate !== currentTaxRate);
         
         // If we have a cached converted value and tax rate hasn't changed, use it
         if (conversionState && !conversionState.loading && conversionState.value && !needsRecalculation) {
@@ -690,15 +691,15 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                         max: '50',
                                         step: '0.1',
                                         placeholder: '25',
-                                        value: (inputs.partner1PortfolioTaxRate * 100) || 25,
+                                        value: inputs.partner1PortfolioTaxRate || 25,
                                         onChange: (e) => {
                                             const validatedRate = validateTaxRate(e.target.value);
-                                            setInputs({...inputs, partner1PortfolioTaxRate: validatedRate / 100});
+                                            setInputs({...inputs, partner1PortfolioTaxRate: validatedRate});
                                         },
                                         onBlur: (e) => {
                                             const validatedRate = validateTaxRate(e.target.value);
                                             e.target.value = validatedRate;
-                                            setInputs({...inputs, partner1PortfolioTaxRate: validatedRate / 100});
+                                            setInputs({...inputs, partner1PortfolioTaxRate: validatedRate});
                                         },
                                         className: `w-full p-1 text-sm border rounded focus:ring-2 focus:ring-pink-500 ${
                                             inputs.partner1PortfolioTaxRate > 0.5 || inputs.partner1PortfolioTaxRate < 0 ? 
@@ -860,15 +861,15 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                         max: '50',
                                         step: '0.1',
                                         placeholder: '25',
-                                        value: (inputs.partner2PortfolioTaxRate * 100) || 25,
+                                        value: inputs.partner2PortfolioTaxRate || 25,
                                         onChange: (e) => {
                                             const validatedRate = validateTaxRate(e.target.value);
-                                            setInputs({...inputs, partner2PortfolioTaxRate: validatedRate / 100});
+                                            setInputs({...inputs, partner2PortfolioTaxRate: validatedRate});
                                         },
                                         onBlur: (e) => {
                                             const validatedRate = validateTaxRate(e.target.value);
                                             e.target.value = validatedRate;
-                                            setInputs({...inputs, partner2PortfolioTaxRate: validatedRate / 100});
+                                            setInputs({...inputs, partner2PortfolioTaxRate: validatedRate});
                                         },
                                         className: `w-full p-1 text-sm border rounded focus:ring-2 focus:ring-purple-500 ${
                                             inputs.partner2PortfolioTaxRate > 0.5 || inputs.partner2PortfolioTaxRate < 0 ? 

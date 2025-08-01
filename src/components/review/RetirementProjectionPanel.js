@@ -104,7 +104,7 @@ const RetirementProjectionPanel = ({ inputs, language = 'en', workingCurrency = 
     // Generate chart data
     const chartData = window.generateRetirementProjectionChart(inputs);
     
-    if (!chartData || !chartData.projections) {
+    if (!chartData || !Array.isArray(chartData) || chartData.length === 0) {
         return createElement('div', {
             className: "bg-yellow-50 rounded-lg p-6 border border-yellow-200 mb-6"
         }, [
@@ -139,7 +139,15 @@ const RetirementProjectionPanel = ({ inputs, language = 'en', workingCurrency = 
     const targetMonthlyPension = monthlyIncome * 0.7; // 70% replacement ratio
     const targetRetirementAmount = targetMonthlyPension * 12 * 25; // 25 years of retirement
     
-    const realisticProjection = chartData.projections.realistic || chartData.projections[0];
+    // Get the final data point (retirement age)
+    const finalProjection = chartData[chartData.length - 1];
+    const realisticProjection = finalProjection ? {
+        finalAmount: finalProjection.totalAccumulation,
+        monthlyIncome: finalProjection.monthlyIncome,
+        inflationAdjustedAmount: finalProjection.inflationAdjustedTotal,
+        inflationAdjustedMonthlyIncome: finalProjection.inflationAdjustedMonthlyIncome
+    } : null;
+    
     const projectionStatus = getProjectionStatus(realisticProjection?.finalAmount || 0, targetRetirementAmount);
     
     return createElement('div', {
@@ -242,68 +250,76 @@ const RetirementProjectionPanel = ({ inputs, language = 'en', workingCurrency = 
             ])
         ]),
         
-        // Scenario projections
-        chartData.projections.length > 1 && createElement('div', {
-            key: 'scenario-projections',
-            className: "grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
-        }, [
-            // Optimistic scenario
-            chartData.projections.optimistic && createElement('div', {
-                key: 'optimistic',
-                className: "bg-green-50 rounded-lg p-4 border border-green-200"
-            }, [
-                createElement('h4', {
-                    key: 'title',
-                    className: "font-semibold text-green-800 mb-2"
-                }, `📈 ${t.optimistic}`),
-                createElement('div', {
-                    key: 'amount',
-                    className: "text-xl font-bold text-green-700"
-                }, formatCurrency(chartData.projections.optimistic.finalAmount)),
-                createElement('div', {
-                    key: 'assumptions',
-                    className: "text-xs text-green-600 mt-1"
-                }, 'Higher returns scenario')
-            ]),
+        // Scenario projections - calculate based on different return assumptions
+        (() => {
+            if (!realisticProjection) return null;
             
-            // Realistic scenario
-            chartData.projections.realistic && createElement('div', {
-                key: 'realistic',
-                className: "bg-blue-50 rounded-lg p-4 border border-blue-200"
-            }, [
-                createElement('h4', {
-                    key: 'title',
-                    className: "font-semibold text-blue-800 mb-2"
-                }, `📊 ${t.realistic}`),
-                createElement('div', {
-                    key: 'amount',
-                    className: "text-xl font-bold text-blue-700"
-                }, formatCurrency(chartData.projections.realistic.finalAmount)),
-                createElement('div', {
-                    key: 'assumptions',
-                    className: "text-xs text-blue-600 mt-1"
-                }, 'Expected returns scenario')
-            ]),
+            // Calculate scenarios based on different returns
+            const optimisticAmount = realisticProjection.finalAmount * 1.25; // 25% higher
+            const conservativeAmount = realisticProjection.finalAmount * 0.75; // 25% lower
             
-            // Conservative scenario
-            chartData.projections.conservative && createElement('div', {
-                key: 'conservative',
-                className: "bg-orange-50 rounded-lg p-4 border border-orange-200"
+            return createElement('div', {
+                key: 'scenario-projections',
+                className: "grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
             }, [
-                createElement('h4', {
-                    key: 'title',
-                    className: "font-semibold text-orange-800 mb-2"
-                }, `📉 ${t.conservative}`),
+                // Optimistic scenario
                 createElement('div', {
-                    key: 'amount',
-                    className: "text-xl font-bold text-orange-700"
-                }, formatCurrency(chartData.projections.conservative.finalAmount)),
+                    key: 'optimistic',
+                    className: "bg-green-50 rounded-lg p-4 border border-green-200"
+                }, [
+                    createElement('h4', {
+                        key: 'title',
+                        className: "font-semibold text-green-800 mb-2"
+                    }, `📈 ${t.optimistic}`),
+                    createElement('div', {
+                        key: 'amount',
+                        className: "text-xl font-bold text-green-700"
+                    }, formatCurrency(optimisticAmount)),
+                    createElement('div', {
+                        key: 'assumptions',
+                        className: "text-xs text-green-600 mt-1"
+                    }, 'Higher returns scenario')
+                ]),
+                
+                // Realistic scenario
                 createElement('div', {
-                    key: 'assumptions',
-                    className: "text-xs text-orange-600 mt-1"
-                }, 'Lower returns scenario')
-            ])
-        ]),
+                    key: 'realistic',
+                    className: "bg-blue-50 rounded-lg p-4 border border-blue-200"
+                }, [
+                    createElement('h4', {
+                        key: 'title',
+                        className: "font-semibold text-blue-800 mb-2"
+                    }, `📊 ${t.realistic}`),
+                    createElement('div', {
+                        key: 'amount',
+                        className: "text-xl font-bold text-blue-700"
+                    }, formatCurrency(realisticProjection.finalAmount)),
+                    createElement('div', {
+                        key: 'assumptions',
+                        className: "text-xs text-blue-600 mt-1"
+                    }, 'Expected returns scenario')
+                ]),
+                
+                // Conservative scenario
+                createElement('div', {
+                    key: 'conservative',
+                    className: "bg-orange-50 rounded-lg p-4 border border-orange-200"
+                }, [
+                    createElement('h4', {
+                        key: 'title',
+                        className: "font-semibold text-orange-800 mb-2"
+                    }, `📉 ${t.conservative}`),
+                    createElement('div', {
+                        key: 'amount',
+                        className: "text-xl font-bold text-orange-700"
+                    }, formatCurrency(conservativeAmount)),
+                    createElement('div', {
+                        key: 'assumptions',
+                        className: "text-xs text-orange-600 mt-1"
+                    }, 'Lower returns scenario')
+                ])
+            ]);
+        })(),
         
         // Chart placeholder (actual chart would be rendered here)
         createElement('div', {

@@ -118,17 +118,56 @@ window.patchFinancialHealthEngine = function() {
         console.log('🔍 Checking for employeePensionRate:', inputs.employeePensionRate);
         console.log('🔍 Checking for trainingFundEmployeeRate:', inputs.trainingFundEmployeeRate);
         
-        const pensionRate = window.enhancedGetFieldValue(inputs, [
-            'employeePensionRate', 'pensionEmployeeRate',
-            'pensionContributionRate', 'pensionRate',
-            'pensionEmployeeContribution', 'employeePensionContribution'
-        ], { allowZero: true, debugMode: true });
+        // In couple mode, combine partner contribution rates
+        let pensionRate = 0;
+        let trainingRate = 0;
         
-        const trainingRate = window.enhancedGetFieldValue(inputs, [
-            'trainingFundEmployeeRate', 'trainingFundContributionRate',
-            'trainingFundRate', 'employeeTrainingFundRate',
-            'trainingFundEmployeeContribution', 'employeeTrainingFundContribution'
-        ], { allowZero: true, debugMode: true });
+        if (inputs.planningType === 'couple') {
+            // Partner 1 rates
+            const partner1PensionRate = window.enhancedGetFieldValue(inputs, [
+                'partner1PensionEmployeeRate', 'partner1EmployeePensionRate',
+                'partner1PensionContributionRate', 'partner1PensionRate'
+            ], { allowZero: true, debugMode: true });
+            
+            const partner1TrainingRate = window.enhancedGetFieldValue(inputs, [
+                'partner1TrainingFundEmployeeRate', 'partner1TrainingFundContributionRate',
+                'partner1TrainingFundRate', 'partner1EmployeeTrainingFundRate'
+            ], { allowZero: true, debugMode: true });
+            
+            // Partner 2 rates
+            const partner2PensionRate = window.enhancedGetFieldValue(inputs, [
+                'partner2PensionEmployeeRate', 'partner2EmployeePensionRate',
+                'partner2PensionContributionRate', 'partner2PensionRate'
+            ], { allowZero: true, debugMode: true });
+            
+            const partner2TrainingRate = window.enhancedGetFieldValue(inputs, [
+                'partner2TrainingFundEmployeeRate', 'partner2TrainingFundContributionRate',
+                'partner2TrainingFundRate', 'partner2EmployeeTrainingFundRate'
+            ], { allowZero: true, debugMode: true });
+            
+            // Average the rates (or could sum if needed)
+            pensionRate = (partner1PensionRate + partner2PensionRate) / 2;
+            trainingRate = (partner1TrainingRate + partner2TrainingRate) / 2;
+            
+            console.log('👫 Couple mode contribution rates:', {
+                partner1: { pension: partner1PensionRate, training: partner1TrainingRate },
+                partner2: { pension: partner2PensionRate, training: partner2TrainingRate },
+                average: { pension: pensionRate, training: trainingRate }
+            });
+        } else {
+            // Individual mode - use original logic
+            pensionRate = window.enhancedGetFieldValue(inputs, [
+                'employeePensionRate', 'pensionEmployeeRate',
+                'pensionContributionRate', 'pensionRate',
+                'pensionEmployeeContribution', 'employeePensionContribution'
+            ], { allowZero: true, debugMode: true });
+            
+            trainingRate = window.enhancedGetFieldValue(inputs, [
+                'trainingFundEmployeeRate', 'trainingFundContributionRate',
+                'trainingFundRate', 'employeeTrainingFundRate',
+                'trainingFundEmployeeContribution', 'employeeTrainingFundContribution'
+            ], { allowZero: true, debugMode: true });
+        }
         
         // If no rates found, check if we should use defaults based on country
         const isIsraeli = inputs.taxCountry === 'israel' || inputs.country === 'israel' || !inputs.taxCountry;
@@ -244,10 +283,29 @@ window.patchFinancialHealthEngine = function() {
         ], { allowZero: false, debugMode: true }) || 30;
         
         // Get contribution rates for tax efficiency
-        const pensionRate = window.enhancedGetFieldValue(inputs, [
-            'employeePensionRate', 'pensionEmployeeRate',
-            'pensionContributionRate', 'pensionRate'
-        ], { allowZero: true, debugMode: true }) || 6.5;
+        let pensionRate = 0;
+        
+        if (inputs.planningType === 'couple') {
+            // In couple mode, average partner pension rates
+            const partner1PensionRate = window.enhancedGetFieldValue(inputs, [
+                'partner1PensionEmployeeRate', 'partner1EmployeePensionRate',
+                'partner1PensionContributionRate', 'partner1PensionRate'
+            ], { allowZero: true, debugMode: true });
+            
+            const partner2PensionRate = window.enhancedGetFieldValue(inputs, [
+                'partner2PensionEmployeeRate', 'partner2EmployeePensionRate',
+                'partner2PensionContributionRate', 'partner2PensionRate'
+            ], { allowZero: true, debugMode: true });
+            
+            pensionRate = (partner1PensionRate + partner2PensionRate) / 2;
+            console.log('👫 Couple mode tax efficiency - average pension rate:', pensionRate);
+        } else {
+            // Individual mode
+            pensionRate = window.enhancedGetFieldValue(inputs, [
+                'employeePensionRate', 'pensionEmployeeRate',
+                'pensionContributionRate', 'pensionRate'
+            ], { allowZero: true, debugMode: true }) || 6.5;
+        }
         
         // Calculate tax efficiency score based on country and contributions
         let score = 8; // Max score

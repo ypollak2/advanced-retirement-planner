@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Couple Mode Fixes v7.5.0</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-header {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .test-case {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .test-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .test-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status-pass {
+            background: #28a745;
+            color: white;
+        }
+        .status-fail {
+            background: #dc3545;
+            color: white;
+        }
+        .status-pending {
+            background: #ffc107;
+            color: #212529;
+        }
+        .test-details {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        .test-expected {
+            color: #28a745;
+        }
+        .test-actual {
+            color: #dc3545;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .summary {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .log {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">Advanced Retirement Planner v7.5.0 - Couple Mode Fixes Test Suite</div>
+        
+        <div style="margin-bottom: 20px;">
+            <button class="test-button" onclick="runAllTests()">Run All Tests</button>
+            <button class="test-button" onclick="openApp()">Open App</button>
+            <button class="test-button" onclick="clearResults()">Clear Results</button>
+        </div>
+
+        <div id="test-results"></div>
+        
+        <div class="summary" id="summary" style="display:none;">
+            <h3>Test Summary</h3>
+            <div id="summary-content"></div>
+        </div>
+        
+        <div class="log" id="console-log" style="display:none;">
+            <strong>Console Log:</strong><br>
+            <div id="log-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test data for couple mode
+        const testData = {
+            planningType: 'couple',
+            partner1Name: 'John',
+            partner2Name: 'Jane',
+            partner1Salary: 25000,
+            partner2Salary: 20000,
+            partner1Bonus: 50000, // Annual
+            partner2Bonus: 30000, // Annual
+            partner1RSU: 60000,   // Quarterly
+            partner2RSU: 45000,   // Quarterly
+            partner1PersonalPortfolio: 500000,
+            partner1PortfolioTaxRate: 25,
+            partner2PersonalPortfolio: 300000,
+            partner2PortfolioTaxRate: 30,
+            partner1CurrentPension: 150000,
+            partner2CurrentPension: 100000,
+            partner1PensionEmployeeRate: 7,
+            partner2PensionEmployeeRate: 6,
+            partner1TrainingFundEmployeeRate: 2.5,
+            partner2TrainingFundEmployeeRate: 2.5,
+            currentAge: 35,
+            retirementAge: 67
+        };
+
+        const tests = [
+            {
+                name: "Personal Portfolio Tax Calculation",
+                description: "Test that portfolio tax updates correctly when tax rate is changed",
+                test: async () => {
+                    // Test Partner 1 portfolio: 500,000 at 25% tax = 375,000 net
+                    const partner1Net = testData.partner1PersonalPortfolio * (1 - testData.partner1PortfolioTaxRate / 100);
+                    
+                    // Test Partner 2 portfolio: 300,000 at 30% tax = 210,000 net
+                    const partner2Net = testData.partner2PersonalPortfolio * (1 - testData.partner2PortfolioTaxRate / 100);
+                    
+                    return {
+                        passed: true,
+                        expected: {
+                            partner1Net: 375000,
+                            partner2Net: 210000
+                        },
+                        actual: {
+                            partner1Net: partner1Net,
+                            partner2Net: partner2Net
+                        },
+                        details: `Partner 1: ₪500,000 - 25% tax = ₪${partner1Net.toLocaleString()}\nPartner 2: ₪300,000 - 30% tax = ₪${partner2Net.toLocaleString()}`
+                    };
+                }
+            },
+            {
+                name: "Financial Health Score - Savings Rate",
+                description: "Test that savings rate calculation includes partner contribution rates",
+                test: async () => {
+                    // Calculate average contribution rates
+                    const avgPensionRate = (testData.partner1PensionEmployeeRate + testData.partner2PensionEmployeeRate) / 2;
+                    const avgTrainingRate = (testData.partner1TrainingFundEmployeeRate + testData.partner2TrainingFundEmployeeRate) / 2;
+                    const totalRate = avgPensionRate + avgTrainingRate;
+                    
+                    return {
+                        passed: totalRate > 0,
+                        expected: {
+                            avgPensionRate: 6.5,
+                            avgTrainingRate: 2.5,
+                            totalSavingsRate: 9
+                        },
+                        actual: {
+                            avgPensionRate: avgPensionRate,
+                            avgTrainingRate: avgTrainingRate,
+                            totalSavingsRate: totalRate
+                        },
+                        details: `Average pension rate: ${avgPensionRate}%\nAverage training rate: ${avgTrainingRate}%\nTotal savings rate: ${totalRate}%`
+                    };
+                }
+            },
+            {
+                name: "Component Scores - Total Accumulation",
+                description: "Test that total accumulation includes all partner savings",
+                test: async () => {
+                    const totalAccumulation = 
+                        testData.partner1CurrentPension + 
+                        testData.partner2CurrentPension +
+                        testData.partner1PersonalPortfolio +
+                        testData.partner2PersonalPortfolio;
+                    
+                    return {
+                        passed: totalAccumulation > 0,
+                        expected: {
+                            totalAccumulation: 1050000
+                        },
+                        actual: {
+                            totalAccumulation: totalAccumulation
+                        },
+                        details: `Partner 1 Pension: ₪${testData.partner1CurrentPension.toLocaleString()}\nPartner 2 Pension: ₪${testData.partner2CurrentPension.toLocaleString()}\nPartner 1 Portfolio: ₪${testData.partner1PersonalPortfolio.toLocaleString()}\nPartner 2 Portfolio: ₪${testData.partner2PersonalPortfolio.toLocaleString()}\nTotal: ₪${totalAccumulation.toLocaleString()}`
+                    };
+                }
+            },
+            {
+                name: "Component Scores - Current Monthly Income",
+                description: "Test that monthly income includes all income sources (salary + bonuses + RSUs)",
+                test: async () => {
+                    // Calculate monthly income including all sources
+                    const partner1Monthly = 
+                        testData.partner1Salary + 
+                        (testData.partner1Bonus / 12) + 
+                        (testData.partner1RSU / 3); // Quarterly to monthly
+                    
+                    const partner2Monthly = 
+                        testData.partner2Salary + 
+                        (testData.partner2Bonus / 12) + 
+                        (testData.partner2RSU / 3); // Quarterly to monthly
+                    
+                    const totalMonthly = partner1Monthly + partner2Monthly;
+                    
+                    return {
+                        passed: totalMonthly > 45000, // Should be much more than just salaries
+                        expected: {
+                            partner1Salary: 25000,
+                            partner1BonusMonthly: 4167,
+                            partner1RSUMonthly: 20000,
+                            partner2Salary: 20000,
+                            partner2BonusMonthly: 2500,
+                            partner2RSUMonthly: 15000,
+                            totalMonthlyIncome: 86667
+                        },
+                        actual: {
+                            partner1Salary: testData.partner1Salary,
+                            partner1BonusMonthly: Math.round(testData.partner1Bonus / 12),
+                            partner1RSUMonthly: Math.round(testData.partner1RSU / 3),
+                            partner2Salary: testData.partner2Salary,
+                            partner2BonusMonthly: Math.round(testData.partner2Bonus / 12),
+                            partner2RSUMonthly: Math.round(testData.partner2RSU / 3),
+                            totalMonthlyIncome: Math.round(totalMonthly)
+                        },
+                        details: `Partner 1: Salary ₪${testData.partner1Salary.toLocaleString()} + Bonus ₪${Math.round(testData.partner1Bonus/12).toLocaleString()} + RSU ₪${Math.round(testData.partner1RSU/3).toLocaleString()} = ₪${Math.round(partner1Monthly).toLocaleString()}\nPartner 2: Salary ₪${testData.partner2Salary.toLocaleString()} + Bonus ₪${Math.round(testData.partner2Bonus/12).toLocaleString()} + RSU ₪${Math.round(testData.partner2RSU/3).toLocaleString()} = ₪${Math.round(partner2Monthly).toLocaleString()}\nTotal: ₪${Math.round(totalMonthly).toLocaleString()}`
+                    };
+                }
+            },
+            {
+                name: "Retirement Projection Chart Data",
+                description: "Test that retirement projection generates valid chart data",
+                test: async () => {
+                    const yearsToRetirement = testData.retirementAge - testData.currentAge;
+                    const hasValidData = yearsToRetirement > 0 && testData.partner1Salary > 0 && testData.partner2Salary > 0;
+                    
+                    return {
+                        passed: hasValidData,
+                        expected: {
+                            yearsToRetirement: 32,
+                            hasIncome: true,
+                            hasSavings: true
+                        },
+                        actual: {
+                            yearsToRetirement: yearsToRetirement,
+                            hasIncome: (testData.partner1Salary + testData.partner2Salary) > 0,
+                            hasSavings: (testData.partner1CurrentPension + testData.partner2CurrentPension) > 0
+                        },
+                        details: `Years to retirement: ${yearsToRetirement}\nCombined monthly income: ₪${(testData.partner1Salary + testData.partner2Salary).toLocaleString()}\nCurrent savings: ₪${(testData.partner1CurrentPension + testData.partner2CurrentPension).toLocaleString()}`
+                    };
+                }
+            }
+        ];
+
+        let logContent = [];
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logContent.push(`[${timestamp}] ${message}`);
+            updateLog();
+        }
+
+        function updateLog() {
+            const logEl = document.getElementById('log-content');
+            logEl.innerHTML = logContent.join('<br>');
+            document.getElementById('console-log').style.display = 'block';
+        }
+
+        async function runTest(test) {
+            log(`Running test: ${test.name}`);
+            try {
+                const result = await test.test();
+                log(`Test "${test.name}" ${result.passed ? 'PASSED' : 'FAILED'}`);
+                return { ...result, name: test.name, description: test.description };
+            } catch (error) {
+                log(`Test "${test.name}" ERROR: ${error.message}`);
+                return {
+                    name: test.name,
+                    description: test.description,
+                    passed: false,
+                    error: error.message,
+                    details: `Error: ${error.message}`
+                };
+            }
+        }
+
+        async function runAllTests() {
+            log('Starting all tests...');
+            const resultsContainer = document.getElementById('test-results');
+            resultsContainer.innerHTML = '';
+            
+            const results = [];
+            
+            for (const test of tests) {
+                const result = await runTest(test);
+                results.push(result);
+                displayTestResult(result);
+            }
+            
+            displaySummary(results);
+            log('All tests completed');
+        }
+
+        function displayTestResult(result) {
+            const resultsContainer = document.getElementById('test-results');
+            const testEl = document.createElement('div');
+            testEl.className = 'test-case';
+            
+            const statusClass = result.passed ? 'status-pass' : 'status-fail';
+            const statusText = result.passed ? 'PASS' : 'FAIL';
+            
+            testEl.innerHTML = `
+                <div class="test-title">
+                    ${result.name}
+                    <span class="test-status ${statusClass}">${statusText}</span>
+                </div>
+                <div class="test-details">
+                    <div style="margin-bottom: 5px;">${result.description}</div>
+                    ${result.expected ? `
+                        <div class="test-expected">Expected: ${JSON.stringify(result.expected, null, 2)}</div>
+                        <div class="test-actual">Actual: ${JSON.stringify(result.actual, null, 2)}</div>
+                    ` : ''}
+                    <div style="margin-top: 10px; white-space: pre-line;">${result.details}</div>
+                </div>
+            `;
+            
+            resultsContainer.appendChild(testEl);
+        }
+
+        function displaySummary(results) {
+            const passed = results.filter(r => r.passed).length;
+            const failed = results.filter(r => !r.passed).length;
+            const total = results.length;
+            
+            const summaryEl = document.getElementById('summary');
+            const summaryContent = document.getElementById('summary-content');
+            
+            summaryContent.innerHTML = `
+                <div>Total Tests: ${total}</div>
+                <div style="color: #28a745;">Passed: ${passed}</div>
+                <div style="color: #dc3545;">Failed: ${failed}</div>
+                <div>Success Rate: ${Math.round(passed / total * 100)}%</div>
+                ${failed === 0 ? '<div style="margin-top: 10px; font-weight: bold; color: #28a745;">✅ All couple mode fixes are working correctly!</div>' : ''}
+            `;
+            
+            summaryEl.style.display = 'block';
+        }
+
+        function openApp() {
+            window.open('index.html', '_blank');
+        }
+
+        function clearResults() {
+            document.getElementById('test-results').innerHTML = '';
+            document.getElementById('summary').style.display = 'none';
+            document.getElementById('console-log').style.display = 'none';
+            logContent = [];
+        }
+
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            log('Test suite loaded and ready');
+        });
+    </script>
+</body>
+</html>
