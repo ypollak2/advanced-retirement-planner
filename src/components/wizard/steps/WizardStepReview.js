@@ -100,6 +100,12 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         const mappedInputs = {
             ...baseInputs,
             
+            // IMPORTANT: Keep the original contribution rate fields for financial health engine
+            employeePensionRate: inputs.employeePensionRate,
+            employerPensionRate: inputs.employerPensionRate,
+            trainingFundEmployeeRate: inputs.trainingFundEmployeeRate,
+            trainingFundEmployerRate: inputs.trainingFundEmployerRate,
+            
             // Enhanced salary field mapping with couple mode support
             currentMonthlySalary: (() => {
                 // For couple mode, prioritize combining partner salaries
