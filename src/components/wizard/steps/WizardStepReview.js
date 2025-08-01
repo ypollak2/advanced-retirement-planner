@@ -533,6 +533,11 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     const projectedIncome = retirementProjections.totalNetIncome || retirementProjections.projectedIncome || 0;
     const monthlyRetirementIncome = retirementProjections.monthlyIncome || 0;
     
+    // Ensure values are not NaN
+    const safeTotalAccumulation = isNaN(totalAccumulation) || !isFinite(totalAccumulation) ? 0 : totalAccumulation;
+    const safeProjectedIncome = isNaN(projectedIncome) || !isFinite(projectedIncome) ? 0 : projectedIncome;
+    const safeMonthlyRetirementIncome = isNaN(monthlyRetirementIncome) || !isFinite(monthlyRetirementIncome) ? 0 : monthlyRetirementIncome;
+    
     console.log('📊 Component Scores Data Mapping:', {
         totalAccumulation: totalAccumulation,
         projectedIncome: projectedIncome,
@@ -613,6 +618,9 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     }
     
     console.log('✅ Total current monthly income:', currentMonthlyIncome);
+    
+    // Ensure current monthly income is not NaN
+    const safeCurrentMonthlyIncome = isNaN(currentMonthlyIncome) || !isFinite(currentMonthlyIncome) ? 0 : currentMonthlyIncome;
     
     // Retirement readiness assessment with memoization (test pattern: readinessScore)
     const readinessScore = React.useMemo(() => {
@@ -771,7 +779,7 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                     className: "p-3 bg-purple-50 rounded-lg text-center"
                 }, [
                     createElement('div', { key: 'accumulation-value', className: "text-lg font-bold text-purple-600" }, 
-                        window.formatCurrency ? window.formatCurrency(totalAccumulation, workingCurrency) : `${totalAccumulation.toLocaleString()}`),
+                        window.formatCurrency ? window.formatCurrency(safeTotalAccumulation, workingCurrency) : `${workingCurrency}${safeTotalAccumulation.toLocaleString()}`),
                     createElement('div', { key: 'accumulation-label', className: "text-sm text-purple-700" }, 
                         language === 'he' ? 'צבירה צפויה' : 'Total Accumulation')
                 ]),
@@ -781,7 +789,7 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                     className: "p-3 bg-orange-50 rounded-lg text-center"
                 }, [
                     createElement('div', { key: 'income-value', className: "text-lg font-bold text-orange-600" }, 
-                        window.formatCurrency ? window.formatCurrency(currentMonthlyIncome, workingCurrency) : `${currentMonthlyIncome.toLocaleString()}`),
+                        window.formatCurrency ? window.formatCurrency(safeCurrentMonthlyIncome, workingCurrency) : `${workingCurrency}${safeCurrentMonthlyIncome.toLocaleString()}`),
                     createElement('div', { key: 'income-label', className: "text-sm text-orange-700" }, 
                         language === 'he' ? 'הכנסה חודשית נוכחית' : 'Current Monthly Income')
                 ])
