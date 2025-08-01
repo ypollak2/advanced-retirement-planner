@@ -998,7 +998,8 @@ function calculateSavingsRateScore(inputs) {
     if (!pensionRate) {
         pensionRate = getFieldValue(inputs, [
             'pensionContributionRate', 'pensionEmployeeRate', 'pensionEmployee',
-            'employeePensionRate', 'pension_contribution_rate', 'pension_rate'
+            'employeePensionRate', 'pension_contribution_rate', 'pension_rate',
+            'pensionEmployeeContribution', 'employeePensionContribution'
         ], { debugMode: true, combinePartners: inputs.planningType === 'couple', combineMethod: 'average' });
     }
     
@@ -1018,7 +1019,8 @@ function calculateSavingsRateScore(inputs) {
     if (!trainingFundRate) {
         trainingFundRate = getFieldValue(inputs, [
             'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee',
-            'employeeTrainingFundRate', 'training_fund_rate', 'trainingFund_rate'
+            'employeeTrainingFundRate', 'training_fund_rate', 'trainingFund_rate',
+            'trainingFundEmployeeContribution', 'employeeTrainingFundContribution'
         ], { debugMode: true, combinePartners: inputs.planningType === 'couple', combineMethod: 'average' });
     }
     
@@ -1885,13 +1887,15 @@ function calculateTaxEfficiencyScore(inputs) {
     // Fallback to legacy method if rates not found
     if (!pensionRate) {
         pensionRate = getFieldValue(inputs, [
-            'pensionContributionRate', 'pensionEmployeeRate', 'pensionEmployee'
+            'pensionContributionRate', 'pensionEmployeeRate', 'pensionEmployee',
+            'pensionEmployeeContribution', 'employeePensionContribution', 'pensionRate'
         ]) || 0;
     }
     
     if (!trainingFundRate) {
         trainingFundRate = getFieldValue(inputs, [
-            'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee'
+            'trainingFundContributionRate', 'trainingFundEmployeeRate', 'trainingFundEmployee',
+            'trainingFundEmployeeContribution', 'employeeTrainingFundContribution', 'trainingFundRate'
         ]) || 0;
     }
     

@@ -1,5 +1,5 @@
 // Advanced Retirement Planner - Guided Intelligence UI Design
-// Created by Yali Pollak (יהלי פולק) - v7.4.6
+// Created by Yali Pollak (יהלי פולק) - v7.4.7
 
 function RetirementPlannerApp() {
     var languageState = React.useState('en');
@@ -2034,7 +2034,7 @@ function RetirementPlannerApp() {
                 React.createElement('span', {
                     key: 'version',
                     className: 'version'
-                }, window.versionInfo ? `v${window.versionInfo.number}` : 'v7.4.6'),
+                }, window.versionInfo ? `v${window.versionInfo.number}` : 'v7.4.7'),
                 ' • Created by ',
                 React.createElement('span', {
                     key: 'author',

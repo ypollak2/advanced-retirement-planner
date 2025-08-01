@@ -68,30 +68,44 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
         try {
             const currentSavings = inputs.currentSavings || 0;
             const currentTrainingFund = inputs.currentTrainingFund || 0;
-            const currentPersonalPortfolio = inputs.currentPersonalPortfolio || 0;
+            
+            // Apply tax to personal portfolio for display purposes
+            const grossPersonalPortfolio = inputs.currentPersonalPortfolio || 0;
+            const portfolioTaxRate = (inputs.portfolioTaxRate || 25) / 100;
+            const netPersonalPortfolio = grossPersonalPortfolio * (1 - portfolioTaxRate);
+            
             const currentRealEstate = inputs.currentRealEstate || 0;
             const currentCrypto = inputs.currentDigitalAssetFiatValue || inputs.currentCryptoFiatValue || inputs.currentCrypto || 0;
             const currentSavingsAccount = inputs.currentSavingsAccount || 0;
             const currentBankAccount = inputs.currentBankAccount || 0;
             
-            // Partner savings if couple
+            // Partner savings if couple - apply tax to partner portfolios too
             const partner1Pension = inputs.partner1CurrentPension || 0;
             const partner1TrainingFund = inputs.partner1CurrentTrainingFund || 0;
-            const partner1Portfolio = inputs.partner1PersonalPortfolio || 0;
+            
+            const grossPartner1Portfolio = inputs.partner1PersonalPortfolio || 0;
+            const partner1TaxRate = (inputs.partner1PortfolioTaxRate || 25) / 100;
+            const netPartner1Portfolio = grossPartner1Portfolio * (1 - partner1TaxRate);
+            
             const partner1RealEstate = inputs.partner1RealEstate || 0;
             const partner1Crypto = inputs.partner1DigitalAssetFiatValue || inputs.partner1CryptoFiatValue || inputs.partner1Crypto || 0;
+            
             const partner2Pension = inputs.partner2CurrentPension || 0;
             const partner2TrainingFund = inputs.partner2CurrentTrainingFund || 0;
-            const partner2Portfolio = inputs.partner2PersonalPortfolio || 0;
+            
+            const grossPartner2Portfolio = inputs.partner2PersonalPortfolio || 0;
+            const partner2TaxRate = (inputs.partner2PortfolioTaxRate || 25) / 100;
+            const netPartner2Portfolio = grossPartner2Portfolio * (1 - partner2TaxRate);
+            
             const partner2RealEstate = inputs.partner2RealEstate || 0;
             const partner2Crypto = inputs.partner2DigitalAssetFiatValue || inputs.partner2CryptoFiatValue || inputs.partner2Crypto || 0;
             const partner1BankAccount = inputs.partner1BankAccount || 0;
             const partner2BankAccount = inputs.partner2BankAccount || 0;
             
-            const total = currentSavings + currentTrainingFund + currentPersonalPortfolio + 
+            const total = currentSavings + currentTrainingFund + netPersonalPortfolio + 
                          currentRealEstate + currentCrypto + currentSavingsAccount + currentBankAccount +
-                         partner1Pension + partner1TrainingFund + partner1Portfolio + partner1RealEstate + partner1Crypto + partner1BankAccount +
-                         partner2Pension + partner2TrainingFund + partner2Portfolio + partner2RealEstate + partner2Crypto + partner2BankAccount;
+                         partner1Pension + partner1TrainingFund + netPartner1Portfolio + partner1RealEstate + partner1Crypto + partner1BankAccount +
+                         partner2Pension + partner2TrainingFund + netPartner2Portfolio + partner2RealEstate + partner2Crypto + partner2BankAccount;
             
             // Validate result
             if (isNaN(total) || !isFinite(total)) {

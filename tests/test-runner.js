@@ -1331,7 +1331,7 @@ function testCurrentSavingsUpdateFunctionality() {
         logTest('Current Savings: Removed old field names (cryptoValue)', noOldCryptoValue);
         
         // Test calculateTotalSavings function includes all partner fields
-        const hasTotalCalculation = content.includes('currentSavings + currentTrainingFund + currentPersonalPortfolio');
+        const hasTotalCalculation = content.includes('currentSavings + currentTrainingFund + netPersonalPortfolio');
         const includesPartnerFields = content.includes('partner1Pension + partner1TrainingFund') &&
                                      content.includes('partner2Pension + partner2TrainingFund');
         
