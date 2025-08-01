@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Cache and Test v7.4.1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        .step {
+            border: 2px solid #dc3545;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            background: #f8d7da;
+        }
+        .command-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 14px;
+            cursor: pointer;
+            position: relative;
+        }
+        .copy-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 Cache Issue Detected!</h1>
+        <p>Your browser is still loading v7.4.0 files instead of v7.4.1. We need to clear the cache.</p>
+    </div>
+
+    <div class="container">
+        <div class="step">
+            <h2>Step 1: Force Refresh (Try This First)</h2>
+            <p>On the production site, press:</p>
+            <ul>
+                <li><strong>Windows/Linux:</strong> Ctrl + F5</li>
+                <li><strong>Mac:</strong> Cmd + Shift + R</li>
+            </ul>
+            <p>This forces the browser to reload all files without using cache.</p>
+        </div>
+
+        <div class="step">
+            <h2>Step 2: Manual Cache Clear (If Step 1 Doesn't Work)</h2>
+            <ol>
+                <li>Open Developer Tools (F12)</li>
+                <li>Right-click the refresh button</li>
+                <li>Select "Empty Cache and Hard Reload"</li>
+            </ol>
+            <p>OR in Chrome:</p>
+            <ol>
+                <li>Settings → Privacy and Security → Clear browsing data</li>
+                <li>Select "Cached images and files"</li>
+                <li>Click "Clear data"</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h2>Step 3: Verify Version After Cache Clear</h2>
+            <p>Run this command to check if v7.4.1 is loaded:</p>
+            
+            <div class="command-block" onclick="copyToClipboard(this)">
+// Check loaded version
+console.log('App Version:', window.APP_VERSION);
+console.log('Title Version:', document.title);
+
+// Check if v7.4.1 scripts are loaded
+const scripts = Array.from(document.querySelectorAll('script')).filter(s => s.src.includes('v='));
+const v741Scripts = scripts.filter(s => s.src.includes('v=7.4.1'));
+const v740Scripts = scripts.filter(s => s.src.includes('v=7.4.0'));
+
+console.log(`\nScripts with v7.4.1: ${v741Scripts.length}`);
+console.log(`Scripts with v7.4.0: ${v740Scripts.length}`);
+
+if (v741Scripts.length > 90) {
+    console.log('✅ SUCCESS: v7.4.1 is loaded!');
+} else {
+    console.log('❌ FAIL: Still loading old version');
+    console.log('Try harder refresh or incognito mode');
+}
+                <button class="copy-btn">Copy</button>
+            </div>
+        </div>
+
+        <div class="step">
+            <h2>Step 4: Test in Incognito Mode</h2>
+            <p>If cache clearing doesn't work, try incognito/private mode:</p>
+            <ul>
+                <li><strong>Chrome:</strong> Ctrl/Cmd + Shift + N</li>
+                <li><strong>Firefox:</strong> Ctrl/Cmd + Shift + P</li>
+                <li><strong>Safari:</strong> Cmd + Shift + N</li>
+            </ul>
+            <button onclick="window.open('https://ypollak2.github.io/advanced-retirement-planner/', '_blank')">
+                Open Production App
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>After Cache is Cleared</h2>
+        <p>Once you see v7.4.1 is loaded, run the test again:</p>
+        
+        <div class="command-block" onclick="copyToClipboard(this)">
+// Quick test after cache clear
+(function() {
+    console.clear();
+    
+    // First check if calculators are available
+    const hasCalculators = typeof window.calculateSavingsRateScore === 'function';
+    
+    if (!hasCalculators) {
+        console.error('❌ Calculator functions not found! Still on old version.');
+        return;
+    }
+    
+    console.log('✅ Calculator functions found! Testing...\n');
+    
+    const data = {
+        planningType: 'individual',
+        currentAge: 35,
+        retirementAge: 67,
+        currentMonthlySalary: 50000,
+        currentMonthlyExpenses: 25000,
+        currentPension: 500000,
+        currentTrainingFund: 300000,
+        currentPortfolio: 200000,
+        emergencyFund: 150000,
+        pensionEmployeeRate: 6,
+        pensionEmployerRate: 6.5,
+        trainingFundEmployeeRate: 2.5,
+        trainingFundEmployerRate: 7.5,
+        country: 'israel'
+    };
+    
+    const result = window.calculateFinancialHealthScore(data);
+    
+    console.log('🎯 SCORE:', result.totalScore);
+    console.log('Expected: 70-90');
+    
+    if (result.totalScore >= 70 && result.totalScore <= 90) {
+        console.log('✅ SUCCESS! v7.4.1 fix is working!');
+    } else if (result.totalScore === 45) {
+        console.log('❌ Still getting 45 - cache not cleared');
+    } else {
+        console.log('❓ Unexpected score:', result.totalScore);
+    }
+})();
+                <button class="copy-btn">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="warning">
+            <h3>⚠️ Why This Happens</h3>
+            <p>GitHub Pages can take 5-10 minutes to fully update, and browsers aggressively cache JavaScript files. The v7.4.1 fix is deployed, but your browser is holding onto the old v7.4.0 files.</p>
+            <p>Service Workers can also cache old versions. The hard refresh should update everything.</p>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(element) {
+            const codeBlock = element.cloneNode(true);
+            const button = codeBlock.querySelector('.copy-btn');
+            if (button) button.remove();
+            
+            const text = codeBlock.textContent.trim();
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = element.querySelector('.copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#28a745';
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy. Please select and copy manually.');
+            });
+        }
+    </script>
+</body>
+</html>
