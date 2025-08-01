@@ -404,7 +404,7 @@ window.calculateRetirement = (
     const monthlyRealEstateIncome = totalRealEstate * 0.04 / 12; // Capital gains withdrawal
     
     // Apply taxes to new investment types
-    const personalPortfolioTax = monthlyPersonalPortfolioIncome * (inputs.personalPortfolioTaxRate / 100);
+    const personalPortfolioTax = monthlyPersonalPortfolioIncome * ((inputs.personalPortfolioTaxRate || inputs.portfolioTaxRate || 25) / 100);
     const cryptoTax = monthlyCryptoIncome * (inputs.cryptoTaxRate / 100);
     const realEstateTax = monthlyRealEstateIncome * (inputs.realEstateTaxRate / 100);
     

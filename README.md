@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v7.4.6 ✨
+# 🚀 Advanced Retirement Planner v7.4.7 ✨
 
-[![Version](https://img.shields.io/badge/version-7.4.6-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-7.4.7-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-374%2F374-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -26,6 +26,28 @@
 > **📋 Deployment Status**: GitHub Pages is the primary deployment and is fully operational with the reorganized component structure. Netlify is currently rebuilding after the repository reorganization and should be available shortly.
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki) | **📊 Repository Statistics:** [View Stats](REPOSITORY-STATISTICS.md)
+
+## 🚀 What's New in v7.4.7 - Contribution Rate Field Mapping & Portfolio Tax Fixes 📊
+
+### 🔧 Critical Fixes
+- **Contribution Rate Field Mapping** - Fixed 0% scores for Savings Rate, Risk Alignment, and Tax Efficiency
+  - Added support for `pensionEmployeeContribution` and `trainingFundEmployeeContribution` field names
+  - Enhanced field mapping in both tax efficiency and savings rate calculations
+  - Now properly detects contribution rates from wizard inputs
+- **Personal Portfolio Tax Slider** - Fixed tax changes not affecting total savings display
+  - Total savings now recalculates when portfolio tax rate changes
+  - Applied net value calculation to all portfolio displays (main and partners)
+  - Tax properly reflected in wizard total savings summary
+
+### 📊 Improvements
+- Better field name compatibility between wizard and calculations
+- Enhanced portfolio tax handling across all components
+- Consistent net value display after tax deductions
+
+### ✅ Quality Assurance
+- All 374 tests passing (fixed test for new net portfolio calculation)
+- Verified all 8 financial health factors calculate correctly
+- No breaking changes to existing functionality
 
 ## 🎨 What's New in v7.4.2 - UI Stability Fix 🛠️
 

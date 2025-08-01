@@ -1,6 +1,6 @@
 {
-  "version": "7.4.6",
+  "version": "7.4.7",
   "build": "2025-08-01",
-  "commit": "financial-health-scoring-fixes",
-  "description": "Fixed financial health scoring issues: calculator return formats, personal portfolio tax calculation, expense analysis with net income, and score display normalization"
+  "commit": "fix-contribution-rates-and-portfolio-tax",
+  "description": "Fixed contribution rate field mapping for savings rate calculation and personal portfolio tax slider to update total savings display"
 }
