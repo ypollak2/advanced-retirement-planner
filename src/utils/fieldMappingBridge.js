@@ -139,8 +139,13 @@ function diagnoseFieldAvailability(inputs) {
         report.criticalIssues.push('No partner salaries found for couple mode');
     }
     
+    // Only consider missing contribution rates critical if other pension-related data exists
     if (!report.foundFields.pensionEmployeeRate && !report.foundFields.trainingFundEmployeeRate) {
-        report.criticalIssues.push('No contribution rates found');
+        // This is expected for new users who haven't filled in contribution data yet
+        // Don't treat it as a critical issue unless they have other pension data
+        if (report.foundFields.currentPensionSavings || report.foundFields.currentTrainingFund) {
+            report.criticalIssues.push('No contribution rates found despite having pension/training fund data');
+        }
     }
     
     return report;
