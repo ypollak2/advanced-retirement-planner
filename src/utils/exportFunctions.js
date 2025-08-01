@@ -1,5 +1,5 @@
 // Export Functions for Advanced Retirement Planner
-// Created by Yali Pollak (יהלי פולק) - v7.4.5
+// Created by Yali Pollak (יהלי פולק) - v7.4.6
 
 // Export retirement plan as image (PNG/PDF)
 async function exportAsImage(format = 'png', includeCharts = true) {
@@ -104,7 +104,7 @@ function exportForLLMAnalysis(inputs, results, partnerResults = null) {
         const analysisData = {
             metadata: {
                 exportDate: new Date().toISOString(),
-                version: 'v7.4.5',
+                version: 'v7.4.6',
                 tool: 'Advanced Retirement Planner by Yali Pollak',
                 purpose: 'LLM Analysis and Recommendations'
             },

@@ -1,6 +1,6 @@
 {
-  "version": "7.4.5",
+  "version": "7.4.6",
   "build": "2025-08-01",
-  "commit": "v7.4.0-comprehensive-e2e-testing-suite",
-  "description": "Comprehensive E2E testing framework with 80 test scenarios, field mapping validation, score validation engine, and automated test runner"
+  "commit": "financial-health-scoring-fixes",
+  "description": "Fixed financial health scoring issues: calculator return formats, personal portfolio tax calculation, expense analysis with net income, and score display normalization"
 }
