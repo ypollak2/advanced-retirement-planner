@@ -451,9 +451,9 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                     createElement('span', { key: 'max-label' }, '50%')
                                 ])
                             ])
-                        ])
+                        ]),
                         // Validation feedback
-                        (inputs.portfolioTaxRate > 0.5 || inputs.portfolioTaxRate < 0) && 
+                        (inputs.portfolioTaxRate > 50 || inputs.portfolioTaxRate < 0) && 
                         createElement('div', {
                             key: 'tax-validation-error',
                             className: 'text-xs text-red-600 mt-1 flex items-center'

@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v7.4.1 ✨
+# 🚀 Advanced Retirement Planner v7.4.2 ✨
 
-[![Version](https://img.shields.io/badge/version-7.4.1-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-7.4.2-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-374%2F374-brightgreen.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -27,20 +27,23 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki) | **📊 Repository Statistics:** [View Stats](REPOSITORY-STATISTICS.md)
 
-## 🎨 What's New in v7.4.1 - Critical Bug Investigation Fix 🔍
+## 🎨 What's New in v7.4.2 - UI Stability Fix 🛠️
 
-### 🐛 Fixed Critical Issue
-- **Score Calculation Bug Resolution**
-  - Fixed issue where three factor calculators weren't accessible globally
-  - Exported individual calculator functions directly to window object
-  - Resolved scoring discrepancy (was showing 45 instead of expected 70-90)
-  - All 8 financial health factors now calculate correctly
+### 🐛 Fixed Critical Issues
+- **WizardStepSavings Component Error**
+  - Fixed createElement syntax error causing component crash
+  - Corrected missing comma in array structure
+  - Component now renders properly without errors
 
-### 🔧 Technical Details
-- Added backward compatibility exports for all calculator functions
-- Maintained existing `financialHealthEngine` namespace
-- No breaking changes to existing integrations
+### 🔧 Tax Rate Validation
+- Fixed portfolio tax rate validation consistency
+- Tax rates properly handled as percentages (0-50)
+- Validation messages display correctly
+
+### ✅ Quality Assurance
 - All 374 tests continue to pass
+- No breaking changes to existing functionality
+- Improved component stability
 
 ### 🛡️ Quality Assurance
 - Validates data persistence through 9-step wizard

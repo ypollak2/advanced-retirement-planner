@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify v7.4.1 Fix - Calculator Functions Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        h1 {
+            color: #333;
+            margin: 0 0 20px 0;
+        }
+        .test-section {
+            border: 2px solid #007bff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        .command-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            position: relative;
+            overflow-x: auto;
+            cursor: pointer;
+        }
+        .command-block:hover {
+            background: #2a2a2a;
+        }
+        .copy-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .copy-btn:hover {
+            background: #218838;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 10px 10px 0;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .result-table th, .result-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .result-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        .pass { color: #28a745; font-weight: bold; }
+        .fail { color: #dc3545; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Verify v7.4.1 Fix - Calculator Functions Test</h1>
+        <p>This test verifies that all financial health calculator functions are now properly accessible and return the correct object format.</p>
+        
+        <button onclick="window.open('https://ypollak2.github.io/advanced-retirement-planner/', '_blank')">
+            Open Production App
+        </button>
+    </div>
+
+    <div class="container">
+        <h2>Test 1: Check Calculator Function Availability</h2>
+        <p>This test checks if all calculator functions are accessible on the window object.</p>
+        
+        <div class="command-block" onclick="copyToClipboard(this)">
+// Test 1: Check if all calculator functions are available
+console.log('🔍 Testing Calculator Function Availability...\n');
+
+const calculatorFunctions = [
+    'calculateSavingsRateScore',
+    'calculateRetirementReadinessScore',
+    'calculateTimeHorizonScore',
+    'calculateRiskAlignmentScore',
+    'calculateDiversificationScore',
+    'calculateTaxEfficiencyScore',
+    'calculateEmergencyFundScore',
+    'calculateDebtManagementScore'
+];
+
+let allAvailable = true;
+const availability = {};
+
+calculatorFunctions.forEach(funcName => {
+    const isAvailable = typeof window[funcName] === 'function';
+    availability[funcName] = isAvailable;
+    console.log(`${isAvailable ? '✅' : '❌'} ${funcName}: ${isAvailable ? 'Available' : 'NOT FOUND'}`);
+    if (!isAvailable) allAvailable = false;
+});
+
+console.log(`\n${allAvailable ? '✅ SUCCESS' : '❌ FAILURE'}: ${allAvailable ? 'All calculator functions are available!' : 'Some calculator functions are missing!'}`);
+
+// Also check the namespace
+if (window.financialHealthEngine) {
+    console.log('\n📦 financialHealthEngine namespace also available');
+}
+            <button class="copy-btn">Copy</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Test 2: Verify Return Format</h2>
+        <p>This test verifies that each calculator returns an object with score and details properties.</p>
+        
+        <div class="command-block" onclick="copyToClipboard(this)">
+// Test 2: Verify each calculator returns correct format
+console.log('\n🧪 Testing Calculator Return Formats...\n');
+
+const testData = {
+    planningType: 'individual',
+    currentAge: 35,
+    retirementAge: 67,
+    currentMonthlySalary: 50000,
+    currentMonthlyExpenses: 25000,
+    currentPension: 500000,
+    currentTrainingFund: 300000,
+    currentPortfolio: 200000,
+    emergencyFund: 150000,
+    pensionContributionRate: 18.5,
+    trainingFundContributionRate: 10,
+    riskTolerance: 'balanced',
+    expectedAnnualReturn: 7,
+    country: 'israel'
+};
+
+const calculators = [
+    'calculateSavingsRateScore',
+    'calculateRetirementReadinessScore',
+    'calculateTaxEfficiencyScore'
+];
+
+calculators.forEach(calcName => {
+    if (window[calcName]) {
+        try {
+            const result = window[calcName](testData);
+            const hasScore = typeof result.score === 'number';
+            const hasDetails = typeof result.details === 'object';
+            const isValid = hasScore && hasDetails;
+            
+            console.log(`${calcName}:`);
+            console.log(`  Type: ${typeof result}`);
+            console.log(`  Has score: ${hasScore} (${result.score})`);
+            console.log(`  Has details: ${hasDetails}`);
+            console.log(`  ${isValid ? '✅ VALID FORMAT' : '❌ INVALID FORMAT'}`);
+            console.log('---');
+        } catch (error) {
+            console.error(`❌ ${calcName} ERROR:`, error.message);
+        }
+    } else {
+        console.error(`❌ ${calcName} NOT FOUND`);
+    }
+});
+            <button class="copy-btn">Copy</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Test 3: Full Score Calculation</h2>
+        <p>This test runs the complete financial health score calculation with all factors.</p>
+        
+        <div class="command-block" onclick="copyToClipboard(this)">
+// Test 3: Run full financial health score calculation
+console.log('\n🎯 Running Full Score Calculation...\n');
+
+const testProfile = {
+    planningType: 'individual',
+    currentAge: 35,
+    retirementAge: 67,
+    currentMonthlySalary: 50000,
+    currentMonthlyExpenses: 25000,
+    currentPension: 500000,
+    currentTrainingFund: 300000,
+    currentPortfolio: 200000,
+    currentRealEstate: 0,
+    currentCrypto: 0,
+    currentSavingsAccount: 50000,
+    emergencyFund: 150000,
+    pensionEmployeeRate: 6,
+    pensionEmployerRate: 6.5,
+    pensionEmployerBenefitsRate: 6,
+    trainingFundEmployeeRate: 2.5,
+    trainingFundEmployerRate: 7.5,
+    riskTolerance: 'balanced',
+    expectedAnnualReturn: 7,
+    country: 'israel'
+};
+
+if (window.calculateFinancialHealthScore) {
+    try {
+        const result = window.calculateFinancialHealthScore(testProfile, {
+            combinePartners: false,
+            debugMode: true
+        });
+        
+        console.log('='.repeat(60));
+        console.log('📊 FINANCIAL HEALTH SCORE RESULTS');
+        console.log('='.repeat(60));
+        console.log(`🎯 Total Score: ${result.totalScore}/100`);
+        console.log(`📈 Expected Range: 70-90`);
+        console.log(`❌ Bug Range: 27-29`);
+        
+        // Check if bug is present
+        if (result.totalScore >= 27 && result.totalScore <= 29) {
+            console.error('\n❌ CRITICAL: The 27-29 bug is STILL PRESENT!');
+        } else if (result.totalScore >= 70 && result.totalScore <= 90) {
+            console.log('\n✅ SUCCESS: Score is in the expected range!');
+            console.log('🎉 The bug has been FIXED!');
+        } else if (result.totalScore >= 40 && result.totalScore <= 50) {
+            console.warn('\n⚠️ PARTIAL FIX: Score improved from 27-29 to ' + result.totalScore);
+            console.warn('Some factors may still need attention.');
+        } else {
+            console.warn(`\n⚠️ WARNING: Score ${result.totalScore} is outside expected range`);
+        }
+        
+        // Show factor breakdown
+        console.log('\n📊 Factor Breakdown:');
+        if (result.factorScores) {
+            Object.entries(result.factorScores).forEach(([factor, data]) => {
+                const score = data.score || 0;
+                const max = data.maxScore || data.weight || 0;
+                const status = score === 0 ? '❌' : '✅';
+                console.log(`${status} ${factor}: ${score}/${max}`);
+            });
+        }
+        
+        console.log('='.repeat(60));
+        
+    } catch (error) {
+        console.error('❌ Error calculating score:', error);
+    }
+} else {
+    console.error('❌ calculateFinancialHealthScore function not found!');
+}
+            <button class="copy-btn">Copy</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Test 4: Individual Factor Testing</h2>
+        <p>Test each problematic factor individually to verify they're working correctly.</p>
+        
+        <div class="command-block" onclick="copyToClipboard(this)">
+// Test 4: Test individual factors that were returning 0
+console.log('\n🔧 Testing Individual Problematic Factors...\n');
+
+const testData = {
+    planningType: 'individual',
+    currentAge: 35,
+    retirementAge: 67,
+    currentMonthlySalary: 50000,
+    currentMonthlyExpenses: 25000,
+    currentPension: 500000,
+    currentTrainingFund: 300000,
+    pensionEmployeeRate: 6,
+    pensionEmployerRate: 6.5,
+    trainingFundEmployeeRate: 2.5,
+    trainingFundEmployerRate: 7.5,
+    country: 'israel'
+};
+
+// Test each problematic factor
+const problematicFactors = [
+    { name: 'savingsRate', func: 'calculateSavingsRateScore', maxScore: 25 },
+    { name: 'retirementReadiness', func: 'calculateRetirementReadinessScore', maxScore: 20 },
+    { name: 'taxEfficiency', func: 'calculateTaxEfficiencyScore', maxScore: 8 }
+];
+
+console.log('Testing factors that were previously returning 0:\n');
+
+problematicFactors.forEach(({ name, func, maxScore }) => {
+    if (window[func]) {
+        try {
+            const result = window[func](testData);
+            const score = result.score || 0;
+            const isFixed = score > 0;
+            
+            console.log(`${name}:`);
+            console.log(`  Score: ${score}/${maxScore}`);
+            console.log(`  Status: ${isFixed ? '✅ FIXED' : '❌ STILL BROKEN'}`);
+            if (result.details) {
+                console.log(`  Details:`, result.details.status || 'No status');
+            }
+            console.log('---');
+        } catch (error) {
+            console.error(`❌ ${name} ERROR:`, error.message);
+        }
+    } else {
+        console.error(`❌ ${func} not found`);
+    }
+});
+
+// Calculate total from fixed factors
+const totalPossibleFromFixed = problematicFactors.reduce((sum, f) => sum + f.maxScore, 0);
+console.log(`\nTotal possible points from these 3 factors: ${totalPossibleFromFixed}/53`);
+console.log('If all 3 are fixed, the total score should increase by ~53 points');
+            <button class="copy-btn">Copy</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Expected Results</h2>
+        
+        <table class="result-table">
+            <tr>
+                <th>Test</th>
+                <th>Expected Result</th>
+                <th>What it Means</th>
+            </tr>
+            <tr>
+                <td>Function Availability</td>
+                <td class="pass">All 8 functions available</td>
+                <td>v7.4.1 fix is deployed</td>
+            </tr>
+            <tr>
+                <td>Return Format</td>
+                <td class="pass">All return {score, details}</td>
+                <td>Functions work correctly</td>
+            </tr>
+            <tr>
+                <td>Total Score</td>
+                <td class="pass">70-90</td>
+                <td>Bug is completely fixed</td>
+            </tr>
+            <tr>
+                <td>Individual Factors</td>
+                <td class="pass">All > 0</td>
+                <td>No factors returning 0</td>
+            </tr>
+        </table>
+        
+        <div class="success">
+            <h3>✅ If All Tests Pass:</h3>
+            <ul>
+                <li>The v7.4.1 fix is working correctly</li>
+                <li>All calculator functions are accessible</li>
+                <li>The 27-29 bug is resolved</li>
+                <li>Financial health scoring is accurate</li>
+            </ul>
+        </div>
+        
+        <div class="error">
+            <h3>❌ If Tests Fail:</h3>
+            <ul>
+                <li>Check if you're on the latest version (v7.4.1)</li>
+                <li>Try refreshing the page (Ctrl+F5)</li>
+                <li>Clear browser cache if needed</li>
+                <li>Report which specific test failed</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(element) {
+            const codeBlock = element.cloneNode(true);
+            const button = codeBlock.querySelector('.copy-btn');
+            if (button) button.remove();
+            
+            const text = codeBlock.textContent.trim();
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = element.querySelector('.copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#28a745';
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy. Please select and copy manually.');
+            });
+        }
+    </script>
+</body>
+</html>
