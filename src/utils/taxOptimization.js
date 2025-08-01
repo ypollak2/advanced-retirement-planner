@@ -102,7 +102,7 @@ window.taxOptimization = {
             reasoning = 'Lower contribution may be sufficient due to low marginal tax rate (10%)';
         }
         
-        const savings = this.calculatePensionTaxSavings(annualSalary, optimalRate, country);
+        const savings = window.taxOptimization.calculatePensionTaxSavings(annualSalary, optimalRate, country);
         
         return {
             optimalRate,
@@ -178,9 +178,9 @@ window.taxOptimization = {
         const currentPensionRate = inputs.pensionContributionRate || 7;
         const currentTrainingFund = inputs.monthlyTrainingFundContribution || 0;
         
-        const pensionAnalysis = this.calculatePensionTaxSavings(annualSalary, currentPensionRate, country);
-        const trainingFundAnalysis = this.calculateTrainingFundTaxSavings(monthlySalary, currentTrainingFund, country);
-        const optimalSuggestion = this.calculateOptimalContribution(monthlySalary, country);
+        const pensionAnalysis = window.taxOptimization.calculatePensionTaxSavings(annualSalary, currentPensionRate, country);
+        const trainingFundAnalysis = window.taxOptimization.calculateTrainingFundTaxSavings(monthlySalary, currentTrainingFund, country);
+        const optimalSuggestion = window.taxOptimization.calculateOptimalContribution(monthlySalary, country);
         
         const totalMonthlySavings = pensionAnalysis.monthlyTaxSavings + trainingFundAnalysis.monthlyTaxSavings;
         const totalAnnualSavings = pensionAnalysis.annualTaxSavings + trainingFundAnalysis.annualTaxSavings;
@@ -199,7 +199,7 @@ window.taxOptimization = {
                 totalAnnualSavings: Math.round(totalAnnualSavings),
                 effectiveTaxReduction: annualSalary > 0 ? Math.round((totalAnnualSavings / annualSalary) * 10000) / 100 : 0
             },
-            recommendations: this.generateRecommendations(pensionAnalysis, trainingFundAnalysis, optimalSuggestion, inputs)
+            recommendations: window.taxOptimization.generateRecommendations(pensionAnalysis, trainingFundAnalysis, optimalSuggestion, inputs)
         };
     },
     

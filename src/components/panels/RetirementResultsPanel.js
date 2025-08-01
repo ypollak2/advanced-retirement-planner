@@ -279,7 +279,28 @@ const ResultsPanel = ({
             results: effectiveResults,
             partnerResults: partnerResults,
             language: language
-        })
+        }),
+        
+        // Chart Display - Net Worth and Expenses Over Time
+        chartData && chartData.length > 0 && SimpleChart && React.createElement('div', {
+            key: 'chart-section',
+            className: 'mt-8'
+        }, [
+            React.createElement('h3', {
+                key: 'chart-title',
+                className: 'text-2xl font-bold mb-4 text-center'
+            }, language === 'he' ? 'גרף צבירה לאורך זמן' : 'Savings Accumulation Over Time'),
+            React.createElement(SimpleChart, {
+                key: 'savings-chart',
+                data: chartData,
+                type: 'line',
+                language: language,
+                partnerData: partnerResults,
+                chartView: chartView,
+                workingCurrency: workingCurrency,
+                inputs: inputs
+            })
+        ])
     ]);
 };
 
