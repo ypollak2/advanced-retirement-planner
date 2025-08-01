@@ -1,5 +1,5 @@
 // Export Functions for Advanced Retirement Planner
-// Created by Yali Pollak (יהלי פולק) - v7.5.7
+// Created by Yali Pollak (יהלי פולק) - v7.5.8
 
 // Export retirement plan as image (PNG/PDF)
 async function exportAsImage(format = 'png', includeCharts = true) {
@@ -109,7 +109,7 @@ function exportForLLMAnalysis(inputs, results, partnerResults = null) {
         const analysisData = {
             metadata: {
                 exportDate: new Date().toISOString(),
-                version: 'v7.5.7',
+                version: 'v7.5.8',
                 tool: 'Advanced Retirement Planner by Yali Pollak',
                 purpose: 'LLM Analysis and Recommendations'
             },
@@ -204,31 +204,111 @@ function exportForLLMAnalysis(inputs, results, partnerResults = null) {
 
 // Generate Claude-specific recommendations prompt
 function generateClaudeRecommendationsPrompt(inputs, results, partnerResults = null) {
+    // Handle couple mode vs individual mode data extraction
+    const isCoupleMode = inputs.planningType === 'couple';
+    
+    // Extract financial data based on mode
+    let currentSavingsTotal = 0;
+    let monthlyIncomeTotal = 0;
+    let monthlyExpensesTotal = 0;
+    let portfolioDetails = '';
+    
+    if (isCoupleMode) {
+        // Calculate totals for couple mode
+        const partner1Pension = parseFloat(inputs.partner1CurrentPension || 0);
+        const partner1TrainingFund = parseFloat(inputs.partner1CurrentTrainingFund || 0);
+        const partner1Portfolio = parseFloat(inputs.partner1PersonalPortfolio || 0);
+        const partner1Salary = parseFloat(inputs.partner1Salary || 0);
+        const partner1Bonus = parseFloat(inputs.partner1AnnualBonus || 0) / 12;
+        const partner1RSU = parseFloat(inputs.partner1QuarterlyRSU || 0) / 3;
+        
+        const partner2Pension = parseFloat(inputs.partner2CurrentPension || 0);
+        const partner2TrainingFund = parseFloat(inputs.partner2CurrentTrainingFund || 0);
+        const partner2Portfolio = parseFloat(inputs.partner2PersonalPortfolio || 0);
+        const partner2Salary = parseFloat(inputs.partner2Salary || 0);
+        const partner2Bonus = parseFloat(inputs.partner2AnnualBonus || 0) / 12;
+        const partner2RSU = parseFloat(inputs.partner2QuarterlyRSU || 0) / 3;
+        
+        currentSavingsTotal = partner1Pension + partner1TrainingFund + partner1Portfolio +
+                             partner2Pension + partner2TrainingFund + partner2Portfolio;
+        
+        monthlyIncomeTotal = partner1Salary + partner1Bonus + partner1RSU +
+                            partner2Salary + partner2Bonus + partner2RSU;
+        
+        monthlyExpensesTotal = parseFloat(inputs.sharedMonthlyExpenses || 0) +
+                              parseFloat(inputs.partner1MonthlyExpenses || 0) +
+                              parseFloat(inputs.partner2MonthlyExpenses || 0);
+        
+        portfolioDetails = `
+**Partner 1 Portfolio:**
+- Pension Fund: ₪${partner1Pension.toLocaleString()}
+- Training Fund: ₪${partner1TrainingFund.toLocaleString()}
+- Personal Portfolio: ₪${partner1Portfolio.toLocaleString()}
+- Monthly Salary: ₪${partner1Salary.toLocaleString()}
+- Annual Bonus: ₪${(partner1Bonus * 12).toLocaleString()}
+- Quarterly RSU: ₪${(partner1RSU * 3).toLocaleString()}
+
+**Partner 2 Portfolio:**
+- Pension Fund: ₪${partner2Pension.toLocaleString()}
+- Training Fund: ₪${partner2TrainingFund.toLocaleString()}
+- Personal Portfolio: ₪${partner2Portfolio.toLocaleString()}
+- Monthly Salary: ₪${partner2Salary.toLocaleString()}
+- Annual Bonus: ₪${(partner2Bonus * 12).toLocaleString()}
+- Quarterly RSU: ₪${(partner2RSU * 3).toLocaleString()}`;
+    } else {
+        // Individual mode
+        currentSavingsTotal = parseFloat(inputs.currentSavings || 0) +
+                             parseFloat(inputs.currentTrainingFund || 0) +
+                             parseFloat(inputs.currentPersonalPortfolio || 0);
+        
+        monthlyIncomeTotal = parseFloat(inputs.currentSalary || inputs.currentMonthlySalary || 0) +
+                            parseFloat(inputs.annualBonus || 0) / 12 +
+                            parseFloat(inputs.quarterlyRSU || 0) / 3;
+        
+        monthlyExpensesTotal = parseFloat(inputs.currentMonthlyExpenses || 0);
+        
+        portfolioDetails = `
+**Investment Portfolio:**
+- Training Fund: ₪${(inputs.currentTrainingFund || 0).toLocaleString()} (${inputs.trainingFundReturn || 0}% return)
+- Personal Portfolio: ₪${(inputs.currentPersonalPortfolio || 0).toLocaleString()} + ₪${inputs.personalPortfolioMonthly || 0}/month
+- Real Estate: ₪${(inputs.currentRealEstate || 0).toLocaleString()}
+- Cryptocurrency: ₪${(inputs.currentCrypto || 0).toLocaleString()}`;
+    }
+    
+    // Calculate projected total accumulation
+    let projectedAccumulation = 0;
+    if (isCoupleMode && results?.partnerResults) {
+        const p1 = results.partnerResults.partner1 || {};
+        const p2 = results.partnerResults.partner2 || {};
+        projectedAccumulation = (p1.totalSavings || 0) + (p1.trainingFundValue || 0) + (p1.personalPortfolioValue || 0) +
+                               (p2.totalSavings || 0) + (p2.trainingFundValue || 0) + (p2.personalPortfolioValue || 0);
+    } else {
+        projectedAccumulation = (results?.totalSavings || 0) + (results?.trainingFundValue || 0) + 
+                               (results?.personalPortfolioValue || 0);
+    }
+    
     const prompt = `
 Please analyze this retirement planning data and provide comprehensive, personalized recommendations:
 
 **Personal Information:**
-- Current Age: ${inputs.currentAge}
-- Target Retirement Age: ${inputs.retirementAge}
+- Current Age: ${inputs.currentAge || (isCoupleMode ? 'Partner 1: ' + inputs.partner1Age + ', Partner 2: ' + inputs.partner2Age : 'N/A')}
+- Target Retirement Age: ${inputs.retirementAge || 67}
 - Planning Type: ${inputs.planningType || 'individual'}
-- Risk Tolerance: ${inputs.riskTolerance}
+- Risk Tolerance: ${inputs.riskTolerance || 'moderate'}
 
 **Current Financial Situation:**
-- Current Savings: ₪${inputs.currentSavings?.toLocaleString()}
-- Current Salary: ₪${inputs.currentSalary?.toLocaleString()}/month
-- Monthly Expenses: ₪${inputs.currentMonthlyExpenses?.toLocaleString()}
-- Target Income Replacement: ${inputs.targetReplacement}%
+- Total Current Savings: ₪${currentSavingsTotal.toLocaleString()}
+- Total Monthly Income (Gross): ₪${monthlyIncomeTotal.toLocaleString()}
+- Total Monthly Expenses: ₪${monthlyExpensesTotal.toLocaleString()}
+- Expense-to-Income Ratio: ${monthlyExpensesTotal > 0 ? Math.round((monthlyExpensesTotal / monthlyIncomeTotal) * 100) : 0}%
+- Target Income Replacement: ${inputs.targetReplacement || 70}%
 
-**Investment Portfolio:**
-- Training Fund: ₪${inputs.currentTrainingFund?.toLocaleString()} (${inputs.trainingFundReturn}% return)
-- Personal Portfolio: ₪${inputs.currentPersonalPortfolio?.toLocaleString()} + ₪${inputs.personalPortfolioMonthly}/month
-- Real Estate: ₪${inputs.currentRealEstate?.toLocaleString()}
-- Cryptocurrency: ₪${inputs.currentCrypto?.toLocaleString()}
+${portfolioDetails}
 
-**Projected Results:**
-- Total Savings at Retirement: ₪${results?.totalSavings?.toLocaleString()}
-- Monthly Pension Income: ₪${results?.monthlyIncome?.toLocaleString()}
-- Retirement Readiness Score: ${results?.readinessScore || 'N/A'}
+**Projected Results at Retirement:**
+- Total Projected Accumulation: ₪${projectedAccumulation.toLocaleString()}
+- Monthly Pension Income: ₪${(results?.totalNetIncome || results?.monthlyIncome || 0).toLocaleString()}
+- Retirement Readiness Score: ${results?.readinessScore || partnerResults?.combined?.readinessScore || 'N/A'}%
 
 Please provide specific, actionable recommendations for:
 1. **Asset Allocation Optimization** - How to improve portfolio balance

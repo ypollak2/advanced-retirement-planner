@@ -563,12 +563,38 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
         processedInputs.currentMonthlySalary, processedInputs.monthlyContribution, 
         processedInputs.inflationRate]);
     
-    // Fix field mapping - retirement calculation returns totalSavings, not totalAccumulation
-    // If retirement projections are 0, calculate from current savings
-    let totalAccumulation = retirementProjections.totalSavings || retirementProjections.totalAccumulation || 0;
+    // Get the projected total accumulation at retirement
+    // This should include all asset growth over the years to retirement
+    let totalAccumulation = 0;
     
-    // If still 0, try to calculate from current savings using processedInputs
+    // For couple mode, sum up all projected values
+    if (processedInputs.planningType === 'couple' && retirementProjections.partnerResults) {
+        const partner1Results = retirementProjections.partnerResults.partner1 || {};
+        const partner2Results = retirementProjections.partnerResults.partner2 || {};
+        
+        // Sum all projected savings components for both partners
+        totalAccumulation = (partner1Results.totalSavings || 0) +
+                           (partner1Results.trainingFundValue || 0) +
+                           (partner1Results.personalPortfolioValue || 0) +
+                           (partner1Results.currentRealEstate || 0) +
+                           (partner1Results.currentCrypto || 0) +
+                           (partner2Results.totalSavings || 0) +
+                           (partner2Results.trainingFundValue || 0) +
+                           (partner2Results.personalPortfolioValue || 0) +
+                           (partner2Results.currentRealEstate || 0) +
+                           (partner2Results.currentCrypto || 0);
+    } else {
+        // Individual mode - use all projected components
+        totalAccumulation = (retirementProjections.totalSavings || 0) +
+                           (retirementProjections.trainingFundValue || 0) +
+                           (retirementProjections.personalPortfolioValue || 0) +
+                           (retirementProjections.currentRealEstate || 0) +
+                           (retirementProjections.currentCrypto || 0);
+    }
+    
+    // If still 0, fall back to current savings (no growth calculated)
     if (totalAccumulation === 0) {
+        console.warn('⚠️ No projected values available, showing current savings only');
         if (processedInputs.planningType === 'couple') {
             totalAccumulation = parseFloat(inputs.partner1CurrentPension || 0) +
                                parseFloat(inputs.partner1CurrentTrainingFund || 0) +
@@ -590,10 +616,44 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     const projectedIncome = retirementProjections.totalNetIncome || retirementProjections.projectedIncome || 0;
     const monthlyRetirementIncome = retirementProjections.monthlyIncome || 0;
     
+    // Calculate total monthly income including all sources
+    let totalMonthlyIncome = 0;
+    if (processedInputs.planningType === 'couple') {
+        // Partner 1 income
+        const partner1Salary = parseFloat(inputs.partner1Salary || 0);
+        const partner1Bonus = parseFloat(inputs.partner1AnnualBonus || 0) / 12;
+        const partner1RSU = parseFloat(inputs.partner1QuarterlyRSU || 0) / 3;
+        const partner1Freelance = parseFloat(inputs.partner1FreelanceIncome || 0);
+        const partner1Rental = parseFloat(inputs.partner1RentalIncome || 0);
+        const partner1Dividend = parseFloat(inputs.partner1DividendIncome || 0);
+        
+        // Partner 2 income
+        const partner2Salary = parseFloat(inputs.partner2Salary || 0);
+        const partner2Bonus = parseFloat(inputs.partner2AnnualBonus || 0) / 12;
+        const partner2RSU = parseFloat(inputs.partner2QuarterlyRSU || 0) / 3;
+        const partner2Freelance = parseFloat(inputs.partner2FreelanceIncome || 0);
+        const partner2Rental = parseFloat(inputs.partner2RentalIncome || 0);
+        const partner2Dividend = parseFloat(inputs.partner2DividendIncome || 0);
+        
+        totalMonthlyIncome = partner1Salary + partner1Bonus + partner1RSU + partner1Freelance + partner1Rental + partner1Dividend +
+                            partner2Salary + partner2Bonus + partner2RSU + partner2Freelance + partner2Rental + partner2Dividend;
+    } else {
+        // Individual mode
+        const salary = parseFloat(processedInputs.currentMonthlySalary || inputs.currentSalary || 0);
+        const bonus = parseFloat(inputs.annualBonus || 0) / 12;
+        const rsu = parseFloat(inputs.quarterlyRSU || 0) / 3;
+        const freelance = parseFloat(inputs.freelanceIncome || 0);
+        const rental = parseFloat(inputs.rentalIncome || 0);
+        const dividend = parseFloat(inputs.dividendIncome || 0);
+        
+        totalMonthlyIncome = salary + bonus + rsu + freelance + rental + dividend;
+    }
+    
     // Ensure values are not NaN
     const safeTotalAccumulation = isNaN(totalAccumulation) || !isFinite(totalAccumulation) ? 0 : totalAccumulation;
     const safeProjectedIncome = isNaN(projectedIncome) || !isFinite(projectedIncome) ? 0 : projectedIncome;
     const safeMonthlyRetirementIncome = isNaN(monthlyRetirementIncome) || !isFinite(monthlyRetirementIncome) ? 0 : monthlyRetirementIncome;
+    const safeTotalMonthlyIncome = isNaN(totalMonthlyIncome) || !isFinite(totalMonthlyIncome) ? 0 : totalMonthlyIncome;
     
     console.log('📊 Component Scores Data Mapping:', {
         totalAccumulation: totalAccumulation,
@@ -850,12 +910,29 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                     className: "p-3 bg-orange-50 rounded-lg text-center"
                 }, [
                     createElement('div', { key: 'income-value', className: "text-lg font-bold text-orange-600" }, 
-                        window.formatCurrency ? window.formatCurrency(processedInputs.currentMonthlySalary || 0, workingCurrency) : `${workingCurrency}${(processedInputs.currentMonthlySalary || 0).toLocaleString()}`),
+                        window.formatCurrency ? window.formatCurrency(safeTotalMonthlyIncome, workingCurrency) : `${workingCurrency}${safeTotalMonthlyIncome.toLocaleString()}`),
                     createElement('div', { key: 'income-label', className: "text-sm text-orange-700" }, 
-                        language === 'he' ? 'הכנסה חודשית נוכחית' : 'Current Monthly Income')
+                        language === 'he' ? 'הכנסה חודשית כוללת (ברוטו)' : 'Total Monthly Income (Gross)')
                 ])
             ])
         ]),
+        
+        // Comprehensive Financial Summary (Income/Expense/Tax)
+        window.ComprehensiveFinancialSummary && createElement(window.ComprehensiveFinancialSummary, {
+            key: 'comprehensive-financial-summary',
+            inputs: inputs,
+            language: language,
+            workingCurrency: workingCurrency
+        }),
+        
+        // Inflation Impact Display
+        window.InflationImpactDisplay && createElement(window.InflationImpactDisplay, {
+            key: 'inflation-impact',
+            retirementProjections: retirementProjections,
+            inputs: inputs,
+            language: language,
+            workingCurrency: workingCurrency
+        }),
         
         // Additional Income Tax Analysis
         window.AdditionalIncomeTaxPanel && createElement(window.AdditionalIncomeTaxPanel, {

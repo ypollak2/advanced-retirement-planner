@@ -6,6 +6,51 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [7.5.8] - 2025-08-01 - Comprehensive Review Step Improvements
+### 🚀 **Major Enhancements**
+- **Fixed Total Accumulation Display**:
+  - Now correctly shows projected retirement savings (₪7.96M) instead of current savings (₪4.6M)
+  - Properly sums all projected asset values at retirement for both individual and couple modes
+  - Includes compound growth calculations over years to retirement
+
+- **Enhanced Monthly Income Display**:
+  - Shows total gross monthly income including all sources (salary + bonuses + RSU + other)
+  - Couple mode: Correctly sums both partners' income sources
+  - Example: ₪86,500 salary + ₪16,667 bonus + ₪166,667 RSU = ₪269,834 total
+
+- **New Comprehensive Financial Summary Panel**:
+  - Detailed Income Breakdown (salaries, bonuses, RSU, freelance, rental, dividends)
+  - Complete Expense Categories with professional naming
+  - Tax Analysis (income tax, national insurance, health tax, capital gains)
+  - Visual Expense-to-Income Ratio indicator with color coding
+  - Net Income and Disposable Income calculations
+  - Savings Rate percentage display
+
+- **Inflation Impact Display**:
+  - Shows retirement projections with both nominal and inflation-adjusted values
+  - Side-by-side comparison of purchasing power
+  - Visual purchasing power loss indicator
+  - Helps users understand real vs. nominal pension values
+
+### 🐛 **Bug Fixes**
+- **Fixed Claude Export for Couple Mode**:
+  - Now properly extracts and displays all partner data
+  - Shows detailed portfolio breakdown for each partner
+  - Calculates correct totals for couple planning
+
+- **Fixed Chart Generation for Couple Mode**:
+  - Savings trajectory chart now properly handles couple income and savings rates
+  - Correctly calculates weighted average contribution rates
+  - Uses appropriate income totals for projections
+
+### 💅 **UI/UX Improvements**
+- Professional field naming throughout (Credit Card, Car Loan, etc.)
+- Enhanced visual indicators for financial health metrics
+- Better organization of review step panels
+- Improved data presentation with clear categorization
+
+---
+
 ## [7.5.7] - 2025-08-01 - NaN Display Fix in Component Scores
 ### 🐛 **Fixed**
 - **Component Scores NaN Display**:
