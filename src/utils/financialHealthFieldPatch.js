@@ -75,6 +75,9 @@ window.patchFinancialHealthEngine = function() {
     // Patch savings rate calculation
     window.calculateSavingsRateScore = function(inputs) {
         console.log('💰 [PATCHED] Calculating Savings Rate Score...');
+        console.log('📋 Available input fields:', Object.keys(inputs).sort());
+        console.log('🔍 Checking for employeePensionRate:', inputs.employeePensionRate);
+        console.log('🔍 Checking for trainingFundEmployeeRate:', inputs.trainingFundEmployeeRate);
         
         // Enhanced income detection
         let monthlyIncome = 0;
@@ -293,5 +296,8 @@ function tryApplyPatch() {
 window.addEventListener('DOMContentLoaded', () => {
     setTimeout(tryApplyPatch, 500);
 });
+
+// Also try immediately in case DOM is already loaded
+setTimeout(tryApplyPatch, 100);
 
 console.log('✅ Financial Health Field Patch loaded');

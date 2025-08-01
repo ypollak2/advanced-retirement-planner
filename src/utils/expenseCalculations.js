@@ -177,10 +177,16 @@ function analyzeExpenseRatios(expenses, monthlyIncome, language = 'en') {
     // Find highest expense category
     let highestCategory = null;
     let highestAmount = 0;
+    let highestCategoryName = null;
     Object.entries(analysis).forEach(([category, data]) => {
         if (category !== 'savings' && data.amount > highestAmount) {
-            highestCategory = category;
+            highestCategoryName = category;
             highestAmount = data.amount;
+            highestCategory = {
+                category: category,
+                amount: data.amount,
+                percentage: data.ratio
+            };
         }
     });
     
@@ -191,7 +197,8 @@ function analyzeExpenseRatios(expenses, monthlyIncome, language = 'en') {
         totalExpenses, 
         totalExpenseRatio,
         categoryBreakdown: analysis,
-        highestCategory: highestCategory
+        highestCategory: highestCategory,
+        savingsPotential: calculateSavingsPotential(expenses, monthlyIncome)
     };
 }
 

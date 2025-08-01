@@ -1,6 +1,6 @@
 {
-  "version": "7.4.9",
+  "version": "7.4.10",
   "build": "2025-08-01",
-  "commit": "fix-scoring-tooltips-expense-analysis",
-  "description": "Fixed savings rate and tax efficiency scoring (0% issue), enhanced tooltip hover functionality, fixed expense analysis ratio calculation"
+  "commit": "critical-hotfix-field-mapping-expense-crash",
+  "description": "CRITICAL HOTFIX: Fixed ExpenseAnalysisPanel crash, fixed field mapping for employeePensionRate, patched financial health scoring"
 }
