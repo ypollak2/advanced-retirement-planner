@@ -61,7 +61,7 @@ window.taxOptimization = {
             taxableAmount = annualContribution - deductibleAmount;
         }
         
-        const taxSavings = this.calculateTaxSavingsFromDeduction(annualSalary, deductibleAmount);
+        const taxSavings = window.taxOptimization.calculateTaxSavingsFromDeduction(annualSalary, deductibleAmount);
         
         return {
             monthlyContribution: Math.round(contributionAmount),
@@ -83,7 +83,7 @@ window.taxOptimization = {
         }
         
         const annualSalary = grossMonthlySalary * 12;
-        const marginalRate = this.getMarginalTaxRate(annualSalary);
+        const marginalRate = window.taxOptimization.getMarginalTaxRate(annualSalary);
         
         let optimalRate = 7; // Israeli legal maximum for tax deduction
         let reasoning = '';
