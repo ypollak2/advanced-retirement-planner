@@ -309,7 +309,7 @@ async function loadHtml2Canvas() {
 async function loadJsPDF() {
     return new Promise((resolve, reject) => {
         // Check if jsPDF is already available in various forms
-        if (typeof window.jsPDF !== 'undefined' || typeof window.jspdf?.jsPDF !== 'undefined') {
+        if (typeof window.jsPDF !== 'undefined' || typeof window.jspdf?.jsPDF !== 'undefined' || typeof jsPDF !== 'undefined') {
             resolve();
             return;
         }
