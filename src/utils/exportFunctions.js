@@ -1,5 +1,5 @@
 // Export Functions for Advanced Retirement Planner
-// Created by Yali Pollak (יהלי פולק) - v7.4.10
+// Created by Yali Pollak (יהלי פולק) - v7.4.11
 
 // Export retirement plan as image (PNG/PDF)
 async function exportAsImage(format = 'png', includeCharts = true) {
@@ -74,7 +74,12 @@ async function exportCanvasAsPDF(canvas) {
             await loadJsPDF();
         }
 
-        const { jsPDF } = window;
+        // Check if jsPDF is properly loaded
+        const jsPDF = window.jsPDF || window.jspdf?.jsPDF;
+        if (!jsPDF || typeof jsPDF !== 'function') {
+            throw new Error('jsPDF constructor not available after loading');
+        }
+        
         const imgData = canvas.toDataURL('image/png', 1.0);
         
         // Calculate PDF dimensions
@@ -104,7 +109,7 @@ function exportForLLMAnalysis(inputs, results, partnerResults = null) {
         const analysisData = {
             metadata: {
                 exportDate: new Date().toISOString(),
-                version: 'v7.4.10',
+                version: 'v7.4.11',
                 tool: 'Advanced Retirement Planner by Yali Pollak',
                 purpose: 'LLM Analysis and Recommendations'
             },
@@ -303,7 +308,8 @@ async function loadHtml2Canvas() {
 // Dynamically load jsPDF library
 async function loadJsPDF() {
     return new Promise((resolve, reject) => {
-        if (typeof jsPDF !== 'undefined') {
+        // Check if jsPDF is already available in various forms
+        if (typeof window.jsPDF !== 'undefined' || typeof window.jspdf?.jsPDF !== 'undefined' || typeof jsPDF !== 'undefined') {
             resolve();
             return;
         }
@@ -312,8 +318,14 @@ async function loadJsPDF() {
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
         script.crossOrigin = 'anonymous';
         script.onload = () => {
-            console.log('✅ jsPDF loaded successfully');
-            resolve();
+            // Verify jsPDF is properly available after loading
+            if (typeof window.jsPDF !== 'undefined' || typeof window.jspdf?.jsPDF !== 'undefined') {
+                console.log('✅ jsPDF loaded successfully');
+                resolve();
+            } else {
+                console.error('❌ jsPDF loaded but constructor not found');
+                reject(new Error('jsPDF constructor not found after script load'));
+            }
         };
         script.onerror = (error) => {
             console.error('❌ Failed to load jsPDF from CDN:', error);
@@ -322,8 +334,12 @@ async function loadJsPDF() {
             fallbackScript.src = 'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js';
             fallbackScript.crossOrigin = 'anonymous';
             fallbackScript.onload = () => {
-                console.log('✅ jsPDF loaded from fallback CDN');
-                resolve();
+                if (typeof window.jsPDF !== 'undefined' || typeof window.jspdf?.jsPDF !== 'undefined') {
+                    console.log('✅ jsPDF loaded from fallback CDN');
+                    resolve();
+                } else {
+                    reject(new Error('jsPDF constructor not found after fallback load'));
+                }
             };
             fallbackScript.onerror = () => {
                 reject(new Error('Failed to load jsPDF from both primary and fallback CDNs'));

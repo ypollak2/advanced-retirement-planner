@@ -288,7 +288,7 @@ const HelpTooltip = ({ term, children, language = 'en', position = 'top' }) => {
         isVisible && React.createElement('div', {
             key: 'tooltip',
             id: `tooltip-${term}`,
-            className: `absolute z-50 ${getTooltipPosition()} w-80 max-w-sm`,
+            className: `absolute z-[9999] ${getTooltipPosition()} w-80 max-w-sm`,
             role: 'tooltip'
         }, [
             React.createElement('div', {

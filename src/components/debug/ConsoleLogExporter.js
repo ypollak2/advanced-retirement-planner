@@ -20,7 +20,7 @@ const ConsoleLogExporter = ({ language = 'en' }) => {
         }
         
         // Listen for new logs
-        const handleNewLog = (event) => {
+        const handleNewLog = React.useCallback((event) => {
             setLogs(prevLogs => {
                 const newLogs = [...prevLogs, event.detail];
                 // Maintain circular buffer size
@@ -29,11 +29,11 @@ const ConsoleLogExporter = ({ language = 'en' }) => {
                 }
                 return newLogs;
             });
-        };
+        }, []);
         
-        const handleClear = () => {
+        const handleClear = React.useCallback(() => {
             setLogs([]);
-        };
+        }, []);
         
         window.addEventListener('consoleLogCaptured', handleNewLog);
         window.addEventListener('consoleLogsCleared', handleClear);
