@@ -106,10 +106,36 @@ window.generateChartData = (
 window.generateRetirementProjectionChart = (inputs) => {
     const currentAge = parseFloat(inputs.currentAge || 30);
     const retirementAge = parseFloat(inputs.retirementAge || 67);
-    const monthlyIncome = parseFloat(inputs.currentMonthlySalary || inputs.currentSalary || 0);
-    const savingsRate = (parseFloat(inputs.pensionContributionRate || 0) + parseFloat(inputs.trainingFundContributionRate || 0)) / 100;
+    
+    // Calculate monthly income based on planning type
+    let monthlyIncome = 0;
+    let savingsRate = 0;
+    
+    if (inputs.planningType === 'couple') {
+        // Couple mode: sum partner incomes
+        const partner1Salary = parseFloat(inputs.partner1Salary || 0);
+        const partner2Salary = parseFloat(inputs.partner2Salary || 0);
+        monthlyIncome = partner1Salary + partner2Salary;
+        
+        // Calculate weighted average savings rate
+        const partner1PensionRate = parseFloat(inputs.partner1EmployeeRate || 0) + parseFloat(inputs.partner1EmployerRate || 0);
+        const partner1TrainingRate = parseFloat(inputs.partner1TrainingFundEmployeeRate || 0) + parseFloat(inputs.partner1TrainingFundEmployerRate || 0);
+        const partner2PensionRate = parseFloat(inputs.employeePensionRate || 0) + parseFloat(inputs.employerPensionRate || 0);
+        const partner2TrainingRate = parseFloat(inputs.trainingFundEmployeeRate || 0) + parseFloat(inputs.trainingFundEmployerRate || 0);
+        
+        const totalIncome = partner1Salary + partner2Salary;
+        if (totalIncome > 0) {
+            savingsRate = ((partner1Salary * (partner1PensionRate + partner1TrainingRate) + 
+                           partner2Salary * (partner2PensionRate + partner2TrainingRate)) / totalIncome) / 100;
+        }
+    } else {
+        // Individual mode
+        monthlyIncome = parseFloat(inputs.currentMonthlySalary || inputs.currentSalary || 0);
+        savingsRate = (parseFloat(inputs.pensionContributionRate || 0) + parseFloat(inputs.trainingFundContributionRate || 0)) / 100;
+    }
+    
     const expectedReturn = parseFloat(inputs.expectedAnnualReturn || 7) / 100;
-    const inflationRate = 0.03;
+    const inflationRate = parseFloat(inputs.inflationRate || 3) / 100;
     
     const yearsToRetirement = retirementAge - currentAge;
     const annualSavings = monthlyIncome * 12 * savingsRate;
