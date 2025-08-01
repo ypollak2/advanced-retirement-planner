@@ -124,10 +124,16 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
             hasPartner1Salary: !!inputs.partner1Salary,
             hasPartner2Salary: !!inputs.partner2Salary,
             hasCurrentMonthlySalary: !!inputs.currentMonthlySalary,
+            hasCurrentSalary: !!inputs.currentSalary,
             hasPensionContributionRate: !!inputs.pensionContributionRate,
             hasTrainingFundContributionRate: !!inputs.trainingFundContributionRate,
             hasEmergencyFund: !!inputs.emergencyFund
         });
+        
+        // Fix field mapping: currentSalary -> currentMonthlySalary
+        if (!baseInputs.currentMonthlySalary && baseInputs.currentSalary) {
+            baseInputs.currentMonthlySalary = baseInputs.currentSalary;
+        }
         
         // Enhanced field mapping for Financial Health Score engine compatibility
         const mappedInputs = {
