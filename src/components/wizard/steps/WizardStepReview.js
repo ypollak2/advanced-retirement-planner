@@ -462,6 +462,40 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
     const projectedIncome = retirementProjections.totalNetIncome || retirementProjections.projectedIncome || 0;
     const monthlyRetirementIncome = retirementProjections.monthlyIncome || 0;
     
+    // Calculate current monthly income including all sources (salary + bonuses + RSUs + other)
+    let currentMonthlyIncome = 0;
+    
+    if (inputs.planningType === 'couple') {
+        // Partner 1 income
+        const partner1Salary = parseFloat(inputs.partner1Salary || 0);
+        const partner1Bonus = parseFloat(inputs.partner1Bonus || inputs.partner1AnnualBonus || 0) / 12;
+        const partner1RSU = parseFloat(inputs.partner1RSU || inputs.partner1QuarterlyRSU || 0) / 3; // Quarterly to monthly
+        const partner1Freelance = parseFloat(inputs.partner1FreelanceIncome || 0);
+        const partner1Rental = parseFloat(inputs.partner1RentalIncome || 0);
+        const partner1Dividend = parseFloat(inputs.partner1DividendIncome || 0);
+        
+        // Partner 2 income
+        const partner2Salary = parseFloat(inputs.partner2Salary || 0);
+        const partner2Bonus = parseFloat(inputs.partner2Bonus || inputs.partner2AnnualBonus || 0) / 12;
+        const partner2RSU = parseFloat(inputs.partner2RSU || inputs.partner2QuarterlyRSU || 0) / 3; // Quarterly to monthly
+        const partner2Freelance = parseFloat(inputs.partner2FreelanceIncome || 0);
+        const partner2Rental = parseFloat(inputs.partner2RentalIncome || 0);
+        const partner2Dividend = parseFloat(inputs.partner2DividendIncome || 0);
+        
+        currentMonthlyIncome = partner1Salary + partner1Bonus + partner1RSU + partner1Freelance + partner1Rental + partner1Dividend +
+                              partner2Salary + partner2Bonus + partner2RSU + partner2Freelance + partner2Rental + partner2Dividend;
+    } else {
+        // Individual mode
+        const salary = parseFloat(inputs.currentMonthlySalary || inputs.monthlySalary || inputs.currentSalary || 0);
+        const bonus = parseFloat(inputs.annualBonus || 0) / 12;
+        const rsu = parseFloat(inputs.quarterlyRSU || 0) / 3; // Quarterly to monthly
+        const freelance = parseFloat(inputs.freelanceIncome || 0);
+        const rental = parseFloat(inputs.rentalIncome || 0);
+        const dividend = parseFloat(inputs.dividendIncome || 0);
+        
+        currentMonthlyIncome = salary + bonus + rsu + freelance + rental + dividend;
+    }
+    
     // Retirement readiness assessment with memoization (test pattern: readinessScore)
     const readinessScore = React.useMemo(() => {
         return window.calculateRetirementReadinessScore ? 
@@ -629,9 +663,9 @@ const WizardStepReview = ({ inputs, setInputs, language = 'en', workingCurrency 
                     className: "p-3 bg-orange-50 rounded-lg text-center"
                 }, [
                     createElement('div', { key: 'income-value', className: "text-lg font-bold text-orange-600" }, 
-                        window.formatCurrency ? window.formatCurrency(monthlyRetirementIncome, workingCurrency) : `${monthlyRetirementIncome.toLocaleString()}`),
+                        window.formatCurrency ? window.formatCurrency(currentMonthlyIncome, workingCurrency) : `${currentMonthlyIncome.toLocaleString()}`),
                     createElement('div', { key: 'income-label', className: "text-sm text-orange-700" }, 
-                        language === 'he' ? 'הכנסה חודשית' : 'Monthly Income')
+                        language === 'he' ? 'הכנסה חודשית נוכחית' : 'Current Monthly Income')
                 ])
             ])
         ]),

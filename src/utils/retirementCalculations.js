@@ -860,8 +860,30 @@ window.calculateProgressiveSavings = (inputs, workPeriods = [], partnerWorkPerio
     let partnerMonthlyPersonalContrib = 0;
     
     if (inputs.planningType === 'couple') {
-        partnerPension = parseFloat(inputs.partner2CurrentSavings || inputs.partnerCurrentSavings || 0);
-        partnerTraining = parseFloat(inputs.partner2CurrentTrainingFund || inputs.partnerCurrentTrainingFund || 0);
+        // Partner 1 savings
+        const partner1Pension = parseFloat(inputs.partner1CurrentPension || inputs.partner1CurrentSavings || 0);
+        const partner1Training = parseFloat(inputs.partner1CurrentTrainingFund || 0);
+        const partner1Portfolio = parseFloat(inputs.partner1PersonalPortfolio || inputs.partner1CurrentPersonalPortfolio || 0);
+        const partner1Real = parseFloat(inputs.partner1RealEstate || inputs.partner1CurrentRealEstate || 0);
+        const partner1Crypto = parseFloat(inputs.partner1Crypto || inputs.partner1CurrentCrypto || 0);
+        
+        // Partner 2 savings
+        const partner2Pension = parseFloat(inputs.partner2CurrentPension || inputs.partner2CurrentSavings || 0);
+        const partner2Training = parseFloat(inputs.partner2CurrentTrainingFund || 0);
+        const partner2Portfolio = parseFloat(inputs.partner2PersonalPortfolio || inputs.partner2CurrentPersonalPortfolio || 0);
+        const partner2Real = parseFloat(inputs.partner2RealEstate || inputs.partner2CurrentRealEstate || 0);
+        const partner2Crypto = parseFloat(inputs.partner2Crypto || inputs.partner2CurrentCrypto || 0);
+        
+        // Add partner savings to totals
+        totalPensionSavings += partner1Pension + partner2Pension;
+        totalTrainingFund += partner1Training + partner2Training;
+        totalPersonalPortfolio += partner1Portfolio + partner2Portfolio;
+        totalRealEstate += partner1Real + partner2Real;
+        totalCrypto += partner1Crypto + partner2Crypto;
+        
+        // For backward compatibility with projections
+        partnerPension = partner2Pension;
+        partnerTraining = partner2Training;
         
         // Apply capital gains tax to partner personal portfolio
         const grossPartner2Portfolio = parseFloat(inputs.partner2CurrentPersonalPortfolio || inputs.partnerCurrentPersonalPortfolio || 0);
