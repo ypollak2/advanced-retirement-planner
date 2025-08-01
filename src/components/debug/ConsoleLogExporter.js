@@ -13,6 +13,22 @@ const ConsoleLogExporter = ({ language = 'en' }) => {
     
     const logsEndRef = React.useRef(null);
     
+    // Define event handlers at the top level with useCallback
+    const handleNewLog = React.useCallback((event) => {
+        setLogs(prevLogs => {
+            const newLogs = [...prevLogs, event.detail];
+            // Maintain circular buffer size
+            if (newLogs.length > window.__maxLogEntries) {
+                return newLogs.slice(-window.__maxLogEntries);
+            }
+            return newLogs;
+        });
+    }, []);
+    
+    const handleClear = React.useCallback(() => {
+        setLogs([]);
+    }, []);
+    
     // Load existing logs on mount
     React.useEffect(() => {
         if (window.__consoleLogs) {
@@ -20,21 +36,6 @@ const ConsoleLogExporter = ({ language = 'en' }) => {
         }
         
         // Listen for new logs
-        const handleNewLog = React.useCallback((event) => {
-            setLogs(prevLogs => {
-                const newLogs = [...prevLogs, event.detail];
-                // Maintain circular buffer size
-                if (newLogs.length > window.__maxLogEntries) {
-                    return newLogs.slice(-window.__maxLogEntries);
-                }
-                return newLogs;
-            });
-        }, []);
-        
-        const handleClear = React.useCallback(() => {
-            setLogs([]);
-        }, []);
-        
         window.addEventListener('consoleLogCaptured', handleNewLog);
         window.addEventListener('consoleLogsCleared', handleClear);
         
@@ -42,7 +43,7 @@ const ConsoleLogExporter = ({ language = 'en' }) => {
             window.removeEventListener('consoleLogCaptured', handleNewLog);
             window.removeEventListener('consoleLogsCleared', handleClear);
         };
-    }, []);
+    }, [handleNewLog, handleClear]);
     
     // Auto-scroll to bottom
     React.useEffect(() => {
