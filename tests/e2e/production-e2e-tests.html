@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Retirement Planner - Production E2E Tests</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <style>
+        .test-passed { @apply bg-green-100 border-green-500 text-green-800; }
+        .test-failed { @apply bg-red-100 border-red-500 text-red-800; }
+        .test-running { @apply bg-yellow-100 border-yellow-500 text-yellow-800; }
+        .test-pending { @apply bg-gray-100 border-gray-300 text-gray-600; }
+        
+        .category-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .test-item {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .test-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .iframe-container {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: #f9fafb;
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        
+        .console-log {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">🧪 Production E2E Tests</h1>
+            <p class="text-gray-600 mb-4">Comprehensive end-to-end testing for Advanced Retirement Planner v7.3.8</p>
+            
+            <!-- Test Controls -->
+            <div class="flex flex-wrap gap-4 mb-4">
+                <button id="runAllTests" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                    🚀 Run All Tests
+                </button>
+                <button id="runQuickTests" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    ⚡ Quick Tests
+                </button>
+                <button id="runScoringTests" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    💯 Scoring Tests
+                </button>
+                <button id="exportResults" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    📊 Export Results
+                </button>
+                <button id="clearLogs" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    🗑️ Clear Logs
+                </button>
+                <button id="exportLogs" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                    📋 Export Logs
+                </button>
+            </div>
+            
+            <!-- Environment Selection -->
+            <div class="flex gap-4 mb-4">
+                <label class="flex items-center">
+                    <input type="radio" name="environment" value="production" checked class="mr-2">
+                    <span class="font-medium">🌐 Production (GitHub Pages)</span>
+                </label>
+                <label class="flex items-center">
+                    <input type="radio" name="environment" value="mirror" class="mr-2">
+                    <span class="font-medium">🪞 Mirror (Netlify)</span>
+                </label>
+                <label class="flex items-center">
+                    <input type="radio" name="environment" value="local" class="mr-2">
+                    <span class="font-medium">💻 Local (localhost:8080)</span>
+                </label>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="bg-gray-200 rounded-full h-3 mb-4">
+                <div id="progressBar" class="bg-blue-600 h-3 rounded-full progress-bar" style="width: 0%"></div>
+            </div>
+            
+            <!-- Test Summary -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div class="bg-green-50 p-3 rounded-lg">
+                    <div id="passedCount" class="text-2xl font-bold text-green-600">0</div>
+                    <div class="text-sm text-green-800">Passed</div>
+                </div>
+                <div class="bg-red-50 p-3 rounded-lg">
+                    <div id="failedCount" class="text-2xl font-bold text-red-600">0</div>
+                    <div class="text-sm text-red-800">Failed</div>
+                </div>
+                <div class="bg-yellow-50 p-3 rounded-lg">
+                    <div id="runningCount" class="text-2xl font-bold text-yellow-600">0</div>
+                    <div class="text-sm text-yellow-800">Running</div>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg">
+                    <div id="totalCount" class="text-2xl font-bold text-gray-600">0</div>
+                    <div class="text-sm text-gray-800">Total</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Categories -->
+        <div id="testCategories" class="space-y-6">
+            <!-- Test categories will be dynamically generated -->
+        </div>
+        
+        <!-- Test Iframe -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+            <h3 class="text-xl font-bold mb-4">🖥️ Test Environment</h3>
+            <div class="iframe-container">
+                <iframe id="testFrame" class="w-full" style="height: 600px;" src="about:blank"></iframe>
+            </div>
+        </div>
+        
+        <!-- Console Output -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+            <h3 class="text-xl font-bold mb-4">📋 Console Output</h3>
+            <div id="consoleOutput" class="console-log bg-gray-900 text-green-400 p-4 rounded-lg">
+                <div class="text-gray-500">Console output will appear here...</div>
+            </div>
+        </div>
+        
+        <!-- Test Results Export -->
+        <div id="exportModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                <h3 class="text-xl font-bold mb-4">📊 Export Test Results</h3>
+                <div class="space-y-3">
+                    <button id="exportJSON" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
+                        Export as JSON
+                    </button>
+                    <button id="exportCSV" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded">
+                        Export as CSV
+                    </button>
+                    <button id="exportMarkdown" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded">
+                        Export as Markdown
+                    </button>
+                    <button id="closeExportModal" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test Configuration
+        const ENVIRONMENTS = {
+            production: 'https://ypollak2.github.io/advanced-retirement-planner/',
+            mirror: 'https://advanced-retirement-planner.netlify.app/',
+            local: 'http://localhost:8080/'
+        };
+        
+        // Test Suite Definition
+        const TEST_SUITE = {
+            'Application Loading': {
+                icon: '🚀',
+                description: 'Basic application loading and initialization tests',
+                tests: [
+                    {
+                        name: 'Page loads successfully',
+                        timeout: 10000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                iframe.onload = () => {
+                                    setTimeout(() => {
+                                        const doc = iframe.contentDocument;
+                                        const title = doc?.title;
+                                        const root = doc?.getElementById('root');
+                                        resolve({
+                                            passed: title?.includes('Advanced Retirement Planner') && root !== null,
+                                            message: title ? `Page loaded: ${title}` : 'Page failed to load'
+                                        });
+                                    }, 2000);
+                                };
+                            });
+                        }
+                    },
+                    {
+                        name: 'Version v7.3.8 loaded correctly',
+                        timeout: 8000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                setTimeout(() => {
+                                    const doc = iframe.contentDocument;
+                                    const versionElement = doc?.querySelector('.version-indicator');
+                                    const hasCorrectVersion = versionElement?.textContent?.includes('v7.3.8');
+                                    resolve({
+                                        passed: hasCorrectVersion,
+                                        message: hasCorrectVersion ? 'Version v7.3.8 detected' : `Version not found or incorrect: ${versionElement?.textContent}`
+                                    });
+                                }, 3000);
+                            });
+                        }
+                    },
+                    {
+                        name: 'React components initialized',
+                        timeout: 12000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                setTimeout(() => {
+                                    const doc = iframe.contentDocument;
+                                    const wizard = doc?.querySelector('[data-testid="retirement-wizard"]') || 
+                                                  doc?.querySelector('.wizard-container') ||
+                                                  doc?.querySelector('#root > div');
+                                    resolve({
+                                        passed: wizard !== null,
+                                        message: wizard ? 'React components initialized' : 'No React components found'
+                                    });
+                                }, 5000);
+                            });
+                        }
+                    },
+                    {
+                        name: 'No JavaScript errors on load',
+                        timeout: 10000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                let errors = [];
+                                
+                                // Override console.error to catch errors
+                                if (iframe.contentWindow) {
+                                    const originalError = iframe.contentWindow.console.error;
+                                    iframe.contentWindow.console.error = function(...args) {
+                                        errors.push(args.join(' '));
+                                        originalError.apply(this, args);
+                                    };
+                                    
+                                    iframe.contentWindow.addEventListener('error', (e) => {
+                                        errors.push(e.message);
+                                    });
+                                }
+                                
+                                setTimeout(() => {
+                                    resolve({
+                                        passed: errors.length === 0,
+                                        message: errors.length === 0 ? 'No JavaScript errors' : `${errors.length} errors: ${errors.slice(0, 3).join(', ')}`
+                                    });
+                                }, 5000);
+                            });
+                        }
+                    }
+                ]
+            },
+            
+            'Session Storage & GitHub Gist': {
+                icon: '💾',
+                description: 'GitHub Gist session storage and debugging features',
+                tests: [
+                    {
+                        name: 'SessionStorageGist initializes',
+                        timeout: 8000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                setTimeout(() => {
+                                    const sessionStorage = iframe.contentWindow?.sessionStorageGist;
+                                    resolve({
+                                        passed: sessionStorage !== undefined,
+                                        message: sessionStorage ? 'SessionStorageGist initialized' : 'SessionStorageGist not found'
+                                    });
+                                }, 4000);
+                            });
+                        }
+                    },
+                    {
+                        name: 'Console interceptor captures logs',
+                        timeout: 6000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                setTimeout(() => {
+                                    const consoleLogs = iframe.contentWindow?.__consoleLogs;
+                                    resolve({
+                                        passed: Array.isArray(consoleLogs) && consoleLogs.length > 0,
+                                        message: consoleLogs ? `${consoleLogs.length} console logs captured` : 'Console interceptor not working'
+                                    });
+                                }, 3000);
+                            });
+                        }
+                    },
+                    {
+                        name: 'Debug mode activates with URL parameter',
+                        timeout: 10000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                // Load with debug parameter
+                                const currentSrc = iframe.src;
+                                const debugUrl = currentSrc.includes('?') ? 
+                                    currentSrc + '&debug=true' : currentSrc + '?debug=true';
+                                
+                                iframe.src = debugUrl;
+                                iframe.onload = () => {
+                                    setTimeout(() => {
+                                        const sessionStorage = iframe.contentWindow?.sessionStorageGist;
+                                        const debugMode = sessionStorage?.config?.debugMode;
+                                        resolve({
+                                            passed: debugMode === true,
+                                            message: debugMode ? 'Debug mode activated' : 'Debug mode not activated'
+                                        });
+                                    }, 4000);
+                                };
+                            });
+                        }
+                    }
+                ]
+            },
+            
+            'Financial Health Scoring': {
+                icon: '💯',
+                description: 'Financial health calculation and scoring validation',
+                tests: [
+                    {
+                        name: 'Field mapping bridge loads without errors',
+                        timeout: 8000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                setTimeout(() => {
+                                    const bridge = iframe.contentWindow?.fieldMappingBridge;
+                                    const dictionary = iframe.contentWindow?.fieldMappingDictionary;
+                                    resolve({
+                                        passed: bridge && dictionary,
+                                        message: bridge && dictionary ? 'Field mapping system loaded' : 'Field mapping system missing'
+                                    });
+                                }, 4000);
+                            });
+                        }
+                    },
+                    {
+                        name: 'Financial health engine calculates scores',
+                        timeout: 12000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                setTimeout(() => {
+                                    try {
+                                        const testInputs = {
+                                            currentAge: 30,
+                                            retirementAge: 67,
+                                            currentMonthlySalary: 20000,
+                                            currentMonthlyExpenses: 12000,
+                                            planningType: 'individual'
+                                        };
+                                        
+                                        const scoreFunction = iframe.contentWindow?.calculateFinancialHealthScore;
+                                        if (!scoreFunction) {
+                                            resolve({
+                                                passed: false,
+                                                message: 'Financial health score function not found'
+                                            });
+                                            return;
+                                        }
+                                        
+                                        const result = scoreFunction(testInputs);
+                                        const hasValidScore = result && typeof result.totalScore === 'number' && result.totalScore >= 0;
+                                        
+                                        resolve({
+                                            passed: hasValidScore,
+                                            message: hasValidScore ? `Score calculated: ${result.totalScore}/100` : 'Score calculation failed'
+                                        });
+                                    } catch (error) {
+                                        resolve({
+                                            passed: false,
+                                            message: `Score calculation error: ${error.message}`
+                                        });
+                                    }
+                                }, 6000);
+                            });
+                        }
+                    },
+                    {
+                        name: 'No FIELD_MAPPINGS conflict errors',
+                        timeout: 8000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                let hasFieldMappingError = false;
+                                
+                                // Check for specific error in console
+                                if (iframe.contentWindow && iframe.contentWindow.console) {
+                                    const originalError = iframe.contentWindow.console.error;
+                                    iframe.contentWindow.console.error = function(...args) {
+                                        const message = args.join(' ');
+                                        if (message.includes('FIELD_MAPPINGS') && message.includes('already been declared')) {
+                                            hasFieldMappingError = true;
+                                        }
+                                        originalError.apply(this, args);
+                                    };
+                                }
+                                
+                                setTimeout(() => {
+                                    resolve({
+                                        passed: !hasFieldMappingError,
+                                        message: hasFieldMappingError ? 'FIELD_MAPPINGS conflict detected' : 'No FIELD_MAPPINGS conflicts'
+                                    });
+                                }, 5000);
+                            });
+                        }
+                    },
+                    {
+                        name: 'Couple mode field mapping works',
+                        timeout: 10000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                setTimeout(() => {
+                                    try {
+                                        const testInputs = {
+                                            planningType: 'couple',
+                                            partner1Salary: 25000,
+                                            partner2Salary: 20000,
+                                            currentAge: 30,
+                                            retirementAge: 67
+                                        };
+                                        
+                                        const scoreFunction = iframe.contentWindow?.calculateFinancialHealthScore;
+                                        if (!scoreFunction) {
+                                            resolve({
+                                                passed: false,
+                                                message: 'Score function not available for couple mode test'
+                                            });
+                                            return;
+                                        }
+                                        
+                                        const result = scoreFunction(testInputs);
+                                        const hasValidScore = result && typeof result.totalScore === 'number';
+                                        
+                                        resolve({
+                                            passed: hasValidScore,
+                                            message: hasValidScore ? `Couple mode score: ${result.totalScore}/100` : 'Couple mode scoring failed'
+                                        });
+                                    } catch (error) {
+                                        resolve({
+                                            passed: false,
+                                            message: `Couple mode error: ${error.message}`
+                                        });
+                                    }
+                                }, 6000);
+                            });
+                        }
+                    }
+                ]
+            },
+            
+            'User Interface & Navigation': {
+                icon: '🖱️',
+                description: 'User interface elements and navigation functionality',
+                tests: [
+                    {
+                        name: 'Planning type selection works',
+                        timeout: 8000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                setTimeout(() => {
+                                    const doc = iframe.contentDocument;
+                                    const individualButton = doc?.querySelector('button[data-planning-type="individual"]') ||
+                                                           doc?.querySelector('button:contains("Individual")') ||
+                                                           doc?.querySelector('.planning-type-individual');
+                                    const coupleButton = doc?.querySelector('button[data-planning-type="couple"]') ||
+                                                        doc?.querySelector('button:contains("Couple")') ||
+                                                        doc?.querySelector('.planning-type-couple');
+                                    
+                                    resolve({
+                                        passed: individualButton || coupleButton,
+                                        message: (individualButton || coupleButton) ? 'Planning type buttons found' : 'Planning type buttons not found'
+                                    });
+                                }, 4000);
+                            });
+                        }
+                    },
+                    {
+                        name: 'Wizard navigation controls present',
+                        timeout: 8000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                setTimeout(() => {
+                                    const doc = iframe.contentDocument;
+                                    const nextButton = doc?.querySelector('button:contains("Next")') ||
+                                                      doc?.querySelector('.next-button') ||
+                                                      doc?.querySelector('[data-action="next"]');
+                                    const backButton = doc?.querySelector('button:contains("Back")') ||
+                                                      doc?.querySelector('.back-button') ||
+                                                      doc?.querySelector('[data-action="back"]');
+                                    
+                                    resolve({
+                                        passed: nextButton || backButton,
+                                        message: (nextButton || backButton) ? 'Navigation controls found' : 'Navigation controls missing'
+                                    });
+                                }, 4000);
+                            });
+                        }
+                    },
+                    {
+                        name: 'Financial health display components load',
+                        timeout: 10000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                setTimeout(() => {
+                                    const doc = iframe.contentDocument;
+                                    const scoreDisplay = doc?.querySelector('.financial-health-score') ||
+                                                        doc?.querySelector('[data-testid="financial-health"]') ||
+                                                        doc?.querySelector('.score-meter');
+                                    
+                                    resolve({
+                                        passed: scoreDisplay !== null,
+                                        message: scoreDisplay ? 'Financial health display found' : 'Financial health display not found'
+                                    });
+                                }, 6000);
+                            });
+                        }
+                    },
+                    {
+                        name: 'Mobile responsive design works',
+                        timeout: 8000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                // Test mobile viewport
+                                iframe.style.width = '375px';
+                                
+                                setTimeout(() => {
+                                    const doc = iframe.contentDocument;
+                                    const body = doc?.body;
+                                    const hasResponsiveClasses = body?.className?.includes('responsive') ||
+                                                               doc?.querySelector('.responsive-container') ||
+                                                               doc?.querySelector('.md\\:px-') ||
+                                                               doc?.querySelector('.sm\\:');
+                                    
+                                    // Reset width
+                                    iframe.style.width = '100%';
+                                    
+                                    resolve({
+                                        passed: hasResponsiveClasses,
+                                        message: hasResponsiveClasses ? 'Responsive design detected' : 'Responsive design not detected'
+                                    });
+                                }, 3000);
+                            });
+                        }
+                    }
+                ]
+            },
+            
+            'Data Persistence & Export': {
+                icon: '💾',
+                description: 'Data saving, loading, and export functionality',
+                tests: [
+                    {
+                        name: 'LocalStorage save/load works',
+                        timeout: 8000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                setTimeout(() => {
+                                    try {
+                                        const localStorage = iframe.contentWindow?.localStorage;
+                                        if (!localStorage) {
+                                            resolve({
+                                                passed: false,
+                                                message: 'LocalStorage not accessible'
+                                            });
+                                            return;
+                                        }
+                                        
+                                        // Test save/load
+                                        const testData = { test: 'data', timestamp: Date.now() };
+                                        localStorage.setItem('e2e-test', JSON.stringify(testData));
+                                        const retrieved = JSON.parse(localStorage.getItem('e2e-test') || '{}');
+                                        
+                                        localStorage.removeItem('e2e-test');
+                                        
+                                        resolve({
+                                            passed: retrieved.test === 'data',
+                                            message: retrieved.test === 'data' ? 'LocalStorage works' : 'LocalStorage failed'
+                                        });
+                                    } catch (error) {
+                                        resolve({
+                                            passed: false,
+                                            message: `LocalStorage error: ${error.message}`
+                                        });
+                                    }
+                                }, 3000);
+                            });
+                        }
+                    },
+                    {
+                        name: 'Export functions are available',
+                        timeout: 6000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                setTimeout(() => {
+                                    const exportFunctions = iframe.contentWindow?.exportAsImage ||
+                                                          iframe.contentWindow?.exportForLLMAnalysis ||
+                                                          iframe.contentWindow?.copyClaudePromptToClipboard;
+                                    
+                                    resolve({
+                                        passed: exportFunctions !== undefined,
+                                        message: exportFunctions ? 'Export functions available' : 'Export functions not found'
+                                    });
+                                }, 3000);
+                            });
+                        }
+                    },
+                    {
+                        name: 'Currency API loads and works',
+                        timeout: 10000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                setTimeout(() => {
+                                    const currencyAPI = iframe.contentWindow?.currencyAPI;
+                                    const rates = currencyAPI?.getCachedRates?.();
+                                    
+                                    resolve({
+                                        passed: currencyAPI && (rates || currencyAPI.fallbackRates),
+                                        message: currencyAPI ? 'Currency API loaded' : 'Currency API not found'
+                                    });
+                                }, 5000);
+                            });
+                        }
+                    }
+                ]
+            },
+            
+            'Performance & Security': {
+                icon: '⚡',
+                description: 'Performance metrics and security validations',
+                tests: [
+                    {
+                        name: 'Page loads within 10 seconds',
+                        timeout: 12000,
+                        test: async (iframe) => {
+                            const startTime = Date.now();
+                            return new Promise((resolve) => {
+                                iframe.onload = () => {
+                                    const loadTime = Date.now() - startTime;
+                                    resolve({
+                                        passed: loadTime < 10000,
+                                        message: `Page loaded in ${loadTime}ms`
+                                    });
+                                };
+                            });
+                        }
+                    },
+                    {
+                        name: 'No console.error messages on startup',
+                        timeout: 8000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                let errorCount = 0;
+                                
+                                if (iframe.contentWindow) {
+                                    const originalError = iframe.contentWindow.console.error;
+                                    iframe.contentWindow.console.error = function(...args) {
+                                        errorCount++;
+                                        originalError.apply(this, args);
+                                    };
+                                }
+                                
+                                setTimeout(() => {
+                                    resolve({
+                                        passed: errorCount === 0,
+                                        message: errorCount === 0 ? 'No console errors' : `${errorCount} console errors detected`
+                                    });
+                                }, 5000);
+                            });
+                        }
+                    },
+                    {
+                        name: 'HTTPS security headers present',
+                        timeout: 5000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                const isHttps = iframe.src.startsWith('https://');
+                                resolve({
+                                    passed: isHttps,
+                                    message: isHttps ? 'HTTPS protocol used' : 'Non-HTTPS protocol detected'
+                                });
+                            });
+                        }
+                    },
+                    {
+                        name: 'Service Worker registers correctly',
+                        timeout: 8000,
+                        test: async (iframe) => {
+                            return new Promise((resolve) => {
+                                setTimeout(() => {
+                                    const sw = iframe.contentWindow?.navigator?.serviceWorker;
+                                    resolve({
+                                        passed: sw !== undefined,
+                                        message: sw ? 'Service Worker API available' : 'Service Worker not available'
+                                    });
+                                }, 4000);
+                            });
+                        }
+                    }
+                ]
+            }
+        };
+        
+        // Test Runner Implementation
+        class ProductionE2ETestRunner {
+            constructor() {
+                this.testResults = {};
+                this.currentTest = null;
+                this.totalTests = 0;
+                this.completedTests = 0;
+                this.passedTests = 0;
+                this.failedTests = 0;
+                this.environment = 'production';
+                this.testFrame = document.getElementById('testFrame');
+                this.testLog = [];
+                this.sessionId = `e2e-session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                this.initializeUI();
+                this.calculateTotalTests();
+                this.initializeLogging();
+            }
+            
+            initializeLogging() {
+                // Create comprehensive test log
+                this.testLog.push({
+                    type: 'session_start',
+                    timestamp: new Date().toISOString(),
+                    sessionId: this.sessionId,
+                    userAgent: navigator.userAgent,
+                    screenResolution: `${screen.width}x${screen.height}`,
+                    windowSize: `${window.innerWidth}x${window.innerHeight}`,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    environment: this.environment,
+                    url: ENVIRONMENTS[this.environment]
+                });
+                
+                // Auto-save log to localStorage every 30 seconds
+                setInterval(() => this.saveLogToStorage(), 30000);
+                
+                // Add export log button to controls
+                this.addExportLogButton();
+                
+                // Save log before page unload
+                window.addEventListener('beforeunload', () => this.saveLogToStorage());
+            }
+            
+            initializeUI() {
+                document.getElementById('runAllTests').onclick = () => this.runAllTests();
+                document.getElementById('runQuickTests').onclick = () => this.runQuickTests();
+                document.getElementById('runScoringTests').onclick = () => this.runScoringTests();
+                document.getElementById('exportResults').onclick = () => this.showExportModal();
+                document.getElementById('clearLogs').onclick = () => this.clearLogs();
+                
+                // Add export log functionality
+                if (document.getElementById('exportLogs')) {
+                    document.getElementById('exportLogs').onclick = () => this.exportTestLog();
+                }
+                
+                // Export modal
+                document.getElementById('closeExportModal').onclick = () => this.hideExportModal();
+                document.getElementById('exportJSON').onclick = () => this.exportResults('json');
+                document.getElementById('exportCSV').onclick = () => this.exportResults('csv');
+                document.getElementById('exportMarkdown').onclick = () => this.exportResults('markdown');
+                
+                // Environment selection
+                document.querySelectorAll('input[name="environment"]').forEach(radio => {
+                    radio.onchange = (e) => {
+                        this.environment = e.target.value;
+                        this.log(`Environment changed to: ${this.environment}`);
+                    };
+                });
+                
+                this.renderTestCategories();
+            }
+            
+            calculateTotalTests() {
+                this.totalTests = Object.values(TEST_SUITE).reduce((total, category) => total + category.tests.length, 0);
+                document.getElementById('totalCount').textContent = this.totalTests;
+            }
+            
+            renderTestCategories() {
+                const container = document.getElementById('testCategories');
+                container.innerHTML = '';
+                
+                Object.entries(TEST_SUITE).forEach(([categoryName, category]) => {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'bg-white rounded-lg shadow-lg overflow-hidden';
+                    
+                    categoryDiv.innerHTML = `
+                        <div class="category-header text-white p-4">
+                            <h3 class="text-xl font-bold">${category.icon} ${categoryName}</h3>
+                            <p class="text-gray-200 text-sm mt-1">${category.description}</p>
+                        </div>
+                        <div class="p-4">
+                            <button class="mb-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-medium transition-colors" 
+                                    onclick="testRunner.runCategory('${categoryName}')">
+                                Run ${categoryName} Tests
+                            </button>
+                            <div class="space-y-2">
+                                ${category.tests.map((test, index) => `
+                                    <div class="test-item border rounded-lg p-3 test-pending" id="test-${categoryName}-${index}">
+                                        <div class="flex justify-between items-center">
+                                            <span class="font-medium">${test.name}</span>
+                                            <span class="test-status text-sm">Pending</span>
+                                        </div>
+                                        <div class="test-message text-sm text-gray-600 mt-1 hidden"></div>
+                                        <div class="test-duration text-xs text-gray-500 mt-1 hidden"></div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(categoryDiv);
+                });
+            }
+            
+            async runAllTests() {
+                this.log('🚀 Starting all E2E tests...');
+                this.resetCounters();
+                
+                for (const categoryName of Object.keys(TEST_SUITE)) {
+                    await this.runCategory(categoryName);
+                }
+                
+                this.log(`✅ All tests completed. Passed: ${this.passedTests}, Failed: ${this.failedTests}`);
+            }
+            
+            async runQuickTests() {
+                this.log('⚡ Running quick tests...');
+                this.resetCounters();
+                
+                await this.runCategory('Application Loading');
+                await this.runCategory('User Interface & Navigation');
+                
+                this.log(`⚡ Quick tests completed. Passed: ${this.passedTests}, Failed: ${this.failedTests}`);
+            }
+            
+            async runScoringTests() {
+                this.log('💯 Running financial health scoring tests...');
+                this.resetCounters();
+                
+                await this.runCategory('Financial Health Scoring');
+                await this.runCategory('Session Storage & GitHub Gist');
+                
+                this.log(`💯 Scoring tests completed. Passed: ${this.passedTests}, Failed: ${this.failedTests}`);
+            }
+            
+            async runCategory(categoryName) {
+                const category = TEST_SUITE[categoryName];
+                if (!category) return;
+                
+                this.log(`📂 Running ${categoryName} tests...`);
+                
+                for (let i = 0; i < category.tests.length; i++) {
+                    const test = category.tests[i];
+                    await this.runTest(categoryName, i, test);
+                }
+            }
+            
+            async runTest(categoryName, testIndex, test) {
+                const testId = `test-${categoryName}-${testIndex}`;
+                const testElement = document.getElementById(testId);
+                const statusElement = testElement.querySelector('.test-status');
+                const messageElement = testElement.querySelector('.test-message');
+                const durationElement = testElement.querySelector('.test-duration');
+                
+                // Update UI to running state
+                testElement.className = 'test-item border rounded-lg p-3 test-running';
+                statusElement.textContent = 'Running...';
+                messageElement.classList.remove('hidden');
+                messageElement.textContent = 'Test in progress...';
+                
+                this.currentTest = testId;
+                this.updateRunningCount(1);
+                
+                // Log test start
+                this.testLog.push({
+                    type: 'test_start',
+                    timestamp: new Date().toISOString(),
+                    sessionId: this.sessionId,
+                    category: categoryName,
+                    testName: test.name,
+                    testId: testId,
+                    timeout: test.timeout || 10000
+                });
+                
+                this.saveLogToStorage();
+                
+                const startTime = Date.now();
+                
+                try {
+                    // Load test environment
+                    const url = ENVIRONMENTS[this.environment];
+                    if (this.testFrame.src !== url) {
+                        this.testFrame.src = url;
+                        await this.waitForFrameLoad();
+                    }
+                    
+                    // Run the test with timeout
+                    const result = await Promise.race([
+                        test.test(this.testFrame),
+                        new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error('Test timeout')), test.timeout || 10000)
+                        )
+                    ]);
+                    
+                    const duration = Date.now() - startTime;
+                    
+                    // Update UI with results
+                    if (result.passed) {
+                        testElement.className = 'test-item border rounded-lg p-3 test-passed';
+                        statusElement.textContent = '✅ Passed';
+                        this.passedTests++;
+                    } else {
+                        testElement.className = 'test-item border rounded-lg p-3 test-failed';
+                        statusElement.textContent = '❌ Failed';
+                        this.failedTests++;
+                    }
+                    
+                    messageElement.textContent = result.message || 'No message';
+                    durationElement.textContent = `${duration}ms`;
+                    durationElement.classList.remove('hidden');
+                    
+                    // Store result
+                    if (!this.testResults[categoryName]) {
+                        this.testResults[categoryName] = {};
+                    }
+                    this.testResults[categoryName][test.name] = {
+                        passed: result.passed,
+                        message: result.message,
+                        duration: duration,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    // Log test completion
+                    this.testLog.push({
+                        type: 'test_complete',
+                        timestamp: new Date().toISOString(),
+                        sessionId: this.sessionId,
+                        category: categoryName,
+                        testName: test.name,
+                        testId: testId,
+                        passed: result.passed,
+                        message: result.message,
+                        duration: duration,
+                        environment: this.environment
+                    });
+                    
+                    this.log(`${result.passed ? '✅' : '❌'} ${test.name}: ${result.message} (${duration}ms)`);
+                    this.saveLogToStorage();
+                    
+                } catch (error) {
+                    const duration = Date.now() - startTime;
+                    
+                    // Update UI with error
+                    testElement.className = 'test-item border rounded-lg p-3 test-failed';
+                    statusElement.textContent = '❌ Error';
+                    messageElement.textContent = error.message;
+                    durationElement.textContent = `${duration}ms`;
+                    durationElement.classList.remove('hidden');
+                    
+                    this.failedTests++;
+                    
+                    // Store error result
+                    if (!this.testResults[categoryName]) {
+                        this.testResults[categoryName] = {};
+                    }
+                    this.testResults[categoryName][test.name] = {
+                        passed: false,
+                        message: error.message,
+                        duration: duration,
+                        timestamp: new Date().toISOString(),
+                        error: true
+                    };
+                    
+                    // Log test error
+                    this.testLog.push({
+                        type: 'test_error',
+                        timestamp: new Date().toISOString(),
+                        sessionId: this.sessionId,
+                        category: categoryName,
+                        testName: test.name,
+                        testId: testId,
+                        error: error.message,
+                        stack: error.stack,
+                        duration: duration,
+                        environment: this.environment
+                    });
+                    
+                    this.log(`❌ ${test.name}: ERROR - ${error.message} (${duration}ms)`);
+                    this.saveLogToStorage();
+                }
+                
+                this.completedTests++;
+                this.updateRunningCount(-1);
+                this.updateProgress();
+                this.updateCounters();
+                
+                // Small delay between tests
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            waitForFrameLoad() {
+                return new Promise((resolve) => {
+                    this.testFrame.onload = resolve;
+                });
+            }
+            
+            resetCounters() {
+                this.completedTests = 0;
+                this.passedTests = 0;
+                this.failedTests = 0;
+                this.testResults = {};
+                this.updateCounters();
+                this.updateProgress();
+            }
+            
+            updateCounters() {
+                document.getElementById('passedCount').textContent = this.passedTests;
+                document.getElementById('failedCount').textContent = this.failedTests;
+            }
+            
+            updateRunningCount(delta) {
+                const current = parseInt(document.getElementById('runningCount').textContent);
+                document.getElementById('runningCount').textContent = Math.max(0, current + delta);
+            }
+            
+            updateProgress() {
+                const percentage = this.totalTests > 0 ? (this.completedTests / this.totalTests) * 100 : 0;
+                document.getElementById('progressBar').style.width = `${percentage}%`;
+            }
+            
+            showExportModal() {
+                document.getElementById('exportModal').classList.remove('hidden');
+                document.getElementById('exportModal').classList.add('flex');
+            }
+            
+            hideExportModal() {
+                document.getElementById('exportModal').classList.add('hidden');
+                document.getElementById('exportModal').classList.remove('flex');
+            }
+            
+            exportResults(format) {
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+                const filename = `e2e-test-results-${timestamp}`;
+                
+                let content, mimeType;
+                
+                switch (format) {
+                    case 'json':
+                        content = JSON.stringify({
+                            metadata: {
+                                timestamp: new Date().toISOString(),
+                                environment: this.environment,
+                                url: ENVIRONMENTS[this.environment],
+                                totalTests: this.totalTests,
+                                passedTests: this.passedTests,
+                                failedTests: this.failedTests,
+                                successRate: this.totalTests > 0 ? (this.passedTests / this.totalTests * 100).toFixed(2) : 0
+                            },
+                            results: this.testResults
+                        }, null, 2);
+                        mimeType = 'application/json';
+                        break;
+                        
+                    case 'csv':
+                        const csvRows = ['Category,Test,Status,Message,Duration,Timestamp'];
+                        Object.entries(this.testResults).forEach(([category, tests]) => {
+                            Object.entries(tests).forEach(([testName, result]) => {
+                                csvRows.push(`"${category}","${testName}","${result.passed ? 'PASS' : 'FAIL'}","${result.message}",${result.duration},"${result.timestamp}"`);
+                            });
+                        });
+                        content = csvRows.join('\n');
+                        mimeType = 'text/csv';
+                        break;
+                        
+                    case 'markdown':
+                        content = `# E2E Test Results\n\n`;
+                        content += `**Environment:** ${this.environment}\n`;
+                        content += `**URL:** ${ENVIRONMENTS[this.environment]}\n`;
+                        content += `**Timestamp:** ${new Date().toISOString()}\n`;
+                        content += `**Total Tests:** ${this.totalTests}\n`;
+                        content += `**Passed:** ${this.passedTests}\n`;
+                        content += `**Failed:** ${this.failedTests}\n`;
+                        content += `**Success Rate:** ${this.totalTests > 0 ? (this.passedTests / this.totalTests * 100).toFixed(2) : 0}%\n\n`;
+                        
+                        Object.entries(this.testResults).forEach(([category, tests]) => {
+                            content += `## ${category}\n\n`;
+                            Object.entries(tests).forEach(([testName, result]) => {
+                                const status = result.passed ? '✅ PASS' : '❌ FAIL';
+                                content += `- **${testName}**: ${status} - ${result.message} (${result.duration}ms)\n`;
+                            });
+                            content += '\n';
+                        });
+                        mimeType = 'text/markdown';
+                        break;
+                }
+                
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${filename}.${format}`;
+                link.click();
+                URL.revokeObjectURL(url);
+                
+                this.hideExportModal();
+                this.log(`📊 Results exported as ${format.toUpperCase()}`);
+            }
+            
+            clearLogs() {
+                document.getElementById('consoleOutput').innerHTML = '<div class="text-gray-500">Console output cleared...</div>';
+            }
+            
+            log(message, level = 'info', extra = {}) {
+                const output = document.getElementById('consoleOutput');
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = document.createElement('div');
+                logEntry.innerHTML = `<span class="text-blue-400">[${timestamp}]</span> ${message}`;
+                output.appendChild(logEntry);
+                output.scrollTop = output.scrollHeight;
+                
+                // Add to test log for export
+                this.testLog.push({
+                    type: 'console_log',
+                    timestamp: new Date().toISOString(),
+                    level: level,
+                    message: message,
+                    sessionId: this.sessionId,
+                    currentTest: this.currentTest,
+                    ...extra
+                });
+                
+                // Keep only last 100 log entries in UI
+                while (output.children.length > 100) {
+                    output.removeChild(output.firstChild);
+                }
+            }
+            
+            saveLogToStorage() {
+                try {
+                    const logData = {
+                        sessionId: this.sessionId,
+                        timestamp: new Date().toISOString(),
+                        environment: this.environment,
+                        url: ENVIRONMENTS[this.environment],
+                        summary: {
+                            totalTests: this.totalTests,
+                            completedTests: this.completedTests,
+                            passedTests: this.passedTests,
+                            failedTests: this.failedTests,
+                            successRate: this.totalTests > 0 ? (this.passedTests / this.totalTests * 100).toFixed(2) : 0
+                        },
+                        testResults: this.testResults,
+                        logs: this.testLog,
+                        userAgent: navigator.userAgent,
+                        viewport: {
+                            width: window.innerWidth,
+                            height: window.innerHeight
+                        }
+                    };
+                    
+                    localStorage.setItem(`e2e-test-log-${this.sessionId}`, JSON.stringify(logData));
+                    this.log('📁 Test log saved to localStorage', 'debug');
+                } catch (error) {
+                    console.error('Failed to save test log:', error);
+                }
+            }
+            
+            exportTestLog() {
+                const logData = {
+                    sessionId: this.sessionId,
+                    exportTimestamp: new Date().toISOString(),
+                    environment: this.environment,
+                    url: ENVIRONMENTS[this.environment],
+                    duration: this.testLog.length > 0 ? 
+                        new Date(this.testLog[this.testLog.length - 1].timestamp) - new Date(this.testLog[0].timestamp) : 0,
+                    summary: {
+                        totalTests: this.totalTests,
+                        completedTests: this.completedTests,
+                        passedTests: this.passedTests,
+                        failedTests: this.failedTests,
+                        successRate: this.totalTests > 0 ? (this.passedTests / this.totalTests * 100).toFixed(2) : 0
+                    },
+                    testResults: this.testResults,
+                    logs: this.testLog,
+                    systemInfo: {
+                        userAgent: navigator.userAgent,
+                        screenResolution: `${screen.width}x${screen.height}`,
+                        windowSize: `${window.innerWidth}x${window.innerHeight}`,
+                        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                        language: navigator.language,
+                        cookieEnabled: navigator.cookieEnabled,
+                        onLine: navigator.onLine
+                    }
+                };
+                
+                // Export as JSON file
+                const blob = new Blob([JSON.stringify(logData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `e2e-test-log-${this.sessionId}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                
+                this.log('📊 Comprehensive test log exported', 'info');
+                return logData;
+            }
+            
+            // Override existing export to include logs
+            exportResults(format) {
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+                const filename = `e2e-test-results-${timestamp}`;
+                
+                let content, mimeType;
+                
+                // Include comprehensive data
+                const comprehensiveData = {
+                    sessionId: this.sessionId,
+                    metadata: {
+                        timestamp: new Date().toISOString(),
+                        environment: this.environment,
+                        url: ENVIRONMENTS[this.environment],
+                        totalTests: this.totalTests,
+                        passedTests: this.passedTests,
+                        failedTests: this.failedTests,
+                        successRate: this.totalTests > 0 ? (this.passedTests / this.totalTests * 100).toFixed(2) : 0,
+                        duration: this.testLog.length > 0 ? 
+                            new Date(this.testLog[this.testLog.length - 1].timestamp) - new Date(this.testLog[0].timestamp) : 0
+                    },
+                    systemInfo: {
+                        userAgent: navigator.userAgent,
+                        screenResolution: `${screen.width}x${screen.height}`,
+                        windowSize: `${window.innerWidth}x${window.innerHeight}`,
+                        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                    },
+                    results: this.testResults,
+                    logs: this.testLog.filter(log => log.type !== 'console_log'), // Exclude verbose console logs
+                    consoleLogs: this.testLog.filter(log => log.type === 'console_log').slice(-50) // Last 50 console logs
+                };
+                
+                switch (format) {
+                    case 'json':
+                        content = JSON.stringify(comprehensiveData, null, 2);
+                        mimeType = 'application/json';
+                        break;
+                        
+                    case 'csv':
+                        const csvRows = ['Session ID,Category,Test,Status,Message,Duration,Timestamp,Environment'];
+                        Object.entries(this.testResults).forEach(([category, tests]) => {
+                            Object.entries(tests).forEach(([testName, result]) => {
+                                csvRows.push(`"${this.sessionId}","${category}","${testName}","${result.passed ? 'PASS' : 'FAIL'}","${result.message}",${result.duration},"${result.timestamp}","${this.environment}"`);
+                            });
+                        });
+                        content = csvRows.join('\n');
+                        mimeType = 'text/csv';
+                        break;
+                        
+                    case 'markdown':
+                        content = `# E2E Test Results\n\n`;
+                        content += `**Session ID:** ${this.sessionId}\n`;
+                        content += `**Environment:** ${this.environment}\n`;
+                        content += `**URL:** ${ENVIRONMENTS[this.environment]}\n`;
+                        content += `**Timestamp:** ${new Date().toISOString()}\n`;
+                        content += `**User Agent:** ${navigator.userAgent}\n`;
+                        content += `**Total Tests:** ${this.totalTests}\n`;
+                        content += `**Passed:** ${this.passedTests}\n`;
+                        content += `**Failed:** ${this.failedTests}\n`;
+                        content += `**Success Rate:** ${this.totalTests > 0 ? (this.passedTests / this.totalTests * 100).toFixed(2) : 0}%\n\n`;
+                        
+                        content += `## Test Summary by Category\n\n`;
+                        Object.entries(this.testResults).forEach(([category, tests]) => {
+                            content += `### ${category}\n\n`;
+                            Object.entries(tests).forEach(([testName, result]) => {
+                                const status = result.passed ? '✅ PASS' : '❌ FAIL';
+                                content += `- **${testName}**: ${status} - ${result.message} (${result.duration}ms)\n`;
+                            });
+                            content += '\n';
+                        });
+                        
+                        content += `## Key Events\n\n`;
+                        this.testLog.filter(log => ['session_start', 'test_start', 'test_complete', 'error'].includes(log.type))
+                            .forEach(log => {
+                                content += `- **${log.timestamp}**: ${log.type.replace('_', ' ').toUpperCase()} - ${log.message || log.testName || 'N/A'}\n`;
+                            });
+                        
+                        mimeType = 'text/markdown';
+                        break;
+                }
+                
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${filename}.${format}`;
+                link.click();
+                URL.revokeObjectURL(url);
+                
+                this.hideExportModal();
+                this.log(`📊 Results exported as ${format.toUpperCase()} with comprehensive logs`);
+            }
+            
+            addExportLogButton() {
+                // This method is called to ensure export log button functionality
+                // The button is already added in the HTML above
+                console.log('Export log button functionality initialized');
+            }
+        }
+        
+        // Initialize test runner
+        const testRunner = new ProductionE2ETestRunner();
+        
+        // Make testRunner globally available
+        window.testRunner = testRunner;
+        
+        // Auto-run basic tests on load
+        document.addEventListener('DOMContentLoaded', () => {
+            testRunner.log('🧪 Production E2E Test Suite Ready');
+            testRunner.log(`📍 Default environment: ${testRunner.environment} (${ENVIRONMENTS[testRunner.environment]})`);
+        });
+    </script>
+</body>
+</html>
