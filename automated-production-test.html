@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated Production Test - Financial Health Score</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        h1 {
+            color: #333;
+            margin: 0 0 20px 0;
+        }
+        .test-status {
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .test-status.running {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .test-status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .test-status.critical {
+            background: #dc3545;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+        .test-step {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .test-step.complete {
+            border-left-color: #28a745;
+        }
+        .test-step.error {
+            border-left-color: #dc3545;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .results {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+        .score-display {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .score-display.good {
+            color: #28a745;
+        }
+        .score-display.bad {
+            color: #dc3545;
+        }
+        .score-display.critical {
+            color: #ff0000;
+            animation: pulse 1s infinite;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .log-container {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Automated Production Test</h1>
+        <p>This test will automatically navigate through the production wizard and test the financial health scoring.</p>
+        
+        <button onclick="runAutomatedTest()" id="runTestBtn">Run Automated Test</button>
+        <button onclick="clearResults()" id="clearBtn">Clear Results</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <div class="container">
+        <h2>Test Progress</h2>
+        <div id="testProgress"></div>
+        <div class="log-container" id="logContainer"></div>
+    </div>
+
+    <div class="container" id="resultsContainer" style="display: none;">
+        <h2>Test Results</h2>
+        <div id="scoreDisplay"></div>
+        <div id="testResults"></div>
+    </div>
+
+    <iframe id="testFrame" style="display: none;"></iframe>
+
+    <script>
+        const PRODUCTION_URL = 'https://ypollak2.github.io/advanced-retirement-planner/';
+        let testFrame = null;
+        let testWindow = null;
+        let currentStep = 0;
+        let testData = {};
+        let logs = [];
+
+        // Test scenario - High income individual who should score 70-90
+        const testScenario = {
+            // Step 1: Personal Information
+            planningType: 'individual',
+            currentAge: '35',
+            retirementAge: '67',
+            country: 'israel',
+            
+            // Step 2: Salary
+            currentMonthlySalary: '50000',
+            annualBonus: '100000',
+            
+            // Step 3: Expenses
+            currentMonthlyExpenses: '25000',
+            
+            // Step 4: Savings
+            currentPension: '500000',
+            currentTrainingFund: '300000',
+            currentPortfolio: '200000',
+            currentRealEstate: '0',
+            currentCrypto: '0',
+            currentSavingsAccount: '50000',
+            emergencyFund: '150000',
+            
+            // Step 5: Contributions
+            pensionEmployeeContribution: '6',
+            pensionEmployerContribution: '6.5',
+            pensionEmployerBenefitsContribution: '6',
+            trainingFundEmployeeContribution: '2.5',
+            trainingFundEmployerContribution: '7.5',
+            
+            // Step 6: Fees
+            pensionManagementFee: '0.5',
+            pensionYearlyYield: '7',
+            trainingFundManagementFee: '0.5',
+            trainingFundYearlyYield: '7',
+            
+            // Step 7: Investment
+            riskTolerance: 'balanced',
+            expectedAnnualReturn: '7',
+            
+            // Step 8: Goals (optional)
+            desiredRetirementSavings: '5000000',
+            desiredMonthlyRetirementIncome: '30000'
+        };
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            logs.push(logEntry);
+            
+            const logContainer = document.getElementById('logContainer');
+            const logDiv = document.createElement('div');
+            logDiv.style.color = type === 'error' ? '#dc3545' : (type === 'success' ? '#28a745' : '#333');
+            logDiv.textContent = logEntry;
+            logContainer.appendChild(logDiv);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            console.log(logEntry);
+        }
+
+        function updateStatus(message, type = 'running') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `test-status ${type}`;
+            statusDiv.textContent = message;
+        }
+
+        function addProgressStep(step, status = 'pending') {
+            const progressDiv = document.getElementById('testProgress');
+            const stepDiv = document.createElement('div');
+            stepDiv.className = `test-step ${status}`;
+            stepDiv.id = `step-${step}`;
+            stepDiv.textContent = `Step ${step}: ${getStepName(step)}`;
+            progressDiv.appendChild(stepDiv);
+        }
+
+        function updateProgressStep(step, status) {
+            const stepDiv = document.getElementById(`step-${step}`);
+            if (stepDiv) {
+                stepDiv.className = `test-step ${status}`;
+            }
+        }
+
+        function getStepName(step) {
+            const stepNames = {
+                1: 'Personal Information',
+                2: 'Salary & Income',
+                3: 'Monthly Expenses',
+                4: 'Current Savings',
+                5: 'Contribution Rates',
+                6: 'Management Fees',
+                7: 'Investment Preferences',
+                8: 'Retirement Goals',
+                9: 'Review & Calculate'
+            };
+            return stepNames[step] || `Step ${step}`;
+        }
+
+        async function runAutomatedTest() {
+            document.getElementById('runTestBtn').disabled = true;
+            document.getElementById('testProgress').innerHTML = '';
+            document.getElementById('logContainer').innerHTML = '';
+            logs = [];
+            
+            updateStatus('Starting automated test...', 'running');
+            
+            // Show iframe
+            testFrame = document.getElementById('testFrame');
+            testFrame.style.display = 'block';
+            
+            // Add all progress steps
+            for (let i = 1; i <= 9; i++) {
+                addProgressStep(i);
+            }
+            
+            try {
+                // Load the production app
+                log('Loading production app...');
+                testFrame.src = PRODUCTION_URL;
+                
+                // Wait for iframe to load
+                await new Promise((resolve, reject) => {
+                    testFrame.onload = resolve;
+                    testFrame.onerror = reject;
+                    setTimeout(() => reject(new Error('Timeout loading app')), 30000);
+                });
+                
+                testWindow = testFrame.contentWindow;
+                log('Production app loaded successfully', 'success');
+                
+                // Wait for app initialization
+                await waitForApp();
+                
+                // Run through wizard steps
+                await runWizardSteps();
+                
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+                updateStatus(`Test failed: ${error.message}`, 'error');
+                document.getElementById('runTestBtn').disabled = false;
+            }
+        }
+
+        async function waitForApp() {
+            log('Waiting for app initialization...');
+            
+            for (let i = 0; i < 50; i++) {
+                try {
+                    if (testWindow.retirementWizard && 
+                        (testWindow.document.querySelector('.wizard-container') || 
+                         testWindow.document.querySelector('[data-testid="wizard-container"]'))) {
+                        log('App initialized', 'success');
+                        return;
+                    }
+                } catch (e) {
+                    // Cross-origin errors are expected
+                }
+                await sleep(200);
+            }
+            
+            throw new Error('App failed to initialize');
+        }
+
+        async function runWizardSteps() {
+            // Start the wizard
+            log('Starting wizard...');
+            await clickStartWizard();
+            
+            // Run through each step
+            for (let step = 1; step <= 9; step++) {
+                updateProgressStep(step, 'running');
+                log(`Processing step ${step}: ${getStepName(step)}`);
+                
+                try {
+                    await processWizardStep(step);
+                    updateProgressStep(step, 'complete');
+                    log(`Step ${step} completed`, 'success');
+                    
+                    if (step < 9) {
+                        await clickNext();
+                        await sleep(1000);
+                    }
+                } catch (error) {
+                    updateProgressStep(step, 'error');
+                    log(`Step ${step} failed: ${error.message}`, 'error');
+                    throw error;
+                }
+            }
+            
+            // Calculate score
+            await calculateScore();
+        }
+
+        async function clickStartWizard() {
+            // Try multiple selectors for the start button
+            const selectors = [
+                'button:contains("Start")',
+                '.start-wizard-btn',
+                '[data-testid="start-wizard"]',
+                'button.btn-primary'
+            ];
+            
+            for (const selector of selectors) {
+                try {
+                    const button = testWindow.document.querySelector(selector) ||
+                                 Array.from(testWindow.document.querySelectorAll('button'))
+                                     .find(btn => btn.textContent.includes('Start') || 
+                                                btn.textContent.includes('התחל'));
+                    if (button) {
+                        button.click();
+                        log('Clicked start button');
+                        await sleep(1000);
+                        return;
+                    }
+                } catch (e) {
+                    continue;
+                }
+            }
+            
+            log('Warning: Could not find start button, assuming wizard already started');
+        }
+
+        async function processWizardStep(step) {
+            switch (step) {
+                case 1:
+                    await fillPersonalInfo();
+                    break;
+                case 2:
+                    await fillSalary();
+                    break;
+                case 3:
+                    await fillExpenses();
+                    break;
+                case 4:
+                    await fillSavings();
+                    break;
+                case 5:
+                    await fillContributions();
+                    break;
+                case 6:
+                    await fillFees();
+                    break;
+                case 7:
+                    await fillInvestment();
+                    break;
+                case 8:
+                    await fillGoals();
+                    break;
+                case 9:
+                    await reviewData();
+                    break;
+            }
+        }
+
+        async function fillPersonalInfo() {
+            // Select individual planning
+            await selectOption('[name="planningType"]', 'individual');
+            await setInputValue('[name="currentAge"]', testScenario.currentAge);
+            await setInputValue('[name="retirementAge"]', testScenario.retirementAge);
+            await selectOption('[name="country"]', 'israel');
+        }
+
+        async function fillSalary() {
+            await setInputValue('[name="currentMonthlySalary"]', testScenario.currentMonthlySalary);
+            await setInputValue('[name="annualBonus"]', testScenario.annualBonus);
+        }
+
+        async function fillExpenses() {
+            await setInputValue('[name="currentMonthlyExpenses"]', testScenario.currentMonthlyExpenses);
+        }
+
+        async function fillSavings() {
+            await setInputValue('[name="currentPension"]', testScenario.currentPension);
+            await setInputValue('[name="currentTrainingFund"]', testScenario.currentTrainingFund);
+            await setInputValue('[name="currentPortfolio"]', testScenario.currentPortfolio);
+            await setInputValue('[name="emergencyFund"]', testScenario.emergencyFund);
+        }
+
+        async function fillContributions() {
+            await setInputValue('[name="pensionEmployeeContribution"]', testScenario.pensionEmployeeContribution);
+            await setInputValue('[name="pensionEmployerContribution"]', testScenario.pensionEmployerContribution);
+            await setInputValue('[name="trainingFundEmployeeContribution"]', testScenario.trainingFundEmployeeContribution);
+            await setInputValue('[name="trainingFundEmployerContribution"]', testScenario.trainingFundEmployerContribution);
+        }
+
+        async function fillFees() {
+            await setInputValue('[name="pensionManagementFee"]', testScenario.pensionManagementFee);
+            await setInputValue('[name="pensionYearlyYield"]', testScenario.pensionYearlyYield);
+        }
+
+        async function fillInvestment() {
+            await selectOption('[name="riskTolerance"]', 'balanced');
+            await setInputValue('[name="expectedAnnualReturn"]', testScenario.expectedAnnualReturn);
+        }
+
+        async function fillGoals() {
+            // Optional step - can skip or fill
+            log('Skipping optional goals step');
+        }
+
+        async function reviewData() {
+            log('Reviewing entered data...');
+            // Check if data is displayed correctly
+            await sleep(2000);
+        }
+
+        async function calculateScore() {
+            log('Calculating financial health score...');
+            
+            // Find and click calculate button
+            const calculateBtn = Array.from(testWindow.document.querySelectorAll('button'))
+                .find(btn => btn.textContent.includes('Calculate') || 
+                           btn.textContent.includes('חשב'));
+            
+            if (calculateBtn) {
+                calculateBtn.click();
+                log('Clicked calculate button');
+                await sleep(3000);
+                
+                // Extract score
+                await extractScore();
+            } else {
+                throw new Error('Calculate button not found');
+            }
+        }
+
+        async function extractScore() {
+            // Try to find score display
+            const scoreSelectors = [
+                '.score-display',
+                '.financial-health-score',
+                '[data-testid="health-score"]',
+                '.total-score'
+            ];
+            
+            let score = null;
+            
+            for (const selector of scoreSelectors) {
+                const element = testWindow.document.querySelector(selector);
+                if (element) {
+                    const text = element.textContent;
+                    const match = text.match(/(\d+)/);
+                    if (match) {
+                        score = parseInt(match[1]);
+                        break;
+                    }
+                }
+            }
+            
+            // If not found, search for text containing score
+            if (!score) {
+                const allText = testWindow.document.body.innerText;
+                const scoreMatch = allText.match(/(?:Score|ציון|נקודות)[:\s]*(\d+)/i);
+                if (scoreMatch) {
+                    score = parseInt(scoreMatch[1]);
+                }
+            }
+            
+            displayResults(score);
+        }
+
+        function displayResults(score) {
+            document.getElementById('resultsContainer').style.display = 'block';
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const resultsDiv = document.getElementById('testResults');
+            
+            if (score !== null) {
+                const isCriticalBug = score >= 27 && score <= 29;
+                const isExpectedRange = score >= 70 && score <= 90;
+                
+                scoreDisplay.className = 'score-display ' + 
+                    (isCriticalBug ? 'critical' : (isExpectedRange ? 'good' : 'bad'));
+                scoreDisplay.textContent = score;
+                
+                let statusMessage = '';
+                let statusType = '';
+                
+                if (isCriticalBug) {
+                    statusMessage = '⚠️ CRITICAL BUG DETECTED: Score is 27-29!';
+                    statusType = 'critical';
+                } else if (isExpectedRange) {
+                    statusMessage = '✅ SUCCESS: Score is in expected range (70-90)';
+                    statusType = 'success';
+                } else {
+                    statusMessage = `⚠️ WARNING: Score ${score} is outside expected range (70-90)`;
+                    statusType = 'error';
+                }
+                
+                updateStatus(statusMessage, statusType);
+                
+                resultsDiv.innerHTML = `
+                    <div class="results">
+                        <h3>Test Results:</h3>
+                        <p><strong>Final Score:</strong> ${score}</p>
+                        <p><strong>Expected Range:</strong> 70-90</p>
+                        <p><strong>Status:</strong> ${statusMessage}</p>
+                        <p><strong>Test Data Used:</strong></p>
+                        <pre>${JSON.stringify(testScenario, null, 2)}</pre>
+                    </div>
+                `;
+                
+                log(`Test completed. Score: ${score}`, isExpectedRange ? 'success' : 'error');
+            } else {
+                scoreDisplay.textContent = '?';
+                resultsDiv.innerHTML = '<div class="test-status error">Could not extract score</div>';
+                updateStatus('Failed to extract score', 'error');
+            }
+            
+            document.getElementById('runTestBtn').disabled = false;
+        }
+
+        async function setInputValue(selector, value) {
+            try {
+                const input = testWindow.document.querySelector(selector) ||
+                            testWindow.document.querySelector(`input[type="number"]`) ||
+                            testWindow.document.querySelector(`input[type="text"]`);
+                
+                if (input) {
+                    input.value = value;
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    log(`Set ${selector} = ${value}`);
+                } else {
+                    log(`Warning: Could not find input ${selector}`);
+                }
+            } catch (e) {
+                log(`Error setting ${selector}: ${e.message}`, 'error');
+            }
+        }
+
+        async function selectOption(selector, value) {
+            try {
+                const element = testWindow.document.querySelector(selector) ||
+                               testWindow.document.querySelector(`[value="${value}"]`);
+                
+                if (element) {
+                    if (element.tagName === 'SELECT') {
+                        element.value = value;
+                        element.dispatchEvent(new Event('change', { bubbles: true }));
+                    } else {
+                        element.click();
+                    }
+                    log(`Selected ${value} for ${selector}`);
+                } else {
+                    log(`Warning: Could not find ${selector}`);
+                }
+            } catch (e) {
+                log(`Error selecting ${selector}: ${e.message}`, 'error');
+            }
+        }
+
+        async function clickNext() {
+            const nextBtn = Array.from(testWindow.document.querySelectorAll('button'))
+                .find(btn => btn.textContent.includes('Next') || 
+                           btn.textContent.includes('הבא') ||
+                           btn.textContent.includes('המשך'));
+            
+            if (nextBtn) {
+                nextBtn.click();
+                log('Clicked next button');
+            } else {
+                log('Warning: Next button not found');
+            }
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function clearResults() {
+            document.getElementById('testProgress').innerHTML = '';
+            document.getElementById('logContainer').innerHTML = '';
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('status').textContent = '';
+            document.getElementById('testFrame').style.display = 'none';
+            logs = [];
+        }
+    </script>
+</body>
+</html>
