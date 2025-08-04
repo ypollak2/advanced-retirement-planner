@@ -281,7 +281,8 @@ window.AdditionalIncomeTax = (() => {
         
         // Calculate net amounts for each income type
         const bonusTaxInfo = calculateBonusTax(annualBonus, baseSalary, country);
-        const rsuTaxInfo = calculateRSUTax(quarterlyRSU, baseSalary + annualBonus, country);
+        const rsuCustomTaxRate = inputs.rsuTaxRate; // Use custom rate if provided
+        const rsuTaxInfo = calculateRSUTax(quarterlyRSU, baseSalary + annualBonus, country, rsuCustomTaxRate);
         
         // For other income types, calculate proportional tax
         const otherIncome = freelanceIncome + rentalIncome + dividendIncome + otherIncomeAmount;
@@ -353,6 +354,40 @@ window.AdditionalIncomeTax = (() => {
         }
     };
     
+    // Calculate partner RSU income for couple mode
+    const calculatePartnerRSUIncome = (inputs, partnerKey) => {
+        const country = inputs.country || 'israel';
+        const baseSalary = (parseFloat(inputs[`${partnerKey}Salary`]) || 0) * 12;
+        
+        // Calculate partner RSU value
+        let annualRSU = 0;
+        const rsuUnits = parseFloat(inputs[`${partnerKey}RsuUnits`]) || 0;
+        const stockPrice = parseFloat(inputs[`${partnerKey}RsuCurrentStockPrice`]) || 0;
+        const frequency = inputs[`${partnerKey}RsuFrequency`] || 'quarterly';
+        
+        if (rsuUnits && stockPrice) {
+            if (frequency === 'monthly') {
+                annualRSU = rsuUnits * stockPrice * 12;
+            } else if (frequency === 'quarterly') {
+                annualRSU = rsuUnits * stockPrice * 4;
+            } else if (frequency === 'yearly') {
+                annualRSU = rsuUnits * stockPrice;
+            }
+        }
+        
+        // Calculate tax with custom rate if provided
+        const customTaxRate = inputs[`${partnerKey}RsuTaxRate`];
+        const rsuTaxInfo = calculateRSUTax(annualRSU, baseSalary, country, customTaxRate);
+        
+        return {
+            grossAnnual: annualRSU,
+            netAnnual: rsuTaxInfo.netRSU,
+            tax: rsuTaxInfo.tax,
+            effectiveRate: rsuTaxInfo.effectiveRate,
+            monthlyNet: Math.round(rsuTaxInfo.netRSU / 12)
+        };
+    };
+    
     // Calculate monthly after-tax additional income for retirement projections
     const getMonthlyAfterTaxAdditionalIncome = (inputs) => {
         const taxInfo = calculateTotalAdditionalIncomeTax(inputs);
@@ -374,7 +409,8 @@ window.AdditionalIncomeTax = (() => {
         calculateRSUTax,
         calculateTotalAdditionalIncomeTax,
         getMonthlyAfterTaxAdditionalIncome,
-        getMarginalTaxRate
+        getMarginalTaxRate,
+        calculatePartnerRSUIncome
     };
 })();
 

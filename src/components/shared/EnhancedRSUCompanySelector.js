@@ -1,4 +1,22 @@
 const EnhancedRSUCompanySelector = ({ inputs, setInputs, language, workingCurrency = 'USD' }) => {
+    // Get default RSU tax rate based on country
+    const getDefaultRSUTaxRate = () => {
+        const country = inputs.country || 'israel';
+        switch(country.toLowerCase()) {
+            case 'israel':
+            case 'isr':
+                return 47.00;
+            case 'us':
+            case 'usa':
+                return 37.00;
+            case 'uk':
+            case 'gbr':
+                return 45.00;
+            default:
+                return 40.00;
+        }
+    };
+    
     const [searchQuery, setSearchQuery] = React.useState('');
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
@@ -555,6 +573,37 @@ const EnhancedRSUCompanySelector = ({ inputs, setInputs, language, workingCurren
                         min: '0',
                         className: "w-full p-2 border border-gray-300 rounded-lg"
                     })
+                ]),
+                
+                // RSU tax rate input
+                React.createElement('div', { key: 'rsu-tax-field' }, [
+                    React.createElement('label', {
+                        key: 'rsu-tax-label',
+                        className: "block text-sm font-medium text-gray-700 mb-1"
+                    }, language === 'he' ? 'שיעור מס RSU (%)' : 'RSU Tax Rate (%)'),
+                    React.createElement('input', {
+                        key: 'rsu-tax-input',
+                        type: 'number',
+                        step: '0.01',
+                        value: inputs.rsuTaxRate !== undefined ? inputs.rsuTaxRate : getDefaultRSUTaxRate(),
+                        onChange: (e) => {
+                            const rate = parseFloat(e.target.value);
+                            if (!isNaN(rate) && rate >= 0 && rate <= 50) {
+                                setInputs({...inputs, rsuTaxRate: rate});
+                            }
+                        },
+                        placeholder: getDefaultRSUTaxRate().toFixed(2),
+                        min: '0',
+                        max: '50',
+                        className: "w-full p-2 border border-gray-300 rounded-lg"
+                    }),
+                    React.createElement('div', {
+                        key: 'rsu-tax-help',
+                        className: "text-xs text-gray-500 mt-1"
+                    }, language === 'he' ? 
+                        'ברירת מחדל: ישראל 47%, ארה"ב 37%, בריטניה 45%' : 
+                        'Default: Israel 47%, US 37%, UK 45%'
+                    )
                 ]),
                 
                 // Actions
