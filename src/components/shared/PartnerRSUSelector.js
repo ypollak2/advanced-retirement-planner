@@ -13,6 +13,11 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
     const [priceSource, setPriceSource] = React.useState('');
     const [lastUpdated, setLastUpdated] = React.useState(null);
     const [currencyRate, setCurrencyRate] = React.useState(null);
+    const [isCustomMode, setIsCustomMode] = React.useState(false);
+    const [customTicker, setCustomTicker] = React.useState('');
+    const [customCompanyName, setCustomCompanyName] = React.useState('');
+    const [tickerValidation, setTickerValidation] = React.useState('');
+    const [selectedSector, setSelectedSector] = React.useState('all');
     
     // Partner-specific field names
     const companyField = `${partnerKey}RsuCompany`;
@@ -21,64 +26,40 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
     const frequencyField = `${partnerKey}RsuFrequency`;
     const quarterlyField = `${partnerKey}QuarterlyRSU`;
     
-    // Comprehensive list of tech companies with RSUs (same as main component)
-    const companies = [
-        // FAANG + Major Tech
-        { symbol: 'AAPL', name: 'Apple Inc.', category: 'Big Tech' },
-        { symbol: 'GOOGL', name: 'Alphabet (Google)', category: 'Big Tech' },
-        { symbol: 'MSFT', name: 'Microsoft Corporation', category: 'Big Tech' },
-        { symbol: 'AMZN', name: 'Amazon.com Inc.', category: 'Big Tech' },
-        { symbol: 'META', name: 'Meta Platforms (Facebook)', category: 'Big Tech' },
-        { symbol: 'NFLX', name: 'Netflix Inc.', category: 'Big Tech' },
+    // Load comprehensive stock list (1000+ companies)
+    const companies = React.useMemo(() => {
+        // Use the comprehensive list if available, otherwise fallback to original list
+        if (window.stockCompanies && window.stockCompanies.length > 0) {
+            // Map to match the existing format
+            return window.stockCompanies.map(company => ({
+                symbol: company.symbol,
+                name: company.name,
+                category: company.sector,
+                exchange: company.exchange
+            }));
+        }
         
-        // Top Tech Companies
-        { symbol: 'TSLA', name: 'Tesla Inc.', category: 'Electric Vehicles' },
-        { symbol: 'NVDA', name: 'NVIDIA Corporation', category: 'Semiconductors' },
-        { symbol: 'AMD', name: 'Advanced Micro Devices', category: 'Semiconductors' },
-        { symbol: 'INTC', name: 'Intel Corporation', category: 'Semiconductors' },
-        { symbol: 'CRM', name: 'Salesforce Inc.', category: 'Cloud Software' },
-        { symbol: 'ORCL', name: 'Oracle Corporation', category: 'Enterprise Software' },
-        { symbol: 'ADBE', name: 'Adobe Inc.', category: 'Creative Software' },
-        { symbol: 'NOW', name: 'ServiceNow Inc.', category: 'Cloud Software' },
-        
-        // Growth Tech
-        { symbol: 'SHOP', name: 'Shopify Inc.', category: 'E-commerce' },
-        { symbol: 'SPOT', name: 'Spotify Technology', category: 'Media Streaming' },
-        { symbol: 'ZM', name: 'Zoom Video Communications', category: 'Communication' },
-        { symbol: 'UBER', name: 'Uber Technologies', category: 'Rideshare' },
-        { symbol: 'ABNB', name: 'Airbnb Inc.', category: 'Travel' },
-        { symbol: 'COIN', name: 'Coinbase Global', category: 'Cryptocurrency' },
-        { symbol: 'PLTR', name: 'Palantir Technologies', category: 'Data Analytics' },
-        { symbol: 'SNOW', name: 'Snowflake Inc.', category: 'Cloud Data' },
-        { symbol: 'DDOG', name: 'Datadog Inc.', category: 'Monitoring' },
-        
-        // Enterprise & Cloud
-        { symbol: 'CRWD', name: 'CrowdStrike Holdings', category: 'Cybersecurity' },
-        { symbol: 'OKTA', name: 'Okta Inc.', category: 'Identity Management' },
-        { symbol: 'TWLO', name: 'Twilio Inc.', category: 'Communication APIs' },
-        { symbol: 'WORK', name: 'Slack Technologies', category: 'Collaboration' },
-        { symbol: 'TEAM', name: 'Atlassian Corporation', category: 'Developer Tools' },
-        { symbol: 'MDB', name: 'MongoDB Inc.', category: 'Database' },
-        { symbol: 'ESTC', name: 'Elastic N.V.', category: 'Search & Analytics' },
-        
-        // Israeli Tech Companies
-        { symbol: 'WDAY', name: 'Workday Inc.', category: 'HR Software' },
-        { symbol: 'NICE', name: 'NICE Ltd.', category: 'Analytics' },
-        { symbol: 'CYBR', name: 'CyberArk Software', category: 'Cybersecurity' },
-        { symbol: 'MNDY', name: 'monday.com Ltd.', category: 'Collaboration' },
-        { symbol: 'S', name: 'SentinelOne Inc.', category: 'Cybersecurity' },
-        { symbol: 'FROG', name: 'JFrog Ltd.', category: 'DevOps' },
-        
-        // Other Notable Tech
-        { symbol: 'LYFT', name: 'Lyft Inc.', category: 'Rideshare' },
-        { symbol: 'PINS', name: 'Pinterest Inc.', category: 'Social Media' },
-        { symbol: 'SNAP', name: 'Snap Inc.', category: 'Social Media' },
-        { symbol: 'TWTR', name: 'Twitter Inc.', category: 'Social Media' },
-        { symbol: 'SQ', name: 'Block Inc. (Square)', category: 'Fintech' },
-        { symbol: 'PYPL', name: 'PayPal Holdings', category: 'Fintech' },
-        { symbol: 'ROKU', name: 'Roku Inc.', category: 'Streaming' },
-        { symbol: 'ZS', name: 'Zscaler Inc.', category: 'Cybersecurity' }
-    ];
+        // Fallback to original list if stockCompanies.js is not loaded
+        return [
+            { symbol: 'AAPL', name: 'Apple Inc.', category: 'Technology' },
+            { symbol: 'GOOGL', name: 'Alphabet (Google)', category: 'Technology' },
+            { symbol: 'MSFT', name: 'Microsoft Corporation', category: 'Technology' },
+            { symbol: 'AMZN', name: 'Amazon.com Inc.', category: 'Technology' },
+            { symbol: 'META', name: 'Meta Platforms (Facebook)', category: 'Technology' },
+            { symbol: 'TSLA', name: 'Tesla Inc.', category: 'Technology' },
+            { symbol: 'NVDA', name: 'NVIDIA Corporation', category: 'Technology' },
+            // Keep a minimal list as fallback
+        ];
+    }, []);
+    
+    // Get all unique sectors for filtering
+    const sectors = React.useMemo(() => {
+        if (window.getAllSectors) {
+            return ['all', ...window.getAllSectors()];
+        }
+        const uniqueSectors = [...new Set(companies.map(c => c.category))];
+        return ['all', ...uniqueSectors.sort()];
+    }, [companies]);
     
     // Currency symbol helper
     const getCurrencySymbol = (currency) => {
@@ -110,19 +91,51 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
         }
     }, [workingCurrency]);
     
-    // Filter companies based on search query
-    const filteredCompanies = companies.filter(company =>
-        company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        company.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        company.category.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // Filter companies based on search query and sector
+    const filteredCompanies = React.useMemo(() => {
+        let filtered = companies;
+        
+        // Filter by sector if not 'all'
+        if (selectedSector !== 'all') {
+            filtered = filtered.filter(company => 
+                company.category === selectedSector
+            );
+        }
+        
+        // Filter by search query
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter(company =>
+                company.name.toLowerCase().includes(query) ||
+                company.symbol.toLowerCase().includes(query) ||
+                company.category.toLowerCase().includes(query)
+            );
+        }
+        
+        // Limit to 50 results for performance
+        return filtered.slice(0, 50);
+    }, [companies, searchQuery, selectedSector]);
     
     const handleCompanySelect = async (symbol) => {
+        // Handle custom mode
+        if (symbol === 'OTHER') {
+            setIsCustomMode(true);
+            setInputs({...inputs, [companyField]: 'OTHER'});
+            setIsDropdownOpen(false);
+            setSearchQuery('');
+            setManualPriceMode(false);
+            return;
+        }
+        
+        // Regular company selection
+        setIsCustomMode(false);
+        setCustomTicker('');
+        setCustomCompanyName('');
         setInputs({...inputs, [companyField]: symbol});
         setIsDropdownOpen(false);
         setSearchQuery('');
         
-        if (symbol && symbol !== 'OTHER' && symbol !== '') {
+        if (symbol && symbol !== '') {
             // Fetch currency rate directly if needed for non-USD currencies
             let effectiveRate = currencyRate;
             if (workingCurrency !== 'USD' && (currencyRate === null || currencyRate <= 0)) {
@@ -147,7 +160,7 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
             }
             await fetchStockPriceForSymbol(symbol, effectiveRate);
         } else {
-            // Reset price data for OTHER or empty selection
+            // Reset price data for empty selection
             setStockPrice(null);
             setPriceSource('');
             setLastUpdated(null);
@@ -335,7 +348,47 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
         }));
     };
     
-    const selectedCompany = companies.find(c => c.symbol === inputs[companyField]);
+    // Handle custom ticker validation
+    const validateCustomTicker = async () => {
+        if (!customTicker) {
+            setTickerValidation('');
+            return;
+        }
+        
+        const ticker = customTicker.toUpperCase();
+        
+        // Basic format validation
+        if (!window.isValidTicker || !window.isValidTicker(ticker)) {
+            setTickerValidation('invalid');
+            return;
+        }
+        
+        // Try to fetch price to validate ticker exists
+        setTickerValidation('validating');
+        try {
+            if (window.fetchStockPrice) {
+                const price = await window.fetchStockPrice(ticker);
+                if (price && price > 0) {
+                    setTickerValidation('valid');
+                    // Update inputs with custom ticker
+                    setInputs(prev => ({...prev, 
+                        [companyField]: ticker,
+                        [`${partnerKey}RsuCompanyName`]: customCompanyName || ticker
+                    }));
+                    // Fetch the price
+                    await fetchStockPriceForSymbol(ticker, currencyRate);
+                } else {
+                    setTickerValidation('not_found');
+                }
+            }
+        } catch (error) {
+            setTickerValidation('not_found');
+        }
+    };
+    
+    const selectedCompany = isCustomMode && customTicker ? 
+        { symbol: customTicker.toUpperCase(), name: customCompanyName || customTicker.toUpperCase(), category: 'Custom' } :
+        companies.find(c => c.symbol === inputs[companyField]);
     
     return React.createElement('div', { key: 'partner-rsu-selector' }, [
         React.createElement('label', {
@@ -343,11 +396,32 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
             className: "block text-sm font-medium text-gray-700 mb-2"
         }, [
             React.createElement('span', { key: 'label-text' }, 
-                language === 'he' ? 'חברה (40+ אפשרויות)' : 'Company (40+ Options)'),
+                language === 'he' ? `חברה (${companies.length}+ חברות)` : `Company (${companies.length}+ Stocks)`),
             React.createElement('span', { 
                 key: 'label-badge',
                 className: "ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-semibold"
             }, language === 'he' ? 'חיפוש חכם' : 'Smart Search')
+        ]),
+        
+        // Sector Filter (only show if we have many companies)
+        companies.length > 100 && React.createElement('div', {
+            key: 'sector-filter',
+            className: "mb-2"
+        }, [
+            React.createElement('select', {
+                key: 'sector-select',
+                value: selectedSector,
+                onChange: (e) => setSelectedSector(e.target.value),
+                className: "w-full p-2 border border-gray-300 rounded-lg text-sm"
+            }, sectors.map(sector => 
+                React.createElement('option', { 
+                    key: sector, 
+                    value: sector 
+                }, sector === 'all' ? 
+                    (language === 'he' ? 'כל הסקטורים' : 'All Sectors') : 
+                    sector
+                )
+            ))
         ]),
         
         // Search Input with Dropdown
@@ -385,15 +459,19 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
                 )
             ]),
             
-            // Dropdown List
-            isDropdownOpen && filteredCompanies.length > 0 ? React.createElement('div', {
+            // Dropdown List (show even if no results to display the custom option)
+            isDropdownOpen ? React.createElement('div', {
                 key: 'dropdown',
                 className: "absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto"
             }, [
-                React.createElement('div', {
+                filteredCompanies.length > 0 ? React.createElement('div', {
                     key: 'dropdown-header',
                     className: "px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-600"
-                }, `${filteredCompanies.length} ${language === 'he' ? 'תוצאות' : 'companies found'}`),
+                }, `${filteredCompanies.length} ${language === 'he' ? 'תוצאות' : 'companies found'}`) : 
+                React.createElement('div', {
+                    key: 'no-results',
+                    className: "px-3 py-4 text-center text-gray-500 text-sm"
+                }, language === 'he' ? 'לא נמצאו תוצאות - בחר באפשרות למטה' : 'No results found - choose option below'),
                 
                 ...filteredCompanies.map((company, index) => 
                     React.createElement('div', {
@@ -423,11 +501,11 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
                     ])
                 ),
                 
-                // Custom option
+                // Custom option - Make it more prominent
                 React.createElement('div', {
                     key: 'custom-option',
                     onClick: () => handleCompanySelect('OTHER'),
-                    className: "px-3 py-3 hover:bg-yellow-50 cursor-pointer border-t-2 border-yellow-200 bg-yellow-25"
+                    className: "px-3 py-3 hover:bg-yellow-50 cursor-pointer border-t-2 border-yellow-200 bg-yellow-50"
                 }, [
                     React.createElement('div', {
                         key: 'custom-content',
@@ -437,11 +515,11 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
                             React.createElement('div', {
                                 key: 'custom-name',
                                 className: "font-semibold text-yellow-800 text-sm"
-                            }, language === 'he' ? '🏢 חברה אחרת' : '🏢 Other Company'),
+                            }, language === 'he' ? '🏢 לא מצאת את החברה שלך?' : "🏢 Can't find your company?"),
                             React.createElement('div', {
                                 key: 'custom-desc',
                                 className: "text-xs text-yellow-600"
-                            }, language === 'he' ? 'הזן פרטים ידנית' : 'Enter details manually')
+                            }, language === 'he' ? 'לחץ כאן להזנת מחיר מניה ידנית' : 'Click here to enter stock price manually')
                         ]),
                         React.createElement('div', {
                             key: 'custom-arrow',
@@ -458,6 +536,122 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
             className: "fixed inset-0 z-40",
             onClick: () => setIsDropdownOpen(false)
         }) : null,
+        
+        // Custom ticker entry mode
+        isCustomMode ? React.createElement('div', {
+            key: 'custom-entry',
+            className: "mt-2 p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
+        }, [
+            React.createElement('h4', {
+                key: 'custom-title',
+                className: "font-semibold text-yellow-800 mb-3"
+            }, language === 'he' ? 'הזן פרטי מניה מותאמת אישית' : 'Enter Custom Stock Details'),
+            
+            React.createElement('div', {
+                key: 'custom-fields',
+                className: "space-y-3"
+            }, [
+                // Custom ticker input
+                React.createElement('div', { key: 'ticker-field' }, [
+                    React.createElement('label', {
+                        key: 'ticker-label',
+                        className: "block text-sm font-medium text-gray-700 mb-1"
+                    }, language === 'he' ? 'סמל מניה (Ticker)' : 'Stock Ticker Symbol'),
+                    React.createElement('div', {
+                        key: 'ticker-input-wrapper',
+                        className: "flex gap-2"
+                    }, [
+                        React.createElement('input', {
+                            key: 'ticker-input',
+                            type: 'text',
+                            value: customTicker,
+                            onChange: (e) => {
+                                const value = e.target.value.toUpperCase();
+                                setCustomTicker(value);
+                                setTickerValidation('');
+                            },
+                            placeholder: language === 'he' ? 'לדוגמה: AAPL' : 'e.g., AAPL',
+                            className: `flex-1 p-2 border rounded-lg ${
+                                tickerValidation === 'valid' ? 'border-green-500' :
+                                tickerValidation === 'invalid' || tickerValidation === 'not_found' ? 'border-red-500' :
+                                'border-gray-300'
+                            }`
+                        }),
+                        React.createElement('button', {
+                            key: 'validate-btn',
+                            onClick: validateCustomTicker,
+                            disabled: !customTicker || tickerValidation === 'validating',
+                            className: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm"
+                        }, tickerValidation === 'validating' ? '...' : 
+                           language === 'he' ? 'אמת' : 'Validate')
+                    ]),
+                    tickerValidation && React.createElement('div', {
+                        key: 'validation-msg',
+                        className: `text-xs mt-1 ${
+                            tickerValidation === 'valid' ? 'text-green-600' :
+                            tickerValidation === 'not_found' ? 'text-red-600' :
+                            tickerValidation === 'invalid' ? 'text-red-600' :
+                            'text-gray-600'
+                        }`
+                    }, tickerValidation === 'valid' ? '✓ Valid ticker - price fetched' :
+                       tickerValidation === 'not_found' ? '✗ Ticker not found - enter price manually' :
+                       tickerValidation === 'invalid' ? '✗ Invalid format (use 1-5 letters)' :
+                       tickerValidation === 'validating' ? 'Validating...' : '')
+                ]),
+                
+                // Custom company name input
+                React.createElement('div', { key: 'name-field' }, [
+                    React.createElement('label', {
+                        key: 'name-label',
+                        className: "block text-sm font-medium text-gray-700 mb-1"
+                    }, language === 'he' ? 'שם החברה (אופציונלי)' : 'Company Name (Optional)'),
+                    React.createElement('input', {
+                        key: 'name-input',
+                        type: 'text',
+                        value: customCompanyName,
+                        onChange: (e) => setCustomCompanyName(e.target.value),
+                        placeholder: language === 'he' ? 'לדוגמה: Apple Inc.' : 'e.g., Apple Inc.',
+                        className: "w-full p-2 border border-gray-300 rounded-lg"
+                    })
+                ]),
+                
+                // Actions
+                React.createElement('div', {
+                    key: 'custom-actions',
+                    className: "flex gap-2 pt-2"
+                }, [
+                    React.createElement('button', {
+                        key: 'use-custom',
+                        onClick: () => {
+                            if (customTicker) {
+                                const ticker = customTicker.toUpperCase();
+                                setInputs(prev => ({...prev, 
+                                    [companyField]: ticker,
+                                    [`${partnerKey}RsuCompanyName`]: customCompanyName || ticker
+                                }));
+                                setIsCustomMode(false);
+                                if (tickerValidation !== 'valid') {
+                                    setManualPriceMode(true);
+                                }
+                            }
+                        },
+                        disabled: !customTicker,
+                        className: "px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm"
+                    }, language === 'he' ? 'השתמש במניה זו' : 'Use This Stock'),
+                    React.createElement('button', {
+                        key: 'cancel-custom',
+                        onClick: () => {
+                            setIsCustomMode(false);
+                            setCustomTicker('');
+                            setCustomCompanyName('');
+                            setTickerValidation('');
+                            setInputs(prev => ({...prev, [companyField]: ''}));
+                        },
+                        className: "px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 text-sm"
+                    }, language === 'he' ? 'ביטול' : 'Cancel')
+                ])
+            ])
+        ]) : 
         
         // Selected company display with stock price
         selectedCompany ? React.createElement('div', {
