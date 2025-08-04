@@ -268,10 +268,11 @@ window.AdditionalIncomeTax = (() => {
         const freelanceIncome = (parseFloat(inputs.freelanceIncome) || 0) * 12;
         const rentalIncome = (parseFloat(inputs.rentalIncome) || 0) * 12;
         const dividendIncome = (parseFloat(inputs.dividendIncome) || 0) * 12;
+        const otherIncomeAmount = (parseFloat(inputs.otherIncome) || 0) * 12; // Add otherIncome field
         
-        // Calculate total annual income
+        // Calculate total annual income (including otherIncome)
         const totalAnnualIncome = baseSalary + annualBonus + quarterlyRSU + 
-                                  freelanceIncome + rentalIncome + dividendIncome;
+                                  freelanceIncome + rentalIncome + dividendIncome + otherIncomeAmount;
         
         // Calculate taxes
         const baseTax = calculateAnnualTax(baseSalary, country);
@@ -283,13 +284,13 @@ window.AdditionalIncomeTax = (() => {
         const rsuTaxInfo = calculateRSUTax(quarterlyRSU, baseSalary + annualBonus, country);
         
         // For other income types, calculate proportional tax
-        const otherIncome = freelanceIncome + rentalIncome + dividendIncome;
+        const otherIncome = freelanceIncome + rentalIncome + dividendIncome + otherIncomeAmount;
         const otherIncomeTax = otherIncome > 0 ? 
             (additionalIncomeTax - bonusTaxInfo.tax - rsuTaxInfo.tax) : 0;
         
         return {
             totalAdditionalIncome: annualBonus + quarterlyRSU + freelanceIncome + 
-                                   rentalIncome + dividendIncome,
+                                   rentalIncome + dividendIncome + otherIncomeAmount,
             totalAdditionalTax: Math.round(additionalIncomeTax),
             effectiveRate: totalAnnualIncome > 0 ? 
                 Math.round((totalTax.totalTax / totalAnnualIncome) * 100) : 0,
