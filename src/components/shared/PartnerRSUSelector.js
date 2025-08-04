@@ -615,6 +615,41 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
                     })
                 ]),
                 
+                // Manual stock price input
+                React.createElement('div', { key: 'price-field' }, [
+                    React.createElement('label', {
+                        key: 'price-label',
+                        className: "block text-sm font-medium text-gray-700 mb-1"
+                    }, language === 'he' ? `מחיר מניה (${currencySymbol})` : `Stock Price (${currencySymbol})`),
+                    React.createElement('input', {
+                        key: 'price-input',
+                        type: 'number',
+                        value: manualPrice,
+                        onChange: (e) => setManualPrice(e.target.value),
+                        placeholder: language === 'he' ? 'הזן מחיר מניה' : 'Enter stock price',
+                        step: '0.01',
+                        min: '0',
+                        className: "w-full p-2 border border-gray-300 rounded-lg"
+                    })
+                ]),
+                
+                // RSU units input  
+                React.createElement('div', { key: 'units-field' }, [
+                    React.createElement('label', {
+                        key: 'units-label',
+                        className: "block text-sm font-medium text-gray-700 mb-1"
+                    }, language === 'he' ? 'מספר יחידות RSU' : 'Number of RSU Units'),
+                    React.createElement('input', {
+                        key: 'units-input',
+                        type: 'number',
+                        value: inputs[unitsField] || 0,
+                        onChange: (e) => setInputs({...inputs, [unitsField]: parseInt(e.target.value) || 0}),
+                        placeholder: language === 'he' ? 'כמה יחידות RSU' : 'How many RSU units',
+                        min: '0',
+                        className: "w-full p-2 border border-gray-300 rounded-lg"
+                    })
+                ]),
+                
                 // Actions
                 React.createElement('div', {
                     key: 'custom-actions',
@@ -625,12 +660,19 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
                         onClick: () => {
                             if (customTicker) {
                                 const ticker = customTicker.toUpperCase();
+                                const price = parseFloat(manualPrice) || 0;
                                 setInputs(prev => ({...prev, 
                                     [companyField]: ticker,
-                                    [`${partnerKey}RsuCompanyName`]: customCompanyName || ticker
+                                    [`${partnerKey}RsuCompanyName`]: customCompanyName || ticker,
+                                    [priceField]: price
                                 }));
+                                if (price > 0) {
+                                    setStockPrice(price);
+                                    setLastUpdated(new Date().toLocaleTimeString());
+                                    setPriceSource('manual');
+                                }
                                 setIsCustomMode(false);
-                                if (tickerValidation !== 'valid') {
+                                if (tickerValidation !== 'valid' && price === 0) {
                                     setManualPriceMode(true);
                                 }
                             }
@@ -645,6 +687,7 @@ const PartnerRSUSelector = ({ inputs, setInputs, language, workingCurrency = 'US
                             setCustomTicker('');
                             setCustomCompanyName('');
                             setTickerValidation('');
+                            setManualPrice('');
                             setInputs(prev => ({...prev, [companyField]: ''}));
                         },
                         className: "px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 text-sm"
