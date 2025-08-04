@@ -30,6 +30,7 @@ const SummaryPanel = ({
             portfolioBreakdown: 'פילוח תיק ההשקעות',
             pensionFund: 'קרן פנסיה',
             trainingFund: 'קרן השתלמות',
+            emergencyFund: 'קרן חירום',
             personalPortfolio: 'תיק אישי',
             realEstate: 'נדל"ן',
             cryptocurrency: 'קריפטו',
@@ -76,6 +77,7 @@ const SummaryPanel = ({
             portfolioBreakdown: 'Portfolio Breakdown',
             pensionFund: 'Pension Fund',
             trainingFund: 'Training Fund',
+            emergencyFund: 'Emergency Fund',
             personalPortfolio: 'Personal Portfolio',
             realEstate: 'Real Estate',
             cryptocurrency: 'Cryptocurrency',
@@ -125,25 +127,30 @@ const SummaryPanel = ({
         // Individual assets
         const pension = parseFloat(inputs.currentSavings || 0);
         const training = parseFloat(inputs.currentTrainingFund || 0);
+        const emergencyFund = parseFloat(inputs.emergencyFund || 0);
         const personal = parseFloat(inputs.currentPersonalPortfolio || 0);
         const realEstate = parseFloat(inputs.currentRealEstate || 0);
         const crypto = parseFloat(inputs.currentCrypto || 0);
         
         // Partner assets (if couple planning)
         let partnerAssets = 0;
+        let partnerEmergencyFunds = 0;
         if (inputs.planningType === 'couple') {
             const partner1Pension = parseFloat(inputs.partner1PensionSavings || 0);
             const partner1Training = parseFloat(inputs.partner1TrainingFund || 0);
+            const partner1Emergency = parseFloat(inputs.partner1EmergencyFund || 0);
             const partner1Personal = parseFloat(inputs.partner1PersonalPortfolio || 0);
             const partner1RealEstate = parseFloat(inputs.partner1RealEstate || 0);
             const partner1Crypto = parseFloat(inputs.partner1Crypto || 0);
             
             const partner2Pension = parseFloat(inputs.partner2PensionSavings || 0);
             const partner2Training = parseFloat(inputs.partner2TrainingFund || 0);
+            const partner2Emergency = parseFloat(inputs.partner2EmergencyFund || 0);
             const partner2Personal = parseFloat(inputs.partner2PersonalPortfolio || 0);
             const partner2RealEstate = parseFloat(inputs.partner2RealEstate || 0);
             const partner2Crypto = parseFloat(inputs.partner2Crypto || 0);
             
+            partnerEmergencyFunds = partner1Emergency + partner2Emergency;
             partnerAssets = partner1Pension + partner1Training + partner1Personal + partner1RealEstate + partner1Crypto +
                            partner2Pension + partner2Training + partner2Personal + partner2RealEstate + partner2Crypto;
         }
@@ -151,17 +158,19 @@ const SummaryPanel = ({
         // Use results data if available for more accurate calculations
         const resultsPension = results?.totalSavings || pension;
         const resultsTraining = results?.trainingFundValue || training;
+        const resultsEmergency = emergencyFund + partnerEmergencyFunds;
         const resultsPersonal = results?.personalPortfolioValue || personal;
         const resultsRealEstate = results?.currentRealEstate || realEstate;
         const resultsCrypto = results?.currentCrypto || crypto;
         
-        const total = resultsPension + resultsTraining + resultsPersonal + resultsRealEstate + resultsCrypto + partnerAssets;
+        const total = resultsPension + resultsTraining + resultsEmergency + resultsPersonal + resultsRealEstate + resultsCrypto + partnerAssets;
         
         if (total === 0) return null;
         
         return {
             pension: (resultsPension / total) * 100,
             training: (resultsTraining / total) * 100,
+            emergencyFund: (resultsEmergency / total) * 100,
             personal: (resultsPersonal / total) * 100,
             realEstate: (resultsRealEstate / total) * 100,
             crypto: (resultsCrypto / total) * 100,
@@ -177,7 +186,7 @@ const SummaryPanel = ({
         if (!portfolioBreakdown) return 0;
         
         // Exclude total and partnerAssets from the score calculation as they are summaries
-        const assetCategories = ['pension', 'training', 'personal', 'realEstate', 'crypto'];
+        const assetCategories = ['pension', 'training', 'emergencyFund', 'personal', 'realEstate', 'crypto'];
         const categoryValues = assetCategories.map(cat => portfolioBreakdown[cat] || 0);
         const nonZeroValues = categoryValues.filter(v => v > 0);
         const maxConcentration = Math.max(...categoryValues);
@@ -188,7 +197,8 @@ const SummaryPanel = ({
         else if (nonZeroValues.length === 2) baseScore = 40;
         else if (nonZeroValues.length === 3) baseScore = 60;
         else if (nonZeroValues.length === 4) baseScore = 80;
-        else if (nonZeroValues.length === 5) baseScore = 100; // Excellent diversification
+        else if (nonZeroValues.length === 5) baseScore = 90;
+        else if (nonZeroValues.length >= 6) baseScore = 100; // Excellent diversification
         
         // Penalty for over-concentration (any single asset > 70%)
         if (maxConcentration > 70) baseScore = Math.max(baseScore - 20, 10);
@@ -544,6 +554,19 @@ const SummaryPanel = ({
                         className: 'text-sm font-semibold text-green-800'
                     }, `${portfolioBreakdown.training.toFixed(1)}%`)
                 ]),
+                portfolioBreakdown.emergencyFund > 0 && React.createElement('div', {
+                    key: 'emergency',
+                    className: 'flex justify-between items-center p-2 bg-yellow-50 rounded'
+                }, [
+                    React.createElement('span', {
+                        key: 'emergency-label',
+                        className: 'text-sm text-yellow-700'
+                    }, t.emergencyFund),
+                    React.createElement('span', {
+                        key: 'emergency-value',
+                        className: 'text-sm font-semibold text-yellow-800'
+                    }, `${portfolioBreakdown.emergencyFund.toFixed(1)}%`)
+                ]),
                 portfolioBreakdown.personal > 0 && React.createElement('div', {
                     key: 'personal-section',
                     className: 'space-y-2'
@@ -698,6 +721,20 @@ const SummaryPanel = ({
                     }, '20%')
                 ])
             ])
+        ]),
+        
+        // Management Fees Calculator
+        window.ManagementFeesCalculator && React.createElement('div', {
+            key: 'fees-section',
+            className: 'mt-6 pt-6 border-t border-gray-200'
+        }, [
+            React.createElement(window.ManagementFeesCalculator, {
+                key: 'fees-calculator',
+                inputs: inputs,
+                language: language,
+                formatCurrency: formatCurrency,
+                workingCurrency: workingCurrency
+            })
         ])
     ]);
 };

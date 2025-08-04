@@ -14,6 +14,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             currentSavings: 'חיסכונות נוכחים',
             pensionSavings: 'חיסכון פנסיוני',
             trainingFund: 'קרן השתלמות',
+            emergencyFund: 'קרן חירום',
             personalPortfolio: 'תיק השקעות אישי',
             realEstate: 'נדל״ן',
             cryptocurrency: 'מטבעות דיגיטליים',
@@ -32,6 +33,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             currentSavings: 'Current Savings',
             pensionSavings: 'Pension Savings',
             trainingFund: 'Training Fund',
+            emergencyFund: 'Emergency Fund',
             personalPortfolio: 'Personal Portfolio',
             realEstate: 'Real Estate',
             cryptocurrency: 'Cryptocurrency',
@@ -68,10 +70,11 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
         try {
             const currentSavings = inputs.currentSavings || 0;
             const currentTrainingFund = inputs.currentTrainingFund || 0;
+            const emergencyFund = inputs.emergencyFund || 0;
             
             // Apply tax to personal portfolio for display purposes
             const grossPersonalPortfolio = inputs.currentPersonalPortfolio || 0;
-            const portfolioTaxRate = (inputs.portfolioTaxRate || 25) / 100;
+            const portfolioTaxRate = (inputs.portfolioTaxRate !== undefined && inputs.portfolioTaxRate !== null ? inputs.portfolioTaxRate : 25) / 100;
             const netPersonalPortfolio = grossPersonalPortfolio * (1 - portfolioTaxRate);
             
             const currentRealEstate = inputs.currentRealEstate || 0;
@@ -82,9 +85,10 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             // Partner savings if couple - apply tax to partner portfolios too
             const partner1Pension = inputs.partner1CurrentPension || 0;
             const partner1TrainingFund = inputs.partner1CurrentTrainingFund || 0;
+            const partner1EmergencyFund = inputs.partner1EmergencyFund || 0;
             
             const grossPartner1Portfolio = inputs.partner1PersonalPortfolio || 0;
-            const partner1TaxRate = (inputs.partner1PortfolioTaxRate || 25) / 100;
+            const partner1TaxRate = (inputs.partner1PortfolioTaxRate !== undefined && inputs.partner1PortfolioTaxRate !== null ? inputs.partner1PortfolioTaxRate : 25) / 100;
             const netPartner1Portfolio = grossPartner1Portfolio * (1 - partner1TaxRate);
             
             const partner1RealEstate = inputs.partner1RealEstate || 0;
@@ -92,9 +96,10 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             
             const partner2Pension = inputs.partner2CurrentPension || 0;
             const partner2TrainingFund = inputs.partner2CurrentTrainingFund || 0;
+            const partner2EmergencyFund = inputs.partner2EmergencyFund || 0;
             
             const grossPartner2Portfolio = inputs.partner2PersonalPortfolio || 0;
-            const partner2TaxRate = (inputs.partner2PortfolioTaxRate || 25) / 100;
+            const partner2TaxRate = (inputs.partner2PortfolioTaxRate !== undefined && inputs.partner2PortfolioTaxRate !== null ? inputs.partner2PortfolioTaxRate : 25) / 100;
             const netPartner2Portfolio = grossPartner2Portfolio * (1 - partner2TaxRate);
             
             const partner2RealEstate = inputs.partner2RealEstate || 0;
@@ -102,10 +107,10 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
             const partner1BankAccount = inputs.partner1BankAccount || 0;
             const partner2BankAccount = inputs.partner2BankAccount || 0;
             
-            const total = currentSavings + currentTrainingFund + netPersonalPortfolio + 
+            const total = currentSavings + currentTrainingFund + emergencyFund + netPersonalPortfolio + 
                          currentRealEstate + currentCrypto + currentSavingsAccount + currentBankAccount +
-                         partner1Pension + partner1TrainingFund + netPartner1Portfolio + partner1RealEstate + partner1Crypto + partner1BankAccount +
-                         partner2Pension + partner2TrainingFund + netPartner2Portfolio + partner2RealEstate + partner2Crypto + partner2BankAccount;
+                         partner1Pension + partner1TrainingFund + partner1EmergencyFund + netPartner1Portfolio + partner1RealEstate + partner1Crypto + partner1BankAccount +
+                         partner2Pension + partner2TrainingFund + partner2EmergencyFund + netPartner2Portfolio + partner2RealEstate + partner2Crypto + partner2BankAccount;
             
             // Validate result
             if (isNaN(total) || !isFinite(total)) {
@@ -205,7 +210,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
     };
     
     // Enhanced real-time net value calculation with currency conversion
-    // Main portfolio: currentPersonalPortfolio * (1 - (inputs.portfolioTaxRate || 0.25))
+    // Main portfolio: currentPersonalPortfolio * (1 - (inputs.portfolioTaxRate ?? 25) / 100)
     // Partner portfolios: partnerPersonalPortfolio * (1 - (inputs.partnerPortfolioTaxRate || 0.25))
     const calculateAndFormatNetValue = useCallback(async (portfolioValue, taxRate, partnerId = null) => {
         if (!portfolioValue || portfolioValue <= 0) return formatCurrency(0);
@@ -258,7 +263,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
         
         // Check if we have a cached value AND if it's still valid (tax rate hasn't changed)
         // We need to recalculate if the tax rate has changed
-        const currentTaxRate = taxRate || 25;
+        const currentTaxRate = taxRate !== undefined && taxRate !== null ? taxRate : 25;
         const currentNetValue = portfolioValue * (1 - currentTaxRate / 100);
         const needsRecalculation = conversionState && (conversionState.netValue !== currentNetValue || conversionState.taxRate !== currentTaxRate);
         
@@ -387,6 +392,28 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                     })
                 ]),
                 
+                // Emergency Fund
+                createElement('div', { 
+                    key: 'emergency-fund',
+                    className: "bg-yellow-50 rounded-xl p-6 border border-yellow-200" 
+                }, [
+                    createElement('label', { 
+                        key: 'emergency-label',
+                        className: "block text-lg font-medium text-yellow-700 mb-2" 
+                    }, t.emergencyFund),
+                    createElement('input', {
+                        key: 'emergency-input',
+                        type: 'number',
+                        value: inputs.emergencyFund || 0,
+                        onChange: (e) => setInputs({...inputs, emergencyFund: parseInt(e.target.value) || 0}),
+                        className: "w-full p-3 text-lg border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
+                    }),
+                    createElement('p', { 
+                        key: 'emergency-help',
+                        className: "mt-2 text-sm text-yellow-600" 
+                    }, language === 'he' ? 'כסף זמין למקרי חירום (3-6 חודשי הוצאות)' : 'Available cash for emergencies (3-6 months expenses)')
+                ]),
+                
                 // Personal Portfolio
                 createElement('div', { 
                     key: 'personal-portfolio',
@@ -423,7 +450,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                 max: '50',
                                 step: '0.1',
                                 placeholder: '25',
-                                value: inputs.portfolioTaxRate || 25,
+                                value: inputs.portfolioTaxRate !== undefined && inputs.portfolioTaxRate !== null ? inputs.portfolioTaxRate : 25,
                                 onChange: (e) => {
                                     const validatedRate = validateTaxRate(e.target.value);
                                     setInputs({...inputs, portfolioTaxRate: validatedRate});
@@ -452,7 +479,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                     min: '0',
                                     max: '50',
                                     step: '1',
-                                    value: inputs.portfolioTaxRate || 25,
+                                    value: inputs.portfolioTaxRate !== undefined && inputs.portfolioTaxRate !== null ? inputs.portfolioTaxRate : 25,
                                     onChange: (e) => {
                                         const validatedRate = validateTaxRate(e.target.value);
                                         setInputs({...inputs, portfolioTaxRate: validatedRate});
@@ -661,6 +688,19 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                 className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-pink-500"
                             })
                         ]),
+                        createElement('div', { key: 'p1-emergency' }, [
+                            createElement('label', { 
+                                key: 'p1-emergency-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.emergencyFund),
+                            createElement('input', {
+                                key: 'p1-emergency-input',
+                                type: 'number',
+                                value: inputs.partner1EmergencyFund || 0,
+                                onChange: (e) => setInputs({...inputs, partner1EmergencyFund: parseInt(e.target.value) || 0}),
+                                className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500"
+                            })
+                        ]),
                         createElement('div', { key: 'p1-portfolio' }, [
                             createElement('label', { 
                                 key: 'p1-portfolio-label',
@@ -691,7 +731,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                         max: '50',
                                         step: '0.1',
                                         placeholder: '25',
-                                        value: inputs.partner1PortfolioTaxRate || 25,
+                                        value: inputs.partner1PortfolioTaxRate !== undefined && inputs.partner1PortfolioTaxRate !== null ? inputs.partner1PortfolioTaxRate : 25,
                                         onChange: (e) => {
                                             const validatedRate = validateTaxRate(e.target.value);
                                             setInputs({...inputs, partner1PortfolioTaxRate: validatedRate});
@@ -831,6 +871,19 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                 className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
                             })
                         ]),
+                        createElement('div', { key: 'p2-emergency' }, [
+                            createElement('label', { 
+                                key: 'p2-emergency-label',
+                                className: "block text-sm font-medium text-gray-700 mb-1" 
+                            }, t.emergencyFund),
+                            createElement('input', {
+                                key: 'p2-emergency-input',
+                                type: 'number',
+                                value: inputs.partner2EmergencyFund || 0,
+                                onChange: (e) => setInputs({...inputs, partner2EmergencyFund: parseInt(e.target.value) || 0}),
+                                className: "w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500"
+                            })
+                        ]),
                         createElement('div', { key: 'p2-portfolio' }, [
                             createElement('label', { 
                                 key: 'p2-portfolio-label',
@@ -861,7 +914,7 @@ const WizardStepSavings = ({ inputs, setInputs, language = 'en', workingCurrency
                                         max: '50',
                                         step: '0.1',
                                         placeholder: '25',
-                                        value: inputs.partner2PortfolioTaxRate || 25,
+                                        value: inputs.partner2PortfolioTaxRate !== undefined && inputs.partner2PortfolioTaxRate !== null ? inputs.partner2PortfolioTaxRate : 25,
                                         onChange: (e) => {
                                             const validatedRate = validateTaxRate(e.target.value);
                                             setInputs({...inputs, partner2PortfolioTaxRate: validatedRate});

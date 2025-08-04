@@ -72,8 +72,8 @@ const WizardStepFees = ({ inputs, setInputs, language = 'en' }) => {
                     createElement('input', {
                         key: 'contribution-input',
                         type: 'number',
-                        step: '0.1',
-                        value: inputs.contributionFees || 1.0,
+                        step: '0.01',
+                        value: inputs.contributionFees !== undefined ? inputs.contributionFees.toFixed(2) : '1.00',
                         onChange: (e) => setInputs({...inputs, contributionFees: parseFloat(e.target.value) || 0}),
                         className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
                     })
@@ -89,8 +89,8 @@ const WizardStepFees = ({ inputs, setInputs, language = 'en' }) => {
                     createElement('input', {
                         key: 'accumulation-input',
                         type: 'number',
-                        step: '0.1',
-                        value: inputs.accumulationFees || 0.1,
+                        step: '0.01',
+                        value: inputs.accumulationFees !== undefined ? inputs.accumulationFees.toFixed(2) : '0.10',
                         onChange: (e) => setInputs({...inputs, accumulationFees: parseFloat(e.target.value) || 0}),
                         className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                     })
@@ -106,8 +106,8 @@ const WizardStepFees = ({ inputs, setInputs, language = 'en' }) => {
                     createElement('input', {
                         key: 'training-fund-input',
                         type: 'number',
-                        step: '0.1',
-                        value: inputs.trainingFundFees || 0.6,
+                        step: '0.01',
+                        value: inputs.trainingFundFees !== undefined ? inputs.trainingFundFees.toFixed(2) : '0.60',
                         onChange: (e) => setInputs({...inputs, trainingFundFees: parseFloat(e.target.value) || 0}),
                         className: "w-full p-4 text-xl border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
                     })
@@ -447,7 +447,20 @@ const WizardStepFees = ({ inputs, setInputs, language = 'en' }) => {
                 key: 'info-text',
                 className: "text-yellow-700 text-sm" 
             }, t.info)
-        ])
+        ]),
+        
+        // Management Fees Calculator
+        window.ManagementFeesCalculator && createElement(window.ManagementFeesCalculator, {
+            key: 'fees-calculator',
+            inputs: inputs,
+            language: language,
+            formatCurrency: (amount) => {
+                const currencySymbols = { ILS: '₪', USD: '$', EUR: '€', GBP: '£' };
+                const symbol = currencySymbols[inputs.workingCurrency] || '$';
+                return `${symbol}${amount.toLocaleString()}`;
+            },
+            workingCurrency: inputs.workingCurrency || 'ILS'
+        })
     ]);
 };
 
