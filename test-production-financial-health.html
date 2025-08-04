@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Financial Health Score Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        
+        .test-case {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-case h3 {
+            margin-top: 0;
+            color: #1f2937;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        
+        .input-data {
+            background: #f9fafb;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .results {
+            margin-top: 15px;
+        }
+        
+        .score-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .score-value {
+            font-size: 36px;
+            font-weight: bold;
+        }
+        
+        .score-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .component {
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .component-name {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+        
+        .component-score {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .component-details {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status.pass {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status.fail {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .status.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background: #2563eb;
+        }
+        
+        .issue {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .issue-title {
+            font-weight: bold;
+            color: #991b1b;
+            margin-bottom: 5px;
+        }
+        
+        .issue-description {
+            font-size: 14px;
+            color: #7f1d1d;
+        }
+        
+        .recommendation {
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .recommendation-title {
+            font-weight: bold;
+            color: #14532d;
+            margin-bottom: 5px;
+        }
+        
+        .debug-console {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .debug-line {
+            margin: 2px 0;
+        }
+        
+        .debug-line.error {
+            color: #ef4444;
+        }
+        
+        .debug-line.warning {
+            color: #f59e0b;
+        }
+        
+        .debug-line.info {
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 Production Financial Health Score Test</h1>
+        <p>Testing the financial health scoring system with real user data scenarios</p>
+        <div class="controls">
+            <button onclick="runAllTests()">Run All Tests</button>
+            <button onclick="testYourData()">Test Your Current Data</button>
+            <button onclick="clearResults()">Clear Results</button>
+        </div>
+    </div>
+    
+    <div id="testResults" class="test-grid"></div>
+    
+    <div class="header" style="margin-top: 20px;">
+        <h2>Debug Console</h2>
+        <div id="debugConsole" class="debug-console"></div>
+    </div>
+    
+    <script>
+        // Debug logging
+        function debugLog(message, type = 'info') {
+            const console = document.getElementById('debugConsole');
+            const line = document.createElement('div');
+            line.className = `debug-line ${type}`;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            console.appendChild(line);
+            console.scrollTop = console.scrollHeight;
+        }
+        
+        // Test cases based on user's reported data
+        const testCases = [
+            {
+                name: "Your Reported Data (Couple Mode)",
+                description: "Based on the screenshot showing score of 68",
+                inputs: {
+                    planningType: 'couple',
+                    currentAge: 30,
+                    retirementAge: 67,
+                    partner1Salary: 53500,
+                    partner2Salary: 33000,
+                    partner1BankAccount: 280000,
+                    partner2BankAccount: 0,
+                    monthlyExpenses: 50600,
+                    partner1CurrentPension: 800000,
+                    partner2CurrentPension: 400000,
+                    partner1CurrentTrainingFund: 400000,
+                    partner2CurrentTrainingFund: 200000,
+                    riskTolerance: 'moderate',
+                    stockPercentage: 60,
+                    annualBonus: 150000,
+                    expenses: {
+                        housing: 15000,
+                        transportation: 5000,
+                        food: 8000,
+                        healthcare: 2000,
+                        education: 5000,
+                        entertainment: 3000,
+                        other: 12600
+                    }
+                },
+                expectedIssues: [
+                    "Missing pension contribution rates",
+                    "Missing training fund contribution rates",
+                    "Limited asset diversification"
+                ]
+            },
+            {
+                name: "Complete Individual Data",
+                description: "All fields properly filled",
+                inputs: {
+                    planningType: 'individual',
+                    currentAge: 35,
+                    retirementAge: 65,
+                    currentMonthlySalary: 30000,
+                    currentMonthlyExpenses: 18000,
+                    emergencyFund: 200000,
+                    currentSavings: 500000,
+                    currentTrainingFund: 300000,
+                    currentPersonalPortfolio: 400000,
+                    currentRealEstate: 1500000,
+                    currentBankAccount: 150000,
+                    riskTolerance: 'moderate',
+                    stockPercentage: 60,
+                    pensionContributionRate: 6.5,
+                    trainingFundContributionRate: 2.5,
+                    personalPortfolioMonthly: 5000,
+                    taxCountry: 'israel'
+                },
+                expectedIssues: []
+            },
+            {
+                name: "Missing Critical Data",
+                description: "Testing with minimal data",
+                inputs: {
+                    planningType: 'individual',
+                    currentAge: 40,
+                    retirementAge: 67
+                },
+                expectedIssues: [
+                    "No income data",
+                    "No savings data",
+                    "No expense data",
+                    "No risk profile"
+                ]
+            },
+            {
+                name: "High Net Worth Couple",
+                description: "Testing upper bounds",
+                inputs: {
+                    planningType: 'couple',
+                    currentAge: 45,
+                    retirementAge: 60,
+                    partner1Salary: 100000,
+                    partner2Salary: 80000,
+                    partner1BankAccount: 1000000,
+                    partner2BankAccount: 800000,
+                    monthlyExpenses: 60000,
+                    partner1CurrentPension: 2000000,
+                    partner2CurrentPension: 1500000,
+                    partner1CurrentTrainingFund: 1000000,
+                    partner2CurrentTrainingFund: 800000,
+                    partner1PersonalPortfolio: 2000000,
+                    partner2PersonalPortfolio: 1500000,
+                    partner1RealEstate: 5000000,
+                    partner2RealEstate: 3000000,
+                    riskTolerance: 'aggressive',
+                    stockPercentage: 80,
+                    partner1PensionEmployeeRate: 7,
+                    partner2PensionEmployeeRate: 6.5,
+                    partner1TrainingFundEmployeeRate: 3,
+                    partner2TrainingFundEmployeeRate: 2.5
+                },
+                expectedIssues: []
+            },
+            {
+                name: "String Field Detection Test",
+                description: "Testing if string fields are properly detected",
+                inputs: {
+                    planningType: 'individual',
+                    currentAge: 30,
+                    retirementAge: 67,
+                    currentMonthlySalary: 25000,
+                    riskTolerance: 'conservative',
+                    taxCountry: 'israel',
+                    riskProfile: 'moderate',
+                    investmentRisk: 'low'
+                },
+                expectedIssues: []
+            }
+        ];
+        
+        // Mock the financial health calculation (simulating the fixed version)
+        function calculateFinancialHealthScore(inputs) {
+            debugLog(`Calculating score for ${inputs.planningType} mode`, 'info');
+            
+            const result = {
+                totalScore: 0,
+                factors: {},
+                issues: []
+            };
+            
+            // Detect planning type
+            const isCoupleMode = inputs.planningType === 'couple';
+            
+            // Calculate monthly income
+            let monthlyIncome = 0;
+            if (isCoupleMode) {
+                monthlyIncome = (inputs.partner1Salary || 0) + (inputs.partner2Salary || 0);
+                debugLog(`Couple mode: Combined income = ${monthlyIncome}`, 'info');
+            } else {
+                monthlyIncome = inputs.currentMonthlySalary || 0;
+                debugLog(`Individual mode: Income = ${monthlyIncome}`, 'info');
+            }
+            
+            // 1. Savings Rate (25 points max)
+            if (monthlyIncome > 0) {
+                const pensionRate = inputs.pensionContributionRate || 
+                    inputs.partner1PensionEmployeeRate || 6.5;
+                const trainingRate = inputs.trainingFundContributionRate || 
+                    inputs.partner1TrainingFundEmployeeRate || 2.5;
+                const personalSavings = inputs.personalPortfolioMonthly || 0;
+                const totalSavingsRate = pensionRate + trainingRate + (personalSavings / monthlyIncome * 100);
+                
+                const score = Math.min(25, Math.round(totalSavingsRate * 25 / 30));
+                result.factors.savingsRate = {
+                    score,
+                    percentage: Math.round((score / 25) * 100),
+                    details: {
+                        rate: totalSavingsRate,
+                        monthlyAmount: monthlyIncome * totalSavingsRate / 100,
+                        monthlyIncome
+                    }
+                };
+                debugLog(`Savings Rate: ${totalSavingsRate.toFixed(1)}% = ${score}/25 points`, 'info');
+            } else {
+                result.factors.savingsRate = {
+                    score: 0,
+                    percentage: 0,
+                    details: { status: 'missing_income_data' }
+                };
+                result.issues.push("No income data found");
+            }
+            
+            // 2. Retirement Readiness (20 points max)
+            if (inputs.currentAge && inputs.retirementAge) {
+                const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
+                const score = yearsToRetirement > 20 ? 20 : Math.round(yearsToRetirement * 20 / 30);
+                result.factors.retirementReadiness = {
+                    score,
+                    percentage: Math.round((score / 20) * 100),
+                    details: { yearsRemaining: yearsToRetirement }
+                };
+                debugLog(`Retirement Readiness: ${yearsToRetirement} years = ${score}/20 points`, 'info');
+            } else {
+                result.factors.retirementReadiness = {
+                    score: 0,
+                    percentage: 0,
+                    details: { status: 'missing_data' }
+                };
+            }
+            
+            // 3. Time Horizon (15 points max)
+            if (inputs.currentAge && inputs.retirementAge) {
+                const years = inputs.retirementAge - inputs.currentAge;
+                const score = years > 10 ? 15 : Math.round(years * 15 / 20);
+                result.factors.timeHorizon = {
+                    score,
+                    percentage: Math.round((score / 15) * 100),
+                    details: { years }
+                };
+                debugLog(`Time Horizon: ${years} years = ${score}/15 points`, 'info');
+            } else {
+                result.factors.timeHorizon = {
+                    score: 0,
+                    percentage: 0
+                };
+            }
+            
+            // 4. Risk Alignment (12 points max)
+            if (inputs.riskTolerance && inputs.stockPercentage !== undefined) {
+                debugLog(`Risk Tolerance detected: "${inputs.riskTolerance}" (string field)`, 'info');
+                const targetStock = inputs.riskTolerance === 'aggressive' ? 80 :
+                    inputs.riskTolerance === 'moderate' ? 60 : 40;
+                const diff = Math.abs(inputs.stockPercentage - targetStock);
+                const score = diff < 10 ? 12 : diff < 20 ? 8 : 4;
+                result.factors.riskAlignment = {
+                    score,
+                    percentage: Math.round((score / 12) * 100),
+                    details: {
+                        riskProfile: inputs.riskTolerance,
+                        stockPercentage: inputs.stockPercentage,
+                        targetStock
+                    }
+                };
+                debugLog(`Risk Alignment: ${inputs.riskTolerance}/${inputs.stockPercentage}% = ${score}/12 points`, 'info');
+            } else {
+                result.factors.riskAlignment = {
+                    score: 0,
+                    percentage: 0
+                };
+                if (!inputs.riskTolerance) result.issues.push("Risk tolerance not specified");
+            }
+            
+            // 5. Diversification (10 points max)
+            let assetClasses = 0;
+            const assets = [];
+            
+            if (isCoupleMode) {
+                if (inputs.partner1CurrentPension || inputs.partner2CurrentPension) {
+                    assetClasses++;
+                    assets.push('Pension');
+                }
+                if (inputs.partner1CurrentTrainingFund || inputs.partner2CurrentTrainingFund) {
+                    assetClasses++;
+                    assets.push('Training Fund');
+                }
+                if (inputs.partner1BankAccount || inputs.partner2BankAccount) {
+                    assetClasses++;
+                    assets.push('Bank/Emergency');
+                }
+                if (inputs.partner1PersonalPortfolio || inputs.partner2PersonalPortfolio) {
+                    assetClasses++;
+                    assets.push('Portfolio');
+                }
+                if (inputs.partner1RealEstate || inputs.partner2RealEstate) {
+                    assetClasses++;
+                    assets.push('Real Estate');
+                }
+            } else {
+                if (inputs.currentSavings || inputs.currentPension) {
+                    assetClasses++;
+                    assets.push('Pension/Savings');
+                }
+                if (inputs.currentTrainingFund) {
+                    assetClasses++;
+                    assets.push('Training Fund');
+                }
+                if (inputs.emergencyFund || inputs.currentBankAccount) {
+                    assetClasses++;
+                    assets.push('Emergency Fund');
+                }
+                if (inputs.currentPersonalPortfolio) {
+                    assetClasses++;
+                    assets.push('Portfolio');
+                }
+                if (inputs.currentRealEstate) {
+                    assetClasses++;
+                    assets.push('Real Estate');
+                }
+            }
+            
+            const score = Math.min(10, assetClasses * 2);
+            result.factors.diversification = {
+                score,
+                percentage: Math.round((score / 10) * 100),
+                details: { 
+                    assetClasses,
+                    assets
+                }
+            };
+            debugLog(`Diversification: ${assetClasses} asset classes = ${score}/10 points`, 'info');
+            
+            // 6. Tax Efficiency (8 points max)
+            const hasPension = inputs.pensionContributionRate || 
+                inputs.partner1PensionEmployeeRate || inputs.partner2PensionEmployeeRate;
+            const score = hasPension ? 6 : 2;
+            result.factors.taxEfficiency = {
+                score,
+                percentage: Math.round((score / 8) * 100),
+                details: {
+                    hasPension,
+                    country: inputs.taxCountry || 'israel'
+                }
+            };
+            if (inputs.taxCountry) {
+                debugLog(`Tax Country detected: "${inputs.taxCountry}" (string field)`, 'info');
+            }
+            
+            // 7. Emergency Fund (7 points max)
+            let emergencyFund = 0;
+            let monthlyExpenses = inputs.monthlyExpenses || inputs.currentMonthlyExpenses || 0;
+            
+            if (isCoupleMode) {
+                emergencyFund = (inputs.partner1BankAccount || 0) + (inputs.partner2BankAccount || 0);
+            } else {
+                emergencyFund = inputs.emergencyFund || inputs.currentBankAccount || 0;
+            }
+            
+            if (emergencyFund > 0 && monthlyExpenses > 0) {
+                const months = emergencyFund / monthlyExpenses;
+                const efScore = months >= 6 ? 7 : Math.round(months * 7 / 6);
+                result.factors.emergencyFund = {
+                    score: efScore,
+                    percentage: Math.round((efScore / 7) * 100),
+                    details: {
+                        months,
+                        amount: emergencyFund,
+                        monthlyExpenses
+                    }
+                };
+                debugLog(`Emergency Fund: ${months.toFixed(1)} months = ${efScore}/7 points`, 'info');
+            } else {
+                result.factors.emergencyFund = {
+                    score: 0,
+                    percentage: 0
+                };
+                if (monthlyExpenses === 0) result.issues.push("Monthly expenses not specified");
+            }
+            
+            // 8. Debt Management (3 points max)
+            result.factors.debtManagement = {
+                score: 3,
+                percentage: 100,
+                details: { status: 'no_debt' }
+            };
+            
+            // Calculate total score
+            result.totalScore = Object.values(result.factors)
+                .reduce((sum, factor) => sum + (factor.score || 0), 0);
+            
+            debugLog(`Total Score: ${result.totalScore}/100`, result.totalScore >= 70 ? 'info' : 'warning');
+            
+            // Add recommendations based on score
+            if (result.totalScore < 70) {
+                if (result.factors.savingsRate.percentage < 40) {
+                    result.issues.push("Consider increasing savings rate to 15% or more");
+                }
+                if (result.factors.diversification.percentage < 60) {
+                    result.issues.push("Add more asset classes for better diversification");
+                }
+                if (result.factors.emergencyFund.percentage < 70) {
+                    result.issues.push("Build emergency fund to cover 6 months of expenses");
+                }
+            }
+            
+            return result;
+        }
+        
+        // Run a single test
+        function runTest(testCase) {
+            debugLog(`Running test: ${testCase.name}`, 'info');
+            
+            const container = document.createElement('div');
+            container.className = 'test-case';
+            
+            // Header
+            const header = document.createElement('h3');
+            header.textContent = testCase.name;
+            container.appendChild(header);
+            
+            const description = document.createElement('p');
+            description.style.fontSize = '14px';
+            description.style.color = '#6b7280';
+            description.textContent = testCase.description;
+            container.appendChild(description);
+            
+            // Calculate score
+            const result = calculateFinancialHealthScore(testCase.inputs);
+            
+            // Display overall score
+            const scoreDisplay = document.createElement('div');
+            scoreDisplay.className = 'score-display';
+            scoreDisplay.innerHTML = `
+                <div>
+                    <div class="score-value">${result.totalScore}/100</div>
+                    <div class="score-label">Financial Health Score</div>
+                </div>
+                <div>
+                    <span class="status ${result.totalScore >= 80 ? 'pass' : result.totalScore >= 60 ? 'warning' : 'fail'}">
+                        ${result.totalScore >= 80 ? 'Excellent' : result.totalScore >= 60 ? 'Good' : 'Needs Improvement'}
+                    </span>
+                </div>
+            `;
+            container.appendChild(scoreDisplay);
+            
+            // Display component scores
+            const componentsTitle = document.createElement('h4');
+            componentsTitle.textContent = 'Component Scores';
+            componentsTitle.style.marginTop = '20px';
+            container.appendChild(componentsTitle);
+            
+            const componentGrid = document.createElement('div');
+            componentGrid.className = 'component-grid';
+            
+            Object.entries(result.factors).forEach(([key, factor]) => {
+                const component = document.createElement('div');
+                component.className = 'component';
+                
+                let details = '';
+                if (factor.details) {
+                    if (factor.details.rate !== undefined) {
+                        details = `Rate: ${factor.details.rate.toFixed(1)}%`;
+                    } else if (factor.details.months !== undefined) {
+                        details = `${factor.details.months.toFixed(1)} months`;
+                    } else if (factor.details.assetClasses !== undefined) {
+                        details = `${factor.details.assetClasses} classes`;
+                    } else if (factor.details.yearsRemaining !== undefined) {
+                        details = `${factor.details.yearsRemaining} years`;
+                    }
+                }
+                
+                component.innerHTML = `
+                    <div class="component-name">${key.replace(/([A-Z])/g, ' $1').trim()}</div>
+                    <div class="component-score">${factor.percentage || 0}%</div>
+                    ${details ? `<div class="component-details">${details}</div>` : ''}
+                `;
+                componentGrid.appendChild(component);
+            });
+            container.appendChild(componentGrid);
+            
+            // Display issues
+            if (result.issues.length > 0) {
+                const issuesTitle = document.createElement('h4');
+                issuesTitle.textContent = 'Issues Found';
+                issuesTitle.style.marginTop = '20px';
+                container.appendChild(issuesTitle);
+                
+                result.issues.forEach(issue => {
+                    const issueDiv = document.createElement('div');
+                    issueDiv.className = 'issue';
+                    issueDiv.innerHTML = `
+                        <div class="issue-title">⚠️ Issue</div>
+                        <div class="issue-description">${issue}</div>
+                    `;
+                    container.appendChild(issueDiv);
+                });
+            }
+            
+            // Check expected issues
+            if (testCase.expectedIssues && testCase.expectedIssues.length > 0) {
+                const expectedTitle = document.createElement('h4');
+                expectedTitle.textContent = 'Expected vs Actual';
+                expectedTitle.style.marginTop = '20px';
+                container.appendChild(expectedTitle);
+                
+                testCase.expectedIssues.forEach(expected => {
+                    const found = result.issues.some(issue => 
+                        issue.toLowerCase().includes(expected.toLowerCase()));
+                    
+                    const expectDiv = document.createElement('div');
+                    expectDiv.innerHTML = `
+                        <span class="status ${found ? 'pass' : 'warning'}">
+                            ${found ? '✓' : '⚠'} ${expected}
+                        </span>
+                    `;
+                    container.appendChild(expectDiv);
+                });
+            }
+            
+            // Add recommendations for improvement
+            if (result.totalScore < 80) {
+                const recommendationDiv = document.createElement('div');
+                recommendationDiv.className = 'recommendation';
+                recommendationDiv.innerHTML = `
+                    <div class="recommendation-title">💡 Recommendations</div>
+                    <ul style="margin: 5px 0; padding-left: 20px;">
+                        ${result.factors.savingsRate.percentage < 40 ? '<li>Increase monthly savings to 15% of income</li>' : ''}
+                        ${result.factors.diversification.percentage < 60 ? '<li>Diversify across more asset classes</li>' : ''}
+                        ${result.factors.emergencyFund.percentage < 70 ? '<li>Build emergency fund to 6 months expenses</li>' : ''}
+                        ${!testCase.inputs.pensionContributionRate && !testCase.inputs.partner1PensionEmployeeRate ? '<li>Add pension contribution rates for accurate scoring</li>' : ''}
+                    </ul>
+                `;
+                container.appendChild(recommendationDiv);
+            }
+            
+            // Debug info
+            const debugDetails = document.createElement('details');
+            debugDetails.style.marginTop = '15px';
+            debugDetails.innerHTML = `
+                <summary style="cursor: pointer; font-size: 14px; color: #6b7280;">View Input Data</summary>
+                <div class="input-data">
+                    <pre>${JSON.stringify(testCase.inputs, null, 2)}</pre>
+                </div>
+            `;
+            container.appendChild(debugDetails);
+            
+            document.getElementById('testResults').appendChild(container);
+        }
+        
+        // Run all tests
+        function runAllTests() {
+            clearResults();
+            debugLog('Starting all tests...', 'info');
+            testCases.forEach(testCase => runTest(testCase));
+            debugLog('All tests completed', 'info');
+        }
+        
+        // Test current user data
+        function testYourData() {
+            clearResults();
+            debugLog('Testing your specific data...', 'info');
+            runTest(testCases[0]); // Your reported data
+        }
+        
+        // Clear results
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '';
+            document.getElementById('debugConsole').innerHTML = '';
+            debugLog('Test results cleared', 'info');
+        }
+        
+        // Initial load
+        window.addEventListener('load', () => {
+            debugLog('Financial Health Score Test Suite loaded', 'info');
+            debugLog('Click "Test Your Current Data" to test with your specific inputs', 'info');
+        });
+    </script>
+</body>
+</html>

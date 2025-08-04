@@ -1,5 +1,5 @@
 // Export Functions for Advanced Retirement Planner
-// Created by Yali Pollak (יהלי פולק) - v7.5.9
+// Created by Yali Pollak (יהלי פולק) - v7.5.10
 
 // Export retirement plan as image (PNG/PDF)
 async function exportAsImage(format = 'png', includeCharts = true) {
@@ -106,68 +106,230 @@ async function exportCanvasAsPDF(canvas) {
 // Export data for LLM analysis
 function exportForLLMAnalysis(inputs, results, partnerResults = null) {
     try {
+        // Determine planning mode
+        const isCoupleMode = inputs.planningType === 'couple';
+        
+        // Build comprehensive analysis data including ALL fields
         const analysisData = {
             metadata: {
                 exportDate: new Date().toISOString(),
-                version: 'v7.5.9',
+                version: 'v7.5.10',
                 tool: 'Advanced Retirement Planner by Yali Pollak',
-                purpose: 'LLM Analysis and Recommendations'
+                purpose: 'LLM Analysis and Recommendations',
+                planningMode: inputs.planningType || 'individual'
             },
             personalInfo: {
                 currentAge: inputs.currentAge,
                 retirementAge: inputs.retirementAge,
                 planningType: inputs.planningType || 'individual',
-                riskTolerance: inputs.riskTolerance
+                riskTolerance: inputs.riskTolerance,
+                stockPercentage: inputs.stockPercentage,
+                userName: inputs.userName,
+                partnerName: inputs.partnerName,
+                partnerAge: inputs.partnerAge,
+                partnerRetirementAge: inputs.partnerRetirementAge
             },
-            financialData: {
-                currentSavings: inputs.currentSavings,
-                currentSalary: inputs.currentSalary,
-                monthlyExpenses: inputs.currentMonthlyExpenses,
-                targetReplacement: inputs.targetReplacement,
-                inflationRate: inputs.inflationRate
-            },
-            investmentPortfolio: {
-                trainingFund: {
-                    current: inputs.currentTrainingFund,
-                    return: inputs.trainingFundReturn,
-                    managementFee: inputs.trainingFundManagementFee
+            // Comprehensive income data
+            incomeData: isCoupleMode ? {
+                partner1: {
+                    salary: inputs.partner1Salary,
+                    annualBonus: inputs.partner1AnnualBonus,
+                    quarterlyRSU: inputs.partner1QuarterlyRSU,
+                    rsuCompany: inputs.partner1RsuCompany,
+                    rsuUnits: inputs.partner1RsuUnits,
+                    rsuCurrentStockPrice: inputs.partner1RsuCurrentStockPrice,
+                    dividendIncome: inputs.partner1DividendIncome,
+                    freelanceIncome: inputs.partner1FreelanceIncome,
+                    otherIncome: inputs.partner1OtherIncome
                 },
-                personalPortfolio: {
-                    current: inputs.currentPersonalPortfolio,
-                    monthly: inputs.personalPortfolioMonthly,
-                    return: inputs.personalPortfolioReturn,
-                    taxRate: inputs.personalPortfolioTaxRate
-                },
-                realEstate: {
-                    current: inputs.currentRealEstate,
-                    monthly: inputs.realEstateMonthly,
-                    return: inputs.realEstateReturn,
-                    rentalYield: inputs.realEstateRentalYield
-                },
-                cryptocurrency: {
-                    current: inputs.currentCrypto,
-                    monthly: inputs.cryptoMonthly,
-                    return: inputs.cryptoReturn
+                partner2: {
+                    salary: inputs.partner2Salary,
+                    annualBonus: inputs.partner2AnnualBonus,
+                    quarterlyRSU: inputs.partner2QuarterlyRSU,
+                    rsuCompany: inputs.partner2RsuCompany,
+                    rsuUnits: inputs.partner2RsuUnits,
+                    rsuCurrentStockPrice: inputs.partner2RsuCurrentStockPrice,
+                    dividendIncome: inputs.partner2DividendIncome,
+                    freelanceIncome: inputs.partner2FreelanceIncome,
+                    otherIncome: inputs.partner2OtherIncome
                 }
+            } : {
+                monthlySalary: inputs.currentMonthlySalary || inputs.currentSalary,
+                annualBonus: inputs.annualBonus,
+                quarterlyRSU: inputs.quarterlyRSU,
+                rsuCompany: inputs.rsuCompany,
+                rsuUnits: inputs.rsuUnits,
+                rsuCurrentStockPrice: inputs.rsuCurrentStockPrice,
+                dividendIncome: inputs.dividendIncome,
+                freelanceIncome: inputs.freelanceIncome,
+                otherIncome: inputs.otherIncome,
+                rentalIncome: inputs.rentalIncome
             },
-            rsuData: inputs.rsuCompany ? {
-                company: inputs.rsuCompany,
-                currentStockPrice: inputs.rsuCurrentStockPrice,
-                totalShares: inputs.rsuTotalShares,
-                vestingYears: inputs.rsuVestingYears
-            } : null,
+            // Comprehensive expense breakdown
+            expenseData: {
+                monthlyExpenses: inputs.monthlyExpenses || inputs.currentMonthlyExpenses,
+                expenseBreakdown: inputs.expenses || {
+                    housing: inputs.housingExpenses,
+                    transportation: inputs.transportationExpenses,
+                    food: inputs.foodExpenses,
+                    healthcare: inputs.healthcareExpenses,
+                    education: inputs.educationExpenses,
+                    entertainment: inputs.entertainmentExpenses,
+                    other: inputs.otherExpenses
+                },
+                jointMonthlyExpenses: inputs.jointMonthlyExpenses,
+                jointRetirementExpenses: inputs.jointRetirementExpenses,
+                familyPlanningCosts: inputs.familyPlanningCosts,
+                fireMonthlyExpenses: inputs.fireMonthlyExpenses
+            },
+            // Complete savings and investment data
+            savingsData: isCoupleMode ? {
+                partner1: {
+                    currentPension: inputs.partner1CurrentPension,
+                    currentTrainingFund: inputs.partner1CurrentTrainingFund,
+                    personalPortfolio: inputs.partner1PersonalPortfolio,
+                    bankAccount: inputs.partner1BankAccount,
+                    realEstate: inputs.partner1RealEstate,
+                    crypto: inputs.partner1Crypto,
+                    digitalAssets: {
+                        amount: inputs.partner1DigitalAssetAmount,
+                        fiatValue: inputs.partner1DigitalAssetFiatValue
+                    }
+                },
+                partner2: {
+                    currentPension: inputs.partner2CurrentPension,
+                    currentTrainingFund: inputs.partner2CurrentTrainingFund,
+                    personalPortfolio: inputs.partner2PersonalPortfolio,
+                    bankAccount: inputs.partner2BankAccount,
+                    realEstate: inputs.partner2RealEstate,
+                    crypto: inputs.partner2Crypto,
+                    digitalAssets: {
+                        amount: inputs.partner2DigitalAssetAmount,
+                        fiatValue: inputs.partner2DigitalAssetFiatValue
+                    }
+                }
+            } : {
+                currentSavings: inputs.currentSavings,
+                currentPension: inputs.currentPension,
+                currentTrainingFund: inputs.currentTrainingFund,
+                currentPersonalPortfolio: inputs.currentPersonalPortfolio,
+                currentBankAccount: inputs.currentBankAccount,
+                emergencyFund: inputs.emergencyFund,
+                currentRealEstate: inputs.currentRealEstate,
+                currentCrypto: inputs.currentCrypto
+            },
+            // Contribution rates and fees
+            contributionData: isCoupleMode ? {
+                partner1: {
+                    pensionEmployeeRate: inputs.partner1PensionEmployeeRate,
+                    pensionEmployerRate: inputs.partner1PensionEmployerRate,
+                    trainingFundEmployeeRate: inputs.partner1TrainingFundEmployeeRate,
+                    trainingFundEmployerRate: inputs.partner1TrainingFundEmployerRate,
+                    trainingFundUnlimited: inputs.partner1TrainingFundUnlimited,
+                    expectedReturn: inputs.partner1ExpectedReturn,
+                    portfolioTaxRate: inputs.partner1PortfolioTaxRate,
+                    riskProfile: inputs.partner1RiskProfile
+                },
+                partner2: {
+                    pensionEmployeeRate: inputs.partner2PensionEmployeeRate,
+                    pensionEmployerRate: inputs.partner2PensionEmployerRate,
+                    trainingFundEmployeeRate: inputs.partner2TrainingFundEmployeeRate,
+                    trainingFundEmployerRate: inputs.partner2TrainingFundEmployerRate,
+                    trainingFundUnlimited: inputs.partner2TrainingFundUnlimited,
+                    expectedReturn: inputs.partner2ExpectedReturn,
+                    portfolioTaxRate: inputs.partner2PortfolioTaxRate,
+                    riskProfile: inputs.partner2RiskProfile
+                }
+            } : {
+                pensionContributionRate: inputs.pensionContributionRate,
+                employeePensionRate: inputs.employeePensionRate,
+                employerPensionRate: inputs.employerPensionRate,
+                trainingFundContributionRate: inputs.trainingFundContributionRate,
+                trainingFundEmployeeRate: inputs.trainingFundEmployeeRate,
+                trainingFundEmployerRate: inputs.trainingFundEmployerRate,
+                personalPortfolioMonthly: inputs.personalPortfolioMonthly,
+                realEstateMonthly: inputs.realEstateMonthly,
+                cryptoMonthly: inputs.cryptoMonthly
+            },
+            // Investment parameters
+            investmentParameters: {
+                trainingFundReturn: inputs.trainingFundReturn,
+                trainingFundManagementFee: inputs.trainingFundManagementFee,
+                personalPortfolioReturn: inputs.personalPortfolioReturn,
+                personalPortfolioTaxRate: inputs.personalPortfolioTaxRate,
+                realEstateReturn: inputs.realEstateReturn,
+                realEstateTaxRate: inputs.realEstateTaxRate,
+                realEstateRentalYield: inputs.realEstateRentalYield,
+                cryptoReturn: inputs.cryptoReturn,
+                cryptoTaxRate: inputs.cryptoTaxRate,
+                inflationRate: inputs.inflationRate,
+                salaryGrowthRate: inputs.salaryGrowthRate,
+                portfolioAllocations: inputs.portfolioAllocations
+            },
+            // Goals and targets
+            retirementGoals: {
+                targetReplacement: inputs.targetReplacement,
+                retirementGoal: inputs.retirementGoal,
+                retirementLifestyle: inputs.retirementLifestyle,
+                fireTargetAge: inputs.fireTargetAge,
+                fireSafeWithdrawlRate: inputs.fireSafeWithdrawlRate
+            },
+            // Tax and inheritance data
+            taxData: {
+                taxCountry: inputs.taxCountry,
+                taxResidency: inputs.taxResidency,
+                capitalGainsTaxRate: inputs.capitalGainsTaxRate,
+                pensionTaxRate: inputs.pensionTaxRate
+            },
+            inheritanceData: {
+                expectedInheritanceAge: inputs.expectedInheritanceAge,
+                expectedInheritanceAmount: inputs.expectedInheritanceAmount,
+                lifeInsuranceAmount: inputs.lifeInsuranceAmount
+            },
+            // Debt data
+            debtData: {
+                debtBalances: inputs.debtBalances,
+                debtInterestRates: inputs.debtInterestRates,
+                debtMonthlyPayments: inputs.debtMonthlyPayments
+            },
+            // Financial Health Score
+            financialHealthScore: inputs.financialHealthScore || {
+                totalScore: results?.financialHealthScore,
+                factors: results?.financialHealthFactors
+            },
+            // Complete projection results
             projectionResults: {
                 totalSavingsAtRetirement: results?.totalSavings,
+                trainingFundValue: results?.trainingFundValue,
+                personalPortfolioValue: results?.personalPortfolioValue,
+                realEstateValue: results?.realEstateValue,
+                cryptoValue: results?.cryptoValue,
                 monthlyPensionIncome: results?.monthlyIncome,
+                totalNetIncome: results?.totalNetIncome,
                 readinessScore: results?.readinessScore,
                 yearsToRetirement: results?.yearsToRetirement,
-                inflationAdjustedValues: results?.inflationAdjusted
+                inflationAdjusted: {
+                    totalSavings: results?.inflationAdjustedTotal,
+                    monthlyIncome: results?.inflationAdjustedIncome,
+                    purchasingPower: results?.purchasingPower
+                },
+                withoutInflation: {
+                    totalSavings: results?.nominalTotal,
+                    monthlyIncome: results?.nominalIncome
+                },
+                savingsTrajectory: results?.savingsTrajectory,
+                yearByYearProjections: results?.yearByYearData
             },
+            // Complete partner results if in couple mode
             partnerData: partnerResults ? {
                 partner1: partnerResults.partner1,
                 partner2: partnerResults.partner2,
-                combined: partnerResults.combined
+                combined: partnerResults.combined,
+                coupleCompatibility: partnerResults.compatibility
             } : null,
+            // All input fields for debugging
+            allInputFields: Object.keys(inputs).sort(),
+            totalFieldsProvided: Object.keys(inputs).filter(key => inputs[key] !== null && inputs[key] !== undefined && inputs[key] !== '').length,
             recommendationAreas: [
                 'asset_allocation_optimization',
                 'savings_rate_improvement', 
@@ -176,7 +338,9 @@ function exportForLLMAnalysis(inputs, results, partnerResults = null) {
                 'retirement_timing_analysis',
                 'diversification_opportunities',
                 'cost_reduction_strategies',
-                'income_replacement_strategies'
+                'income_replacement_strategies',
+                'inflation_protection',
+                'estate_planning'
             ]
         };
 
