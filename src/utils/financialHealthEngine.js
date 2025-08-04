@@ -293,10 +293,11 @@ function getFieldValue(inputs, fieldNames, options = {}) {
                 for (const variation of variations) {
                     const value = inputs[variation];
                     if (value !== undefined && value !== null && value !== '') {
-                        const parsed = parseFloat(value);
-                        if (!isNaN(parsed) && (allowZero || parsed > 0)) {
-                            logger.fieldFound(`Found field "${variation}" (mapped from "${fieldName}"): ${parsed}`);
-                            return parsed;
+                        // Use processFieldValue to handle both string and numeric fields
+                        const processedValue = processFieldValue(value, variation);
+                        if (processedValue !== null) {
+                            logger.fieldFound(`Found field "${variation}" (mapped from "${fieldName}"): ${processedValue}`);
+                            return processedValue;
                         }
                     }
                 }
@@ -307,10 +308,11 @@ function getFieldValue(inputs, fieldNames, options = {}) {
             if (suggestion) {
                 const value = inputs[suggestion];
                 if (value !== undefined && value !== null && value !== '') {
-                    const parsed = parseFloat(value);
-                    if (!isNaN(parsed) && (allowZero || parsed > 0)) {
-                        logger.fieldFound(`Found suggested field "${suggestion}" for "${fieldName}": ${parsed}`);
-                        return parsed;
+                    // Use processFieldValue to handle both string and numeric fields
+                    const processedValue = processFieldValue(value, suggestion);
+                    if (processedValue !== null) {
+                        logger.fieldFound(`Found suggested field "${suggestion}" for "${fieldName}": ${processedValue}`);
+                        return processedValue;
                     }
                 }
             }
@@ -348,13 +350,20 @@ function getFieldValue(inputs, fieldNames, options = {}) {
             logger.debug(`  Checking field "${fieldName}": ${value} (type: ${typeof value})`);
             
             if (value !== undefined && value !== null && value !== '') {
-                const parsed = parseFloat(value);
-                if (!isNaN(parsed) && (allowZero || parsed > 0)) {
-                    const convertedValue = detectSalaryType(fieldName, parsed);
-                    logger.fieldFound(`Found valid field "${fieldName}": ${convertedValue}`);
-                    return convertedValue;
+                // Use processFieldValue to handle both string and numeric fields
+                const processedValue = processFieldValue(value, fieldName);
+                if (processedValue !== null) {
+                    // If it's a numeric field and salary-related, apply salary conversion
+                    if (typeof processedValue === 'number') {
+                        const convertedValue = detectSalaryType(fieldName, processedValue);
+                        logger.fieldFound(`Found valid field "${fieldName}": ${convertedValue}`);
+                        return convertedValue;
+                    } else {
+                        // Return string value as-is
+                        return processedValue;
+                    }
                 } else {
-                    logger.debug(`  Field "${fieldName}" exists but value invalid: ${parsed}`);
+                    logger.debug(`  Field "${fieldName}" exists but value invalid`);
                 }
             }
         }
@@ -374,10 +383,11 @@ function getFieldValue(inputs, fieldNames, options = {}) {
                 for (const fieldName of fieldNames) {
                     const stepValue = stepData[fieldName];
                     if (stepValue !== undefined && stepValue !== null && stepValue !== '') {
-                        const parsed = parseFloat(stepValue);
-                        if (!isNaN(parsed) && (allowZero || parsed > 0)) {
-                            logger.fieldFound(`Found in step${stepNum}.${fieldName}: ${parsed}`);
-                            return parsed;
+                        // Use processFieldValue to handle both string and numeric fields
+                        const processedValue = processFieldValue(stepValue, fieldName);
+                        if (processedValue !== null) {
+                            logger.fieldFound(`Found in step${stepNum}.${fieldName}: ${processedValue}`);
+                            return processedValue;
                         }
                     }
                 }

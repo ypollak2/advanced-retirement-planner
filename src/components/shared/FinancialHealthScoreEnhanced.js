@@ -217,6 +217,8 @@
         const normalizeFactorScore = (factorScore, factorKey) => {
             if (!factorScore || typeof factorScore.score !== 'number') return 0;
             
+            // The score is already weighted (e.g., 6 out of 25 for savings rate)
+            // We need to convert this to a percentage (0-100 scale)
             const maxWeight = window.SCORE_FACTORS?.[factorKey]?.weight || 25;
             const normalizedScore = Math.round((factorScore.score / maxWeight) * 100);
             

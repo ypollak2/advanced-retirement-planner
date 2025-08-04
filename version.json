@@ -1,5 +1,5 @@
 {
-  "version": "7.5.9",
+  "version": "7.5.10",
   "build": "2025-08-01",
   "commit": "critical-hotfix-field-mapping-expense-crash",
   "description": "CRITICAL HOTFIX: Fixed ExpenseAnalysisPanel crash, fixed field mapping for employeePensionRate, patched financial health scoring"
