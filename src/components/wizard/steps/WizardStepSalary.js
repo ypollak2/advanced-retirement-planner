@@ -240,10 +240,10 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         currentMonthlySalary: inputs.partner2Salary || 0,
                         annualBonus: inputs.partnerAnnualBonus || 0,
                         quarterlyRSU: inputs.partnerQuarterlyRSU || 0,
-                        // Enhanced partner RSU fields
-                        rsuUnits: inputs.partnerRsuUnits || 0,
-                        rsuCurrentStockPrice: inputs.partnerRsuCurrentStockPrice || 0,
-                        rsuFrequency: inputs.partnerRsuFrequency || 'quarterly',
+                        // Enhanced partner RSU fields - use partner2 specific fields
+                        rsuUnits: inputs.partner2RsuUnits || inputs.partnerRsuUnits || 0,
+                        rsuCurrentStockPrice: inputs.partner2RsuCurrentStockPrice || inputs.partnerRsuCurrentStockPrice || 0,
+                        rsuFrequency: inputs.partner2RsuFrequency || inputs.partnerRsuFrequency || 'quarterly',
                         freelanceIncome: inputs.partnerFreelanceIncome || 0,
                         rentalIncome: inputs.partnerRentalIncome || 0,
                         dividendIncome: inputs.partnerDividendIncome || 0,
@@ -1157,7 +1157,9 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                 // Calculate partner RSU income separately
                 let partner1RSUNet = 0;
                 let partner2RSUNet = 0;
+                let partner1MainRSUNet = 0; // Main person's RSU attributed to Partner 1
                 
+                // Calculate Partner 1 and Partner 2 RSU from partner-specific fields
                 if (window.AdditionalIncomeTax?.calculatePartnerRSUIncome) {
                     const partner1RSUInfo = window.AdditionalIncomeTax.calculatePartnerRSUIncome(inputs, 'partner1');
                     const partner2RSUInfo = window.AdditionalIncomeTax.calculatePartnerRSUIncome(inputs, 'partner2');
@@ -1165,23 +1167,55 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                     partner2RSUNet = partner2RSUInfo.monthlyNet || 0;
                 }
                 
-                // Partner additional income calculation (excluding RSU, calculated separately)
-                const partnerInputs = {
+                // Calculate Partner 1's additional income (includes main person fields in couple mode)
+                let partner1AdditionalNet = 0;
+                if (window.AdditionalIncomeTax?.getMonthlyAfterTaxAdditionalIncome) {
+                    // Partner 1 gets the main person's additional income fields
+                    const partner1TaxResult = window.AdditionalIncomeTax.getMonthlyAfterTaxAdditionalIncome(inputs);
+                    partner1AdditionalNet = partner1TaxResult.totalMonthlyNet || 0;
+                    partner1MainRSUNet = partner1TaxResult.monthlyNetRSU || 0; // Extract RSU portion for display
+                } else {
+                    // Fallback calculation
+                    const freelanceIncome = inputs.freelanceIncome || 0;
+                    const rentalIncome = inputs.rentalIncome || 0;
+                    const dividendIncome = inputs.dividendIncome || 0;
+                    const annualBonusMonthly = (inputs.annualBonus || 0) / 12 * 0.5;
+                    const quarterlyRSUMonthly = (inputs.quarterlyRSU || 0) / 3 * 0.55;
+                    const otherIncome = inputs.otherIncome || 0;
+                    partner1AdditionalNet = freelanceIncome + rentalIncome + dividendIncome + 
+                                          annualBonusMonthly + quarterlyRSUMonthly + otherIncome;
+                    partner1MainRSUNet = quarterlyRSUMonthly;
+                }
+                
+                // Calculate Partner 2's additional income (partner-specific fields)
+                let partner2AdditionalNet = 0;
+                const partner2Inputs = {
                     country: inputs.country || 'israel',
-                    currentMonthlySalary: inputs.partner1Salary || 0,
+                    currentMonthlySalary: inputs.partner2Salary || 0,
                     annualBonus: inputs.partnerAnnualBonus || 0,
-                    quarterlyRSU: 0, // RSU calculated separately
+                    quarterlyRSU: inputs.partnerQuarterlyRSU || 0, // Include RSU here to avoid double calculation
+                    // Enhanced partner RSU fields - use partner2 specific fields
+                    rsuUnits: inputs.partner2RsuUnits || inputs.partnerRsuUnits || 0,
+                    rsuCurrentStockPrice: inputs.partner2RsuCurrentStockPrice || inputs.partnerRsuCurrentStockPrice || 0,
+                    rsuFrequency: inputs.partner2RsuFrequency || inputs.partnerRsuFrequency || 'quarterly',
                     freelanceIncome: inputs.partnerFreelanceIncome || 0,
                     rentalIncome: inputs.partnerRentalIncome || 0,
                     dividendIncome: inputs.partnerDividendIncome || 0,
                     otherIncome: inputs.partnerOtherIncome || 0
                 };
                 
-                const partnerAdditionalNet = window.AdditionalIncomeTax?.getMonthlyAfterTaxAdditionalIncome 
-                    ? (window.AdditionalIncomeTax.getMonthlyAfterTaxAdditionalIncome(partnerInputs)?.totalMonthlyNet || 0)
-                    : ((inputs.partnerAnnualBonus || 0) / 12 * 0.55 + (inputs.partnerFreelanceIncome || 0) + (inputs.partnerRentalIncome || 0) + (inputs.partnerDividendIncome || 0) + (inputs.partnerOtherIncome || 0));
+                if (window.AdditionalIncomeTax?.getMonthlyAfterTaxAdditionalIncome) {
+                    const partner2TaxResult = window.AdditionalIncomeTax.getMonthlyAfterTaxAdditionalIncome(partner2Inputs);
+                    partner2AdditionalNet = partner2TaxResult.totalMonthlyNet || 0;
+                } else {
+                    partner2AdditionalNet = (inputs.partnerAnnualBonus || 0) / 12 * 0.55 + 
+                                          (inputs.partnerFreelanceIncome || 0) + 
+                                          (inputs.partnerRentalIncome || 0) + 
+                                          (inputs.partnerDividendIncome || 0) + 
+                                          (inputs.partnerOtherIncome || 0);
+                }
                 
-                const partnerTotal = partner1NetSalary + partner2NetSalary + partner1RSUNet + partner2RSUNet + partnerAdditionalNet;
+                const partnerTotal = partner1NetSalary + partner2NetSalary + partner1AdditionalNet + partner2AdditionalNet;
                 
                 return [
                     createElement('div', {
@@ -1213,6 +1247,12 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                             createElement('span', { key: 'p2-salary-value', className: "font-medium" }, 
                                 formatCurrency(partner2NetSalary))
                         ]),
+                        partner1MainRSUNet > 0 && createElement('div', { key: 'p1-main-rsu-row', className: "flex justify-between" }, [
+                            createElement('span', { key: 'p1-main-rsu-label', className: "text-gray-600" }, 
+                                language === 'he' ? 'RSU בן/בת זוג 1 (ראשי):' : 'Partner 1 RSU (Main):'),
+                            createElement('span', { key: 'p1-main-rsu-value', className: "font-medium" }, 
+                                formatCurrency(partner1MainRSUNet))
+                        ]),
                         partner1RSUNet > 0 && createElement('div', { key: 'p1-rsu-row', className: "flex justify-between" }, [
                             createElement('span', { key: 'p1-rsu-label', className: "text-gray-600" }, 
                                 language === 'he' ? 'RSU בן/בת זוג 1:' : 'Partner 1 RSU:'),
@@ -1225,12 +1265,22 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                             createElement('span', { key: 'p2-rsu-value', className: "font-medium" }, 
                                 formatCurrency(partner2RSUNet))
                         ]),
-                        partnerAdditionalNet > 0 && createElement('div', { key: 'partner-additional-row', className: "flex justify-between" }, [
-                            createElement('span', { key: 'partner-additional-label', className: "text-gray-600" }, 
-                                language === 'he' ? 'הכנסות אחרות נטו:' : 'Other Income Net:'),
-                            createElement('span', { key: 'partner-additional-value', className: "font-medium" }, 
-                                formatCurrency(partnerAdditionalNet))
+                        (partner1AdditionalNet - partner1MainRSUNet - partner1RSUNet) > 0 && createElement('div', { key: 'p1-additional-row', className: "flex justify-between" }, [
+                            createElement('span', { key: 'p1-additional-label', className: "text-gray-600" }, 
+                                language === 'he' ? 'הכנסות אחרות בן/בת זוג 1:' : 'Partner 1 Other Income:'),
+                            createElement('span', { key: 'p1-additional-value', className: "font-medium" }, 
+                                formatCurrency(partner1AdditionalNet - partner1MainRSUNet - partner1RSUNet))
                         ]),
+                        (partner2AdditionalNet - partner2RSUNet) > 0 && createElement('div', { key: 'p2-additional-row', className: "flex justify-between" }, [
+                            createElement('span', { key: 'p2-additional-label', className: "text-gray-600" }, 
+                                language === 'he' ? 'הכנסות אחרות בן/בת זוג 2:' : 'Partner 2 Other Income:'),
+                            createElement('span', { key: 'p2-additional-value', className: "font-medium" }, 
+                                formatCurrency(partner2AdditionalNet - partner2RSUNet))
+                        ]),
+                        // Main person RSU Details (attributed to Partner 1 in couple mode)
+                        (inputs.rsuUnits > 0 && inputs.rsuCompany) && createElement('div', { key: 'main-rsu-details', className: "text-xs text-gray-500 mt-1 col-span-2" }, 
+                            `P1 Main: ${inputs.rsuUnits} ${inputs.rsuCompany} @ ${currencySymbol}${inputs.rsuCurrentStockPrice || 0} (${inputs.rsuFrequency || 'quarterly'}) - ${language === 'he' ? 'מס' : 'Tax'}: ${inputs.rsuTaxRate || 40}%`
+                        ),
                         // Partner 1 RSU Details
                         (inputs.partner1RsuUnits > 0 && inputs.partner1RsuCompany) && createElement('div', { key: 'p1-rsu-details', className: "text-xs text-gray-500 mt-1 col-span-2" }, 
                             `P1: ${inputs.partner1RsuUnits} ${inputs.partner1RsuCompany} @ ${currencySymbol}${inputs.partner1RsuCurrentStockPrice || 0} - ${language === 'he' ? 'מס' : 'Tax'}: ${inputs.partner1RsuTaxRate || 40}%`
