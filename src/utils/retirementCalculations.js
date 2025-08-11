@@ -518,7 +518,28 @@ window.calculateRetirement = (
         // Fallback to simple calculation if tax utilities not available
         console.warn('Additional income tax utilities not available, using gross values');
         annualBonusMonthly = (parseFloat(inputs.annualBonus) || 0) / 12;
-        quarterlyRSUMonthly = (parseFloat(inputs.quarterlyRSU) || 0) / 3;
+        
+        // Calculate RSU monthly income from new fields or fall back to legacy field
+        let rsuAnnual = 0;
+        if (inputs.rsuUnits && inputs.rsuCurrentStockPrice) {
+            const units = parseFloat(inputs.rsuUnits) || 0;
+            const price = parseFloat(inputs.rsuCurrentStockPrice) || 0;
+            const frequency = inputs.rsuFrequency || 'quarterly';
+            
+            if (units && price) {
+                if (frequency === 'monthly') {
+                    rsuAnnual = units * price * 12;
+                } else if (frequency === 'quarterly') {
+                    rsuAnnual = units * price * 4;
+                } else if (frequency === 'yearly' || frequency === 'annual') {
+                    rsuAnnual = units * price;
+                }
+            }
+        }
+        
+        // Use calculated RSU or fall back to legacy quarterlyRSU field
+        quarterlyRSUMonthly = rsuAnnual > 0 ? rsuAnnual / 12 : (parseFloat(inputs.quarterlyRSU) || 0) / 3;
+        
         freelanceIncome = parseFloat(inputs.freelanceIncome) || 0;
         rentalIncome = parseFloat(inputs.rentalIncome) || 0;
         dividendIncome = parseFloat(inputs.dividendIncome) || 0;
@@ -527,15 +548,51 @@ window.calculateRetirement = (
     // Partner additional income sources with tax treatment
     let partnerAdditionalIncome = 0;
     if (inputs.planningType === 'couple') {
+        // Helper to calculate RSU income from new fields
+        const calculateRSUIncome = (units, price, frequency) => {
+            const u = parseFloat(units) || 0;
+            const p = parseFloat(price) || 0;
+            const f = frequency || 'quarterly';
+            
+            if (u && p) {
+                if (f === 'monthly') {
+                    return u * p * 12; // Annual
+                } else if (f === 'quarterly') {
+                    return u * p * 4; // Annual
+                } else if (f === 'yearly' || f === 'annual') {
+                    return u * p; // Annual
+                }
+            }
+            return 0;
+        };
+        
+        // Calculate partner RSU annual values
+        const partner1RSUAnnual = calculateRSUIncome(
+            inputs.partner1RsuUnits, 
+            inputs.partner1RsuCurrentStockPrice, 
+            inputs.partner1RsuFrequency
+        ) || (parseFloat(inputs.partner1QuarterlyRSU) || 0) * 4; // Fallback to legacy field
+        
+        const partner2RSUAnnual = calculateRSUIncome(
+            inputs.partner2RsuUnits, 
+            inputs.partner2RsuCurrentStockPrice, 
+            inputs.partner2RsuFrequency
+        ) || (parseFloat(inputs.partner2QuarterlyRSU) || 0) * 4; // Fallback to legacy field
+        
         // Create partner 1 inputs object for tax calculation
         const partner1Inputs = {
             country: inputs.country,
             currentMonthlySalary: inputs.partner1Salary || 0,
             annualBonus: inputs.partner1AnnualBonus || 0,
-            quarterlyRSU: inputs.partner1QuarterlyRSU || 0,
+            quarterlyRSU: partner1RSUAnnual / 4, // Convert to quarterly for compatibility
             freelanceIncome: inputs.partner1FreelanceIncome || 0,
             rentalIncome: inputs.partner1RentalIncome || 0,
-            dividendIncome: inputs.partner1DividendIncome || 0
+            dividendIncome: inputs.partner1DividendIncome || 0,
+            // Include new RSU fields for proper tax calculation
+            partner1RsuUnits: inputs.partner1RsuUnits,
+            partner1RsuCurrentStockPrice: inputs.partner1RsuCurrentStockPrice,
+            partner1RsuFrequency: inputs.partner1RsuFrequency,
+            partner1RsuTaxRate: inputs.partner1RsuTaxRate
         };
         
         // Create partner 2 inputs object for tax calculation
@@ -543,10 +600,15 @@ window.calculateRetirement = (
             country: inputs.country,
             currentMonthlySalary: inputs.partner2Salary || 0,
             annualBonus: inputs.partner2AnnualBonus || 0,
-            quarterlyRSU: inputs.partner2QuarterlyRSU || 0,
+            quarterlyRSU: partner2RSUAnnual / 4, // Convert to quarterly for compatibility
             freelanceIncome: inputs.partner2FreelanceIncome || 0,
             rentalIncome: inputs.partner2RentalIncome || 0,
-            dividendIncome: inputs.partner2DividendIncome || 0
+            dividendIncome: inputs.partner2DividendIncome || 0,
+            // Include new RSU fields for proper tax calculation
+            partner2RsuUnits: inputs.partner2RsuUnits,
+            partner2RsuCurrentStockPrice: inputs.partner2RsuCurrentStockPrice,
+            partner2RsuFrequency: inputs.partner2RsuFrequency,
+            partner2RsuTaxRate: inputs.partner2RsuTaxRate
         };
         
         if (window.TaxCalculators && window.TaxCalculators.getMonthlyAfterTaxAdditionalIncome) {
@@ -556,19 +618,19 @@ window.calculateRetirement = (
         } else {
             // Fallback to gross values
             const partner1AnnualBonusMonthly = (parseFloat(inputs.partner1AnnualBonus) || 0) / 12;
-            const partner1QuarterlyRSUMonthly = (parseFloat(inputs.partner1QuarterlyRSU) || 0) / 3;
+            const partner1RSUMonthly = partner1RSUAnnual / 12; // Use calculated RSU value
             const partner1FreelanceIncome = parseFloat(inputs.partner1FreelanceIncome) || 0;
             const partner1RentalIncome = parseFloat(inputs.partner1RentalIncome) || 0;
             const partner1DividendIncome = parseFloat(inputs.partner1DividendIncome) || 0;
             
             const partner2AnnualBonusMonthly = (parseFloat(inputs.partner2AnnualBonus) || 0) / 12;
-            const partner2QuarterlyRSUMonthly = (parseFloat(inputs.partner2QuarterlyRSU) || 0) / 3;
+            const partner2RSUMonthly = partner2RSUAnnual / 12; // Use calculated RSU value
             const partner2FreelanceIncome = parseFloat(inputs.partner2FreelanceIncome) || 0;
             const partner2RentalIncome = parseFloat(inputs.partner2RentalIncome) || 0;
             const partner2DividendIncome = parseFloat(inputs.partner2DividendIncome) || 0;
             
-            partnerAdditionalIncome = partner1AnnualBonusMonthly + partner1QuarterlyRSUMonthly + partner1FreelanceIncome + partner1RentalIncome + partner1DividendIncome +
-                                     partner2AnnualBonusMonthly + partner2QuarterlyRSUMonthly + partner2FreelanceIncome + partner2RentalIncome + partner2DividendIncome;
+            partnerAdditionalIncome = partner1AnnualBonusMonthly + partner1RSUMonthly + partner1FreelanceIncome + partner1RentalIncome + partner1DividendIncome +
+                                     partner2AnnualBonusMonthly + partner2RSUMonthly + partner2FreelanceIncome + partner2RentalIncome + partner2DividendIncome;
         }
     }
     

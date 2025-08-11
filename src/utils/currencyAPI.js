@@ -14,6 +14,15 @@ class CurrencyAPI {
             ETH: 0.00035     // ~2,850 USD per ETH
         };
         
+        // Rate boundaries for validation (min, max)
+        this.rateBoundaries = {
+            USD: { min: 2.5, max: 5.0 },
+            EUR: { min: 3.0, max: 6.0 },
+            GBP: { min: 3.5, max: 7.0 },
+            BTC: { min: 0.00001, max: 0.001 },
+            ETH: { min: 0.0001, max: 0.01 }
+        };
+        
         // API endpoints with CORS-friendly options and better fallbacks
         this.apiEndpoints = [
             {
@@ -21,10 +30,15 @@ class CurrencyAPI {
                 url: 'https://api.exchangerate-api.com/v4/latest/ILS',
                 parse: (data) => {
                     const rates = data.rates;
+                    // Validate rates before division
+                    const usdRate = rates.USD || 0.27;
+                    const eurRate = rates.EUR || 0.25;
+                    const gbpRate = rates.GBP || 0.22;
+                    
                     return {
-                        USD: 1 / (rates.USD || 0.27),
-                        EUR: 1 / (rates.EUR || 0.25),
-                        GBP: 1 / (rates.GBP || 0.22)
+                        USD: usdRate > 0 ? 1 / usdRate : 3.7,
+                        EUR: eurRate > 0 ? 1 / eurRate : 4.0,
+                        GBP: gbpRate > 0 ? 1 / gbpRate : 4.6
                     };
                 }
             },
@@ -40,10 +54,15 @@ class CurrencyAPI {
             {
                 name: 'CoinGecko-Crypto',
                 url: 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=ils',
-                parse: (data) => ({
-                    BTC: 1 / (data.bitcoin?.ils || 150000),
-                    ETH: 1 / (data.ethereum?.ils || 10000)
-                })
+                parse: (data) => {
+                    const btcRate = data.bitcoin?.ils || 150000;
+                    const ethRate = data.ethereum?.ils || 10000;
+                    
+                    return {
+                        BTC: btcRate > 0 ? 1 / btcRate : 1 / 150000,
+                        ETH: ethRate > 0 ? 1 / ethRate : 1 / 10000
+                    };
+                }
             },
             {
                 name: 'Fallback-Priority',
@@ -53,6 +72,27 @@ class CurrencyAPI {
         ];
     }
 
+    // Validate rate is within reasonable boundaries
+    isRateValid(currency, rate) {
+        if (!rate || rate <= 0 || !isFinite(rate)) {
+            return false;
+        }
+        
+        const boundaries = this.rateBoundaries[currency];
+        if (!boundaries) {
+            // Unknown currency, accept any positive rate
+            return true;
+        }
+        
+        // Check if rate is within boundaries
+        if (rate < boundaries.min || rate > boundaries.max) {
+            console.warn(`Rate for ${currency} (${rate}) is outside expected range [${boundaries.min}, ${boundaries.max}]`);
+            return false;
+        }
+        
+        return true;
+    }
+    
     // Check if cache is valid
     isCacheValid() {
         return this.lastUpdated && 
@@ -125,16 +165,30 @@ class CurrencyAPI {
                 const data = await response.json();
                 const rates = endpoint.parse(data);
                 
-                // Update cache with fetched rates
+                // Validate and update cache with fetched rates
                 this.cache.clear();
+                const validatedRates = {};
+                
                 Object.entries(rates).forEach(([currency, rate]) => {
-                    this.cache.set(currency, rate);
+                    if (this.isRateValid(currency, rate)) {
+                        this.cache.set(currency, rate);
+                        validatedRates[currency] = rate;
+                    } else {
+                        // Use fallback for invalid rates
+                        const fallback = this.fallbackRates[currency];
+                        if (fallback) {
+                            console.warn(`Using fallback rate for ${currency}: ${fallback}`);
+                            this.cache.set(currency, fallback);
+                            validatedRates[currency] = fallback;
+                        }
+                    }
                 });
+                
                 this.lastUpdated = Date.now();
                 this.lastError = null;
 
                 console.log(`CurrencyAPI: Successfully fetched rates from ${endpoint.name}`);
-                return rates;
+                return validatedRates;
                 
             } catch (error) {
                 console.warn(`CurrencyAPI: ${endpoint.name} failed:`, error.message);
@@ -169,24 +223,70 @@ class CurrencyAPI {
         return await this.fetchExchangeRates();
     }
 
-    // Get specific currency rate
+    // Get specific currency rate with validation
     async getRate(fromCurrency, toCurrency = 'ILS') {
         const rates = await this.fetchExchangeRates();
         
         if (fromCurrency === toCurrency) return 1;
-        if (fromCurrency === 'ILS') return 1 / (rates[toCurrency] || 1);
-        if (toCurrency === 'ILS') return rates[fromCurrency] || 1;
+        
+        if (fromCurrency === 'ILS') {
+            const rate = rates[toCurrency];
+            if (!rate || rate <= 0 || !isFinite(rate)) {
+                console.warn(`Invalid rate for ${toCurrency}, using fallback`);
+                return 1 / (this.fallbackRates[toCurrency] || 1);
+            }
+            return 1 / rate;
+        }
+        
+        if (toCurrency === 'ILS') {
+            const rate = rates[fromCurrency];
+            if (!rate || rate <= 0 || !isFinite(rate)) {
+                console.warn(`Invalid rate for ${fromCurrency}, using fallback`);
+                return this.fallbackRates[fromCurrency] || 1;
+            }
+            return rate;
+        }
         
         // Cross currency conversion (e.g., USD to EUR)
-        const fromRate = rates[fromCurrency] || 1;
-        const toRate = rates[toCurrency] || 1;
+        const fromRate = rates[fromCurrency];
+        const toRate = rates[toCurrency];
+        
+        if (!fromRate || fromRate <= 0 || !isFinite(fromRate) ||
+            !toRate || toRate <= 0 || !isFinite(toRate)) {
+            console.warn(`Invalid cross-currency rates for ${fromCurrency}/${toCurrency}, using fallbacks`);
+            const fallbackFrom = this.fallbackRates[fromCurrency] || 1;
+            const fallbackTo = this.fallbackRates[toCurrency] || 1;
+            return fallbackFrom / fallbackTo;
+        }
+        
         return fromRate / toRate;
     }
 
-    // Convert amount between currencies
+    // Convert amount between currencies with validation
     async convertAmount(amount, fromCurrency, toCurrency = 'ILS') {
+        // Validate input amount
+        if (!amount || !isFinite(amount)) {
+            console.warn(`Invalid amount for conversion: ${amount}`);
+            return 0;
+        }
+        
         const rate = await this.getRate(fromCurrency, toCurrency);
-        return amount * rate;
+        
+        // Validate rate
+        if (!rate || rate <= 0 || !isFinite(rate)) {
+            console.warn(`Invalid conversion rate: ${rate}`);
+            return amount; // Return original amount as fallback
+        }
+        
+        const result = amount * rate;
+        
+        // Validate result
+        if (!isFinite(result)) {
+            console.warn(`Invalid conversion result: ${result}`);
+            return amount; // Return original amount as fallback
+        }
+        
+        return result;
     }
 
     // Format currency with proper symbol and formatting

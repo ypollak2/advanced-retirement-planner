@@ -5,7 +5,7 @@
 ## Deployment Rules (STRICT - NO EXCEPTIONS)
 
 **CRITICAL**: 100% test pass rate required before ANY deployment
-- Run `npm test` and ensure 302/302 tests pass (updated from 245)
+- Run `npm test` and ensure 374/374 tests pass (updated from 302)
 - NO exceptions for "critical fixes" or "urgent deployments"  
 - If tests fail, fix the tests FIRST, then deploy
 - NEVER commit or push with failing tests
@@ -13,7 +13,7 @@
 
 ## Test Compliance Requirements
 
-- All 302 tests must pass (100% success rate)
+- All 374 tests must pass (100% success rate)
 - Performance test requires < 5 inline script tags in index.html
 - Security tests must pass (no vulnerabilities)
 - Syntax validation must pass for all JavaScript files
@@ -54,7 +54,7 @@
 ## Memory Log
 
 - To memorize - you need to have 100% QA testing pass
-- NEVER deploy unless `npm test` shows 302/302 tests passing
+- NEVER deploy unless `npm test` shows 374/374 tests passing
 - Fix any failing tests before deployment, no matter how urgent the fix seems
 - When user shares error messages, use different specialized agents to investigate:
   - Use Search agent for finding related error patterns in codebase

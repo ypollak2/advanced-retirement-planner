@@ -15,7 +15,15 @@ class CurrencyExchangeAPI {
 
     async fetchFiatRates() {
         try {
-            const response = await fetch(this.apiEndpoints.fiat);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+            
+            const response = await fetch(this.apiEndpoints.fiat, {
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -31,7 +39,11 @@ class CurrencyExchangeAPI {
             
             return rates;
         } catch (error) {
-            console.error('Error fetching fiat rates:', error);
+            if (error.name === 'AbortError') {
+                console.warn('⚠️ Currency API timeout: Fiat rates request took too long, using fallback rates');
+            } else {
+                console.error('Error fetching fiat rates:', error);
+            }
             // Fallback rates
             return {
                 USD: 0.27, // ~3.7 ILS per USD
@@ -43,7 +55,15 @@ class CurrencyExchangeAPI {
 
     async fetchCryptoRates() {
         try {
-            const response = await fetch(this.apiEndpoints.crypto);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+            
+            const response = await fetch(this.apiEndpoints.crypto, {
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -59,7 +79,11 @@ class CurrencyExchangeAPI {
             
             return rates;
         } catch (error) {
-            console.error('Error fetching crypto rates:', error);
+            if (error.name === 'AbortError') {
+                console.warn('⚠️ Currency API timeout: Crypto rates request took too long, using fallback rates');
+            } else {
+                console.error('Error fetching crypto rates:', error);
+            }
             // Fallback rates (approximate)
             return {
                 BTC: 0.000025, // ~40,000 ILS per BTC

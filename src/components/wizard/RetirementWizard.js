@@ -19,39 +19,58 @@ const RetirementWizard = ({
             const savedProgress = localStorage.getItem(WIZARD_STORAGE_KEY);
             const savedInputs = localStorage.getItem(WIZARD_INPUTS_KEY);
             
+            const result = {};
+            
             if (savedProgress) {
                 const progress = JSON.parse(savedProgress);
-                return {
+                result.progress = {
                     currentStep: progress.currentStep || 1,
                     completedSteps: progress.completedSteps || [],
                     skippedSteps: progress.skippedSteps || [],
                     lastSaved: progress.lastSaved
                 };
             }
+            
+            if (savedInputs) {
+                result.inputs = JSON.parse(savedInputs);
+            }
+            
+            return result;
         } catch (error) {
             console.warn('Failed to load saved wizard progress:', error);
         }
-        return null;
+        return {};
     };
     
     const totalSteps = 9;
-    const savedProgress = loadSavedProgress();
+    const savedData = loadSavedProgress();
     
     // Ensure saved step doesn't exceed new total (fixing 10->8 step reduction)
-    const initialStep = savedProgress?.currentStep ? 
-        Math.min(savedProgress.currentStep, totalSteps) : 1;
+    const initialStep = savedData?.progress?.currentStep ? 
+        Math.min(savedData.progress.currentStep, totalSteps) : 1;
     
     const [currentStep, setCurrentStep] = React.useState(initialStep);
-    const [completedSteps, setCompletedSteps] = React.useState(savedProgress?.completedSteps || []);
-    const [skippedSteps, setSkippedSteps] = React.useState(savedProgress?.skippedSteps || []);
+    const [completedSteps, setCompletedSteps] = React.useState(savedData?.progress?.completedSteps || []);
+    const [skippedSteps, setSkippedSteps] = React.useState(savedData?.progress?.skippedSteps || []);
     const [showSaveNotification, setShowSaveNotification] = React.useState(false);
-    const [lastSaved, setLastSaved] = React.useState(savedProgress?.lastSaved || null);
+    const [lastSaved, setLastSaved] = React.useState(savedData?.progress?.lastSaved || null);
     
     // Use refs to store current values and prevent infinite loops
     const currentStepRef = React.useRef(currentStep);
     const completedStepsRef = React.useRef(completedSteps);
     const skippedStepsRef = React.useRef(skippedSteps);
     const inputsRef = React.useRef(inputs);
+    
+    // Load saved inputs on mount
+    React.useEffect(() => {
+        if (savedData?.inputs && Object.keys(savedData.inputs).length > 0) {
+            console.log('Loading saved wizard inputs...');
+            setInputs(prevInputs => ({
+                ...prevInputs,
+                ...savedData.inputs
+            }));
+        }
+    }, []); // Run only on mount
     
     // Update refs when values change
     React.useEffect(() => {

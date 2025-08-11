@@ -371,7 +371,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                             key: 'toggle-manual',
                             type: 'button',
                             onClick: () => setInputs({...inputs, manualNetSalary: !inputs.manualNetSalary}),
-                            className: "text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-600"
+                            className: "text-xs px-3 py-2 min-h-[44px] rounded bg-gray-100 hover:bg-gray-200 text-gray-600"
                         }, inputs.manualNetSalary ? t.switchToAuto : t.switchToManual)
                     ]),
                     createElement('input', {
@@ -504,7 +504,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                                 key: 'partner1-toggle-manual',
                                 type: 'button',
                                 onClick: () => setInputs({...inputs, manualPartner1NetSalary: !inputs.manualPartner1NetSalary}),
-                                className: "text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-600"
+                                className: "text-xs px-3 py-2 min-h-[44px] rounded bg-gray-100 hover:bg-gray-200 text-gray-600"
                             }, inputs.manualPartner1NetSalary ? t.switchToAuto : t.switchToManual)
                         ]),
                         createElement('input', {
@@ -596,7 +596,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                                 key: 'partner2-toggle-manual',
                                 type: 'button',
                                 onClick: () => setInputs({...inputs, manualPartner2NetSalary: !inputs.manualPartner2NetSalary}),
-                                className: "text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-600"
+                                className: "text-xs px-3 py-2 min-h-[44px] rounded bg-gray-100 hover:bg-gray-200 text-gray-600"
                             }, inputs.manualPartner2NetSalary ? t.switchToAuto : t.switchToManual)
                         ]),
                         createElement('input', {

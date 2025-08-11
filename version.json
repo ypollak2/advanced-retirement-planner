@@ -1,6 +1,6 @@
 {
   "version": "7.5.10",
-  "build": "2025-08-01",
-  "commit": "critical-hotfix-field-mapping-expense-crash",
-  "description": "CRITICAL HOTFIX: Fixed ExpenseAnalysisPanel crash, fixed field mapping for employeePensionRate, patched financial health scoring"
+  "build": "2025-08-11",
+  "commit": "comprehensive-fixes-e2e-issues",
+  "description": "Fixed 12 issues: Partner RSU fields, currency validation, LocalStorage restore, Missing Data Modal, API timeouts, mobile touch targets, age validation, and more"
 }

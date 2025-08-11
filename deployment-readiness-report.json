@@ -3,29 +3,30 @@
     "Node.js version check",
     "Version consistency",
     "Full test suite",
-    "License compliance check",
     "Secret scanner",
     "Performance tests",
-    "Clean working directory",
     "Correct branch"
   ],
   "failed": [],
   "warnings": [
-    "NPM security audit"
+    "Build date not current",
+    "NPM security audit",
+    "License compliance check",
+    "Uncommitted changes present"
   ],
   "testResults": {},
   "versionInfo": {
-    "package": "7.3.3",
-    "versionFile": "7.3.3",
-    "readme": "7.3.3",
-    "buildDate": "2025-07-30",
-    "description": "Removed number key navigation that interfered with form inputs, improved keyboard UX"
+    "package": "7.5.10",
+    "versionFile": "7.5.10",
+    "readme": "7.5.10",
+    "buildDate": "2025-08-01",
+    "description": "CRITICAL HOTFIX: Fixed ExpenseAnalysisPanel crash, fixed field mapping for employeePensionRate, patched financial health scoring"
   },
-  "timestamp": "2025-07-30T20:38:46.327Z",
+  "timestamp": "2025-08-11T15:07:51.624Z",
   "summary": {
     "ready": true,
-    "passedChecks": 8,
+    "passedChecks": 6,
     "failedChecks": 0,
-    "warnings": 1
+    "warnings": 4
   }
 }

@@ -210,6 +210,66 @@ const FIELD_MAPPINGS = {
         'stockTicker', 'companyTicker', 'rsuTicker', 'stockSymbol'
     ],
     
+    // Partner RSU fields
+    partner1RsuUnits: [
+        'partner1RsuUnits', 'partner1RSUUnits', 'partner1RestrictedStockUnits',
+        'partner1StockUnits', 'partner1VestingUnits', 'partner1GrantedUnits'
+    ],
+    
+    partner2RsuUnits: [
+        'partner2RsuUnits', 'partner2RSUUnits', 'partner2RestrictedStockUnits',
+        'partner2StockUnits', 'partner2VestingUnits', 'partner2GrantedUnits'
+    ],
+    
+    partner1RsuCompany: [
+        'partner1RsuCompany', 'partner1RSUCompany', 'partner1StockCompany',
+        'partner1EmployerStock', 'partner1CompanyStock', 'partner1StockTicker'
+    ],
+    
+    partner2RsuCompany: [
+        'partner2RsuCompany', 'partner2RSUCompany', 'partner2StockCompany',
+        'partner2EmployerStock', 'partner2CompanyStock', 'partner2StockTicker'
+    ],
+    
+    partner1RsuCurrentStockPrice: [
+        'partner1RsuCurrentStockPrice', 'partner1CurrentStockPrice', 'partner1StockPrice',
+        'partner1RSUPrice', 'partner1SharePrice'
+    ],
+    
+    partner2RsuCurrentStockPrice: [
+        'partner2RsuCurrentStockPrice', 'partner2CurrentStockPrice', 'partner2StockPrice',
+        'partner2RSUPrice', 'partner2SharePrice'
+    ],
+    
+    partner1RsuFrequency: [
+        'partner1RsuFrequency', 'partner1RSUFrequency', 'partner1VestingFrequency',
+        'partner1StockFrequency', 'partner1GrantFrequency'
+    ],
+    
+    partner2RsuFrequency: [
+        'partner2RsuFrequency', 'partner2RSUFrequency', 'partner2VestingFrequency',
+        'partner2StockFrequency', 'partner2GrantFrequency'
+    ],
+    
+    partner1RsuTaxRate: [
+        'partner1RsuTaxRate', 'partner1RSUTaxRate', 'partner1StockTaxRate',
+        'partner1VestingTaxRate', 'partner1EquityTaxRate'
+    ],
+    
+    partner2RsuTaxRate: [
+        'partner2RsuTaxRate', 'partner2RSUTaxRate', 'partner2StockTaxRate',
+        'partner2VestingTaxRate', 'partner2EquityTaxRate'
+    ],
+    
+    // Legacy partner RSU fields for backward compatibility
+    partner1QuarterlyRSU: [
+        'partner1QuarterlyRSU', 'partner1QuarterlyRsu', 'partner1QuarterlyStockUnits'
+    ],
+    
+    partner2QuarterlyRSU: [
+        'partner2QuarterlyRSU', 'partner2QuarterlyRsu', 'partner2QuarterlyStockUnits'
+    ],
+    
     // ========== WORK PERIOD FIELDS ==========
     workPeriods: [
         'workPeriods', 'employmentHistory', 'workHistory', 'careerHistory',
@@ -220,6 +280,65 @@ const FIELD_MAPPINGS = {
     annualBonus: [
         'annualBonus', 'yearlyBonus', 'bonusAmount', 'annualBonusAmount',
         'expectedBonus', 'typicalBonus', 'averageBonus', 'bonusIncome'
+    ],
+    
+    // Partner bonus fields
+    partner1AnnualBonus: [
+        'partner1AnnualBonus', 'partner1YearlyBonus', 'partner1BonusAmount',
+        'partner1ExpectedBonus', 'partner1Bonus', 'partner1BonusIncome'
+    ],
+    
+    partner2AnnualBonus: [
+        'partner2AnnualBonus', 'partner2YearlyBonus', 'partner2BonusAmount',
+        'partner2ExpectedBonus', 'partner2Bonus', 'partner2BonusIncome'
+    ],
+    
+    // Freelance income fields
+    freelanceIncome: [
+        'freelanceIncome', 'consultingIncome', 'contractIncome', 'selfEmployedIncome',
+        'independentIncome', 'sideIncome', 'gigIncome', 'freelanceEarnings'
+    ],
+    
+    partner1FreelanceIncome: [
+        'partner1FreelanceIncome', 'partner1ConsultingIncome', 'partner1ContractIncome',
+        'partner1SelfEmployedIncome', 'partner1IndependentIncome', 'partner1SideIncome'
+    ],
+    
+    partner2FreelanceIncome: [
+        'partner2FreelanceIncome', 'partner2ConsultingIncome', 'partner2ContractIncome',
+        'partner2SelfEmployedIncome', 'partner2IndependentIncome', 'partner2SideIncome'
+    ],
+    
+    // Rental income fields
+    rentalIncome: [
+        'rentalIncome', 'propertyIncome', 'realEstateIncome', 'rentIncome',
+        'leaseIncome', 'tenantIncome', 'monthlyRent', 'rentalRevenue'
+    ],
+    
+    partner1RentalIncome: [
+        'partner1RentalIncome', 'partner1PropertyIncome', 'partner1RealEstateIncome',
+        'partner1RentIncome', 'partner1LeaseIncome', 'partner1MonthlyRent'
+    ],
+    
+    partner2RentalIncome: [
+        'partner2RentalIncome', 'partner2PropertyIncome', 'partner2RealEstateIncome',
+        'partner2RentIncome', 'partner2LeaseIncome', 'partner2MonthlyRent'
+    ],
+    
+    // Dividend income fields
+    dividendIncome: [
+        'dividendIncome', 'investmentDividends', 'stockDividends', 'dividends',
+        'dividendPayments', 'dividendEarnings', 'portfolioDividends', 'dividendRevenue'
+    ],
+    
+    partner1DividendIncome: [
+        'partner1DividendIncome', 'partner1Dividends', 'partner1StockDividends',
+        'partner1InvestmentDividends', 'partner1DividendPayments', 'partner1DividendEarnings'
+    ],
+    
+    partner2DividendIncome: [
+        'partner2DividendIncome', 'partner2Dividends', 'partner2StockDividends',
+        'partner2InvestmentDividends', 'partner2DividendPayments', 'partner2DividendEarnings'
     ],
     
     foreignPension: [

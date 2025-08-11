@@ -227,7 +227,7 @@ const CurrencySelector = ({
                 React.createElement('button', {
                     key: 'retry',
                     onClick: loadRates,
-                    className: 'ml-2 px-2 py-1 text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 rounded transition-colors',
+                    className: 'ml-2 px-3 py-2 text-xs min-h-[44px] bg-orange-100 hover:bg-orange-200 text-orange-700 rounded transition-colors',
                     disabled: isLoading
                 }, isLoading ? '⟳' : (language === 'he' ? 'נסה שוב' : 'Retry'))
             ])
