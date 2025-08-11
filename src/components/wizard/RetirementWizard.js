@@ -272,7 +272,7 @@ const RetirementWizard = ({
     
     // Load saved inputs on mount only (runs once)
     React.useEffect(() => {
-        if (savedProgress) {
+        if (savedData?.progress) {
             try {
                 const savedInputs = localStorage.getItem(WIZARD_INPUTS_KEY);
                 if (savedInputs) {
@@ -567,7 +567,7 @@ const RetirementWizard = ({
             ]),
             
             // Clear Progress Button (only show if there's saved progress)
-            (savedProgress && currentStep > 1) ? React.createElement('div', {
+            (savedData?.progress && currentStep > 1) ? React.createElement('div', {
                 key: 'progress-controls',
                 className: "flex justify-center mb-6"
             }, [

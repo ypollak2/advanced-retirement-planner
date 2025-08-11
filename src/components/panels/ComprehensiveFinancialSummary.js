@@ -344,7 +344,7 @@ const ComprehensiveFinancialSummary = ({ inputs, language, workingCurrency }) =>
                     React.createElement('span', { key: 'value', className: 'font-medium' }, 
                         window.formatCurrency(category.amount, workingCurrency))
                 ])
-            )
+            ))
         ]),
         
         // Tax Section
