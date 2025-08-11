@@ -3,7 +3,6 @@
     "Node.js version check",
     "Version consistency",
     "Full test suite",
-    "License compliance check",
     "Secret scanner",
     "Performance tests",
     "Clean working directory",
@@ -11,21 +10,22 @@
   ],
   "failed": [],
   "warnings": [
-    "NPM security audit"
+    "NPM security audit",
+    "License compliance check"
   ],
   "testResults": {},
   "versionInfo": {
-    "package": "7.3.3",
-    "versionFile": "7.3.3",
-    "readme": "7.3.3",
-    "buildDate": "2025-07-30",
-    "description": "Removed number key navigation that interfered with form inputs, improved keyboard UX"
+    "package": "7.5.10",
+    "versionFile": "7.5.10",
+    "readme": "7.5.10",
+    "buildDate": "2025-08-11",
+    "description": "Fixed 12 issues: Partner RSU fields, currency validation, LocalStorage restore, Missing Data Modal, API timeouts, mobile touch targets, age validation, and more"
   },
-  "timestamp": "2025-07-30T20:38:46.327Z",
+  "timestamp": "2025-08-11T15:10:05.013Z",
   "summary": {
     "ready": true,
-    "passedChecks": 8,
+    "passedChecks": 7,
     "failedChecks": 0,
-    "warnings": 1
+    "warnings": 2
   }
 }

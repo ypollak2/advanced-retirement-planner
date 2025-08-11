@@ -1,6 +1,6 @@
 {
   "name": "advanced-retirement-planner",
-  "version": "7.5.10",
+  "version": "7.5.11",
   "description": "Professional retirement planning tool with enhanced UI/UX, proper partner data visualization, salary tracking, family planning, comprehensive investment tracking, FIRE calculator, stress testing, and dedicated data management",
   "main": "index.html",
   "homepage": "https://ypollak2.github.io/advanced-retirement-planner",
@@ -139,6 +139,7 @@
     "not ie 11"
   ],
   "dependencies": {
+    "memory-engineering-mcp": "^13.3.2",
     "playwright": "^1.54.1"
   }
 }

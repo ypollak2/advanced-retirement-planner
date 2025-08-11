@@ -70,8 +70,17 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
     };
 
     // Validation functions
-    const isValidAge = (age) => age >= 18 && age <= 100;
-    const isValidRetirementAge = (retAge, currentAge) => retAge > currentAge && retAge <= 100;
+    const isValidAge = (age) => {
+        if (age === '' || age === null || age === undefined) return true; // Allow empty for optional fields
+        if (typeof age !== 'number' || isNaN(age)) return false;
+        return age >= 18 && age <= 100;
+    };
+    const isValidRetirementAge = (retAge, currentAge) => {
+        if (retAge === '' || retAge === null || retAge === undefined) return true; // Allow empty for optional fields
+        if (typeof retAge !== 'number' || isNaN(retAge)) return false;
+        if (typeof currentAge !== 'number' || isNaN(currentAge)) return false;
+        return retAge > currentAge && retAge <= 100;
+    };
     
     // Required fields validation using InputValidation utility
     const validateStepRequiredFields = () => {
@@ -261,7 +270,11 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                             min: '18',
                             max: '100',
                             value: inputs.currentAge || '',
-                            onChange: (e) => setInputs(prev => ({ ...prev, currentAge: parseInt(e.target.value) || '' })),
+                            onChange: (e) => {
+                                const value = e.target.value;
+                                const age = value === '' ? '' : parseInt(value);
+                                setInputs(prev => ({ ...prev, currentAge: age }));
+                            },
                             className: `w-full px-4 py-3 md:px-3 md:py-2 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                                 inputs.currentAge && !isValidAge(inputs.currentAge) ? 'border-red-500' : 'border-gray-300'
                             }`,
@@ -294,7 +307,11 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                             min: '50',
                             max: '100',
                             value: inputs.retirementAge || '',
-                            onChange: (e) => setInputs(prev => ({ ...prev, retirementAge: parseInt(e.target.value) || '' })),
+                            onChange: (e) => {
+                                const value = e.target.value;
+                                const age = value === '' ? '' : parseInt(value);
+                                setInputs(prev => ({ ...prev, retirementAge: age }));
+                            },
                             className: `w-full px-4 py-3 md:px-3 md:py-2 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                                 inputs.retirementAge && !isValidRetirementAge(inputs.retirementAge, inputs.currentAge) ? 'border-red-500' : 'border-gray-300'
                             }`,
@@ -357,7 +374,11 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                             min: '18',
                             max: '100',
                             value: inputs.partnerAge || '',
-                            onChange: (e) => setInputs(prev => ({ ...prev, partnerAge: parseInt(e.target.value) || '' })),
+                            onChange: (e) => {
+                                const value = e.target.value;
+                                const age = value === '' ? '' : parseInt(value);
+                                setInputs(prev => ({ ...prev, partnerAge: age }));
+                            },
                             className: `w-full px-4 py-3 md:px-3 md:py-2 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
                                 inputs.partnerAge && !isValidAge(inputs.partnerAge) ? 'border-red-500' : 'border-gray-300'
                             }`
@@ -382,7 +403,11 @@ const WizardStepPersonal = ({ inputs, setInputs, language, workingCurrency }) =>
                             min: '50',
                             max: '100',
                             value: inputs.partnerRetirementAge || '',
-                            onChange: (e) => setInputs(prev => ({ ...prev, partnerRetirementAge: parseInt(e.target.value) || '' })),
+                            onChange: (e) => {
+                                const value = e.target.value;
+                                const age = value === '' ? '' : parseInt(value);
+                                setInputs(prev => ({ ...prev, partnerRetirementAge: age }));
+                            },
                             className: `w-full px-4 py-3 md:px-3 md:py-2 text-base border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
                                 inputs.partnerRetirementAge && !isValidRetirementAge(inputs.partnerRetirementAge, inputs.partnerAge) ? 'border-red-500' : 'border-gray-300'
                             }`

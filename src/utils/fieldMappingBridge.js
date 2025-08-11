@@ -79,7 +79,12 @@ function getFieldValueWithMapping(inputs, fieldName, options = {}) {
     // Handle couple mode with partner combination
     if (combinePartners && inputs.planningType === 'couple') {
         // Check if this is a field that should be combined from partners
-        const partnerFields = ['Salary', 'PensionRate', 'TrainingRate'];
+        const partnerFields = [
+            'Salary', 'PensionRate', 'TrainingRate',
+            'RsuUnits', 'RsuCompany', 'RsuCurrentStockPrice', 'RsuFrequency', 'RsuTaxRate',
+            'AnnualBonus', 'FreelanceIncome', 'RentalIncome', 'DividendIncome',
+            'PersonalPortfolio', 'Crypto', 'CurrentTrainingFund', 'CurrentPensionSavings'
+        ];
         
         for (const pField of partnerFields) {
             if (fieldName.includes(pField)) {

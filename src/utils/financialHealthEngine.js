@@ -925,6 +925,66 @@ function calculateSavingsRateScore(inputs) {
         console.log('💰 No RSU income found');
     }
     
+    // PHASE 1.5b: Add partner RSU income if in couple mode
+    if (inputs.planningType === 'couple') {
+        let partner1RSUIncome = 0;
+        let partner2RSUIncome = 0;
+        
+        // Partner 1 RSU income
+        if (inputs.partner1RsuUnits && inputs.partner1RsuCurrentStockPrice) {
+            const units = safeParseFloat(inputs.partner1RsuUnits, 0);
+            const price = safeParseFloat(inputs.partner1RsuCurrentStockPrice, 0);
+            const frequency = inputs.partner1RsuFrequency || 'quarterly';
+            
+            if (frequency === 'monthly') {
+                partner1RSUIncome = units * price;
+            } else if (frequency === 'quarterly') {
+                partner1RSUIncome = (units * price * 4) / 12;
+            } else if (frequency === 'yearly' || frequency === 'annual') {
+                partner1RSUIncome = (units * price) / 12;
+            }
+            
+            // Handle currency conversion
+            if (inputs.currency === 'ILS' && partner1RSUIncome > 0) {
+                const usdToILS = 3.5;
+                partner1RSUIncome = partner1RSUIncome * usdToILS;
+            }
+            
+            console.log(`💰 Partner 1 RSU Income: ${units} units × $${price} (${frequency}) = ${partner1RSUIncome.toFixed(2)}/month`);
+        }
+        
+        // Partner 2 RSU income
+        if (inputs.partner2RsuUnits && inputs.partner2RsuCurrentStockPrice) {
+            const units = safeParseFloat(inputs.partner2RsuUnits, 0);
+            const price = safeParseFloat(inputs.partner2RsuCurrentStockPrice, 0);
+            const frequency = inputs.partner2RsuFrequency || 'quarterly';
+            
+            if (frequency === 'monthly') {
+                partner2RSUIncome = units * price;
+            } else if (frequency === 'quarterly') {
+                partner2RSUIncome = (units * price * 4) / 12;
+            } else if (frequency === 'yearly' || frequency === 'annual') {
+                partner2RSUIncome = (units * price) / 12;
+            }
+            
+            // Handle currency conversion
+            if (inputs.currency === 'ILS' && partner2RSUIncome > 0) {
+                const usdToILS = 3.5;
+                partner2RSUIncome = partner2RSUIncome * usdToILS;
+            }
+            
+            console.log(`💰 Partner 2 RSU Income: ${units} units × $${price} (${frequency}) = ${partner2RSUIncome.toFixed(2)}/month`);
+        }
+        
+        // Add partner RSU income to total
+        const totalPartnerRSU = partner1RSUIncome + partner2RSUIncome;
+        if (totalPartnerRSU > 0) {
+            monthlyIncome += totalPartnerRSU;
+            console.log(`💰 Total partner RSU income: ${totalPartnerRSU.toFixed(2)}/month`);
+            console.log(`💰 Total monthly income with all RSUs: ${monthlyIncome}`);
+        }
+    }
+    
     // PHASE 1.6: Add bonus and other income if available
     let monthlyBonusIncome = 0;
     let monthlyOtherIncome = 0;
@@ -2702,7 +2762,10 @@ function calculateFinancialHealthScore(inputs) {
                 calculationMethod: 'enhanced_field_mapping',
                 zeroScoreFactors: Object.entries(factors)
                     .filter(([_, factor]) => factor.score === 0)
-                    .map(([name, factor]) => ({ name, reason: factor.details?.calculationMethod || 'unknown' })),
+                    .map(([name, factor]) => ({ 
+                        name, 
+                        reason: factor.details?.reason || factor.details?.message || factor.details?.status || 'Missing data'
+                    })),
                 fieldDiagnostics: fieldDiagnostics ? {
                     foundFields: Object.keys(fieldDiagnostics.foundFields),
                     missingFields: Object.keys(fieldDiagnostics.missingFields),

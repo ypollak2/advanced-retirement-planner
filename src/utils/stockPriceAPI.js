@@ -245,25 +245,39 @@ async function fetchRealTimePrice(symbol) {
                 data = await corsProxy.fetchWithProxy(yahooUrl);
             } catch (proxyError) {
                 console.log(`⚠️ CORS proxy failed, trying direct fetch...`);
-                // Fallback to direct fetch
+                // Fallback to direct fetch with timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+                
                 const response = await fetch(yahooUrl, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
-                    }
+                    },
+                    signal: controller.signal
                 });
+                
+                clearTimeout(timeoutId);
+                
                 if (response.ok) {
                     data = await response.json();
                 }
             }
         } else {
-            // No CORS proxy available, try direct fetch
+            // No CORS proxy available, try direct fetch with timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+            
             const response = await fetch(yahooUrl, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                }
+                },
+                signal: controller.signal
             });
+            
+            clearTimeout(timeoutId);
+            
             if (response.ok) {
                 data = await response.json();
             }
