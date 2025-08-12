@@ -34,7 +34,7 @@ const AdditionalIncomeTaxPanel = ({ inputs, language = 'en', workingCurrency = '
             
             // Income types
             bonusIncome: 'הכנסה מבונוס',
-            otherIncome: 'הכנסות אחרות',
+            otherIncome: 'הכנסה מפרילנס',
             
             // Details
             bonusGross: 'בונוס ברוטו',
@@ -79,7 +79,7 @@ const AdditionalIncomeTaxPanel = ({ inputs, language = 'en', workingCurrency = '
             
             // Income types
             bonusIncome: 'Bonus Income',
-            otherIncome: 'Other Income',
+            otherIncome: 'Freelance Income',
             
             // Details
             bonusGross: 'Bonus Gross',

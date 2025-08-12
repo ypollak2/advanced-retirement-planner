@@ -138,7 +138,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             additionalIncome: 'הכנסות נוספות',
             mainAdditionalIncome: 'הכנסות נוספות עיקריות',
             partnerAdditionalIncome: 'הכנסות נוספות בני הזוג',
-            freelanceIncome: `הכנסות מעבודה עצמאית (${currencySymbol})`,
+            freelanceIncome: `הכנסות אחרות (${currencySymbol})`,
             rentalIncome: `הכנסות מדירות להשכרה (${currencySymbol})`,
             dividendIncome: `דיבידנדים והכנסות השקעה (${currencySymbol})`,
             annualBonus: `בונוס שנתי (${currencySymbol})`,
@@ -148,7 +148,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             monthly: 'חודשי',
             quarterly: 'רבעוני',
             yearly: 'שנתי',
-            otherIncome: `הכנסות אחרות (${currencySymbol})`,
+            otherIncome: `הכנסה מפרילנס (${currencySymbol})`,
             partnerSalaries: 'משכורות בני הזוג',
             partner1Salary: 'משכורת ברוטו בן/בת זוג (לפני מסים)',
             partner2Salary: 'משכורת ברוטו בן/בת זוג נוסף (לפני מסים)',
@@ -179,7 +179,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             additionalIncome: 'Additional Income Sources',
             mainAdditionalIncome: 'Main Additional Income',
             partnerAdditionalIncome: 'Partner Additional Income',
-            freelanceIncome: `Freelance Income (${currencySymbol})`,
+            freelanceIncome: `Other Income (${currencySymbol})`,
             rentalIncome: `Rental Income (${currencySymbol})`,
             dividendIncome: `Dividends & Investment Income (${currencySymbol})`,
             annualBonus: `Annual Bonus (${currencySymbol})`,
@@ -189,7 +189,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             monthly: 'Monthly',
             quarterly: 'Quarterly', 
             yearly: 'Yearly',
-            otherIncome: `Other Income (${currencySymbol})`,
+            otherIncome: `Freelance Income (${currencySymbol})`,
             partnerSalaries: 'Partner Salaries',
             partner1Salary: 'Partner Gross Salary (Before Taxes)',
             partner2Salary: 'Additional Partner Gross Salary (Before Taxes)',
@@ -722,7 +722,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                 key: 'additional-income-grid',
                 className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" 
             }, [
-                // Freelance Income with frequency and tax options
+                // Other Income with frequency and tax options
                 createElement('div', { key: 'freelance-income', className: "bg-gray-50 p-4 rounded-lg" }, [
                     createElement('label', { 
                         key: 'freelance-label',
@@ -976,7 +976,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                             `Vesting ${inputs.rsuFrequency || 'quarterly'}`)
                     ])
                 ]),
-                // Other Income with frequency and tax options
+                // Freelance Income with frequency and tax options
                 createElement('div', { key: 'other-income', className: "bg-gray-50 p-4 rounded-lg" }, [
                     createElement('label', { 
                         key: 'other-label',
