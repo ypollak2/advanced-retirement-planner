@@ -91,31 +91,56 @@ components/
 
 ## ⚙️ Utility Functions (/src/utils/)
 
-### Core Engines
-- **retirementCalculations.js** - Primary calculation engine
-- **financialHealthEngine.js** - Health score calculations
+### Core Engines (Modularized)
+- **retirementCalculations.js** - Primary calculation engine (modular)
+- **financialHealthEngine.js** - Health score calculations (modular)
 - **monteCarloSimulation.js** - Advanced projections
 
-### Specialized Utilities
+### Directory Structure (v7.5.11+)
 ```
 utils/
-├── 💰 Financial Calculations
-│   ├── pensionCalculations.js
-│   ├── taxOptimization.js
-│   ├── debtCalculations.js
-│   └── inflationCalculations.js
-├── 🌐 External APIs
+├── 📁 api/                    # External API integrations
 │   ├── currencyAPI.js
 │   ├── stockPriceAPI.js
 │   └── cryptoPriceAPI.js
-├── 🛠️ System Utilities
+├── 📁 calculations/           # Financial calculations
+│   ├── tax/
+│   │   ├── TaxCalculators.js
+│   │   ├── additionalIncomeTax.js
+│   │   └── taxOptimization.js
+│   ├── investments/
+│   │   ├── dynamicReturnAssumptions.js
+│   │   └── advancedRebalancing.js
+│   └── pension/
+├── 📁 validation/             # Input validation
+│   ├── inputValidation.js
+│   └── coupleValidation.js
+├── 📁 ui/                     # UI utilities
+│   ├── animations/
+│   │   ├── celebrationAnimations.js
+│   │   └── particleBackground.js
+│   └── formatting/
+├── 📁 storage/                # Storage utilities
+│   └── sessionStorageGist.js
+├── 📁 system/                 # System utilities
 │   ├── fullAppInitializer.js
 │   ├── performanceMonitor.js
-│   └── analyticsTracker.js
-└── 📊 Analysis Tools
-    ├── portfolioOptimizer.js
-    ├── stressTestLogic.js
-    └── withdrawalStrategies.js
+│   └── dynamicLoader.js
+├── 📁 financialHealth/        # Modular health engine
+│   ├── safeCalculations.js
+│   ├── constants.js
+│   ├── fieldMapper.js
+│   ├── scoringCalculators.js
+│   ├── additionalCalculators.js
+│   └── engine.js
+└── 📁 retirement/             # Modular calculations
+    ├── currencyHelpers.js
+    ├── returnCalculators.js
+    ├── progressiveCalculations.js
+    ├── chartFormatting.js
+    ├── incomeCalculations.js
+    ├── coreCalculations.js
+    └── chartData.js
 ```
 
 ## 🧪 Testing Structure (/tests/)

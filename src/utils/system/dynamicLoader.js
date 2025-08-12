@@ -8,39 +8,39 @@ const loadingPromises = new Map();
 // Component paths for lazy loading
 const COMPONENT_PATHS = {
     // Wizard Steps (loaded on demand)
-    'WizardStep': '/src/components/WizardStep.js',
-    'WizardStepPersonal': '/src/components/WizardStepPersonal.js',
-    'WizardStepSalary': '/src/components/WizardStepSalary.js',
-    'WizardStepSavings': '/src/components/WizardStepSavings.js',
-    'WizardStepContributions': '/src/components/WizardStepContributions.js',
-    'WizardStepFees': '/src/components/WizardStepFees.js',
-    'WizardStepRiskProfile': '/src/components/WizardStepRiskProfile.js',
-    'WizardStepInheritance': '/src/components/WizardStepInheritance.js',
-    'WizardStepInvestments': '/src/components/WizardStepInvestments.js',
-    'WizardStepGoals': '/src/components/WizardStepGoals.js',
-    'WizardStepReview': '/src/components/WizardStepReview.js',
+    'WizardStep': 'src/components/WizardStep.js',
+    'WizardStepPersonal': 'src/components/WizardStepPersonal.js',
+    'WizardStepSalary': 'src/components/WizardStepSalary.js',
+    'WizardStepSavings': 'src/components/WizardStepSavings.js',
+    'WizardStepContributions': 'src/components/WizardStepContributions.js',
+    'WizardStepFees': 'src/components/WizardStepFees.js',
+    'WizardStepRiskProfile': 'src/components/WizardStepRiskProfile.js',
+    'WizardStepInheritance': 'src/components/WizardStepInheritance.js',
+    'WizardStepInvestments': 'src/components/WizardStepInvestments.js',
+    'WizardStepGoals': 'src/components/WizardStepGoals.js',
+    'WizardStepReview': 'src/components/WizardStepReview.js',
     
     // Dashboard Components (loaded on demand)
-    'SummaryPanel': '/src/components/SummaryPanel.js',
-    'SavingsSummaryPanel': '/src/components/SavingsSummaryPanel.js',
-    'PermanentSidePanel': '/src/components/PermanentSidePanel.js',
-    'DynamicPartnerCharts': '/src/components/DynamicPartnerCharts.js',
-    'ExportControls': '/src/components/ExportControls.js',
-    'StressTestInterface': '/src/components/StressTestInterface.js',
-    'ClaudeRecommendations': '/src/components/ClaudeRecommendations.js',
-    'InflationAnalysis': '/src/components/InflationAnalysis.js',
-    'RetirementAdvancedForm': '/src/components/RetirementAdvancedForm.js',
-    'RetirementResultsPanel': '/src/components/RetirementResultsPanel.js',
+    'SummaryPanel': 'src/components/SummaryPanel.js',
+    'SavingsSummaryPanel': 'src/components/SavingsSummaryPanel.js',
+    'PermanentSidePanel': 'src/components/PermanentSidePanel.js',
+    'DynamicPartnerCharts': 'src/components/DynamicPartnerCharts.js',
+    'ExportControls': 'src/components/ExportControls.js',
+    'StressTestInterface': 'src/components/StressTestInterface.js',
+    'ClaudeRecommendations': 'src/components/ClaudeRecommendations.js',
+    'InflationAnalysis': 'src/components/InflationAnalysis.js',
+    'RetirementAdvancedForm': 'src/components/RetirementAdvancedForm.js',
+    'RetirementResultsPanel': 'src/components/RetirementResultsPanel.js',
     
     // Advanced Modules (loaded on demand)
-    'AdvancedPortfolio': '/src/modules/advanced-portfolio.js',
-    'ScenariosStress': '/src/modules/scenarios-stress.js',
-    'MarketAnalytics': '/src/modules/market-analytics.js',
+    'AdvancedPortfolio': 'src/modules/advanced-portfolio.js',
+    'ScenariosStress': 'src/modules/scenarios-stress.js',
+    'MarketAnalytics': 'src/modules/market-analytics.js',
     
     // Utilities (loaded on demand)
-    'StockPriceAPI': '/src/utils/stockPriceAPI.js',
-    'CurrencyAPI': '/src/utils/currencyAPI.js',
-    'AnalyticsTracker': '/src/utils/analyticsTracker.js'
+    'StockPriceAPI': 'src/utils/stockPriceAPI.js',
+    'CurrencyAPI': 'src/utils/currencyAPI.js',
+    'AnalyticsTracker': 'src/utils/analyticsTracker.js'
 };
 
 // Loading states

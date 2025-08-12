@@ -124,7 +124,7 @@ if (!window.financialHealthModulesLoaded) {
 
 // Export a function to manually trigger module loading if needed
 window.loadFinancialHealthModules = () => {
-    const baseUrl = '/src/utils/financialHealth/';
+    const baseUrl = 'src/utils/financialHealth/';
     const modules = [
         'safeCalculations.js',
         'constants.js', 

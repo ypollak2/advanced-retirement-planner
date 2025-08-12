@@ -13,12 +13,12 @@ console.log('📊 Loading Financial Health Engine (compatibility layer)...');
     
     // Define the module loading sequence
     const modules = [
-        '/src/utils/financialHealth/safeCalculations.js',
-        '/src/utils/financialHealth/constants.js',
-        '/src/utils/financialHealth/fieldMapper.js',
-        '/src/utils/financialHealth/scoringCalculators.js',
-        '/src/utils/financialHealth/additionalCalculators.js',
-        '/src/utils/financialHealth/engine.js'
+        'src/utils/financialHealth/safeCalculations.js',
+        'src/utils/financialHealth/constants.js',
+        'src/utils/financialHealth/fieldMapper.js',
+        'src/utils/financialHealth/scoringCalculators.js',
+        'src/utils/financialHealth/additionalCalculators.js',
+        'src/utils/financialHealth/engine.js'
     ];
     
     let loadedCount = 0;

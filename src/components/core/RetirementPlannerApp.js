@@ -16,10 +16,10 @@ console.log('📊 Loading Retirement Planner App (modular structure)...');
     
     // Define the module loading sequence
     const modules = [
-        '/src/components/core/app/initialState.js',
-        '/src/components/core/app/eventHandlers.js',
-        '/src/components/core/app/uiComponents.js',
-        '/src/components/core/app/RetirementPlannerAppCore.js'
+        'src/components/core/app/initialState.js',
+        'src/components/core/app/eventHandlers.js',
+        'src/components/core/app/uiComponents.js',
+        'src/components/core/app/RetirementPlannerAppCore.js'
     ];
     
     let loadedCount = 0;

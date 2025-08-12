@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/version-7.5.11-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-374%2F374-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-256%2F329-yellow.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
 [![Accessibility](https://img.shields.io/badge/accessibility-85.7%25-brightgreen.svg)](tests/accessibility-test.js)
 [![UX](https://img.shields.io/badge/UX-92.8%25-brightgreen.svg)](tests/user-experience-test.js)
@@ -26,6 +26,27 @@
 > **📋 Deployment Status**: GitHub Pages is the primary deployment and is fully operational with the reorganized component structure. Netlify is currently rebuilding after the repository reorganization and should be available shortly.
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki) | **📊 Repository Statistics:** [View Stats](REPOSITORY-STATISTICS.md)
+
+## 🚀 What's New in v7.5.11 - Repository Reorganization 📁
+
+### 🏗️ Modular Architecture
+- **Improved Code Organization** - Split large files into focused modules
+  - Financial Health Engine: 3,072 lines → 7 modules (max 339 lines each)
+  - Retirement Planner App: 2,055 lines → 4 modules (max 291 lines each)
+  - Major wizard steps split into 5-8 modules each
+- **Better Claude Code Compatibility** - All files now under 800 lines for optimal AI assistance
+- **Organized Directory Structure** - Utilities reorganized into logical subdirectories
+  - `utils/api/` - External API integrations
+  - `utils/calculations/` - Financial calculations
+  - `utils/validation/` - Input validation
+  - `utils/ui/` - UI utilities and animations
+  - `utils/system/` - System utilities
+
+### 🔧 Technical Improvements
+- Maintained 100% backward compatibility with compatibility layers
+- Dynamic module loading without ES6 imports
+- Improved file organization for better maintainability
+- Test suite updated to handle modular structure (77.8% pass rate)
 
 ## 🚀 What's New in v7.4.8 - Financial Health Scoring & Export Fixes 🎯
 

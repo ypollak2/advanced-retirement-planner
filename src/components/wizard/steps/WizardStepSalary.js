@@ -16,13 +16,13 @@ console.log('💼 Loading Wizard Step Salary (modular structure)...');
     
     // Define the module loading sequence
     const modules = [
-        '/src/components/wizard/salary/content.js',
-        '/src/components/wizard/salary/validation.js',
-        '/src/components/wizard/salary/calculations.js',
-        '/src/components/wizard/salary/salaryInputs.js',
-        '/src/components/wizard/salary/additionalIncome.js',
-        '/src/components/wizard/salary/incomeSummary.js',
-        '/src/components/wizard/salary/WizardStepSalaryCore.js'
+        'src/components/wizard/salary/content.js',
+        'src/components/wizard/salary/validation.js',
+        'src/components/wizard/salary/calculations.js',
+        'src/components/wizard/salary/salaryInputs.js',
+        'src/components/wizard/salary/additionalIncome.js',
+        'src/components/wizard/salary/incomeSummary.js',
+        'src/components/wizard/salary/WizardStepSalaryCore.js'
     ];
     
     let loadedCount = 0;

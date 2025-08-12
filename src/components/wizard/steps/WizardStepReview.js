@@ -16,12 +16,12 @@ console.log('📊 Loading Wizard Step Review (modular structure)...');
     
     // Define the module loading sequence
     const modules = [
-        '/src/components/wizard/review/content.js',
-        '/src/components/wizard/review/inputProcessing.js',
-        '/src/components/wizard/review/calculations.js',
-        '/src/components/wizard/review/summaryComponents.js',
-        '/src/components/wizard/review/dataStorage.js',
-        '/src/components/wizard/review/WizardStepReviewCore.js'
+        'src/components/wizard/review/content.js',
+        'src/components/wizard/review/inputProcessing.js',
+        'src/components/wizard/review/calculations.js',
+        'src/components/wizard/review/summaryComponents.js',
+        'src/components/wizard/review/dataStorage.js',
+        'src/components/wizard/review/WizardStepReviewCore.js'
     ];
     
     let loadedCount = 0;
