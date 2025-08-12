@@ -15,14 +15,17 @@ const ConsoleLogExporter = ({ language = 'en' }) => {
     
     // Define event handlers at the top level with useCallback
     const handleNewLog = React.useCallback((event) => {
-        setLogs(prevLogs => {
-            const newLogs = [...prevLogs, event.detail];
-            // Maintain circular buffer size
-            if (newLogs.length > window.__maxLogEntries) {
-                return newLogs.slice(-window.__maxLogEntries);
-            }
-            return newLogs;
-        });
+        // Defer state update to avoid React warning about updating during render
+        setTimeout(() => {
+            setLogs(prevLogs => {
+                const newLogs = [...prevLogs, event.detail];
+                // Maintain circular buffer size
+                if (newLogs.length > window.__maxLogEntries) {
+                    return newLogs.slice(-window.__maxLogEntries);
+                }
+                return newLogs;
+            });
+        }, 0);
     }, []);
     
     const handleClear = React.useCallback(() => {
