@@ -1,6 +1,6 @@
-# 🚀 Advanced Retirement Planner v7.5.11 ✨
+# 🚀 Advanced Retirement Planner v8.0.0 ✨
 
-[![Version](https://img.shields.io/badge/version-7.5.11-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
+[![Version](https://img.shields.io/badge/version-8.0.0-blue.svg)](https://github.com/ypollak2/advanced-retirement-planner)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-256%2F329-yellow.svg)](tests/)
 [![Security](https://img.shields.io/badge/security-100%25-brightgreen.svg)](tests/security-qa-analysis.js)
@@ -27,7 +27,7 @@
 
 **📚 Full Documentation:** [GitHub Wiki](https://github.com/ypollak2/advanced-retirement-planner/wiki) | **📊 Repository Statistics:** [View Stats](REPOSITORY-STATISTICS.md)
 
-## 🚀 What's New in v7.5.11 - Repository Reorganization 📁
+## 🚀 What's New in v8.0.0 - Major Architecture Overhaul 🏗️
 
 ### 🏗️ Modular Architecture
 - **Improved Code Organization** - Split large files into focused modules

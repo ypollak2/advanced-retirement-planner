@@ -28,7 +28,7 @@ console.log('💼 Loading Wizard Step Savings (modular structure)...');
     // Load all modules
     modules.forEach((modulePath, index) => {
         const script = document.createElement('script');
-        script.src = modulePath + '?v=7.5.11';
+        script.src = modulePath + '?v=8.0.0';
         script.async = false; // Ensure sequential loading
         
         script.onload = () => {

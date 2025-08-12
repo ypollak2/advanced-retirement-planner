@@ -1,7 +1,7 @@
-# Repository Reorganization Status
+# Repository Reorganization Status - v8.0.0
 
 ## Overview
-This document tracks the progress of reorganizing the Advanced Retirement Planner repository to ensure all files are under 800 lines for optimal Claude Code compatibility.
+This document tracks the progress of reorganizing the Advanced Retirement Planner repository for v8.0.0 to ensure all files are under 800 lines for optimal Claude Code compatibility.
 
 ## Completed ✅
 
