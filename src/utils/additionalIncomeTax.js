@@ -265,10 +265,49 @@ window.AdditionalIncomeTax = (() => {
         }
         const quarterlyRSU = annualRSU; // Keep variable name for compatibility
         
-        const freelanceIncome = (parseFloat(inputs.freelanceIncome) || 0) * 12;
-        const rentalIncome = (parseFloat(inputs.rentalIncome) || 0) * 12;
-        const dividendIncome = (parseFloat(inputs.dividendIncome) || 0) * 12;
-        const otherIncomeAmount = (parseFloat(inputs.otherIncome) || 0) * 12; // Add otherIncome field
+        // Helper function to convert income to annual based on frequency
+        const convertToAnnual = (amount, frequency) => {
+            if (!amount || amount === 0) return 0;
+            switch (frequency) {
+                case 'monthly':
+                    return amount * 12;
+                case 'quarterly':
+                    return amount * 4;
+                case 'yearly':
+                    return amount;
+                default:
+                    return amount * 12; // Default to monthly
+            }
+        };
+        
+        // Helper function to apply tax if income is before tax
+        const applyTaxToIncome = (amount, isAfterTax, taxRate = 30) => {
+            if (!amount || amount === 0) return { gross: 0, net: 0, tax: 0 };
+            if (isAfterTax) {
+                return { gross: amount, net: amount, tax: 0 };
+            }
+            const tax = amount * (taxRate / 100);
+            return { gross: amount, net: amount - tax, tax: tax };
+        };
+        
+        // Calculate each income type with frequency and tax handling
+        const freelanceAnnual = convertToAnnual(inputs.freelanceIncome || 0, inputs.freelanceIncomeFrequency || 'monthly');
+        const freelanceTaxInfo = applyTaxToIncome(freelanceAnnual, inputs.freelanceIncomeAfterTax, inputs.freelanceIncomeTaxRate || 30);
+        
+        const rentalAnnual = convertToAnnual(inputs.rentalIncome || 0, inputs.rentalIncomeFrequency || 'monthly');
+        const rentalTaxInfo = applyTaxToIncome(rentalAnnual, inputs.rentalIncomeAfterTax, inputs.rentalIncomeTaxRate || 31);
+        
+        const dividendAnnual = convertToAnnual(inputs.dividendIncome || 0, inputs.dividendIncomeFrequency || 'quarterly');
+        const dividendTaxInfo = applyTaxToIncome(dividendAnnual, inputs.dividendIncomeAfterTax, inputs.dividendIncomeTaxRate || 25);
+        
+        const otherAnnual = convertToAnnual(inputs.otherIncome || 0, inputs.otherIncomeFrequency || 'monthly');
+        const otherTaxInfo = applyTaxToIncome(otherAnnual, inputs.otherIncomeAfterTax, inputs.otherIncomeTaxRate || 30);
+        
+        // If income is marked as after-tax, use the net values directly
+        const freelanceIncome = inputs.freelanceIncomeAfterTax ? freelanceTaxInfo.net : freelanceAnnual;
+        const rentalIncome = inputs.rentalIncomeAfterTax ? rentalTaxInfo.net : rentalAnnual;
+        const dividendIncome = inputs.dividendIncomeAfterTax ? dividendTaxInfo.net : dividendAnnual;
+        const otherIncomeAmount = inputs.otherIncomeAfterTax ? otherTaxInfo.net : otherAnnual;
         
         // Calculate total annual income (including otherIncome)
         const totalAnnualIncome = baseSalary + annualBonus + quarterlyRSU + 
@@ -390,17 +429,100 @@ window.AdditionalIncomeTax = (() => {
     
     // Calculate monthly after-tax additional income for retirement projections
     const getMonthlyAfterTaxAdditionalIncome = (inputs) => {
-        const taxInfo = calculateTotalAdditionalIncomeTax(inputs);
+        const country = inputs.country || 'israel';
+        const baseSalary = (parseFloat(inputs.currentMonthlySalary) || 0) * 12;
         
+        // Helper functions
+        const convertToAnnual = (amount, frequency) => {
+            if (!amount || amount === 0) return 0;
+            switch (frequency) {
+                case 'monthly':
+                    return amount * 12;
+                case 'quarterly':
+                    return amount * 4;
+                case 'yearly':
+                    return amount;
+                default:
+                    return amount * 12;
+            }
+        };
+        
+        const getNetAmount = (amount, frequency, isAfterTax, taxRate = 30) => {
+            const annual = convertToAnnual(amount, frequency);
+            if (!annual) return 0;
+            if (isAfterTax) return annual;
+            return annual * (1 - taxRate / 100);
+        };
+        
+        // Calculate net amounts for each income type
+        const freelanceNet = getNetAmount(
+            inputs.freelanceIncome || 0,
+            inputs.freelanceIncomeFrequency || 'monthly',
+            inputs.freelanceIncomeAfterTax,
+            inputs.freelanceIncomeTaxRate || 30
+        );
+        
+        const rentalNet = getNetAmount(
+            inputs.rentalIncome || 0,
+            inputs.rentalIncomeFrequency || 'monthly',
+            inputs.rentalIncomeAfterTax,
+            inputs.rentalIncomeTaxRate || 31
+        );
+        
+        const dividendNet = getNetAmount(
+            inputs.dividendIncome || 0,
+            inputs.dividendIncomeFrequency || 'quarterly',
+            inputs.dividendIncomeAfterTax,
+            inputs.dividendIncomeTaxRate || 25
+        );
+        
+        const otherNet = getNetAmount(
+            inputs.otherIncome || 0,
+            inputs.otherIncomeFrequency || 'monthly',
+            inputs.otherIncomeAfterTax,
+            inputs.otherIncomeTaxRate || 30
+        );
+        
+        // Calculate bonus and RSU using existing methods
+        const annualBonus = parseFloat(inputs.annualBonus) || 0;
+        const bonusTaxInfo = calculateBonusTax(annualBonus, baseSalary, country);
+        
+        // Enhanced RSU calculation
+        let annualRSU = 0;
+        if (inputs.rsuUnits && inputs.rsuCurrentStockPrice) {
+            const rsuUnits = parseFloat(inputs.rsuUnits) || 0;
+            const stockPrice = parseFloat(inputs.rsuCurrentStockPrice) || 0;
+            const frequency = inputs.rsuFrequency || 'quarterly';
+            
+            if (frequency === 'monthly') {
+                annualRSU = rsuUnits * stockPrice * 12;
+            } else if (frequency === 'quarterly') {
+                annualRSU = rsuUnits * stockPrice * 4;
+            } else if (frequency === 'yearly') {
+                annualRSU = rsuUnits * stockPrice;
+            }
+        } else {
+            annualRSU = (parseFloat(inputs.quarterlyRSU) || 0) * 4;
+        }
+        
+        const rsuTaxInfo = calculateRSUTax(annualRSU, baseSalary + annualBonus, country, inputs.rsuTaxRate);
+        
+        // Calculate monthly values
         return {
-            monthlyNetBonus: Math.round(taxInfo.breakdown.bonus.net / 12),
-            monthlyNetRSU: Math.round(taxInfo.breakdown.rsu.net / 12),
-            monthlyNetOther: Math.round(taxInfo.breakdown.otherIncome.net / 12),
+            monthlyNetBonus: Math.round(bonusTaxInfo.netBonus / 12),
+            monthlyNetRSU: Math.round(rsuTaxInfo.netRSU / 12),
+            monthlyNetOther: Math.round((freelanceNet + rentalNet + dividendNet + otherNet) / 12),
             totalMonthlyNet: Math.round(
-                (taxInfo.breakdown.bonus.net + 
-                 taxInfo.breakdown.rsu.net + 
-                 taxInfo.breakdown.otherIncome.net) / 12
-            )
+                (bonusTaxInfo.netBonus + rsuTaxInfo.netRSU + 
+                 freelanceNet + rentalNet + dividendNet + otherNet) / 12
+            ),
+            // Detailed breakdown
+            breakdown: {
+                freelance: { annual: freelanceNet, monthly: Math.round(freelanceNet / 12) },
+                rental: { annual: rentalNet, monthly: Math.round(rentalNet / 12) },
+                dividend: { annual: dividendNet, monthly: Math.round(dividendNet / 12) },
+                other: { annual: otherNet, monthly: Math.round(otherNet / 12) }
+            }
         };
     };
     

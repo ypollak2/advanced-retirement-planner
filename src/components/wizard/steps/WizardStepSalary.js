@@ -154,7 +154,11 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             partner2Salary: 'משכורת ברוטו בן/בת זוג נוסף (לפני מסים)',
             optional: 'אופציונלי',
             totalMonthlyIncome: 'סך הכנסה חודשית',
-            incomeBreakdown: 'פירוט ההכנסות'
+            incomeBreakdown: 'פירוט ההכנסות',
+            afterTax: 'אחרי מס',
+            beforeTax: 'לפני מס',
+            taxRate: 'שיעור מס %',
+            frequencyLabel: 'תדירות'
         },
         en: {
             mainSalary: 'Main Monthly Salary',
@@ -191,11 +195,37 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
             partner2Salary: 'Additional Partner Gross Salary (Before Taxes)',
             optional: 'Optional',
             totalMonthlyIncome: 'Total Monthly Income',
-            incomeBreakdown: 'Income Breakdown'
+            incomeBreakdown: 'Income Breakdown',
+            afterTax: 'After Tax',
+            beforeTax: 'Before Tax',
+            taxRate: 'Tax Rate %',
+            frequencyLabel: 'Frequency'
         }
     };
 
     const t = content[language];
+
+    // Helper function to convert income to monthly based on frequency
+    const convertToMonthly = (amount, frequency) => {
+        if (!amount || amount === 0) return 0;
+        switch (frequency) {
+            case 'monthly':
+                return amount;
+            case 'quarterly':
+                return amount / 3;
+            case 'yearly':
+                return amount / 12;
+            default:
+                return amount; // Default to monthly
+        }
+    };
+
+    // Helper function to apply tax if income is before tax
+    const applyTax = (amount, isAfterTax, taxRate = 30) => {
+        if (!amount || amount === 0) return 0;
+        if (isAfterTax) return amount;
+        return amount * (1 - taxRate / 100);
+    };
 
     // Calculate total income using NET (after-tax) amounts
     const calculateTotalIncome = () => {
@@ -221,14 +251,26 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                 } catch (error) {
                     console.warn('Error calculating partner 1 additional income tax:', error);
                     // Fallback to simplified calculation for Partner 1
-                    const freelanceIncome = inputs.freelanceIncome || 0;
-                    const rentalIncome = inputs.rentalIncome || 0;
-                    const dividendIncome = inputs.dividendIncome || 0;
+                    const freelanceMonthly = convertToMonthly(
+                        applyTax(inputs.freelanceIncome || 0, inputs.freelanceIncomeAfterTax, inputs.freelanceIncomeTaxRate),
+                        inputs.freelanceIncomeFrequency || 'monthly'
+                    );
+                    const rentalMonthly = convertToMonthly(
+                        applyTax(inputs.rentalIncome || 0, inputs.rentalIncomeAfterTax, inputs.rentalIncomeTaxRate),
+                        inputs.rentalIncomeFrequency || 'monthly'
+                    );
+                    const dividendMonthly = convertToMonthly(
+                        applyTax(inputs.dividendIncome || 0, inputs.dividendIncomeAfterTax, inputs.dividendIncomeTaxRate),
+                        inputs.dividendIncomeFrequency || 'quarterly'
+                    );
                     const annualBonusMonthly = (inputs.annualBonus || 0) / 12 * 0.5; // Assume ~50% tax
                     const quarterlyRSUMonthly = (inputs.quarterlyRSU || 0) / 3 * 0.55; // Assume ~45% tax
-                    const otherIncome = inputs.otherIncome || 0;
-                    mainAdditionalIncomeMonthly = freelanceIncome + rentalIncome + dividendIncome + 
-                                                annualBonusMonthly + quarterlyRSUMonthly + otherIncome;
+                    const otherMonthly = convertToMonthly(
+                        applyTax(inputs.otherIncome || 0, inputs.otherIncomeAfterTax, inputs.otherIncomeTaxRate),
+                        inputs.otherIncomeFrequency || 'monthly'
+                    );
+                    mainAdditionalIncomeMonthly = freelanceMonthly + rentalMonthly + dividendMonthly + 
+                                                annualBonusMonthly + quarterlyRSUMonthly + otherMonthly;
                 }
             }
             
@@ -275,15 +317,27 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                     mainAdditionalIncomeMonthly = mainTaxResult.totalMonthlyNet || 0;
                 } catch (error) {
                     console.warn('Error calculating main additional income tax:', error);
-                    // Fallback to simplified calculation
-                    const freelanceIncome = inputs.freelanceIncome || 0;
-                    const rentalIncome = inputs.rentalIncome || 0;
-                    const dividendIncome = inputs.dividendIncome || 0;
+                    // Fallback to simplified calculation with frequency and tax handling
+                    const freelanceMonthly = convertToMonthly(
+                        applyTax(inputs.freelanceIncome || 0, inputs.freelanceIncomeAfterTax, inputs.freelanceIncomeTaxRate),
+                        inputs.freelanceIncomeFrequency || 'monthly'
+                    );
+                    const rentalMonthly = convertToMonthly(
+                        applyTax(inputs.rentalIncome || 0, inputs.rentalIncomeAfterTax, inputs.rentalIncomeTaxRate),
+                        inputs.rentalIncomeFrequency || 'monthly'
+                    );
+                    const dividendMonthly = convertToMonthly(
+                        applyTax(inputs.dividendIncome || 0, inputs.dividendIncomeAfterTax, inputs.dividendIncomeTaxRate),
+                        inputs.dividendIncomeFrequency || 'quarterly'
+                    );
                     const annualBonusMonthly = (inputs.annualBonus || 0) / 12 * 0.5; // Assume ~50% tax
                     const quarterlyRSUMonthly = (inputs.quarterlyRSU || 0) / 3 * 0.55; // Assume ~45% tax
-                    const otherIncome = inputs.otherIncome || 0;
-                    mainAdditionalIncomeMonthly = freelanceIncome + rentalIncome + dividendIncome + 
-                                                annualBonusMonthly + quarterlyRSUMonthly + otherIncome;
+                    const otherMonthly = convertToMonthly(
+                        applyTax(inputs.otherIncome || 0, inputs.otherIncomeAfterTax, inputs.otherIncomeTaxRate),
+                        inputs.otherIncomeFrequency || 'monthly'
+                    );
+                    mainAdditionalIncomeMonthly = freelanceMonthly + rentalMonthly + dividendMonthly + 
+                                                annualBonusMonthly + quarterlyRSUMonthly + otherMonthly;
                 }
             }
         }
@@ -668,7 +722,8 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                 key: 'additional-income-grid',
                 className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" 
             }, [
-                createElement('div', { key: 'freelance-income' }, [
+                // Freelance Income with frequency and tax options
+                createElement('div', { key: 'freelance-income', className: "bg-gray-50 p-4 rounded-lg" }, [
                     createElement('label', { 
                         key: 'freelance-label',
                         className: "block text-sm font-medium text-gray-700 mb-2" 
@@ -679,9 +734,46 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         value: inputs.freelanceIncome || 0,
                         onChange: (e) => setInputs({...inputs, freelanceIncome: parseInt(e.target.value) || 0}),
                         className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    }),
+                    // Frequency selector
+                    createElement('select', {
+                        key: 'freelance-frequency',
+                        value: inputs.freelanceIncomeFrequency || 'monthly',
+                        onChange: (e) => setInputs({...inputs, freelanceIncomeFrequency: e.target.value}),
+                        className: "w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-sm"
+                    }, [
+                        createElement('option', { key: 'monthly', value: 'monthly' }, t.monthly),
+                        createElement('option', { key: 'quarterly', value: 'quarterly' }, t.quarterly),
+                        createElement('option', { key: 'yearly', value: 'yearly' }, t.yearly)
+                    ]),
+                    // Tax toggle
+                    createElement('div', { key: 'freelance-tax-toggle', className: "mt-2 flex items-center" }, [
+                        createElement('input', {
+                            key: 'freelance-after-tax',
+                            type: 'checkbox',
+                            id: 'freelanceAfterTax',
+                            checked: inputs.freelanceIncomeAfterTax || false,
+                            onChange: (e) => setInputs({...inputs, freelanceIncomeAfterTax: e.target.checked}),
+                            className: "mr-2"
+                        }),
+                        createElement('label', {
+                            key: 'freelance-after-tax-label',
+                            htmlFor: 'freelanceAfterTax',
+                            className: "text-sm text-gray-600"
+                        }, language === 'he' ? 'אחרי מס' : 'After Tax')
+                    ]),
+                    // Tax rate input (only show if before tax)
+                    !inputs.freelanceIncomeAfterTax && createElement('input', {
+                        key: 'freelance-tax-rate',
+                        type: 'number',
+                        value: inputs.freelanceIncomeTaxRate || 30,
+                        onChange: (e) => setInputs({...inputs, freelanceIncomeTaxRate: parseInt(e.target.value) || 0}),
+                        placeholder: language === 'he' ? 'שיעור מס %' : 'Tax Rate %',
+                        className: "w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-sm"
                     })
                 ]),
-                createElement('div', { key: 'rental-income' }, [
+                // Rental Income with frequency and tax options
+                createElement('div', { key: 'rental-income', className: "bg-gray-50 p-4 rounded-lg" }, [
                     createElement('label', { 
                         key: 'rental-label',
                         className: "block text-sm font-medium text-gray-700 mb-2" 
@@ -692,9 +784,46 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         value: inputs.rentalIncome || 0,
                         onChange: (e) => setInputs({...inputs, rentalIncome: parseInt(e.target.value) || 0}),
                         className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    }),
+                    // Frequency selector
+                    createElement('select', {
+                        key: 'rental-frequency',
+                        value: inputs.rentalIncomeFrequency || 'monthly',
+                        onChange: (e) => setInputs({...inputs, rentalIncomeFrequency: e.target.value}),
+                        className: "w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-sm"
+                    }, [
+                        createElement('option', { key: 'monthly', value: 'monthly' }, t.monthly),
+                        createElement('option', { key: 'quarterly', value: 'quarterly' }, t.quarterly),
+                        createElement('option', { key: 'yearly', value: 'yearly' }, t.yearly)
+                    ]),
+                    // Tax toggle
+                    createElement('div', { key: 'rental-tax-toggle', className: "mt-2 flex items-center" }, [
+                        createElement('input', {
+                            key: 'rental-after-tax',
+                            type: 'checkbox',
+                            id: 'rentalAfterTax',
+                            checked: inputs.rentalIncomeAfterTax || false,
+                            onChange: (e) => setInputs({...inputs, rentalIncomeAfterTax: e.target.checked}),
+                            className: "mr-2"
+                        }),
+                        createElement('label', {
+                            key: 'rental-after-tax-label',
+                            htmlFor: 'rentalAfterTax',
+                            className: "text-sm text-gray-600"
+                        }, language === 'he' ? 'אחרי מס' : 'After Tax')
+                    ]),
+                    // Tax rate input (only show if before tax)
+                    !inputs.rentalIncomeAfterTax && createElement('input', {
+                        key: 'rental-tax-rate',
+                        type: 'number',
+                        value: inputs.rentalIncomeTaxRate || 31,
+                        onChange: (e) => setInputs({...inputs, rentalIncomeTaxRate: parseInt(e.target.value) || 0}),
+                        placeholder: language === 'he' ? 'שיעור מס %' : 'Tax Rate %',
+                        className: "w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-sm"
                     })
                 ]),
-                createElement('div', { key: 'dividend-income' }, [
+                // Dividend Income with frequency and tax options
+                createElement('div', { key: 'dividend-income', className: "bg-gray-50 p-4 rounded-lg" }, [
                     createElement('label', { 
                         key: 'dividend-label',
                         className: "block text-sm font-medium text-gray-700 mb-2" 
@@ -705,6 +834,42 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         value: inputs.dividendIncome || 0,
                         onChange: (e) => setInputs({...inputs, dividendIncome: parseInt(e.target.value) || 0}),
                         className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    }),
+                    // Frequency selector
+                    createElement('select', {
+                        key: 'dividend-frequency',
+                        value: inputs.dividendIncomeFrequency || 'quarterly',
+                        onChange: (e) => setInputs({...inputs, dividendIncomeFrequency: e.target.value}),
+                        className: "w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-sm"
+                    }, [
+                        createElement('option', { key: 'monthly', value: 'monthly' }, t.monthly),
+                        createElement('option', { key: 'quarterly', value: 'quarterly' }, t.quarterly),
+                        createElement('option', { key: 'yearly', value: 'yearly' }, t.yearly)
+                    ]),
+                    // Tax toggle
+                    createElement('div', { key: 'dividend-tax-toggle', className: "mt-2 flex items-center" }, [
+                        createElement('input', {
+                            key: 'dividend-after-tax',
+                            type: 'checkbox',
+                            id: 'dividendAfterTax',
+                            checked: inputs.dividendIncomeAfterTax || false,
+                            onChange: (e) => setInputs({...inputs, dividendIncomeAfterTax: e.target.checked}),
+                            className: "mr-2"
+                        }),
+                        createElement('label', {
+                            key: 'dividend-after-tax-label',
+                            htmlFor: 'dividendAfterTax',
+                            className: "text-sm text-gray-600"
+                        }, language === 'he' ? 'אחרי מס' : 'After Tax')
+                    ]),
+                    // Tax rate input (only show if before tax)
+                    !inputs.dividendIncomeAfterTax && createElement('input', {
+                        key: 'dividend-tax-rate',
+                        type: 'number',
+                        value: inputs.dividendIncomeTaxRate || 25,
+                        onChange: (e) => setInputs({...inputs, dividendIncomeTaxRate: parseInt(e.target.value) || 0}),
+                        placeholder: language === 'he' ? 'שיעור מס %' : 'Tax Rate %',
+                        className: "w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-sm"
                     })
                 ]),
                 createElement('div', { key: 'annual-bonus' }, [
@@ -811,7 +976,8 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                             `Vesting ${inputs.rsuFrequency || 'quarterly'}`)
                     ])
                 ]),
-                createElement('div', { key: 'other-income' }, [
+                // Other Income with frequency and tax options
+                createElement('div', { key: 'other-income', className: "bg-gray-50 p-4 rounded-lg" }, [
                     createElement('label', { 
                         key: 'other-label',
                         className: "block text-sm font-medium text-gray-700 mb-2" 
@@ -822,6 +988,42 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         value: inputs.otherIncome || 0,
                         onChange: (e) => setInputs({...inputs, otherIncome: parseInt(e.target.value) || 0}),
                         className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                    }),
+                    // Frequency selector
+                    createElement('select', {
+                        key: 'other-frequency',
+                        value: inputs.otherIncomeFrequency || 'monthly',
+                        onChange: (e) => setInputs({...inputs, otherIncomeFrequency: e.target.value}),
+                        className: "w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-sm"
+                    }, [
+                        createElement('option', { key: 'monthly', value: 'monthly' }, t.monthly),
+                        createElement('option', { key: 'quarterly', value: 'quarterly' }, t.quarterly),
+                        createElement('option', { key: 'yearly', value: 'yearly' }, t.yearly)
+                    ]),
+                    // Tax toggle
+                    createElement('div', { key: 'other-tax-toggle', className: "mt-2 flex items-center" }, [
+                        createElement('input', {
+                            key: 'other-after-tax',
+                            type: 'checkbox',
+                            id: 'otherAfterTax',
+                            checked: inputs.otherIncomeAfterTax || false,
+                            onChange: (e) => setInputs({...inputs, otherIncomeAfterTax: e.target.checked}),
+                            className: "mr-2"
+                        }),
+                        createElement('label', {
+                            key: 'other-after-tax-label',
+                            htmlFor: 'otherAfterTax',
+                            className: "text-sm text-gray-600"
+                        }, language === 'he' ? 'אחרי מס' : 'After Tax')
+                    ]),
+                    // Tax rate input (only show if before tax)
+                    !inputs.otherIncomeAfterTax && createElement('input', {
+                        key: 'other-tax-rate',
+                        type: 'number',
+                        value: inputs.otherIncomeTaxRate || 30,
+                        onChange: (e) => setInputs({...inputs, otherIncomeTaxRate: parseInt(e.target.value) || 0}),
+                        placeholder: language === 'he' ? 'שיעור מס %' : 'Tax Rate %',
+                        className: "w-full mt-2 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-sm"
                     })
                 ])
             ])
@@ -852,6 +1054,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         className: "text-lg font-semibold text-blue-700 mb-4" 
                     }, t.mainAdditionalIncome),
                     createElement('div', { key: 'main-additional-fields', className: "space-y-4" }, [
+                        // Main person freelance income with frequency and tax
                         createElement('div', { key: 'main-freelance' }, [
                             createElement('label', { 
                                 key: 'main-freelance-label',
@@ -863,6 +1066,41 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                                 value: inputs.freelanceIncome || 0,
                                 onChange: (e) => setInputs({...inputs, freelanceIncome: parseInt(e.target.value) || 0}),
                                 className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            }),
+                            createElement('div', { key: 'main-freelance-options', className: "mt-2 grid grid-cols-2 gap-2" }, [
+                                createElement('select', {
+                                    key: 'main-freelance-frequency',
+                                    value: inputs.freelanceIncomeFrequency || 'monthly',
+                                    onChange: (e) => setInputs({...inputs, freelanceIncomeFrequency: e.target.value}),
+                                    className: "p-2 border border-gray-300 rounded-lg text-sm"
+                                }, [
+                                    createElement('option', { key: 'monthly', value: 'monthly' }, t.monthly),
+                                    createElement('option', { key: 'quarterly', value: 'quarterly' }, t.quarterly),
+                                    createElement('option', { key: 'yearly', value: 'yearly' }, t.yearly)
+                                ]),
+                                createElement('div', { key: 'main-freelance-tax', className: "flex items-center" }, [
+                                    createElement('input', {
+                                        key: 'checkbox',
+                                        type: 'checkbox',
+                                        id: 'mainFreelanceAfterTax',
+                                        checked: inputs.freelanceIncomeAfterTax || false,
+                                        onChange: (e) => setInputs({...inputs, freelanceIncomeAfterTax: e.target.checked}),
+                                        className: "mr-2"
+                                    }),
+                                    createElement('label', {
+                                        key: 'label',
+                                        htmlFor: 'mainFreelanceAfterTax',
+                                        className: "text-sm text-gray-600"
+                                    }, t.afterTax)
+                                ])
+                            ]),
+                            !inputs.freelanceIncomeAfterTax && createElement('input', {
+                                key: 'main-freelance-tax-rate',
+                                type: 'number',
+                                value: inputs.freelanceIncomeTaxRate || 30,
+                                onChange: (e) => setInputs({...inputs, freelanceIncomeTaxRate: parseInt(e.target.value) || 0}),
+                                placeholder: t.taxRate,
+                                className: "w-full mt-2 p-2 border border-gray-300 rounded-lg text-sm"
                             })
                         ]),
                         createElement('div', { key: 'main-rental' }, [
@@ -984,6 +1222,7 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                         className: "text-lg font-semibold text-green-700 mb-4" 
                     }, t.partnerAdditionalIncome),
                     createElement('div', { key: 'partner-additional-fields', className: "space-y-4" }, [
+                        // Partner freelance income with frequency and tax
                         createElement('div', { key: 'partner-freelance' }, [
                             createElement('label', { 
                                 key: 'partner-freelance-label',
@@ -995,6 +1234,41 @@ const WizardStepSalary = ({ inputs, setInputs, language = 'en', workingCurrency 
                                 value: inputs.partnerFreelanceIncome || 0,
                                 onChange: (e) => setInputs({...inputs, partnerFreelanceIncome: parseInt(e.target.value) || 0}),
                                 className: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                            }),
+                            createElement('div', { key: 'partner-freelance-options', className: "mt-2 grid grid-cols-2 gap-2" }, [
+                                createElement('select', {
+                                    key: 'partner-freelance-frequency',
+                                    value: inputs.partnerFreelanceIncomeFrequency || 'monthly',
+                                    onChange: (e) => setInputs({...inputs, partnerFreelanceIncomeFrequency: e.target.value}),
+                                    className: "p-2 border border-gray-300 rounded-lg text-sm"
+                                }, [
+                                    createElement('option', { key: 'monthly', value: 'monthly' }, t.monthly),
+                                    createElement('option', { key: 'quarterly', value: 'quarterly' }, t.quarterly),
+                                    createElement('option', { key: 'yearly', value: 'yearly' }, t.yearly)
+                                ]),
+                                createElement('div', { key: 'partner-freelance-tax', className: "flex items-center" }, [
+                                    createElement('input', {
+                                        key: 'checkbox',
+                                        type: 'checkbox',
+                                        id: 'partnerFreelanceAfterTax',
+                                        checked: inputs.partnerFreelanceIncomeAfterTax || false,
+                                        onChange: (e) => setInputs({...inputs, partnerFreelanceIncomeAfterTax: e.target.checked}),
+                                        className: "mr-2"
+                                    }),
+                                    createElement('label', {
+                                        key: 'label',
+                                        htmlFor: 'partnerFreelanceAfterTax',
+                                        className: "text-sm text-gray-600"
+                                    }, t.afterTax)
+                                ])
+                            ]),
+                            !inputs.partnerFreelanceIncomeAfterTax && createElement('input', {
+                                key: 'partner-freelance-tax-rate',
+                                type: 'number',
+                                value: inputs.partnerFreelanceIncomeTaxRate || 30,
+                                onChange: (e) => setInputs({...inputs, partnerFreelanceIncomeTaxRate: parseInt(e.target.value) || 0}),
+                                placeholder: t.taxRate,
+                                className: "w-full mt-2 p-2 border border-gray-300 rounded-lg text-sm"
                             })
                         ]),
                         createElement('div', { key: 'partner-rental' }, [

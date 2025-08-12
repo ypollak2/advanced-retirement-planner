@@ -162,7 +162,8 @@ window.calculateRetirement = (
     // Partner salary aggregation for couple mode
     const calculateTotalIncome = (inputs) => {
         if (inputs.planningType === 'couple') {
-            const partner1Salary = parseFloat(inputs.partner1Salary || inputs.currentSalary || 0);
+            // In couple mode, ONLY use partner fields - no fallback to main person fields
+            const partner1Salary = parseFloat(inputs.partner1Salary || 0);
             const partner2Salary = parseFloat(inputs.partner2Salary || inputs.partnerSalary || 0);
             return partner1Salary + partner2Salary;
         }
