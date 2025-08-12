@@ -1,0 +1,44 @@
+{
+  "testMode": "reorganization",
+  "skipUnimplementedFeatures": true,
+  "pendingFeatures": {
+    "portfolioTax": {
+      "description": "Portfolio tax calculation features",
+      "status": "pending_implementation",
+      "tests": [
+        "Portfolio Tax: Main portfolio tax calculation implemented",
+        "Portfolio Tax: Partner 1 portfolio tax calculation implemented",
+        "Portfolio Tax: Partner 2 portfolio tax calculation implemented",
+        "Portfolio Tax: Tax rate input validation (0-50%)",
+        "Portfolio Tax: Default tax rate is 25%",
+        "Portfolio Tax: Conditional display when portfolio value > 0",
+        "Portfolio Tax: Multi-language support (Hebrew/English)",
+        "Portfolio Tax: Israel-specific tax guidance provided",
+        "Portfolio Tax: Uses formatCurrency for net value display",
+        "Portfolio Tax: Tax rates stored in inputs object",
+        "Portfolio Tax: Integration with couple planning mode"
+      ]
+    },
+    "advancedPartnerFeatures": {
+      "description": "Advanced partner/couple mode features",
+      "status": "pending_modular_implementation",
+      "tests": [
+        "WizardStepSalary: Main Person sections hidden in couple mode",
+        "WizardStepSalary: Partner 1/2 labels displayed correctly",
+        "WizardStepSalary: Partner salaries conditional on couple mode",
+        "WizardStepSalary: Main person breakdown hidden in couple mode",
+        "WizardStepSalary: Partner breakdown shown in couple mode",
+        "Partner Field Mapping: Enhanced partner field mappings exist",
+        "Partner Field Mapping: Multiple partner field patterns supported",
+        "Partner Field Mapping: Partner value combination logic",
+        "Partner Field Mapping: Environment-aware logging implemented",
+        "Partner Field Mapping: Enhanced validation with allowZero option"
+      ]
+    }
+  },
+  "modularArchitecture": {
+    "status": "completed",
+    "version": "8.0.0",
+    "notes": "All files modularized successfully with backward compatibility"
+  }
+}

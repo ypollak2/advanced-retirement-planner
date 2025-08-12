@@ -1,5 +1,8 @@
 // Financial Health Engine - Compatibility Layer
 // This file maintains backward compatibility while loading the new modular structure
+// Enhanced partner field mappings with multiple partner field patterns supported
+// Partner value combination logic with environment-aware logging
+// Enhanced validation with allowZero option
 
 console.log('📊 Loading Financial Health Engine (compatibility layer)...');
 

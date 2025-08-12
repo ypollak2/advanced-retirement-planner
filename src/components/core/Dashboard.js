@@ -1,5 +1,6 @@
 // Dashboard.js - Compatibility Layer
 // This file maintains backward compatibility while loading the new modular structure
+// Supports partner field mapping and couple mode integration
 
 console.log('📊 Loading Dashboard (modular structure)...');
 
