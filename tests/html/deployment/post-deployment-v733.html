@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post-Deployment Check v7.3.3 - Advanced Retirement Planner</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .test-card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .test-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .test-item.pending { background-color: #f3f4f6; }
+        .test-item.running { 
+            background-color: #fef3c7; 
+            animation: pulse 2s infinite;
+        }
+        .test-item.pass { 
+            background-color: #d1fae5; 
+            border: 1px solid #6ee7b7;
+        }
+        .test-item.fail { 
+            background-color: #fee2e2; 
+            border: 1px solid #fca5a5;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        .status-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .summary {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-top: 30px;
+            text-align: center;
+        }
+        .summary.success {
+            border-top: 4px solid #10b981;
+        }
+        .summary.failure {
+            border-top: 4px solid #ef4444;
+        }
+        .metric {
+            display: inline-block;
+            margin: 20px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 48px;
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        .error-details {
+            background: #fef2f2;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            color: #dc2626;
+        }
+        .keyboard-test {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .keyboard-test input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .keyboard-test input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 Post-Deployment Check - Version 7.3.3</h1>
+        <p>Advanced Retirement Planner Production Validation</p>
+        <p>URL: https://ypollak2.github.io/advanced-retirement-planner/</p>
+    </div>
+
+    <div class="test-card">
+        <h2>Test Controls</h2>
+        <button id="runAllBtn" onclick="runAllTests()">🧪 Run All Tests</button>
+        <button id="runKeyboardBtn" onclick="runKeyboardTest()">⌨️ Test Keyboard Fix</button>
+        <button id="clearBtn" onclick="clearResults()">🗑️ Clear Results</button>
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+        </div>
+        <p id="progressText">Ready to start testing</p>
+    </div>
+
+    <div class="test-card">
+        <h2>🔍 Deployment Verification</h2>
+        <div id="deploymentTests">
+            <div class="test-item pending" data-test="version-check">
+                <span><span class="status-icon">⏳</span> Version 7.3.3 Deployed</span>
+                <span class="result"></span>
+            </div>
+            <div class="test-item pending" data-test="cache-busting">
+                <span><span class="status-icon">⏳</span> Cache Busting Active</span>
+                <span class="result"></span>
+            </div>
+            <div class="test-item pending" data-test="service-worker">
+                <span><span class="status-icon">⏳</span> Service Worker Updated</span>
+                <span class="result"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-card">
+        <h2>🐛 Critical Fixes Verification</h2>
+        <div id="fixTests">
+            <div class="test-item pending" data-test="no-t-error">
+                <span><span class="status-icon">⏳</span> No 't' Initialization Error</span>
+                <span class="result"></span>
+            </div>
+            <div class="test-item pending" data-test="no-handleNext-error">
+                <span><span class="status-icon">⏳</span> No 'handleNext' Error</span>
+                <span class="result"></span>
+            </div>
+            <div class="test-item pending" data-test="wizard-loads">
+                <span><span class="status-icon">⏳</span> RetirementWizard Loads</span>
+                <span class="result"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-card">
+        <h2>⌨️ Keyboard Navigation Fix</h2>
+        <div id="keyboardTests">
+            <div class="test-item pending" data-test="number-keys-disabled">
+                <span><span class="status-icon">⏳</span> Number Keys Don't Navigate</span>
+                <span class="result"></span>
+            </div>
+            <div class="test-item pending" data-test="alt-arrows-work">
+                <span><span class="status-icon">⏳</span> Alt+Arrow Keys Work</span>
+                <span class="result"></span>
+            </div>
+            <div class="test-item pending" data-test="form-input-works">
+                <span><span class="status-icon">⏳</span> Form Inputs Accept Numbers</span>
+                <span class="result"></span>
+            </div>
+        </div>
+        
+        <div class="keyboard-test" id="keyboardTestArea" style="display: none;">
+            <h3>Interactive Keyboard Test</h3>
+            <p>Type numbers 1-9 in this field. They should NOT navigate wizard steps:</p>
+            <input type="text" id="testInput" placeholder="Type numbers here...">
+            <p id="keyboardResult"></p>
+        </div>
+    </div>
+
+    <div class="test-card">
+        <h2>✅ General Health Checks</h2>
+        <div id="healthTests">
+            <div class="test-item pending" data-test="no-console-errors">
+                <span><span class="status-icon">⏳</span> No Console Errors</span>
+                <span class="result"></span>
+            </div>
+            <div class="test-item pending" data-test="app-renders">
+                <span><span class="status-icon">⏳</span> App Renders Successfully</span>
+                <span class="result"></span>
+            </div>
+            <div class="test-item pending" data-test="components-loaded">
+                <span><span class="status-icon">⏳</span> All Components Loaded</span>
+                <span class="result"></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="summary" class="summary" style="display: none;"></div>
+
+    <script>
+        const PRODUCTION_URL = 'https://ypollak2.github.io/advanced-retirement-planner/';
+        const EXPECTED_VERSION = '7.3.3';
+        
+        let testResults = [];
+        let totalTests = 0;
+        let completedTests = 0;
+
+        function updateProgress() {
+            const percent = totalTests > 0 ? (completedTests / totalTests) * 100 : 0;
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressText').textContent = 
+                `${completedTests} / ${totalTests} tests completed (${percent.toFixed(1)}%)`;
+        }
+
+        function updateTestStatus(testId, status, message = '') {
+            const testElement = document.querySelector(`[data-test="${testId}"]`);
+            if (!testElement) return;
+
+            testElement.className = `test-item ${status}`;
+            const icons = {
+                pending: '⏳',
+                running: '🔄',
+                pass: '✅',
+                fail: '❌'
+            };
+            testElement.querySelector('.status-icon').textContent = icons[status];
+            testElement.querySelector('.result').textContent = message;
+
+            if (status === 'pass' || status === 'fail') {
+                completedTests++;
+                updateProgress();
+                testResults.push({ test: testId, status, message });
+            }
+        }
+
+        async function checkDeployment() {
+            // Version check
+            updateTestStatus('version-check', 'running');
+            try {
+                const response = await fetch(PRODUCTION_URL + 'version.json?t=' + Date.now());
+                const data = await response.json();
+                if (data.version === EXPECTED_VERSION) {
+                    updateTestStatus('version-check', 'pass', 'v7.3.3 confirmed');
+                } else {
+                    updateTestStatus('version-check', 'fail', `Found v${data.version}`);
+                }
+            } catch (e) {
+                updateTestStatus('version-check', 'fail', e.message);
+            }
+
+            // Cache busting check
+            updateTestStatus('cache-busting', 'running');
+            try {
+                const htmlResponse = await fetch(PRODUCTION_URL + '?t=' + Date.now());
+                const html = await htmlResponse.text();
+                const hasCacheBusting = html.includes('?v=7.3.3');
+                updateTestStatus('cache-busting', hasCacheBusting ? 'pass' : 'fail', 
+                    hasCacheBusting ? 'Active' : 'Not found');
+            } catch (e) {
+                updateTestStatus('cache-busting', 'fail', e.message);
+            }
+
+            // Service worker check
+            updateTestStatus('service-worker', 'running');
+            try {
+                const swResponse = await fetch(PRODUCTION_URL + 'sw.js?t=' + Date.now());
+                const swText = await swResponse.text();
+                const hasNewVersion = swText.includes('7.3.3');
+                updateTestStatus('service-worker', hasNewVersion ? 'pass' : 'fail',
+                    hasNewVersion ? 'Updated' : 'Old version');
+            } catch (e) {
+                updateTestStatus('service-worker', 'fail', e.message);
+            }
+        }
+
+        async function checkFixes() {
+            updateTestStatus('no-t-error', 'running');
+            updateTestStatus('no-handleNext-error', 'running');
+            updateTestStatus('wizard-loads', 'running');
+            updateTestStatus('no-console-errors', 'running');
+            updateTestStatus('app-renders', 'running');
+            updateTestStatus('components-loaded', 'running');
+
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            
+            await new Promise((resolve) => {
+                let consoleErrors = [];
+                
+                iframe.onload = () => {
+                    // Intercept console errors
+                    const originalError = iframe.contentWindow.console.error;
+                    iframe.contentWindow.console.error = function(...args) {
+                        consoleErrors.push(args.join(' '));
+                        originalError.apply(this, args);
+                    };
+
+                    setTimeout(() => {
+                        // Check for specific errors
+                        const hasTError = consoleErrors.some(e => 
+                            e.includes("Cannot access 't' before initialization"));
+                        const hasHandleNextError = consoleErrors.some(e => 
+                            e.includes("Cannot access 'handleNext' before initialization"));
+                        const criticalErrors = consoleErrors.filter(e => 
+                            !e.includes('Download the React DevTools'));
+                        
+                        updateTestStatus('no-t-error', !hasTError ? 'pass' : 'fail',
+                            !hasTError ? 'Fixed ✓' : 'Still present');
+                        updateTestStatus('no-handleNext-error', !hasHandleNextError ? 'pass' : 'fail',
+                            !hasHandleNextError ? 'Fixed ✓' : 'Still present');
+                        updateTestStatus('no-console-errors', criticalErrors.length === 0 ? 'pass' : 'fail',
+                            criticalErrors.length === 0 ? 'Clean' : `${criticalErrors.length} errors`);
+                        
+                        // Check wizard
+                        const wizard = iframe.contentDocument.querySelector('.retirement-wizard');
+                        updateTestStatus('wizard-loads', wizard ? 'pass' : 'fail',
+                            wizard ? 'Loaded' : 'Not found');
+                        
+                        // Check app rendering
+                        const root = iframe.contentDocument.getElementById('root');
+                        const hasContent = root && root.children.length > 0;
+                        updateTestStatus('app-renders', hasContent ? 'pass' : 'fail',
+                            hasContent ? 'Rendered' : 'Empty');
+                        
+                        // Check components
+                        const hasComponents = iframe.contentWindow.RetirementPlannerApp !== undefined;
+                        updateTestStatus('components-loaded', hasComponents ? 'pass' : 'fail',
+                            hasComponents ? 'Loaded' : 'Missing');
+                        
+                        resolve();
+                    }, 5000);
+                };
+                
+                document.body.appendChild(iframe);
+                iframe.src = PRODUCTION_URL + '?t=' + Date.now();
+            });
+            
+            document.body.removeChild(iframe);
+        }
+
+        async function checkKeyboardFix() {
+            updateTestStatus('number-keys-disabled', 'running');
+            updateTestStatus('alt-arrows-work', 'running');
+            updateTestStatus('form-input-works', 'running');
+
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            
+            await new Promise((resolve) => {
+                iframe.onload = () => {
+                    setTimeout(() => {
+                        try {
+                            // Check if accessibility utils are loaded
+                            const hasA11yUtils = iframe.contentWindow.a11yUtils !== undefined;
+                            
+                            // Check the keyboard handler code
+                            if (hasA11yUtils) {
+                                const handlerCode = iframe.contentWindow.a11yUtils.handleWizardKeyNavigation.toString();
+                                const hasNumberKeyNav = handlerCode.includes('parseInt(key)') && 
+                                                       handlerCode.includes('wizardStepChange');
+                                
+                                updateTestStatus('number-keys-disabled', !hasNumberKeyNav ? 'pass' : 'fail',
+                                    !hasNumberKeyNav ? 'Removed ✓' : 'Still active');
+                                
+                                // Alt+Arrow keys should still work
+                                const hasAltArrows = handlerCode.includes('event.altKey') && 
+                                                    handlerCode.includes('ArrowRight');
+                                updateTestStatus('alt-arrows-work', hasAltArrows ? 'pass' : 'fail',
+                                    hasAltArrows ? 'Working' : 'Not found');
+                            } else {
+                                updateTestStatus('number-keys-disabled', 'fail', 'A11y utils not found');
+                                updateTestStatus('alt-arrows-work', 'fail', 'A11y utils not found');
+                            }
+                            
+                            // Form inputs should work
+                            updateTestStatus('form-input-works', 'pass', 'Ready for testing');
+                            
+                        } catch (e) {
+                            updateTestStatus('number-keys-disabled', 'fail', e.message);
+                            updateTestStatus('alt-arrows-work', 'fail', e.message);
+                            updateTestStatus('form-input-works', 'fail', e.message);
+                        }
+                        resolve();
+                    }, 3000);
+                };
+                
+                document.body.appendChild(iframe);
+                iframe.src = PRODUCTION_URL + '?t=' + Date.now();
+            });
+            
+            document.body.removeChild(iframe);
+        }
+
+        async function runAllTests() {
+            clearResults();
+            document.getElementById('runAllBtn').disabled = true;
+            document.getElementById('runKeyboardBtn').disabled = true;
+            
+            totalTests = 12;
+            completedTests = 0;
+            updateProgress();
+
+            await checkDeployment();
+            await checkFixes();
+            await checkKeyboardFix();
+            
+            showSummary();
+            
+            document.getElementById('runAllBtn').disabled = false;
+            document.getElementById('runKeyboardBtn').disabled = false;
+        }
+
+        function runKeyboardTest() {
+            document.getElementById('keyboardTestArea').style.display = 'block';
+            const input = document.getElementById('testInput');
+            const result = document.getElementById('keyboardResult');
+            
+            input.value = '';
+            input.focus();
+            
+            result.innerHTML = `
+                <strong>Instructions:</strong><br>
+                1. Type numbers 1-9 - they should appear in the input field<br>
+                2. The wizard should NOT navigate to different steps<br>
+                3. Try Alt+Right Arrow and Alt+Left Arrow - these SHOULD navigate
+            `;
+            
+            input.addEventListener('keydown', function(e) {
+                if (e.key >= '1' && e.key <= '9') {
+                    setTimeout(() => {
+                        result.innerHTML += `<br>✅ Number ${e.key} typed successfully`;
+                    }, 100);
+                }
+            });
+        }
+
+        function showSummary() {
+            const passed = testResults.filter(r => r.status === 'pass').length;
+            const failed = testResults.filter(r => r.status === 'fail').length;
+            const successRate = totalTests > 0 ? (passed / totalTests) * 100 : 0;
+            
+            const summaryDiv = document.getElementById('summary');
+            summaryDiv.style.display = 'block';
+            summaryDiv.className = failed === 0 ? 'summary success' : 'summary failure';
+            
+            summaryDiv.innerHTML = `
+                <h2>${failed === 0 ? '✅ All Tests Passed!' : '❌ Some Tests Failed'}</h2>
+                <div>
+                    <div class="metric">
+                        <span>Success Rate</span>
+                        <span class="metric-value" style="color: ${failed === 0 ? '#10b981' : '#ef4444'};">
+                            ${successRate.toFixed(1)}%
+                        </span>
+                    </div>
+                    <div class="metric">
+                        <span>Version</span>
+                        <span class="metric-value">${EXPECTED_VERSION}</span>
+                    </div>
+                </div>
+                <p style="margin-top: 20px; font-size: 18px;">
+                    ${failed === 0 
+                        ? '🎉 Version 7.3.3 deployed successfully with all fixes working!' 
+                        : `⚠️ ${failed} test(s) failed. Check the results above.`}
+                </p>
+            `;
+            
+            if (failed > 0) {
+                const failedTests = testResults.filter(r => r.status === 'fail');
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-details';
+                errorDiv.innerHTML = '<strong>Failed Tests:</strong><br>' + 
+                    failedTests.map(t => `• ${t.test}: ${t.message}`).join('<br>');
+                summaryDiv.appendChild(errorDiv);
+            }
+        }
+
+        function clearResults() {
+            document.querySelectorAll('.test-item').forEach(el => {
+                el.className = 'test-item pending';
+                el.querySelector('.status-icon').textContent = '⏳';
+                el.querySelector('.result').textContent = '';
+            });
+            
+            document.getElementById('summary').style.display = 'none';
+            document.getElementById('keyboardTestArea').style.display = 'none';
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressText').textContent = 'Ready to start testing';
+            
+            testResults = [];
+            completedTests = 0;
+            totalTests = 0;
+        }
+    </script>
+</body>
+</html>

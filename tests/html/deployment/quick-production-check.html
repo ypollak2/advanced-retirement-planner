@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Production Check - v7.3.1</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .status { 
+            padding: 20px; 
+            margin: 10px 0; 
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background-color: #0056b3; }
+        .console {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Quick Production Check</h1>
+    <p>Target: https://ypollak2.github.io/advanced-retirement-planner/</p>
+    
+    <button onclick="checkProduction()">Run Production Check</button>
+    
+    <div id="results"></div>
+    <div id="console" class="console"></div>
+
+    <script>
+        const PRODUCTION_URL = 'https://ypollak2.github.io/advanced-retirement-planner/';
+        
+        function log(message, type = 'info') {
+            const console = document.getElementById('console');
+            const time = new Date().toLocaleTimeString();
+            console.innerHTML += `[${time}] ${message}<br>`;
+            console.scrollTop = console.scrollHeight;
+        }
+        
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+        
+        async function checkProduction() {
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('console').innerHTML = '';
+            
+            log('Starting production check...');
+            
+            try {
+                // 1. Check if site is accessible
+                log('Checking site accessibility...');
+                const response = await fetch(PRODUCTION_URL, { mode: 'no-cors' });
+                addResult('✅ Production site is accessible', 'success');
+                log('Site responded successfully');
+                
+                // 2. Load in iframe to check for errors
+                log('Loading site in iframe...');
+                const iframe = document.createElement('iframe');
+                iframe.style.width = '100%';
+                iframe.style.height = '600px';
+                iframe.style.border = '2px solid #ddd';
+                iframe.style.marginTop = '20px';
+                
+                const loadPromise = new Promise((resolve, reject) => {
+                    iframe.onload = () => {
+                        log('Iframe loaded successfully');
+                        
+                        // Check for version
+                        setTimeout(() => {
+                            try {
+                                const version = iframe.contentDocument.querySelector('.version-display');
+                                if (version && version.textContent.includes('7.3.1')) {
+                                    addResult('✅ Version 7.3.1 is deployed', 'success');
+                                    log('Version 7.3.1 confirmed');
+                                } else {
+                                    addResult('⚠️ Could not verify version 7.3.1', 'warning');
+                                    log('Version element: ' + (version ? version.textContent : 'not found'));
+                                }
+                                
+                                // Check for wizard
+                                const wizard = iframe.contentDocument.querySelector('.retirement-wizard');
+                                if (wizard) {
+                                    addResult('✅ Retirement Wizard is present', 'success');
+                                    log('Wizard component found');
+                                } else {
+                                    // Check if app is loaded
+                                    const app = iframe.contentDocument.querySelector('#root');
+                                    if (app && app.children.length > 0) {
+                                        addResult('✅ Application loaded successfully', 'success');
+                                        log('Root app element has content');
+                                    } else {
+                                        addResult('⚠️ Application may not be fully loaded', 'warning');
+                                        log('Root element children: ' + (app ? app.children.length : 'root not found'));
+                                    }
+                                }
+                                
+                                // Check console for errors
+                                if (iframe.contentWindow.console) {
+                                    addResult('ℹ️ Check browser console for any errors', 'info');
+                                }
+                                
+                                resolve();
+                            } catch (e) {
+                                log('Error checking iframe content: ' + e.message, 'error');
+                                resolve();
+                            }
+                        }, 5000); // Wait 5 seconds for app to load
+                    };
+                    
+                    iframe.onerror = () => {
+                        addResult('❌ Failed to load production site', 'error');
+                        log('Iframe load error', 'error');
+                        reject();
+                    };
+                });
+                
+                iframe.src = PRODUCTION_URL;
+                document.body.appendChild(iframe);
+                
+                await loadPromise;
+                
+                addResult('✅ Production check completed', 'success');
+                log('All checks completed');
+                
+            } catch (error) {
+                addResult('❌ Production check failed: ' + error.message, 'error');
+                log('Fatal error: ' + error.message, 'error');
+            }
+        }
+        
+        // Auto-run on load
+        window.addEventListener('load', () => {
+            log('Quick production check ready');
+            log('Click "Run Production Check" to begin');
+        });
+    </script>
+</body>
+</html>

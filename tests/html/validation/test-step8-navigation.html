@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Step 8 Navigation Fix</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .info {
+            color: #007bff;
+            margin: 10px 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .test-results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Step 8 Navigation Test</h1>
+    
+    <div class="test-container">
+        <h2>Test Scenario</h2>
+        <p>Testing that the Next button on Step 8 (Retirement Goals) is always enabled, regardless of whether data has been changed.</p>
+        
+        <div id="testResults" class="test-results"></div>
+        
+        <button onclick="runTest()">Run Test</button>
+    </div>
+
+    <script>
+        function logResult(message, isSuccess) {
+            const resultsDiv = document.getElementById('testResults');
+            const result = document.createElement('div');
+            result.className = isSuccess ? 'success' : 'error';
+            result.textContent = `${isSuccess ? '✅' : '❌'} ${message}`;
+            resultsDiv.appendChild(result);
+        }
+
+        function logInfo(message) {
+            const resultsDiv = document.getElementById('testResults');
+            const info = document.createElement('div');
+            info.className = 'info';
+            info.textContent = `ℹ️ ${message}`;
+            resultsDiv.appendChild(info);
+        }
+
+        async function runTest() {
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '';
+            
+            try {
+                // Load the wizard component
+                logInfo('Loading RetirementWizard.js...');
+                const script = document.createElement('script');
+                script.src = 'src/components/wizard/RetirementWizard.js';
+                document.head.appendChild(script);
+                
+                await new Promise(resolve => script.onload = resolve);
+                
+                // Check if the validation function exists
+                logInfo('Checking step validation logic...');
+                
+                // Read the source code to verify the fix
+                const response = await fetch('src/components/wizard/RetirementWizard.js');
+                const sourceCode = await response.text();
+                
+                // Check if step 8 validation returns true
+                const step8ValidationPattern = /case 8:[\s\S]*?return true;/;
+                const hasStep8Fix = step8ValidationPattern.test(sourceCode);
+                
+                if (hasStep8Fix) {
+                    logResult('Step 8 validation has been fixed to always return true', true);
+                    logInfo('The Next button will now always be enabled on Step 8');
+                } else {
+                    logResult('Step 8 validation still has conditions', false);
+                    logInfo('The fix may not have been applied correctly');
+                }
+                
+                // Check that the old validation is removed
+                const oldValidationPattern = /retirementGoal.*?> 0.*?currentMonthlyExpenses.*?> 0/;
+                const hasOldValidation = oldValidationPattern.test(sourceCode);
+                
+                if (!hasOldValidation) {
+                    logResult('Old restrictive validation has been removed', true);
+                } else {
+                    logResult('Old validation conditions still exist', false);
+                }
+                
+                // Summary
+                logInfo('');
+                logInfo('Test Summary:');
+                if (hasStep8Fix && !hasOldValidation) {
+                    logResult('✨ Step 8 navigation fix is working correctly!', true);
+                    logInfo('Users can now proceed from Step 8 without entering retirement goals');
+                } else {
+                    logResult('Step 8 navigation fix needs attention', false);
+                }
+                
+            } catch (error) {
+                logResult(`Test failed: ${error.message}`, false);
+            }
+        }
+    </script>
+</body>
+</html>

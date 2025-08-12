@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Tax E2E Test - v7.3.6</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .status {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status.running { background: #fff3cd; color: #856404; }
+        .status.passed { background: #d4edda; color: #155724; }
+        .status.failed { background: #f8d7da; color: #721c24; }
+        .test-step {
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 3px solid #007bff;
+            background: #f8f9fa;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .result.success { background: #d4edda; border: 1px solid #c3e6cb; }
+        .result.error { background: #f8d7da; border: 1px solid #f5c6cb; }
+        .result.warning { background: #fff3cd; border: 1px solid #ffeeba; }
+        iframe {
+            width: 100%;
+            height: 800px;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .calculation-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .calc-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+        .calc-item h4 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+        .calc-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .test-scenario {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <div>
+                <h1>🧪 Portfolio Tax E2E Test - Version 7.3.6</h1>
+                <p>Testing capital gains tax calculation on personal portfolio</p>
+            </div>
+            <div class="status running" id="test-status">Running...</div>
+        </div>
+
+        <div class="test-scenario">
+            <h3>Test Scenarios</h3>
+            <ol>
+                <li><strong>Individual Mode - 25% Tax</strong>: 1,000,000 portfolio → Expected: 750,000 net</li>
+                <li><strong>Individual Mode - 30% Tax</strong>: 1,000,000 portfolio → Expected: 700,000 net</li>
+                <li><strong>Couple Mode - Partner 1</strong>: 1,000,000 with 25% tax → Expected: 750,000 net</li>
+                <li><strong>Couple Mode - Partner 2</strong>: 1,000,000 with 30% tax → Expected: 700,000 net</li>
+            </ol>
+        </div>
+
+        <div id="test-results"></div>
+        
+        <iframe id="app-frame" src="https://ypollak2.github.io/advanced-retirement-planner/" 
+                style="display:none"></iframe>
+    </div>
+
+    <script>
+        const testResults = document.getElementById('test-results');
+        const statusEl = document.getElementById('test-status');
+        const frame = document.getElementById('app-frame');
+        let testsPassed = 0;
+        let testsFailed = 0;
+
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            testResults.appendChild(div);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function updateStatus() {
+            const total = testsPassed + testsFailed;
+            if (testsFailed > 0) {
+                statusEl.textContent = `Failed: ${testsPassed}/${total} passed`;
+                statusEl.className = 'status failed';
+            } else if (total > 0) {
+                statusEl.textContent = `Passed: ${testsPassed}/${total} tests`;
+                statusEl.className = 'status passed';
+            }
+        }
+
+        async function waitForApp() {
+            return new Promise((resolve, reject) => {
+                let attempts = 0;
+                const maxAttempts = 30;
+                
+                const checkInterval = setInterval(() => {
+                    try {
+                        const appWindow = frame.contentWindow;
+                        const hasReact = appWindow.React && appWindow.ReactDOM;
+                        const hasApp = appWindow.RetirementPlannerApp;
+                        const hasCalc = appWindow.calculateRetirement;
+                        
+                        if (hasReact && hasApp && hasCalc) {
+                            clearInterval(checkInterval);
+                            log('✅ App loaded successfully', 'success');
+                            resolve(appWindow);
+                        } else {
+                            attempts++;
+                            if (attempts >= maxAttempts) {
+                                clearInterval(checkInterval);
+                                reject(new Error('App failed to load after 30 seconds'));
+                            }
+                        }
+                    } catch (e) {
+                        attempts++;
+                        if (attempts >= maxAttempts) {
+                            clearInterval(checkInterval);
+                            reject(new Error('Cross-origin error or app unavailable'));
+                        }
+                    }
+                }, 1000);
+            });
+        }
+
+        async function testPortfolioTaxCalculation(appWindow, scenario) {
+            const { inputs, expectedNet, description } = scenario;
+            
+            log(`\n📊 Testing: ${description}`);
+            
+            try {
+                // Call calculateRetirement with test inputs
+                const results = appWindow.calculateRetirement(inputs);
+                
+                // Extract the actual portfolio value used in calculations
+                const actualPortfolioValue = results.personalPortfolioValue || 0;
+                
+                // Check if tax was applied
+                const grossValue = inputs.currentPersonalPortfolio || 0;
+                const taxRate = (inputs.portfolioTaxRate || 25) / 100;
+                const calculatedNet = grossValue * (1 - taxRate);
+                
+                // Log calculation details
+                const calcDetails = document.createElement('div');
+                calcDetails.className = 'calculation-details';
+                calcDetails.innerHTML = `
+                    <div class="calc-item">
+                        <h4>Gross Portfolio</h4>
+                        <div class="calc-value">${grossValue.toLocaleString()}</div>
+                    </div>
+                    <div class="calc-item">
+                        <h4>Tax Rate</h4>
+                        <div class="calc-value">${(taxRate * 100).toFixed(0)}%</div>
+                    </div>
+                    <div class="calc-item">
+                        <h4>Expected Net</h4>
+                        <div class="calc-value">${expectedNet.toLocaleString()}</div>
+                    </div>
+                    <div class="calc-item">
+                        <h4>Actual in Calc</h4>
+                        <div class="calc-value">${actualPortfolioValue.toLocaleString()}</div>
+                    </div>
+                `;
+                testResults.appendChild(calcDetails);
+                
+                // Verify the calculation
+                const tolerance = 1; // Allow $1 rounding difference
+                const isCorrect = Math.abs(actualPortfolioValue - expectedNet) <= tolerance;
+                
+                if (isCorrect) {
+                    log(`✅ PASS: Portfolio value correctly calculated as ${actualPortfolioValue.toLocaleString()}`, 'success');
+                    testsPassed++;
+                } else {
+                    log(`❌ FAIL: Expected ${expectedNet.toLocaleString()} but got ${actualPortfolioValue.toLocaleString()}`, 'error');
+                    log(`   Tax may not be applied to principal!`, 'error');
+                    testsFailed++;
+                }
+                
+                // Also check total savings to ensure it includes the net portfolio
+                const totalSavings = results.totalSavings || 0;
+                log(`   Total savings at retirement: ${totalSavings.toLocaleString()}`);
+                
+                // Log raw calculation results for debugging
+                log(`<pre>Raw results:\n${JSON.stringify(results, null, 2)}</pre>`);
+                
+            } catch (error) {
+                log(`❌ ERROR: ${error.message}`, 'error');
+                testsFailed++;
+            }
+            
+            updateStatus();
+        }
+
+        async function runTests() {
+            log('🚀 Starting Portfolio Tax E2E Tests for v7.3.6');
+            log('Waiting for app to load...');
+            
+            frame.style.display = 'block';
+            
+            try {
+                const appWindow = await waitForApp();
+                
+                // Check version
+                const version = appWindow.APP_VERSION || 'unknown';
+                log(`📌 App version: ${version}`);
+                
+                if (version !== 'v7.3.6') {
+                    log(`⚠️ WARNING: Expected v7.3.6 but got ${version}`, 'warning');
+                }
+                
+                // Test scenarios
+                const scenarios = [
+                    {
+                        description: 'Individual Mode - 25% Tax on 1M Portfolio',
+                        inputs: {
+                            planningType: 'individual',
+                            currentAge: 35,
+                            retirementAge: 65,
+                            currentSalary: 10000,
+                            currentPersonalPortfolio: 1000000,
+                            portfolioTaxRate: 25,
+                            personalPortfolioMonthly: 1000,
+                            personalPortfolioReturn: 7,
+                            currentPensionSavings: 0,
+                            currentTrainingFund: 0,
+                            inflationRate: 2
+                        },
+                        expectedNet: 750000
+                    },
+                    {
+                        description: 'Individual Mode - 30% Tax on 1M Portfolio',
+                        inputs: {
+                            planningType: 'individual',
+                            currentAge: 35,
+                            retirementAge: 65,
+                            currentSalary: 10000,
+                            currentPersonalPortfolio: 1000000,
+                            portfolioTaxRate: 30,
+                            personalPortfolioMonthly: 1000,
+                            personalPortfolioReturn: 7,
+                            currentPensionSavings: 0,
+                            currentTrainingFund: 0,
+                            inflationRate: 2
+                        },
+                        expectedNet: 700000
+                    },
+                    {
+                        description: 'Couple Mode - Partner 1 with 25% Tax',
+                        inputs: {
+                            planningType: 'couple',
+                            currentAge: 35,
+                            retirementAge: 65,
+                            partner1Salary: 10000,
+                            partner2Salary: 10000,
+                            partner1PersonalPortfolio: 1000000,
+                            partner1PortfolioTaxRate: 25,
+                            partner1PersonalPortfolioMonthly: 1000,
+                            partner1PersonalPortfolioReturn: 7,
+                            partner2PersonalPortfolio: 0,
+                            currentPensionSavings: 0,
+                            currentTrainingFund: 0,
+                            inflationRate: 2
+                        },
+                        expectedNet: 750000
+                    },
+                    {
+                        description: 'Couple Mode - Partner 2 with 30% Tax',
+                        inputs: {
+                            planningType: 'couple',
+                            currentAge: 35,
+                            retirementAge: 65,
+                            partner1Salary: 10000,
+                            partner2Salary: 10000,
+                            partner1PersonalPortfolio: 0,
+                            partner2PersonalPortfolio: 1000000,
+                            partner2PortfolioTaxRate: 30,
+                            partner2PersonalPortfolioMonthly: 1000,
+                            partner2PersonalPortfolioReturn: 7,
+                            currentPensionSavings: 0,
+                            currentTrainingFund: 0,
+                            inflationRate: 2
+                        },
+                        expectedNet: 700000
+                    }
+                ];
+                
+                for (const scenario of scenarios) {
+                    await testPortfolioTaxCalculation(appWindow, scenario);
+                }
+                
+                // Summary
+                log('\n📊 Test Summary:');
+                log(`✅ Passed: ${testsPassed}`);
+                log(`❌ Failed: ${testsFailed}`);
+                log(`📈 Success Rate: ${((testsPassed / (testsPassed + testsFailed)) * 100).toFixed(1)}%`);
+                
+            } catch (error) {
+                log(`🚨 CRITICAL ERROR: ${error.message}`, 'error');
+                statusEl.textContent = 'Test Failed';
+                statusEl.className = 'status failed';
+            }
+        }
+
+        // Start tests when page loads
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>

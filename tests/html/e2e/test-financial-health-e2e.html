@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Health Score E2E Test Suite</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .test-status {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .test-status.pass { color: #10b981; }
+        .test-status.fail { color: #ef4444; }
+        .test-status.running { color: #f59e0b; }
+        
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            background: #f9fafb;
+        }
+        
+        .test-result.pass {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .test-result.fail {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .score-display {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .score-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .component-scores {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .component-score {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .component-score-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .component-score-label {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .debug-info {
+            background: #f9fafb;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background: #2563eb;
+        }
+        
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            background: #f3f4f6;
+            border-radius: 3px;
+        }
+        
+        .log-entry.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .log-entry.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .log-entry.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <h1>Financial Health Score E2E Test Suite</h1>
+    
+    <div class="controls">
+        <button id="runAllTests">Run All Tests</button>
+        <button id="runIndividualTests">Run Individual Mode Tests</button>
+        <button id="runCoupleTests">Run Couple Mode Tests</button>
+        <button id="clearResults">Clear Results</button>
+    </div>
+    
+    <div id="testResults"></div>
+    
+    <div class="test-container">
+        <h2>Test Log</h2>
+        <div id="testLog" class="debug-info"></div>
+    </div>
+    
+    <script>
+        const testResults = document.getElementById('testResults');
+        const testLog = document.getElementById('testLog');
+        
+        // Logging helper
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            testLog.appendChild(entry);
+            testLog.scrollTop = testLog.scrollHeight;
+        }
+        
+        // Test suite
+        const testSuite = {
+            // Individual mode tests
+            individual: [
+                {
+                    name: 'Basic Individual - Complete Data',
+                    inputs: {
+                        planningType: 'individual',
+                        currentAge: 30,
+                        retirementAge: 67,
+                        currentMonthlySalary: 20000,
+                        currentMonthlyExpenses: 12000,
+                        emergencyFund: 100000,
+                        currentSavings: 200000,
+                        currentTrainingFund: 150000,
+                        riskTolerance: 'moderate',
+                        stockPercentage: 60,
+                        pensionContributionRate: 6.5,
+                        trainingFundContributionRate: 2.5
+                    },
+                    expectedResults: {
+                        totalScore: { min: 60, max: 80 },
+                        components: {
+                            savingsRate: { min: 20, max: 40 },
+                            retirementReadiness: { min: 70, max: 100 },
+                            timeHorizon: { min: 80, max: 100 },
+                            riskAlignment: { min: 80, max: 100 },
+                            diversification: { min: 10, max: 50 },
+                            taxEfficiency: { min: 50, max: 100 },
+                            emergencyFund: { min: 50, max: 100 },
+                            debtManagement: { min: 80, max: 100 }
+                        }
+                    }
+                },
+                {
+                    name: 'Individual - Missing Contribution Rates',
+                    inputs: {
+                        planningType: 'individual',
+                        currentAge: 35,
+                        retirementAge: 65,
+                        currentMonthlySalary: 15000,
+                        currentMonthlyExpenses: 10000,
+                        emergencyFund: 50000,
+                        riskTolerance: 'moderate',
+                        stockPercentage: 50
+                    },
+                    expectedResults: {
+                        totalScore: { min: 40, max: 60 },
+                        components: {
+                            savingsRate: { min: 10, max: 30 }, // Should use default rates
+                            emergencyFund: { min: 40, max: 80 }
+                        }
+                    }
+                },
+                {
+                    name: 'Individual - High Income High Saver',
+                    inputs: {
+                        planningType: 'individual',
+                        currentAge: 40,
+                        retirementAge: 60,
+                        currentMonthlySalary: 50000,
+                        currentMonthlyExpenses: 20000,
+                        emergencyFund: 300000,
+                        currentSavings: 1000000,
+                        currentTrainingFund: 500000,
+                        currentBankAccount: 200000,
+                        currentRealEstate: 2000000,
+                        riskTolerance: 'aggressive',
+                        stockPercentage: 80,
+                        pensionContributionRate: 10,
+                        trainingFundContributionRate: 5,
+                        personalPortfolioMonthly: 10000
+                    },
+                    expectedResults: {
+                        totalScore: { min: 75, max: 95 },
+                        components: {
+                            savingsRate: { min: 70, max: 100 },
+                            diversification: { min: 60, max: 100 },
+                            emergencyFund: { min: 80, max: 100 }
+                        }
+                    }
+                },
+                {
+                    name: 'Individual - Zero/Missing Data',
+                    inputs: {
+                        planningType: 'individual',
+                        currentAge: 25,
+                        retirementAge: 70
+                    },
+                    expectedResults: {
+                        totalScore: { min: 10, max: 30 },
+                        components: {
+                            savingsRate: { min: 0, max: 10 },
+                            retirementReadiness: { min: 0, max: 10 },
+                            emergencyFund: { min: 0, max: 10 }
+                        }
+                    }
+                }
+            ],
+            
+            // Couple mode tests
+            couple: [
+                {
+                    name: 'Basic Couple - Complete Data',
+                    inputs: {
+                        planningType: 'couple',
+                        currentAge: 30,
+                        retirementAge: 67,
+                        partner1Salary: 25000,
+                        partner2Salary: 18000,
+                        partner1BankAccount: 100000,
+                        partner2BankAccount: 50000,
+                        partner1CurrentPension: 150000,
+                        partner2CurrentPension: 80000,
+                        partner1CurrentTrainingFund: 100000,
+                        partner2CurrentTrainingFund: 60000,
+                        monthlyExpenses: 25000,
+                        riskTolerance: 'moderate',
+                        stockPercentage: 60
+                    },
+                    expectedResults: {
+                        totalScore: { min: 65, max: 85 },
+                        components: {
+                            savingsRate: { min: 20, max: 40 },
+                            retirementReadiness: { min: 70, max: 100 },
+                            emergencyFund: { min: 40, max: 80 },
+                            diversification: { min: 20, max: 60 }
+                        }
+                    }
+                },
+                {
+                    name: 'Couple - Unequal Partners',
+                    inputs: {
+                        planningType: 'couple',
+                        currentAge: 35,
+                        retirementAge: 65,
+                        partnerAge: 30,
+                        partnerRetirementAge: 67,
+                        partner1Salary: 50000,
+                        partner2Salary: 10000,
+                        partner1BankAccount: 300000,
+                        partner2BankAccount: 0,
+                        partner1CurrentPension: 500000,
+                        partner2CurrentPension: 20000,
+                        monthlyExpenses: 30000,
+                        riskTolerance: 'moderate',
+                        stockPercentage: 50
+                    },
+                    expectedResults: {
+                        totalScore: { min: 60, max: 80 },
+                        components: {
+                            savingsRate: { min: 15, max: 35 },
+                            emergencyFund: { min: 60, max: 100 }
+                        }
+                    }
+                },
+                {
+                    name: 'Couple - High Net Worth',
+                    inputs: {
+                        planningType: 'couple',
+                        currentAge: 45,
+                        retirementAge: 60,
+                        partnerAge: 42,
+                        partnerRetirementAge: 62,
+                        partner1Salary: 80000,
+                        partner2Salary: 60000,
+                        partner1BankAccount: 500000,
+                        partner2BankAccount: 400000,
+                        partner1CurrentPension: 1500000,
+                        partner2CurrentPension: 1200000,
+                        partner1CurrentTrainingFund: 800000,
+                        partner2CurrentTrainingFund: 600000,
+                        partner1RealEstate: 3000000,
+                        partner2RealEstate: 2000000,
+                        partner1PersonalPortfolio: 1000000,
+                        partner2PersonalPortfolio: 800000,
+                        monthlyExpenses: 50000,
+                        riskTolerance: 'aggressive',
+                        stockPercentage: 75,
+                        partner1PensionEmployeeRate: 8,
+                        partner2PensionEmployeeRate: 7,
+                        partner1TrainingFundEmployeeRate: 4,
+                        partner2TrainingFundEmployeeRate: 3
+                    },
+                    expectedResults: {
+                        totalScore: { min: 80, max: 95 },
+                        components: {
+                            savingsRate: { min: 60, max: 100 },
+                            diversification: { min: 70, max: 100 },
+                            emergencyFund: { min: 90, max: 100 },
+                            taxEfficiency: { min: 60, max: 100 }
+                        }
+                    }
+                }
+            ]
+        };
+        
+        // Mock financial health engine for testing
+        function mockCalculateFinancialHealthScore(inputs) {
+            try {
+                // This would normally call the actual calculateFinancialHealthScore
+                // For testing, we'll create a mock implementation
+                const result = {
+                    totalScore: 0,
+                    factors: {},
+                    debugInfo: {}
+                };
+                
+                // Mock calculations based on inputs
+                const hasIncome = inputs.currentMonthlySalary || 
+                    (inputs.partner1Salary && inputs.partner2Salary);
+                const hasExpenses = inputs.currentMonthlyExpenses || inputs.monthlyExpenses;
+                const hasEmergency = inputs.emergencyFund || 
+                    (inputs.partner1BankAccount || inputs.partner2BankAccount);
+                
+                // Savings Rate
+                if (hasIncome) {
+                    const income = inputs.planningType === 'couple' ? 
+                        (inputs.partner1Salary || 0) + (inputs.partner2Salary || 0) :
+                        inputs.currentMonthlySalary || 0;
+                    const pensionRate = inputs.pensionContributionRate || 
+                        inputs.partner1PensionEmployeeRate || 6.5;
+                    const trainingRate = inputs.trainingFundContributionRate || 
+                        inputs.partner1TrainingFundEmployeeRate || 2.5;
+                    const totalRate = pensionRate + trainingRate + 
+                        (inputs.personalPortfolioMonthly ? (inputs.personalPortfolioMonthly / income * 100) : 0);
+                    
+                    result.factors.savingsRate = {
+                        score: Math.min(25, Math.round(totalRate * 25 / 30)),
+                        details: {
+                            rate: totalRate,
+                            monthlyAmount: income * totalRate / 100,
+                            monthlyIncome: income
+                        }
+                    };
+                } else {
+                    result.factors.savingsRate = {
+                        score: 0,
+                        details: { status: 'missing_income_data' }
+                    };
+                }
+                
+                // Retirement Readiness
+                if (hasIncome && inputs.currentAge && inputs.retirementAge) {
+                    const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
+                    result.factors.retirementReadiness = {
+                        score: yearsToRetirement > 20 ? 20 : Math.round(yearsToRetirement * 20 / 30),
+                        details: { yearsRemaining: yearsToRetirement }
+                    };
+                } else {
+                    result.factors.retirementReadiness = {
+                        score: 0,
+                        details: { status: 'missing_data' }
+                    };
+                }
+                
+                // Time Horizon
+                if (inputs.currentAge && inputs.retirementAge) {
+                    const years = inputs.retirementAge - inputs.currentAge;
+                    result.factors.timeHorizon = {
+                        score: years > 10 ? 15 : Math.round(years * 15 / 20),
+                        details: { years }
+                    };
+                } else {
+                    result.factors.timeHorizon = {
+                        score: 0,
+                        details: {}
+                    };
+                }
+                
+                // Risk Alignment
+                if (inputs.riskTolerance && inputs.stockPercentage !== undefined) {
+                    const targetStock = inputs.riskTolerance === 'aggressive' ? 80 :
+                        inputs.riskTolerance === 'moderate' ? 60 : 40;
+                    const diff = Math.abs(inputs.stockPercentage - targetStock);
+                    result.factors.riskAlignment = {
+                        score: diff < 10 ? 12 : diff < 20 ? 8 : 4,
+                        details: {
+                            riskProfile: inputs.riskTolerance,
+                            stockPercentage: inputs.stockPercentage
+                        }
+                    };
+                } else {
+                    result.factors.riskAlignment = {
+                        score: 0,
+                        details: {}
+                    };
+                }
+                
+                // Diversification
+                let assetClasses = 0;
+                if (inputs.currentSavings || inputs.partner1CurrentPension || inputs.partner2CurrentPension) assetClasses++;
+                if (inputs.currentTrainingFund || inputs.partner1CurrentTrainingFund || inputs.partner2CurrentTrainingFund) assetClasses++;
+                if (inputs.currentBankAccount || inputs.partner1BankAccount || inputs.partner2BankAccount) assetClasses++;
+                if (inputs.currentRealEstate || inputs.partner1RealEstate || inputs.partner2RealEstate) assetClasses++;
+                if (inputs.currentPersonalPortfolio || inputs.partner1PersonalPortfolio || inputs.partner2PersonalPortfolio) assetClasses++;
+                if (hasEmergency) assetClasses++;
+                
+                result.factors.diversification = {
+                    score: Math.min(10, assetClasses * 2),
+                    details: { assetClasses }
+                };
+                
+                // Tax Efficiency
+                const hasPension = inputs.pensionContributionRate || 
+                    inputs.partner1PensionEmployeeRate || inputs.partner2PensionEmployeeRate;
+                result.factors.taxEfficiency = {
+                    score: hasPension ? 6 : 2,
+                    details: { 
+                        currentRate: hasPension ? (inputs.pensionContributionRate || 6.5) : 0,
+                        optimalRate: inputs.currentAge < 35 ? 12 : 15
+                    }
+                };
+                
+                // Emergency Fund
+                if (hasEmergency && hasExpenses) {
+                    const emergency = inputs.planningType === 'couple' ?
+                        (inputs.partner1BankAccount || 0) + (inputs.partner2BankAccount || 0) :
+                        inputs.emergencyFund || 0;
+                    const expenses = inputs.monthlyExpenses || inputs.currentMonthlyExpenses || 10000;
+                    const months = emergency / expenses;
+                    result.factors.emergencyFund = {
+                        score: months >= 6 ? 7 : Math.round(months * 7 / 6),
+                        details: {
+                            months,
+                            currentAmount: emergency,
+                            monthlyExpenses: expenses
+                        }
+                    };
+                } else {
+                    result.factors.emergencyFund = {
+                        score: 0,
+                        details: { status: 'missing_data' }
+                    };
+                }
+                
+                // Debt Management
+                result.factors.debtManagement = {
+                    score: 3, // Default to good if no debt specified
+                    details: {}
+                };
+                
+                // Calculate total
+                result.totalScore = Object.values(result.factors)
+                    .reduce((sum, factor) => sum + (factor.score || 0), 0);
+                
+                return result;
+            } catch (error) {
+                log(`Error in mock calculation: ${error.message}`, 'error');
+                return {
+                    totalScore: 0,
+                    factors: {},
+                    error: error.message
+                };
+            }
+        }
+        
+        // Run a single test
+        async function runTest(test) {
+            log(`Running test: ${test.name}`);
+            
+            const container = document.createElement('div');
+            container.className = 'test-container';
+            
+            const header = document.createElement('div');
+            header.className = 'test-header';
+            header.innerHTML = `
+                <h3>${test.name}</h3>
+                <span class="test-status running">Running...</span>
+            `;
+            container.appendChild(header);
+            
+            const resultsDiv = document.createElement('div');
+            container.appendChild(resultsDiv);
+            
+            testResults.appendChild(container);
+            
+            try {
+                // Calculate score
+                const result = mockCalculateFinancialHealthScore(test.inputs);
+                
+                // Display results
+                const scoreDisplay = document.createElement('div');
+                scoreDisplay.className = 'score-display';
+                scoreDisplay.innerHTML = `
+                    <div class="score-value">${result.totalScore}/100</div>
+                    <div>Overall Financial Health Score</div>
+                `;
+                resultsDiv.appendChild(scoreDisplay);
+                
+                // Component scores
+                const componentScores = document.createElement('div');
+                componentScores.className = 'component-scores';
+                
+                Object.entries(result.factors).forEach(([key, factor]) => {
+                    const componentDiv = document.createElement('div');
+                    componentDiv.className = 'component-score';
+                    
+                    // Get max weight for this factor
+                    const maxWeight = {
+                        savingsRate: 25,
+                        retirementReadiness: 20,
+                        timeHorizon: 15,
+                        riskAlignment: 12,
+                        diversification: 10,
+                        taxEfficiency: 8,
+                        emergencyFund: 7,
+                        debtManagement: 3
+                    }[key] || 10;
+                    
+                    const percentage = Math.round((factor.score / maxWeight) * 100);
+                    
+                    componentDiv.innerHTML = `
+                        <div class="component-score-value">${percentage}%</div>
+                        <div class="component-score-label">${key}</div>
+                    `;
+                    componentScores.appendChild(componentDiv);
+                });
+                resultsDiv.appendChild(componentScores);
+                
+                // Run assertions
+                let allPassed = true;
+                const assertions = [];
+                
+                // Check total score
+                if (test.expectedResults.totalScore) {
+                    const { min, max } = test.expectedResults.totalScore;
+                    const passed = result.totalScore >= min && result.totalScore <= max;
+                    assertions.push({
+                        name: 'Total Score',
+                        expected: `${min}-${max}`,
+                        actual: result.totalScore,
+                        passed
+                    });
+                    if (!passed) allPassed = false;
+                }
+                
+                // Check component scores
+                if (test.expectedResults.components) {
+                    Object.entries(test.expectedResults.components).forEach(([component, range]) => {
+                        const factor = result.factors[component];
+                        if (factor) {
+                            const maxWeight = {
+                                savingsRate: 25,
+                                retirementReadiness: 20,
+                                timeHorizon: 15,
+                                riskAlignment: 12,
+                                diversification: 10,
+                                taxEfficiency: 8,
+                                emergencyFund: 7,
+                                debtManagement: 3
+                            }[component] || 10;
+                            
+                            const percentage = Math.round((factor.score / maxWeight) * 100);
+                            const passed = percentage >= range.min && percentage <= range.max;
+                            
+                            assertions.push({
+                                name: component,
+                                expected: `${range.min}%-${range.max}%`,
+                                actual: `${percentage}%`,
+                                passed
+                            });
+                            if (!passed) allPassed = false;
+                        }
+                    });
+                }
+                
+                // Display assertions
+                const assertionsDiv = document.createElement('div');
+                assertionsDiv.style.marginTop = '20px';
+                
+                assertions.forEach(assertion => {
+                    const assertDiv = document.createElement('div');
+                    assertDiv.className = `test-result ${assertion.passed ? 'pass' : 'fail'}`;
+                    assertDiv.innerHTML = `
+                        <strong>${assertion.name}:</strong>
+                        Expected ${assertion.expected}, Got ${assertion.actual}
+                        ${assertion.passed ? '✓' : '✗'}
+                    `;
+                    assertionsDiv.appendChild(assertDiv);
+                });
+                resultsDiv.appendChild(assertionsDiv);
+                
+                // Debug info
+                const debugDiv = document.createElement('details');
+                debugDiv.style.marginTop = '20px';
+                debugDiv.innerHTML = `
+                    <summary>Debug Information</summary>
+                    <div class="debug-info">
+                        <strong>Inputs:</strong>
+                        <pre>${JSON.stringify(test.inputs, null, 2)}</pre>
+                        <strong>Results:</strong>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    </div>
+                `;
+                resultsDiv.appendChild(debugDiv);
+                
+                // Update status
+                const statusElement = header.querySelector('.test-status');
+                statusElement.className = `test-status ${allPassed ? 'pass' : 'fail'}`;
+                statusElement.textContent = allPassed ? 'PASSED' : 'FAILED';
+                
+                log(`Test ${test.name}: ${allPassed ? 'PASSED' : 'FAILED'}`, 
+                    allPassed ? 'info' : 'error');
+                
+                return allPassed;
+            } catch (error) {
+                const statusElement = header.querySelector('.test-status');
+                statusElement.className = 'test-status fail';
+                statusElement.textContent = 'ERROR';
+                
+                resultsDiv.innerHTML = `
+                    <div class="test-result fail">
+                        Error: ${error.message}
+                    </div>
+                `;
+                
+                log(`Test ${test.name} error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // Run test suites
+        async function runTestSuite(tests) {
+            testResults.innerHTML = '';
+            let passed = 0;
+            let failed = 0;
+            
+            for (const test of tests) {
+                const result = await runTest(test);
+                if (result) passed++;
+                else failed++;
+                
+                // Small delay between tests
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            // Summary
+            const summary = document.createElement('div');
+            summary.className = 'test-container';
+            summary.innerHTML = `
+                <h2>Test Summary</h2>
+                <div class="test-grid">
+                    <div class="score-display">
+                        <div class="score-value" style="color: #10b981">${passed}</div>
+                        <div>Tests Passed</div>
+                    </div>
+                    <div class="score-display">
+                        <div class="score-value" style="color: #ef4444">${failed}</div>
+                        <div>Tests Failed</div>
+                    </div>
+                    <div class="score-display">
+                        <div class="score-value">${Math.round(passed / (passed + failed) * 100)}%</div>
+                        <div>Success Rate</div>
+                    </div>
+                </div>
+            `;
+            testResults.insertBefore(summary, testResults.firstChild);
+            
+            log(`Test suite complete: ${passed} passed, ${failed} failed`, 
+                failed === 0 ? 'info' : 'warning');
+        }
+        
+        // Event handlers
+        document.getElementById('runAllTests').addEventListener('click', () => {
+            runTestSuite([...testSuite.individual, ...testSuite.couple]);
+        });
+        
+        document.getElementById('runIndividualTests').addEventListener('click', () => {
+            runTestSuite(testSuite.individual);
+        });
+        
+        document.getElementById('runCoupleTests').addEventListener('click', () => {
+            runTestSuite(testSuite.couple);
+        });
+        
+        document.getElementById('clearResults').addEventListener('click', () => {
+            testResults.innerHTML = '';
+            testLog.innerHTML = '';
+            log('Results cleared', 'info');
+        });
+        
+        // Initial message
+        log('Financial Health Score E2E Test Suite loaded', 'info');
+        log('Click "Run All Tests" to begin comprehensive testing', 'info');
+    </script>
+</body>
+</html>

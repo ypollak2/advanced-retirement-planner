@@ -1,0 +1,31 @@
+{
+  "passed": [
+    "Node.js version check",
+    "Version consistency",
+    "Full test suite",
+    "Secret scanner",
+    "Performance tests",
+    "Clean working directory",
+    "Correct branch"
+  ],
+  "failed": [],
+  "warnings": [
+    "NPM security audit",
+    "License compliance check"
+  ],
+  "testResults": {},
+  "versionInfo": {
+    "package": "7.5.10",
+    "versionFile": "7.5.10",
+    "readme": "7.5.10",
+    "buildDate": "2025-08-11",
+    "description": "Fixed 12 issues: Partner RSU fields, currency validation, LocalStorage restore, Missing Data Modal, API timeouts, mobile touch targets, age validation, and more"
+  },
+  "timestamp": "2025-08-11T15:10:05.013Z",
+  "summary": {
+    "ready": true,
+    "passedChecks": 7,
+    "failedChecks": 0,
+    "warnings": 2
+  }
+}

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Validation - Advanced Retirement Planner v7.3.1</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .test-card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .test-result {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .test-result.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-result.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .test-result.warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .test-result.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .icon {
+            font-size: 20px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .instructions {
+            background-color: #e6f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #b3d9ff;
+        }
+        .code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .summary {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .external-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .external-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 Production Validation Suite</h1>
+        <p>Advanced Retirement Planner - Version 7.3.1</p>
+        <p>Target URL: <a href="https://ypollak2.github.io/advanced-retirement-planner/" target="_blank" style="color: white;">https://ypollak2.github.io/advanced-retirement-planner/</a></p>
+    </div>
+
+    <div class="instructions">
+        <h3>📋 Validation Instructions</h3>
+        <p>This tool will validate the production deployment through multiple methods:</p>
+        <ol>
+            <li><strong>API Validation:</strong> Direct fetch requests to check availability</li>
+            <li><strong>Manual Browser Test:</strong> Opens the app in a new tab for manual verification</li>
+            <li><strong>Version Check:</strong> Fetches and validates version.json</li>
+            <li><strong>Service Worker Check:</strong> Verifies SW registration</li>
+        </ol>
+        <p><strong>Note:</strong> Due to browser security (CORS), some tests require manual verification in the opened tab.</p>
+    </div>
+
+    <div class="test-card">
+        <h2>Automated Tests</h2>
+        <button onclick="runAutomatedTests()">Run Automated Tests</button>
+        <div id="automatedResults"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>Manual Verification Checklist</h2>
+        <button onclick="openProductionSite()">Open Production Site</button>
+        <div id="manualChecklist" style="margin-top: 20px;"></div>
+    </div>
+
+    <div id="summary" style="display: none;"></div>
+
+    <script>
+        const PRODUCTION_URL = 'https://ypollak2.github.io/advanced-retirement-planner/';
+        const EXPECTED_VERSION = '7.3.1';
+        let testResults = {
+            automated: [],
+            manual: []
+        };
+
+        function addResult(container, message, type = 'info', icon = 'ℹ️') {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️',
+                info: 'ℹ️'
+            };
+            
+            resultDiv.innerHTML = `
+                <span class="icon">${icons[type] || icon}</span>
+                <span>${message}</span>
+            `;
+            
+            document.getElementById(container).appendChild(resultDiv);
+        }
+
+        async function runAutomatedTests() {
+            const container = document.getElementById('automatedResults');
+            container.innerHTML = '';
+            testResults.automated = [];
+            
+            // Test 1: Check site availability
+            try {
+                addResult('automatedResults', 'Checking site availability...', 'info');
+                const response = await fetch(PRODUCTION_URL, { mode: 'no-cors' });
+                addResult('automatedResults', 'Production site is accessible', 'success');
+                testResults.automated.push({ test: 'Site Availability', status: 'pass' });
+            } catch (error) {
+                addResult('automatedResults', 'Failed to access production site: ' + error.message, 'error');
+                testResults.automated.push({ test: 'Site Availability', status: 'fail' });
+            }
+            
+            // Test 2: Check version.json
+            try {
+                addResult('automatedResults', 'Fetching version information...', 'info');
+                const versionResponse = await fetch(PRODUCTION_URL + 'version.json');
+                if (versionResponse.ok) {
+                    const versionData = await versionResponse.json();
+                    if (versionData.version === EXPECTED_VERSION) {
+                        addResult('automatedResults', `Version ${EXPECTED_VERSION} confirmed in version.json`, 'success');
+                        testResults.automated.push({ test: 'Version Check', status: 'pass' });
+                    } else {
+                        addResult('automatedResults', `Version mismatch: expected ${EXPECTED_VERSION}, got ${versionData.version}`, 'error');
+                        testResults.automated.push({ test: 'Version Check', status: 'fail' });
+                    }
+                } else {
+                    throw new Error('Could not fetch version.json');
+                }
+            } catch (error) {
+                addResult('automatedResults', 'Could not verify version: ' + error.message, 'warning');
+                testResults.automated.push({ test: 'Version Check', status: 'warning' });
+            }
+            
+            // Test 3: Check critical resources
+            const criticalResources = [
+                'index.html',
+                'src/components/wizard/RetirementWizard.js',
+                'src/utils/retirementCalculations.js',
+                'src/utils/financialHealthEngine.js'
+            ];
+            
+            addResult('automatedResults', 'Checking critical resources...', 'info');
+            let resourcesPassed = 0;
+            
+            for (const resource of criticalResources) {
+                try {
+                    const response = await fetch(PRODUCTION_URL + resource + '?v=' + EXPECTED_VERSION, { mode: 'no-cors' });
+                    resourcesPassed++;
+                } catch (error) {
+                    addResult('automatedResults', `Failed to load: ${resource}`, 'warning');
+                }
+            }
+            
+            if (resourcesPassed === criticalResources.length) {
+                addResult('automatedResults', `All ${criticalResources.length} critical resources are accessible`, 'success');
+                testResults.automated.push({ test: 'Critical Resources', status: 'pass' });
+            } else {
+                addResult('automatedResults', `${resourcesPassed}/${criticalResources.length} critical resources loaded`, 'warning');
+                testResults.automated.push({ test: 'Critical Resources', status: 'warning' });
+            }
+            
+            // Test 4: Check service worker
+            try {
+                addResult('automatedResults', 'Checking service worker...', 'info');
+                const swResponse = await fetch(PRODUCTION_URL + 'sw.js', { mode: 'no-cors' });
+                addResult('automatedResults', 'Service worker file is accessible', 'success');
+                testResults.automated.push({ test: 'Service Worker', status: 'pass' });
+            } catch (error) {
+                addResult('automatedResults', 'Service worker not accessible', 'warning');
+                testResults.automated.push({ test: 'Service Worker', status: 'warning' });
+            }
+            
+            // Show summary
+            showAutomatedSummary();
+        }
+
+        function showAutomatedSummary() {
+            const passed = testResults.automated.filter(r => r.status === 'pass').length;
+            const total = testResults.automated.length;
+            const type = passed === total ? 'success' : passed > 0 ? 'warning' : 'error';
+            
+            addResult('automatedResults', '', 'info');
+            addResult('automatedResults', `Automated Tests Complete: ${passed}/${total} passed`, type);
+        }
+
+        function openProductionSite() {
+            // Open in new tab
+            window.open(PRODUCTION_URL, '_blank');
+            
+            // Show manual checklist
+            const checklist = document.getElementById('manualChecklist');
+            checklist.innerHTML = `
+                <h3>Please verify the following in the opened tab:</h3>
+                <div class="test-result info">
+                    <span class="icon">📋</span>
+                    <div>
+                        <strong>Version Display:</strong> Check that the version shows as <code>v${EXPECTED_VERSION}</code> in the UI
+                    </div>
+                </div>
+                <div class="test-result info">
+                    <span class="icon">🧙</span>
+                    <div>
+                        <strong>Retirement Wizard:</strong> Click "Start Planning" and verify the wizard loads without errors
+                    </div>
+                </div>
+                <div class="test-result info">
+                    <span class="icon">🔧</span>
+                    <div>
+                        <strong>Console Errors:</strong> Open DevTools (F12) and check the Console tab for any red errors
+                    </div>
+                </div>
+                <div class="test-result info">
+                    <span class="icon">💾</span>
+                    <div>
+                        <strong>Data Persistence:</strong> Enter some data in the wizard and refresh - data should persist
+                    </div>
+                </div>
+                <div class="test-result info">
+                    <span class="icon">🌐</span>
+                    <div>
+                        <strong>Language Switch:</strong> Toggle between Hebrew and English using the language selector
+                    </div>
+                </div>
+                <div class="test-result info">
+                    <span class="icon">💱</span>
+                    <div>
+                        <strong>Currency Selector:</strong> Verify all 6 currencies are available (ILS, USD, EUR, GBP, BTC, ETH)
+                    </div>
+                </div>
+                <div class="test-result info">
+                    <span class="icon">♿</span>
+                    <div>
+                        <strong>Keyboard Navigation:</strong> Try navigating with Tab key and Alt+Arrow keys in the wizard
+                    </div>
+                </div>
+                <div class="test-result info">
+                    <span class="icon">📊</span>
+                    <div>
+                        <strong>Financial Health Score:</strong> Complete enough wizard steps to see if the score calculates
+                    </div>
+                </div>
+            `;
+            
+            // Add report button
+            const reportBtn = document.createElement('button');
+            reportBtn.textContent = 'Report Manual Test Results';
+            reportBtn.style.marginTop = '20px';
+            reportBtn.onclick = showManualTestForm;
+            checklist.appendChild(reportBtn);
+        }
+
+        function showManualTestForm() {
+            const checklist = document.getElementById('manualChecklist');
+            const form = document.createElement('div');
+            form.style.marginTop = '20px';
+            form.innerHTML = `
+                <h3>Quick Manual Test Report:</h3>
+                <div class="test-result info">
+                    <label>
+                        <input type="checkbox" id="versionOk"> Version shows as v${EXPECTED_VERSION}
+                    </label>
+                </div>
+                <div class="test-result info">
+                    <label>
+                        <input type="checkbox" id="wizardOk"> Retirement Wizard loads without errors
+                    </label>
+                </div>
+                <div class="test-result info">
+                    <label>
+                        <input type="checkbox" id="noConsoleErrors"> No critical console errors (non-React warnings)
+                    </label>
+                </div>
+                <div class="test-result info">
+                    <label>
+                        <input type="checkbox" id="persistenceOk"> Data persists after refresh
+                    </label>
+                </div>
+                <div class="test-result info">
+                    <label>
+                        <input type="checkbox" id="languageOk"> Language switching works
+                    </label>
+                </div>
+                <div class="test-result info">
+                    <label>
+                        <input type="checkbox" id="currencyOk"> All currencies available
+                    </label>
+                </div>
+                <button onclick="submitManualResults()" style="margin-top: 10px;">Submit Results</button>
+            `;
+            checklist.appendChild(form);
+        }
+
+        function submitManualResults() {
+            const checks = [
+                { id: 'versionOk', name: 'Version Display' },
+                { id: 'wizardOk', name: 'Wizard Loading' },
+                { id: 'noConsoleErrors', name: 'Console Errors' },
+                { id: 'persistenceOk', name: 'Data Persistence' },
+                { id: 'languageOk', name: 'Language Switch' },
+                { id: 'currencyOk', name: 'Currency Selector' }
+            ];
+            
+            testResults.manual = [];
+            let passed = 0;
+            
+            checks.forEach(check => {
+                const isChecked = document.getElementById(check.id).checked;
+                testResults.manual.push({
+                    test: check.name,
+                    status: isChecked ? 'pass' : 'fail'
+                });
+                if (isChecked) passed++;
+            });
+            
+            showFinalSummary(passed, checks.length);
+        }
+
+        function showFinalSummary(manualPassed, manualTotal) {
+            const summaryDiv = document.getElementById('summary');
+            summaryDiv.style.display = 'block';
+            
+            const automatedPassed = testResults.automated.filter(r => r.status === 'pass').length;
+            const automatedTotal = testResults.automated.length;
+            
+            const totalPassed = automatedPassed + manualPassed;
+            const totalTests = automatedTotal + manualTotal;
+            
+            const overallStatus = totalPassed === totalTests ? 'SUCCESS' : 
+                                 totalPassed > totalTests * 0.7 ? 'PARTIAL SUCCESS' : 'NEEDS ATTENTION';
+            
+            summaryDiv.className = 'summary';
+            summaryDiv.innerHTML = `
+                <h2>📊 Production Validation Summary</h2>
+                <p style="font-size: 24px; margin: 20px 0;">
+                    <strong>${overallStatus}</strong>
+                </p>
+                <p style="font-size: 18px;">
+                    Total Tests Passed: ${totalPassed}/${totalTests} (${Math.round(totalPassed/totalTests * 100)}%)
+                </p>
+                <div style="display: flex; justify-content: center; gap: 40px; margin-top: 20px;">
+                    <div>
+                        <strong>Automated:</strong> ${automatedPassed}/${automatedTotal}
+                    </div>
+                    <div>
+                        <strong>Manual:</strong> ${manualPassed}/${manualTotal}
+                    </div>
+                </div>
+                <p style="margin-top: 20px;">
+                    <strong>Version:</strong> ${EXPECTED_VERSION}<br>
+                    <strong>Validated:</strong> ${new Date().toLocaleString()}
+                </p>
+            `;
+            
+            // Log for records
+            console.log('Production Validation Results:', {
+                overall: overallStatus,
+                automated: testResults.automated,
+                manual: testResults.manual,
+                timestamp: new Date().toISOString()
+            });
+        }
+    </script>
+</body>
+</html>

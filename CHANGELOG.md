@@ -6,6 +6,80 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [8.0.0] - 2025-08-12 - MAJOR ARCHITECTURAL REORGANIZATION 🏗️
+
+### 🚀 **Major Changes**
+- **Complete Repository Reorganization**: Modularized all files over 800 lines into smaller, manageable modules
+- **File Structure Overhaul**: Split 7 large files into 46 focused modules for better Claude Code compatibility
+- **Clean Repository Structure**: Organized 63 loose test files into proper directories
+- **Documentation Cleanup**: Condensed README.md and moved version history to CHANGELOG.md
+
+### 🏗️ **Architectural Changes**
+- **Modularized Components**:
+  - `financialHealthEngine.js` (3,072 lines) → 7 modules with compatibility layer
+  - `RetirementPlannerApp.js` (2,055 lines) → 4 modules with better separation of concerns
+  - `retirementCalculations.js` (1,840 lines) → 3 modules with cleaner interfaces
+  - `additionalIncomeTax.js` (1,283 lines) → 4 modules with focused responsibilities
+  - `RetirementWizard.js` (1,047 lines) → 3 modules with improved state management
+  - `WizardStepReview.js` (973 lines) → 3 modules with better organization
+  - `Dashboard.js` (905 lines) → 3 modules with cleaner separation
+
+### 🧹 **Repository Organization**
+- **Created New Directory Structure**:
+  - `tests/html/e2e/` - End-to-end test HTML files
+  - `tests/html/debug/` - Debug and troubleshooting HTML files
+  - `tests/html/validation/` - Validation test HTML files
+  - `tests/html/deployment/` - Post-deployment verification tests
+  - `tests/fixtures/` - JavaScript test fixtures
+  - `scripts/debug/` - Debug scripts
+  - `docs/deployment/` - Deployment documentation
+  - `docs/tickets/` - Completed ticket documentation
+
+### 🐛 **Bug Fixes**
+- **Fixed Component Loading Race Condition**: Added robust loading check in RetirementWizard for WizardStep component
+- **Fixed Version Display**: Updated all files from v7.5.11 to v8.0.0
+- **Fixed React Component Error**: Resolved "Element type is invalid" error preventing app from loading
+
+### ✅ **Quality Assurance**
+- **100% Test Pass Rate**: All 374 tests passing (increased from 245)
+- **Backward Compatibility**: All existing functionality preserved through compatibility layers
+- **No Breaking Changes**: Modularization done with careful preservation of APIs
+
+### 📚 **Documentation Updates**
+- **Condensed README.md**: Reduced from 872 lines to focused content
+- **Comprehensive CHANGELOG**: Moved all version history from README to CHANGELOG
+- **Updated Project Structure**: Added PROJECT_STRUCTURE.md documenting new organization
+
+### 🔧 **Technical Details**
+- **Module Pattern**: Used IIFE with window exports for all modules
+- **Dynamic Loading**: Enhanced dynamic loader for modular components
+- **Test Infrastructure**: Updated test-module-helper.js for modular architecture
+- **Version Management**: Updated version to 8.0.0 across all 15 file references
+
+---
+
+## [7.5.11] - 2025-08-11 - Emergency Fund & Management Fees Calculator
+
+### 🚀 **Added**
+- **Emergency Fund Calculator**: New comprehensive emergency fund planning tool
+- **Management Fees Breakdown**: Detailed fee analysis and projection tool
+- **RSU Tax Rate Input**: Added manual tax rate input for RSU income
+- **Manual Stock Entry**: Added manual stock price and units input for RSU custom mode
+
+### 🐛 **Fixed**
+- **Salary & Income Calculations**: Fixed manual entry mode income calculation issues
+- **Component Loading**: Resolved race conditions in component initialization
+
+---
+
+## [7.5.10] - 2025-08-11 - Salary Income Page Fixes
+
+### 🐛 **Fixed**
+- **Salary & Income Page**: Resolved critical calculation issues
+- **Manual Entry Mode**: Fixed income calculation in manual entry scenarios
+
+---
+
 ## [7.5.9] - 2025-08-01 - Test Release with Pre-filled Data
 ### 🧪 **Testing Features**
 - **Test Data Initializer**:
@@ -1465,7 +1539,62 @@ This changelog is automatically updated with each release and should be:
 
 ---
 
-**Last Updated**: July 22, 2025  
-**Current Version**: v6.5.1  
+## [7.4.8] - 2025-07-31 - Financial Health Scoring & Export Fixes
+
+### 🔧 **Fixed**
+- **Financial Health Scoring Field Detection** - Resolved 0% scores for critical factors
+  - Fixed Savings Rate calculation - Now properly detects partner salaries and contribution rates
+  - Fixed Risk Alignment calculation - Enhanced risk tolerance and stock percentage detection
+  - Fixed Tax Efficiency calculation - Improved country and age field detection
+  - Added comprehensive field mapping patch to handle wizard field name variations
+- **Export Functionality** - Fixed CDN loading errors for html2canvas and jsPDF
+  - Added fallback CDNs for both PNG and PDF export libraries
+  - Improved error handling with retry logic
+  - Added CORS headers for cross-origin resource loading
+
+### 📊 **Improvements**
+- Enhanced field detection with patched scoring functions
+- Better debugging output for field mapping issues
+- More resilient export functionality with multiple CDN sources
+- Clearer error messages when exports fail
+
+---
+
+## [7.4.7] - 2025-07-31 - Contribution Rate Field Mapping & Portfolio Tax Fixes
+
+### 🔧 **Fixed**
+- **Contribution Rate Field Mapping** - Fixed 0% scores for Savings Rate, Risk Alignment, and Tax Efficiency
+  - Added support for `pensionEmployeeContribution` and `trainingFundEmployeeContribution` field names
+  - Enhanced field mapping in both tax efficiency and savings rate calculations
+  - Now properly detects contribution rates from wizard inputs
+- **Personal Portfolio Tax Slider** - Fixed tax changes not affecting total savings display
+  - Total savings now recalculates when portfolio tax rate changes
+  - Applied net value calculation to all portfolio displays (main and partners)
+  - Tax properly reflected in wizard total savings summary
+
+### 📊 **Improvements**
+- Better field name compatibility between wizard and calculations
+- Enhanced portfolio tax handling across all components
+- Consistent net value display after tax deductions
+
+---
+
+## [7.4.2] - 2025-07-31 - UI Stability Fix
+
+### 🐛 **Fixed**
+- **WizardStepSavings Component Error**
+  - Fixed createElement syntax error causing component crash
+  - Corrected missing comma in array structure
+  - Component now renders properly without errors
+
+### 🔧 **Enhanced**
+- Fixed portfolio tax rate validation consistency
+- Tax rates properly handled as percentages (0-50)
+- Validation messages display correctly
+
+---
+
+**Last Updated**: August 12, 2025  
+**Current Version**: v8.0.0  
 **Maintainer**: Yali Pollak (יהלי פולק)  
 **Repository**: [Advanced Retirement Planner](https://github.com/ypollak2/advanced-retirement-planner)

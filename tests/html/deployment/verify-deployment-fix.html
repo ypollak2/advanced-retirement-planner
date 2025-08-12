@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Deployment Fix - Portfolio Tax</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        .test-case {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            border: 2px solid #dee2e6;
+        }
+        .result {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+        .details {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background: #0056b3; }
+        #status {
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .loading { background: #cfe2ff; color: #084298; }
+        .complete { background: #d1e7dd; color: #0f5132; }
+        .failed { background: #f8d7da; color: #842029; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Verify Portfolio Tax Fix Deployment</h1>
+        <p>This test will verify if the portfolio tax calculation fix is properly deployed.</p>
+        
+        <div id="status" class="loading">Loading retirement calculator...</div>
+        
+        <button onclick="runTest()" id="testButton" disabled>Run Test</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Load the retirement calculations directly
+        const script = document.createElement('script');
+        script.src = 'https://ypollak2.github.io/advanced-retirement-planner/src/utils/retirementCalculations.js?v=7.3.6&t=' + Date.now();
+        script.onload = () => {
+            document.getElementById('status').textContent = 'Calculator loaded! Click Run Test to verify fix.';
+            document.getElementById('status').className = 'complete';
+            document.getElementById('testButton').disabled = false;
+        };
+        script.onerror = () => {
+            document.getElementById('status').textContent = 'Failed to load calculator. Check console for errors.';
+            document.getElementById('status').className = 'failed';
+        };
+        document.head.appendChild(script);
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'ILS',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function runTest() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            
+            // Test Case 1: Individual mode with 25% tax
+            const testCase1 = document.createElement('div');
+            testCase1.className = 'test-case';
+            testCase1.innerHTML = '<h3>Test Case 1: Individual Mode - 25% Tax</h3>';
+            
+            try {
+                const inputs1 = {
+                    planningType: 'individual',
+                    currentAge: 35,
+                    retirementAge: 65,
+                    currentSalary: 10000,
+                    currentPersonalPortfolio: 1000000,
+                    portfolioTaxRate: 25,
+                    personalPortfolioMonthly: 0,
+                    personalPortfolioReturn: 7,
+                    currentPensionSavings: 0,
+                    currentTrainingFund: 0,
+                    inflationRate: 2,
+                    country: 'israel'
+                };
+                
+                const result1 = window.calculateRetirement(inputs1);
+                const portfolioValue = result1.personalPortfolioValue || 0;
+                const expectedValue = 750000; // 1,000,000 * (1 - 0.25)
+                
+                testCase1.innerHTML += `
+                    <div class="details">
+                        Input Portfolio: ${formatCurrency(1000000)}
+                        <br>Tax Rate: 25%
+                        <br>Expected Net: ${formatCurrency(expectedValue)}
+                        <br>Actual Value: ${formatCurrency(portfolioValue)}
+                    </div>
+                `;
+                
+                // Check if value is correct (allowing for compound growth)
+                const baseValue = 750000;
+                const years = 30;
+                const monthlyReturn = 0.07 / 12;
+                const months = years * 12;
+                const expectedWithGrowth = baseValue * Math.pow(1 + monthlyReturn, months);
+                
+                if (portfolioValue < 900000) {
+                    // If less than 900k, tax was likely applied
+                    testCase1.innerHTML += '<div class="result success">✅ Tax appears to be applied correctly!</div>';
+                    testCase1.innerHTML += `<div class="details">After 30 years of growth: ${formatCurrency(portfolioValue)}</div>`;
+                } else {
+                    testCase1.innerHTML += '<div class="result error">❌ Tax NOT applied - value too high!</div>';
+                    testCase1.innerHTML += '<div class="details">The portfolio value suggests tax was not deducted from principal.</div>';
+                }
+                
+            } catch (error) {
+                testCase1.innerHTML += `<div class="result error">❌ Error: ${error.message}</div>`;
+            }
+            
+            resultsDiv.appendChild(testCase1);
+            
+            // Test Case 2: Individual mode with 30% tax
+            const testCase2 = document.createElement('div');
+            testCase2.className = 'test-case';
+            testCase2.innerHTML = '<h3>Test Case 2: Individual Mode - 30% Tax</h3>';
+            
+            try {
+                const inputs2 = {
+                    planningType: 'individual',
+                    currentAge: 35,
+                    retirementAge: 65,
+                    currentSalary: 10000,
+                    currentPersonalPortfolio: 1000000,
+                    portfolioTaxRate: 30,
+                    personalPortfolioMonthly: 0,
+                    personalPortfolioReturn: 7,
+                    currentPensionSavings: 0,
+                    currentTrainingFund: 0,
+                    inflationRate: 2,
+                    country: 'israel'
+                };
+                
+                const result2 = window.calculateRetirement(inputs2);
+                const portfolioValue2 = result2.personalPortfolioValue || 0;
+                const expectedValue2 = 700000; // 1,000,000 * (1 - 0.30)
+                
+                testCase2.innerHTML += `
+                    <div class="details">
+                        Input Portfolio: ${formatCurrency(1000000)}
+                        <br>Tax Rate: 30%
+                        <br>Expected Net: ${formatCurrency(expectedValue2)}
+                        <br>Actual Value: ${formatCurrency(portfolioValue2)}
+                    </div>
+                `;
+                
+                if (portfolioValue2 < 850000) {
+                    // If less than 850k, tax was likely applied
+                    testCase2.innerHTML += '<div class="result success">✅ Tax appears to be applied correctly!</div>';
+                    testCase2.innerHTML += `<div class="details">After 30 years of growth: ${formatCurrency(portfolioValue2)}</div>`;
+                } else {
+                    testCase2.innerHTML += '<div class="result error">❌ Tax NOT applied - value too high!</div>';
+                }
+                
+            } catch (error) {
+                testCase2.innerHTML += `<div class="result error">❌ Error: ${error.message}</div>`;
+            }
+            
+            resultsDiv.appendChild(testCase2);
+            
+            // Summary
+            const summary = document.createElement('div');
+            summary.className = 'test-case';
+            summary.style.background = '#e7f3ff';
+            summary.innerHTML = `
+                <h3>📊 Summary</h3>
+                <p>If both tests show ✅, the fix is properly deployed.</p>
+                <p>If tests show ❌, try:</p>
+                <ul>
+                    <li>Clear browser cache (Ctrl+Shift+R)</li>
+                    <li>Check if service worker needs update</li>
+                    <li>Wait 5-10 minutes for CDN cache to refresh</li>
+                </ul>
+                <p><strong>App Version:</strong> ${window.APP_VERSION || 'Unknown'}</p>
+            `;
+            resultsDiv.appendChild(summary);
+        }
+    </script>
+</body>
+</html>

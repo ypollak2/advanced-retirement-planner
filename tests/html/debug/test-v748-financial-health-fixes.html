@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>v7.4.8 Financial Health Fixes Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .warning {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        .info {
+            color: #007bff;
+            margin: 10px 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .score-card {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .total-score {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        pre {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>v7.4.8 Financial Health Scoring Fixes Test</h1>
+    
+    <div class="test-container">
+        <h2>Test Overview</h2>
+        <p>This test verifies that the v7.4.8 fixes resolve the financial health scoring issues:</p>
+        <ul>
+            <li>✅ Savings Rate score calculation (was returning 0/25)</li>
+            <li>✅ Risk Alignment score calculation (was returning 0/12)</li>
+            <li>✅ Tax Efficiency score calculation (was returning 0/8)</li>
+            <li>✅ Export functionality (html2canvas/jsPDF loading errors)</li>
+        </ul>
+        
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="testExportFunctionality()">Test Export Functions</button>
+    </div>
+
+    <div id="results" class="test-container" style="display: none;">
+        <h2>Test Results</h2>
+        <div id="resultsContent"></div>
+    </div>
+
+    <!-- Load all required scripts in correct order -->
+    <script src="src/utils/financialHealthEngine.js?v=7.4.8"></script>
+    <script src="src/utils/fieldMappingBridge.js?v=7.4.8"></script>
+    <script src="src/utils/fieldMappingDictionary.js?v=7.4.8"></script>
+    <script src="src/utils/financialHealthFieldPatch.js?v=7.4.8"></script>
+    <script src="src/utils/exportFunctions.js?v=7.4.8"></script>
+    
+    <script>
+        // Test data that matches actual wizard field names
+        const testScenarios = {
+            coupleComplete: {
+                name: 'Couple Mode - Complete Data',
+                inputs: {
+                    // Basic info
+                    planningType: 'couple',
+                    currentAge: 35,
+                    retirementAge: 65,
+                    
+                    // Partner salaries (actual field names from wizard)
+                    partner1Salary: 24000,
+                    partner2Salary: 20000,
+                    partner1NetSalary: 17000,
+                    partner2NetSalary: 14000,
+                    
+                    // Contribution rates (actual field names from wizard)
+                    employeePensionRate: 6.5,
+                    employerPensionRate: 6.5,
+                    trainingFundContributionRate: 10.0,
+                    
+                    // Current savings
+                    currentSavings: 200000,  // Wizard uses currentSavings
+                    currentPensionSavings: 200000,  // Engine expects this
+                    currentTrainingFund: 80000,
+                    currentPersonalPortfolio: 150000,
+                    
+                    // Risk and tax fields
+                    riskTolerance: 'moderate',
+                    stockPercentage: 60,
+                    taxCountry: 'israel',
+                    country: 'israel',
+                    
+                    // Expenses
+                    currentMonthlyExpenses: 25000,
+                    expenses: {
+                        housing: 8000,
+                        transport: 3000,
+                        food: 4000,
+                        healthcare: 1000,
+                        entertainment: 2000,
+                        other: 7000
+                    }
+                }
+            },
+            individualComplete: {
+                name: 'Individual Mode - Complete Data',
+                inputs: {
+                    planningType: 'individual',
+                    currentAge: 35,
+                    retirementAge: 65,
+                    currentMonthlySalary: 15000,
+                    employeePensionRate: 6.5,
+                    employerPensionRate: 6.5,
+                    trainingFundContributionRate: 10.0,
+                    currentPensionSavings: 150000,
+                    currentTrainingFund: 50000,
+                    currentPersonalPortfolio: 100000,
+                    riskTolerance: 'moderate',
+                    stockPercentage: 60,
+                    taxCountry: 'israel',
+                    currentMonthlyExpenses: 12000
+                }
+            }
+        };
+
+        async function runAllTests() {
+            console.clear();
+            console.log('🚀 Running v7.4.8 Financial Health Fixes Tests...');
+            
+            const results = document.getElementById('results');
+            const resultsContent = document.getElementById('resultsContent');
+            results.style.display = 'block';
+            
+            let html = '<h3>Test Results</h3>';
+            
+            // Test each scenario
+            for (const [key, scenario] of Object.entries(testScenarios)) {
+                html += `<div class="score-card">
+                    <h4>${scenario.name}</h4>`;
+                
+                try {
+                    // Calculate financial health score
+                    const scoreResult = window.calculateFinancialHealthScore(scenario.inputs);
+                    
+                    // Display total score
+                    html += `<div class="total-score">${scoreResult.totalScore}/100</div>`;
+                    
+                    // Display factor breakdown
+                    html += '<h5>Score Breakdown:</h5>';
+                    html += '<div class="grid">';
+                    
+                    const criticalFactors = ['savingsRate', 'riskAlignment', 'taxEfficiency'];
+                    
+                    Object.entries(scoreResult.factors).forEach(([name, factor]) => {
+                        const isCritical = criticalFactors.includes(name);
+                        const statusClass = factor.score === 0 ? 'error' : 
+                                          factor.score < factor.weight * 0.5 ? 'warning' : 'success';
+                        const icon = factor.score === 0 ? '❌' : 
+                                   factor.score < factor.weight * 0.5 ? '⚠️' : '✅';
+                        
+                        html += `<div style="${isCritical ? 'border: 2px solid #ff6b6b;' : ''}">
+                            <strong>${name}:</strong> 
+                            <span class="${statusClass}">${icon} ${factor.score}/${factor.weight || 0}</span>
+                            <br>Status: ${factor.details?.status || 'unknown'}
+                            ${factor.details?.debugInfo ? 
+                                `<pre>${JSON.stringify(factor.details.debugInfo, null, 2)}</pre>` : ''}
+                        </div>`;
+                    });
+                    
+                    html += '</div>';
+                    
+                    // Check if critical issues are fixed
+                    const savingsRateFixed = scoreResult.factors.savingsRate?.score > 0;
+                    const riskAlignmentFixed = scoreResult.factors.riskAlignment?.score > 0;
+                    const taxEfficiencyFixed = scoreResult.factors.taxEfficiency?.score > 0;
+                    
+                    html += '<h5>Critical Issues Status:</h5>';
+                    html += `<div class="${savingsRateFixed ? 'success' : 'error'}">
+                        ${savingsRateFixed ? '✅' : '❌'} Savings Rate Score: ${scoreResult.factors.savingsRate?.score || 0}/25
+                    </div>`;
+                    html += `<div class="${riskAlignmentFixed ? 'success' : 'error'}">
+                        ${riskAlignmentFixed ? '✅' : '❌'} Risk Alignment Score: ${scoreResult.factors.riskAlignment?.score || 0}/12
+                    </div>`;
+                    html += `<div class="${taxEfficiencyFixed ? 'success' : 'error'}">
+                        ${taxEfficiencyFixed ? '✅' : '❌'} Tax Efficiency Score: ${scoreResult.factors.taxEfficiency?.score || 0}/8
+                    </div>`;
+                    
+                } catch (error) {
+                    html += `<div class="error">❌ Error: ${error.message}</div>`;
+                    console.error('Test error:', error);
+                }
+                
+                html += '</div>';
+            }
+            
+            resultsContent.innerHTML = html;
+        }
+
+        async function testExportFunctionality() {
+            console.log('🧪 Testing Export Functionality...');
+            
+            const resultsContent = document.getElementById('resultsContent');
+            let html = '<h3>Export Functionality Test</h3>';
+            
+            try {
+                // Test PNG export
+                html += '<div class="score-card"><h4>PNG Export Test</h4>';
+                try {
+                    await window.exportAsImage('PNG');
+                    html += '<div class="success">✅ PNG export successful</div>';
+                } catch (error) {
+                    html += `<div class="error">❌ PNG export failed: ${error.message}</div>`;
+                }
+                html += '</div>';
+                
+                // Test PDF export
+                html += '<div class="score-card"><h4>PDF Export Test</h4>';
+                try {
+                    await window.exportAsImage('PDF');
+                    html += '<div class="success">✅ PDF export successful</div>';
+                } catch (error) {
+                    html += `<div class="error">❌ PDF export failed: ${error.message}</div>`;
+                }
+                html += '</div>';
+                
+                // Test LLM export
+                html += '<div class="score-card"><h4>LLM Export Test</h4>';
+                try {
+                    const llmData = window.exportForLLMAnalysis();
+                    if (llmData) {
+                        html += '<div class="success">✅ LLM export successful</div>';
+                        html += `<pre>${JSON.stringify(llmData, null, 2).slice(0, 500)}...</pre>`;
+                    }
+                } catch (error) {
+                    html += `<div class="error">❌ LLM export failed: ${error.message}</div>`;
+                }
+                html += '</div>';
+                
+            } catch (error) {
+                html += `<div class="error">❌ Export test error: ${error.message}</div>`;
+            }
+            
+            document.getElementById('results').style.display = 'block';
+            resultsContent.innerHTML = html;
+        }
+
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            console.log('✅ v7.4.8 Test Page Loaded');
+            console.log('🔧 Patch Status:', window.patchFinancialHealthEngine ? 'Available' : 'Not loaded');
+            
+            // Apply patch if available
+            if (window.patchFinancialHealthEngine) {
+                window.patchFinancialHealthEngine();
+            }
+            
+            // Run tests after a short delay
+            setTimeout(() => {
+                runAllTests();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
