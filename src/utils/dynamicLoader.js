@@ -1,5 +1,5 @@
 // Dynamic Component Loader for Code Splitting
-// Created by Yali Pollak (יהלי פולק) - v6.1.0
+// Created by Yali Pollak (יהלי פולק) - v8.0.0
 
 // Cache for loaded components
 const componentCache = new Map();
@@ -8,17 +8,19 @@ const loadingPromises = new Map();
 // Component paths for lazy loading
 const COMPONENT_PATHS = {
     // Wizard Steps (loaded on demand)
-    'WizardStep': '/src/components/WizardStep.js',
-    'WizardStepPersonal': '/src/components/WizardStepPersonal.js',
-    'WizardStepSalary': '/src/components/WizardStepSalary.js',
-    'WizardStepSavings': '/src/components/WizardStepSavings.js',
-    'WizardStepContributions': '/src/components/WizardStepContributions.js',
-    'WizardStepFees': '/src/components/WizardStepFees.js',
-    'WizardStepRiskProfile': '/src/components/WizardStepRiskProfile.js',
-    'WizardStepInheritance': '/src/components/WizardStepInheritance.js',
-    'WizardStepInvestments': '/src/components/WizardStepInvestments.js',
-    'WizardStepGoals': '/src/components/WizardStepGoals.js',
-    'WizardStepReview': '/src/components/WizardStepReview.js',
+    'WizardStep': '/src/components/wizard/WizardStep.js',
+    'WizardStepPersonal': '/src/components/wizard/steps/WizardStepPersonal.js',
+    'WizardStepSalary': '/src/components/wizard/steps/WizardStepSalary.js',
+    'WizardStepSavings': '/src/components/wizard/steps/WizardStepSavings.js',
+    'WizardStepContributions': '/src/components/wizard/steps/WizardStepContributions.js',
+    'WizardStepFees': '/src/components/wizard/steps/WizardStepFees.js',
+    'WizardStepRiskProfile': '/src/components/wizard/steps/WizardStepRiskProfile.js',
+    'WizardStepInheritance': '/src/components/wizard/steps/WizardStepInheritance.js',
+    'WizardStepInvestments': '/src/components/wizard/steps/WizardStepInvestments.js',
+    'WizardStepGoals': '/src/components/wizard/steps/WizardStepGoals.js',
+    'WizardStepReview': '/src/components/wizard/steps/WizardStepReview.js',
+    'WizardStepExpenses': '/src/components/wizard/steps/WizardStepExpenses.js',
+    'WizardStepTaxes': '/src/components/wizard/steps/WizardStepTaxes.js',
     
     // Dashboard Components (loaded on demand)
     'SummaryPanel': '/src/components/SummaryPanel.js',
