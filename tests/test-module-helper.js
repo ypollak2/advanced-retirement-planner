@@ -120,6 +120,24 @@ window.InputValidation = {
     },
     validateRequired: function(value) {
         return value !== null && value !== undefined && value !== '';
+    },
+    validators: {
+        number: function(input, options) {
+            const num = parseFloat(input);
+            if (isNaN(num)) {
+                return { valid: false, value: options.min || 0 };
+            }
+            
+            if (num < (options.min || 0)) {
+                return { valid: false, value: options.min || 0 };
+            }
+            
+            if (num > (options.max || Infinity)) {
+                return { valid: false, value: options.max || 100 };
+            }
+            
+            return { valid: true, value: num };
+        }
     }
 };
 
