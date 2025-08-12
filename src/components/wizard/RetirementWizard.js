@@ -54,6 +54,7 @@ const RetirementWizard = ({
     const [skippedSteps, setSkippedSteps] = React.useState(savedData?.progress?.skippedSteps || []);
     const [showSaveNotification, setShowSaveNotification] = React.useState(false);
     const [lastSaved, setLastSaved] = React.useState(savedData?.progress?.lastSaved || null);
+    const [isWizardStepLoaded, setIsWizardStepLoaded] = React.useState(!!window.WizardStep);
     
     // Use refs to store current values and prevent infinite loops
     const currentStepRef = React.useRef(currentStep);
@@ -71,6 +72,26 @@ const RetirementWizard = ({
             }));
         }
     }, []); // Run only on mount
+    
+    // Check if WizardStep is loaded
+    React.useEffect(() => {
+        if (!isWizardStepLoaded && window.WizardStep) {
+            setIsWizardStepLoaded(true);
+        } else if (!isWizardStepLoaded) {
+            // Poll for WizardStep to be loaded
+            const checkInterval = setInterval(() => {
+                if (window.WizardStep) {
+                    setIsWizardStepLoaded(true);
+                    clearInterval(checkInterval);
+                }
+            }, 100);
+            
+            // Clear interval after 5 seconds to prevent memory leak
+            setTimeout(() => clearInterval(checkInterval), 5000);
+            
+            return () => clearInterval(checkInterval);
+        }
+    }, [isWizardStepLoaded]);
     
     // Update refs when values change
     React.useEffect(() => {
@@ -613,7 +634,7 @@ const RetirementWizard = ({
         ]),
 
         // Current Step
-        React.createElement(window.WizardStep, {
+        isWizardStepLoaded && window.WizardStep ? React.createElement(window.WizardStep, {
             key: 'current-step',
             stepNumber: currentStep,
             totalSteps: totalSteps,
@@ -628,7 +649,19 @@ const RetirementWizard = ({
             isLast: currentStep === totalSteps,
             language: language,
             progressPercent: getProgressPercent(currentStep)
-        }, renderStepContent())
+        }, renderStepContent()) : React.createElement('div', {
+            key: 'loading-wizard-step',
+            className: 'text-center py-8'
+        }, [
+            React.createElement('div', {
+                key: 'spinner',
+                className: 'animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4'
+            }),
+            React.createElement('p', {
+                key: 'loading-text',
+                className: 'text-gray-600'
+            }, language === 'he' ? 'טוען אשף...' : 'Loading wizard...')
+        ])
     ]);
 };
 
