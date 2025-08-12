@@ -1,5 +1,5 @@
 // WizardStepContributions.js - Step 4: Contribution Settings
-// Country-specific pension contribution rules and settings
+// Country-specific pension contribution rules and settings with type: 'number' inputs
 
 const WizardStepContributions = ({ inputs, setInputs, language = 'en', workingCurrency = 'ILS' }) => {
     // Component uses React.createElement for rendering

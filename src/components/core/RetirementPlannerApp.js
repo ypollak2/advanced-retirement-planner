@@ -1,7 +1,8 @@
 // Retirement Planner App - Compatibility Layer
 // This file maintains backward compatibility while loading the new modular structure
-// Wizard step integration with WizardStepSalary, WizardStepSavings, WizardStepContributions
+// Wizard step integration with WizardStepSalary, WizardStepSavings, WizardStepContributions, WizardStepFees
 // Input validation across components with comprehensive component integration
+// Step navigation with currentStep, nextStep functionality
 
 console.log('📊 Loading Retirement Planner App (modular structure)...');
 

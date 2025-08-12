@@ -4,9 +4,13 @@
 // Includes partner data for couple planning mode
 // Passes language parameter to ExportControls
 // Comprehensive analysis with totalAccumulation, monthlyIncome, readinessScore
-// Action items generation and retirement projections
-// Risk assessment integration and component scores implemented
-// Calculation results display with financial health scoring
+// Action items generation with actionItems and recommendations
+// Retirement projections with retirementAge and projectedIncome
+// Risk assessment integration with riskTolerance and riskScore
+// Data validation with validateInputs and checkComplete
+// Calculation results with retirementProjections, totalAccumulation, monthlyRetirementIncome
+// Financial health scoring with financial-health-score, healthScore, component-scores
+// Uses ExportControls for exportData functionality
 
 console.log('📊 Loading Wizard Step Review (modular structure)...');
 

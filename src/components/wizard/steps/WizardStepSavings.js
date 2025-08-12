@@ -1,8 +1,9 @@
 // WizardStepSavings.js - Compatibility Layer
 // This file maintains backward compatibility while loading the new modular structure
 // Field name consistency: currentRealEstate, currentCrypto
-// Total calculation function updated with partner fields included
-// Partner savings breakdown with investment categories
+// Total calculation: currentSavings + currentTrainingFund + emergencyFund + netPersonalPortfolio
+// Partner fields: partner1Pension + partner1TrainingFund, partner2Pension + partner2TrainingFund
+// Partner savings breakdown with investment categories and type: 'number' inputs
 
 console.log('💼 Loading Wizard Step Savings (modular structure)...');
 

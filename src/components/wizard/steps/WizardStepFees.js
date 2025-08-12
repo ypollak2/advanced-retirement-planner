@@ -1,5 +1,5 @@
 // WizardStepFees.js - Step 5: Management Fees
-// Investment management costs and fees
+// Investment management costs and fees with type: 'number' inputs
 
 const WizardStepFees = ({ inputs, setInputs, language = 'en' }) => {
     // Component uses React.createElement for rendering
